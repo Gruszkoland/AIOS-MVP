@@ -21,11 +21,11 @@ services:
       - DB_POSTGRESDB_PASSWORD=adrion_pass
     volumes:
       - ./n8n_data:/home/node/.n8n
+    networks:
+      - adrion-frontend
+      - adrion-backend
     depends_on:
       - postgres
-
-  # Korzysta z natywnej Ollamy na Twoim Windowsie (port 11434)
-  # Usunięto kontener, aby uniknąć konfliktu portów
 
   postgres:
     image: postgres:15
@@ -39,6 +39,9 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - adrion-backend
+
   vortex-engine:
     build:
       context: ..
@@ -50,7 +53,32 @@ services:
     environment:
       - DB_HOST=adrion-db
       - DB_USER=adrion
+    networks:
+      - adrion-frontend
+      - adrion-backend
+
+  adrion-healer:
+    build:
+      context: ..
+      dockerfile: Dockerfile.healer
+    container_name: adrion-healer
+    restart: always
+    environment:
+      - DB_HOST=adrion-db
+      - DB_USER=adrion
       - DB_PASSWORD=adrion_pass
       - DB_NAME=genesis_record
-    depends_on:
-      - postgres
+    networks:
+      - adrion-backend
+
+networks:
+  adrion-frontend:
+    driver: bridge
+  adrion-backend:
+    driver: bridge
+
+volumes:
+  n8n_data:
+  postgres_data:
+
+
