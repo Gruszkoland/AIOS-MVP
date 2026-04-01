@@ -1,19 +1,33 @@
-# ADRION 369 - Multi-Persona AI Coding System
+# ADRION 369 v2.0 - Advanced AI System
 
 ## Overview
 
-**ADRION 369** is a sophisticated local AI coding system that orchestrates **6 interdependent personas** with **9 governing laws** for autonomous code analysis, optimization, and healing.
+**ADRION 369 v2.0** is an elite, security-hardened autonomous execution environment based on the **Trinity-EBDI** framework. It orchestrates high-performance components across Go and Python to deliver predictive intelligence (Vortex Oracle) and real-time governance.
+
+### 🚀 Key Innovations (v2.0)
+- **Go Sentinel 174Hz**: Low-latency execution monitoring and rapid-response logic in Go.
+- **Python Quantum**: Advanced decision-making and pattern recognition using high-dimensional modeling.
+- **162D Decision Space**: A 162-dimensional workspace for evaluating actions based on Material, Intellectual, and Essential perspectives.
+- **Trinity-EBDI Engine**: Blending emotional intelligence (EBDI) with logical purity for balanced decisions.
 
 ### 🎯 Core Philosophy
-- **Local-First**: All inference on your machine (Ollama + DeepSeek-Coder)
-- **Privacy-Centric**: No data leaves your system (Genesis Record)
-- **Multi-Persona**: Different AI agents for different specialized roles
-- **Autonomous**: Should run with minimal human intervention
-- **Continuous Healing**: System improves itself over time
+- **Local-First**: All inference on your machine via Ollama (DeepSeek-Coder).
+- **Privacy-Centric**: Genesis Record ensures zero data export.
+- **Trinity Reasoning**: Every decision is weighted by ROI (Material), Logic (Intellectual), and Ethics (Essential).
+- **Self-Healing**: Automated technical debt reduction and error recovery.
 
 ---
 
-## 🧠 The Six Personas
+## 🏗️ Architecture
+
+- **vortex-core (Go)**: High-speed API and system telemetry.
+- **quantum-oracle (Python)**: Strategic arbitrage and predictive analysis.
+- **n8n-adrion**: Workflow orchestration and stream connectors.
+- **Genesis Record**: Unified local storage for all decisions and logs.
+
+---
+
+## 🧠 The Swarm Personas
 
 | Persona | Role | Law | Trigger |
 |---------|------|-----|---------|
