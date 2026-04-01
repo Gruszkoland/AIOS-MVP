@@ -1,0 +1,322 @@
+{
+  "name": "Lead Arbitrage System - Full Pipeline",
+  "description": "3-Agent autonomous SDR system: Scout → Analyzer → Mailer",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": "everyDay",
+        "hour": 10,
+        "minute": 0
+      },
+      "id": "Trigger_Daily",
+      "name": "🎯 Trigger: Daily 10AM",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [100, 200]
+    },
+    {
+      "parameters": {
+        "query": "SELECT * FROM leads WHERE status = 'new' AND created_date = DATE('now') LIMIT 50",
+        "operation": "executeQuery"
+      },
+      "id": "Node_Scout_Apify",
+      "name": "🔍 Scout: Google Maps Scraper",
+      "type": "n8n-nodes-base.http",
+      "typeVersion": 4,
+      "position": [300, 200],
+      "credentials": {
+        "httpBasicAuth": "ApifyToken"
+      },
+      "notes": "Calls Apify Google Maps scraper task. Returns: {name, rating, reviews, phone, website, email}"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Filter leads by pain point criteria\nconst leads = $input.all();\nconst filtered = leads.filter(lead => {\n  const rating = lead.json.rating || 5;\n  const unansweredReviews = lead.json.unanswered_count || 0;\n  \n  return (rating < 3.5) || (unansweredReviews > 3);\n});\n\nreturn filtered;"
+      },
+      "id": "Node_Filter_PainPoints",
+      "name": "🔎 Filter: Pain Points",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 200],
+      "notes": "Keep only leads with rating < 3.5 OR unanswered_reviews > 3"
+    },
+    {
+      "parameters": {
+        "query": "INSERT OR IGNORE INTO leads (name, website, phone, email, rating, problem, status, created_date) VALUES (?, ?, ?, ?, ?, ?, 'new', DATE('now'))",
+        "parameterMode": "fromInput",
+        "parameters": {
+          "param1": "{{ $node['Node_Filter_PainPoints'].json.name }}",
+          "param2": "{{ $node['Node_Filter_PainPoints'].json.website }}",
+          "param3": "{{ $node['Node_Filter_PainPoints'].json.phone }}",
+          "param4": "{{ $node['Node_Filter_PainPoints'].json.email }}",
+          "param5": "{{ $node['Node_Filter_PainPoints'].json.rating }}",
+          "param6": "Unresponsive to reviews"
+        },
+        "operation": "executeQuery"
+      },
+      "id": "Node_Store_Leads",
+      "name": "💾 SQLite: Store Qualified Leads",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [700, 200]
+    },
+    {
+      "parameters": {
+        "query": "SELECT id, name, website, phone, email, rating FROM leads WHERE status = 'new' AND analyzed = 0 LIMIT 30"
+      },
+      "id": "Node_Get_Unanalyzed",
+      "name": "📋 Get Unanalyzed Leads",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer {{ $credentials.openrouter_api_key }}",
+          "HTTP-Referer": "your_domain.com",
+          "X-Title": "Lead Arbitrage"
+        },
+        "body": {
+          "contentType": "application/json",
+          "body": "{\n  \"model\": \"openai/gpt-3.5-turbo\",\n  \"temperature\": 0.3,\n  \"max_tokens\": 200,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a B2B consultant analyzing potential clients for AI automation. Respond in JSON.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Company: {{ $node['Node_Get_Unanalyzed'].json.name }}\\nWebsite: {{ $node['Node_Get_Unanalyzed'].json.website }}\\nRating: {{ $node['Node_Get_Unanalyzed'].json.rating }}\\n\\nAnalyze: 1) Is the pain point REAL? (confidence 0-100), 2) Time/money saved? (hours/month), 3) Fit score (Yes/No/Maybe), 4) Best approach angle (1 sentence).\\n\\nOutput JSON: {\\\"confidence\\\": int, \\\"hours_saved\\\": int, \\\"fit_score\\\": string, \\\"approach_angle\\\": string}\"\n    }\n  ]\n}"
+        }
+      },
+      "id": "Node_Analyzer_LLM",
+      "name": "🧠 Analyzer: LLM Assessment",
+      "type": "n8n-nodes-base.http",
+      "typeVersion": 4,
+      "position": [1100, 200],
+      "notes": "OpenRouter gpt-3.5-turbo - determines fit score and approach"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract LLM response and filter high-fit leads\nconst response = $input.first().json;\nconst content = response.choices[0].message.content;\nconst parsed = JSON.parse(content);\n\nif (parsed.fit_score === 'Yes' || parsed.fit_score === 'Maybe') {\n  return [{\n    lead_id: $node['Node_Get_Unanalyzed'].json.id,\n    confidence: parsed.confidence,\n    hours_saved: parsed.hours_saved,\n    fit_score: parsed.fit_score,\n    approach_angle: parsed.approach_angle\n  }];\n}\nreturn [];"
+      },
+      "id": "Node_Filter_Fit",
+      "name": "✅ Filter: Fit Score >= High",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1300, 200]
+    },
+    {
+      "parameters": {
+        "query": "UPDATE leads SET confidence = ?, hours_saved = ?, fit_score = ?, approach_angle = ?, analyzed = 1, status = 'ready' WHERE id = ?",
+        "parameterMode": "fromInput",
+        "parameters": {
+          "param1": "{{ $node['Node_Filter_Fit'].json.confidence }}",
+          "param2": "{{ $node['Node_Filter_Fit'].json.hours_saved }}",
+          "param3": "{{ $node['Node_Filter_Fit'].json.fit_score }}",
+          "param4": "{{ $node['Node_Filter_Fit'].json.approach_angle }}",
+          "param5": "{{ $node['Node_Filter_Fit'].json.lead_id }}"
+        }
+      },
+      "id": "Node_Store_Analysis",
+      "name": "💾 SQLite: Store Analysis",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [1500, 200]
+    },
+    {
+      "parameters": {
+        "query": "SELECT id, name, email, website, approach_angle FROM leads WHERE status = 'ready' AND emailed = 0 LIMIT 30"
+      },
+      "id": "Node_Get_Ready_To_Email",
+      "name": "📧 Get Ready-to-Email Leads",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [1700, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer {{ $credentials.openrouter_api_key }}"
+        },
+        "body": {
+          "contentType": "application/json",
+          "body": "{\n  \"model\": \"openai/gpt-3.5-turbo\",\n  \"temperature\": 0.7,\n  \"max_tokens\": 300,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a world-class SDR. Write a short, personalized cold email (4 sentences max). NO corporate jargon. Reference something specific. Output JSON: {\\\"subject_line\\\": string, \\\"body\\\": string}\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Company: {{ $node['Node_Get_Ready_To_Email'].json.name }}\\nWebsite: {{ $node['Node_Get_Ready_To_Email'].json.website }}\\nApproach: {{ $node['Node_Get_Ready_To_Email'].json.approach_angle }}\"\n    }\n  ]\n}"
+        }
+      },
+      "id": "Node_Mailer_Generate",
+      "name": "✉️ Mailer: Generate Email",
+      "type": "n8n-nodes-base.http",
+      "typeVersion": 4,
+      "position": [1900, 200]
+    },
+    {
+      "parameters": {
+        "pauseType": "indefinite",
+        "reason": "HUMAN REVIEW - Approve/Reject/Edit email"
+      },
+      "id": "Node_Human_Review",
+      "name": "👤 HUMAN IN LOOP: Review Email",
+      "type": "n8n-nodes-base.pause",
+      "typeVersion": 1,
+      "position": [2100, 200],
+      "notes": "CRITICAL: You must review and approve each email before sending"
+    },
+    {
+      "parameters": {
+        "fromEmail": "leadgen@yourdomain.com",
+        "toEmail": "{{ $node['Node_Get_Ready_To_Email'].json.email }}",
+        "subject": "{{ $node['Node_Mailer_Generate'].json.subject_line }}",
+        "emailType": "text",
+        "textContent": "{{ $node['Node_Mailer_Generate'].json.body }}"
+      },
+      "id": "Node_Send_Email",
+      "name": "📨 Send via Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [2300, 200],
+      "credentials": {
+        "gmailOAuth2": "YourGmailCredentials"
+      }
+    },
+    {
+      "parameters": {
+        "query": "UPDATE leads SET emailed = 1, email_sent_date = DATE('now'), status = 'emailed' WHERE id = ?"
+      },
+      "id": "Node_Log_Email",
+      "name": "📊 Log Email Sent",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [2500, 200]
+    },
+    {
+      "parameters": {
+        "trigger": "onNewEmail",
+        "folderName": "[Gmail]/All Mail",
+        "markAsRead": false
+      },
+      "id": "Node_Monitor_Replies",
+      "name": "📬 Monitor: Check Replies",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [2700, 200],
+      "credentials": {
+        "gmailOAuth2": "YourGmailCredentials"
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "method": "POST",
+        "body": {
+          "contentType": "application/json",
+          "body": "{\n  \"model\": \"openai/gpt-3.5-turbo\",\n  \"temperature\": 0.2,\n  \"max_tokens\": 50,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Classify email reply as ONE of: [Interested, Not Interested, Out of Office, Question, Other]. Output JSON: {\\\"class\\\": string, \\\"confidence\\\": int}\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $node['Node_Monitor_Replies'].json.snippet }}\"\n    }\n  ]\n}"
+        }
+      },
+      "id": "Node_Classify_Reply",
+      "name": "🤖 Classify: Email Response Type",
+      "type": "n8n-nodes-base.http",
+      "typeVersion": 4,
+      "position": [2900, 200]
+    },
+    {
+      "parameters": {
+        "query": "INSERT INTO email_log (lead_id, email_from, reply_body, classification, created_date) VALUES (?, ?, ?, ?, DATE('now'))",
+        "parameterMode": "fromInput",
+        "parameters": {
+          "param1": "{{ $node['Node_Get_Ready_To_Email'].json.id }}",
+          "param2": "{{ $node['Node_Monitor_Replies'].json.sender }}",
+          "param3": "{{ $node['Node_Monitor_Replies'].json.snippet }}",
+          "param4": "{{ $node['Node_Classify_Reply'].json.class }}"
+        }
+      },
+      "id": "Node_Log_Reply",
+      "name": "💾 Log Reply",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [3100, 200]
+    }
+  ],
+  "connections": {
+    "Trigger_Daily": {
+      "main": [
+        [{"node": "Node_Scout_Apify", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Scout_Apify": {
+      "main": [
+        [{"node": "Node_Filter_PainPoints", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Filter_PainPoints": {
+      "main": [
+        [{"node": "Node_Store_Leads", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Store_Leads": {
+      "main": [
+        [{"node": "Node_Get_Unanalyzed", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Get_Unanalyzed": {
+      "main": [
+        [{"node": "Node_Analyzer_LLM", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Analyzer_LLM": {
+      "main": [
+        [{"node": "Node_Filter_Fit", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Filter_Fit": {
+      "main": [
+        [{"node": "Node_Store_Analysis", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Store_Analysis": {
+      "main": [
+        [{"node": "Node_Get_Ready_To_Email", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Get_Ready_To_Email": {
+      "main": [
+        [{"node": "Node_Mailer_Generate", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Mailer_Generate": {
+      "main": [
+        [{"node": "Node_Human_Review", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Human_Review": {
+      "main": [
+        [{"node": "Node_Send_Email", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Send_Email": {
+      "main": [
+        [{"node": "Node_Log_Email", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Log_Email": {
+      "main": [
+        [{"node": "Node_Monitor_Replies", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Monitor_Replies": {
+      "main": [
+        [{"node": "Node_Classify_Reply", "type": "main", "index": 0}]
+      ]
+    },
+    "Node_Classify_Reply": {
+      "main": [
+        [{"node": "Node_Log_Reply", "type": "main", "index": 0}]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "UTC",
+    "executionTimeout": "300",
+    "retryOnError": true,
+    "maxRetries": 2,
+    "concurrency": 1
+  },
+  "notes": "Lead Arbitrage System v2.0 - ADRION 369. Scout → Analyze → Mail → Monitor. All data stored in SQLite."
+}

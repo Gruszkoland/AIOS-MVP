@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "github.copilot-chat",
+    "ms-python.python",
+    "ms-python.pylance",
+    "ms-vscode.powershell",
+    "ms-azuretools.vscode-docker",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint"
+  ]
+}

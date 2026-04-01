@@ -1,0 +1,99 @@
+name: 162demencjewschemacie369
+services:
+  adrion-api:
+    build:
+      context: C:\Users\adiha\162 demencje w schemacie 369
+      dockerfile: Dockerfile
+    container_name: adrion-api
+    environment:
+      ANTHROPIC_API_KEY: ""
+      APIFY_API_TOKEN: ""
+      DAILY_BID_LIMIT: "20"
+      DB_PATH: /app/data/arbitrage.db
+      LLM_BACKEND: auto
+      LLM_MODEL: openai/gpt-3.5-turbo
+      MIN_ANALYZER_SCORE: "7"
+      MIN_PROFIT_USD: "30"
+      OPENAI_API_KEY: ""
+      OPENROUTER_API_KEY: ""
+      XRP_TARGET: "1000"
+      XRP_WALLET: r8CrcqWqafeVwDJFfVUmuYLS9ZQ4iDQqu
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/api/arbitrage/status', timeout=3)
+      timeout: 5s
+      interval: 30s
+      retries: 5
+      start_period: 20s
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8001
+        published: "8001"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: C:\Users\adiha\162 demencje w schemacie 369\data
+        target: /app/data
+        bind:
+          create_host_path: true
+  adrion-dashboard:
+    build:
+      context: C:\Users\adiha\162 demencje w schemacie 369
+      dockerfile: Dockerfile
+    command:
+      - python
+      - server.py
+    container_name: adrion-dashboard
+    depends_on:
+      adrion-api:
+        condition: service_started
+        required: true
+    environment:
+      ANTHROPIC_API_KEY: ""
+      APIFY_API_TOKEN: ""
+      DAILY_BID_LIMIT: "20"
+      DASHBOARD_HOST: 0.0.0.0
+      DASHBOARD_PORT: "9000"
+      DB_PATH: /app/data/arbitrage.db
+      LLM_BACKEND: auto
+      LLM_MODEL: openai/gpt-3.5-turbo
+      MIN_ANALYZER_SCORE: "7"
+      MIN_PROFIT_USD: "30"
+      OLLAMA_URL: http://host.docker.internal:11434
+      OPENAI_API_KEY: ""
+      OPENROUTER_API_KEY: ""
+      XRP_TARGET: "1000"
+      XRP_WALLET: r8CrcqWqafeVwDJFfVUmuYLS9ZQ4iDQqu
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/api/system/info', timeout=3)
+      timeout: 5s
+      interval: 30s
+      retries: 5
+      start_period: 20s
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 9000
+        published: "9000"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: C:\Users\adiha\162 demencje w schemacie 369\data
+        target: /app/data
+        bind:
+          create_host_path: true
+networks:
+  default:
+    name: 162demencjewschemacie369_default

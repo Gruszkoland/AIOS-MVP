@@ -1,0 +1,141 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🚀 Start Ollama Server",
+      "type": "shell",
+      "command": "ollama",
+      "args": ["serve"],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Ollama.*",
+          "endsPattern": "^.*API.*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "🤖 Start Aider (Librarian Mode)",
+      "type": "shell",
+      "command": "aider",
+      "args": [
+        "--model",
+        "openai/deepseek-coder-v2:16b",
+        "--openai-api-base",
+        "http://localhost:11434/v1",
+        "--openai-api-key",
+        "ollama"
+      ],
+      "isBackground": false,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "📊 Show Ollama Models",
+      "type": "shell",
+      "command": "ollama",
+      "args": ["list"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "📥 Download DeepSeek Model (16B)",
+      "type": "shell",
+      "command": "ollama",
+      "args": ["pull", "deepseek-coder-v2:16b"],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📥 Download DeepSeek Model (Lite)",
+      "type": "shell",
+      "command": "ollama",
+      "args": ["pull", "deepseek-coder-v2:lite"],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "✅ Check System Status",
+      "type": "shell",
+      "command": "PowerShell",
+      "args": [
+        "-Command",
+        "Write-Host 'Checking Ollama...'; curl http://localhost:11434/api/tags; Write-Host 'System OK'"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: /audit - Audyt Bezpieczeństwa (Sentinel/Auditor)",
+      "type": "shell",
+      "command": "aider --model openai/deepseek-coder-v2:16b --openai-api-base http://localhost:11434/v1 --openai-api-key ollama --message '/audit check current workspace security'",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "new" }
+    },
+    {
+      "label": "ADRION: /boost - Dźwignie ROI (Booster)",
+      "type": "shell",
+      "command": "aider --model openai/deepseek-coder-v2:16b --openai-api-base http://localhost:11434/v1 --openai-api-key ollama --message '/boost analyze 3 levers'",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "ADRION: /heal - Samonaprawa (Healer)",
+      "type": "shell",
+      "command": "aider --model openai/deepseek-coder-v2:16b --openai-api-base http://localhost:11434/v1 --openai-api-key ollama --message '/heal fix latest errors'",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "new" }
+    },
+    {
+      "label": "ADRION: /sync - Synchronizacja Chronos (SAP)",
+      "type": "shell",
+      "command": "aider --model openai/deepseek-coder-v2:16b --openai-api-base http://localhost:11434/v1 --openai-api-key ollama --message '/sync update status'",
+      "presentation": { "reveal": "silent" }
+    },
+    {
+      "label": "📋 View Session Logs",
+      "type": "shell",
+      "command": "PowerShell",
+      "args": [
+        "-Command",
+        "if (Test-Path '.aider/logs/session.log') { Get-Content -Tail 50 .aider/logs/session.log } else { Write-Host 'No logs yet' }"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

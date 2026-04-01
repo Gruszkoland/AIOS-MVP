@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+!.env.example
+.aider/logs/
+data/
+arbitrage.db
+.runtime/
+node_modules/
+**/node_modules/
+**/.next/
+micro-saas/.env.local
+
+.aider*

@@ -1,0 +1,55 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "files.autoSave": "onFocusChange",
+  "files.exclude": {
+    "**/.aider": false,
+    "**/.git": false,
+    "**/node_modules": true,
+    "**/*.pyc": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  },
+  "search.exclude": {
+    ".aider": false,
+    "node_modules": true,
+    ".git": true
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[yaml]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  "workbench.colorTheme": "Abyss",
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    }
+  },
+  "peacock.color": "#264653",
+  "files.associations": {
+    "**/config/personas.yml": "yaml",
+    "**/aider/config.yml": "yaml"
+  },
+  "diffEditor.maxComputationTime": 0,
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": ".github/adrion-protocol.md",
+      "explanation": "Zasady 9 Niepodważalnych Praw ADRION. Audytor musi zatwierdzić każdy kod."
+    }
+  ],
+  "github.copilot.chat.agentStyle": "concise"
+}

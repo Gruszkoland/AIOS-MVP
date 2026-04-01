@@ -1,0 +1,172 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: ADRION Runtime Alerts
+    folder: ADRION Monitoring
+    interval: 1m
+    rules:
+      - uid: adrion_api_5xx_spike
+        title: ADRION API 5xx spike
+        condition: C
+        for: 2m
+        noDataState: OK
+        execErrState: Alerting
+        annotations:
+          summary: API returns 5xx responses.
+          description: More than 0 API 5xx logs detected in last 5 minutes.
+        labels:
+          severity: critical
+          team: adrion
+        data:
+          - refId: A
+            queryType: range
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: P8E80F9AEF21F6940
+            model:
+              datasource:
+                type: loki
+                uid: P8E80F9AEF21F6940
+              editorMode: code
+              expr: sum(count_over_time({compose_service="adrion-api"} |= "event=request" |~ "status=5.." [5m]))
+              queryType: range
+              refId: A
+          - refId: C
+            queryType: ""
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              refId: C
+              type: threshold
+
+      - uid: adrion_llm_fallback_detected
+        title: ADRION LLM fallback detected
+        condition: C
+        for: 5m
+        noDataState: OK
+        execErrState: Alerting
+        annotations:
+          summary: LLM fallback events detected.
+          description: Analyzer or bidder fallback events are present in last 5 minutes.
+        labels:
+          severity: warning
+          team: adrion
+        data:
+          - refId: A
+            queryType: range
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: P8E80F9AEF21F6940
+            model:
+              datasource:
+                type: loki
+                uid: P8E80F9AEF21F6940
+              editorMode: code
+              expr: sum(count_over_time({compose_service="adrion-api"} |~ "event=llm_analyze|event=llm_cover_letter" |= "mode=fallback" [5m]))
+              queryType: range
+              refId: A
+          - refId: C
+            queryType: ""
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              refId: C
+              type: threshold
+
+      - uid: adrion_ollama_offline
+        title: ADRION Ollama offline
+        condition: C
+        for: 3m
+        noDataState: OK
+        execErrState: Alerting
+        annotations:
+          summary: Dashboard cannot reach Ollama.
+          description: Offline Ollama status events are present in last 5 minutes.
+        labels:
+          severity: warning
+          team: adrion
+        data:
+          - refId: A
+            queryType: range
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: P8E80F9AEF21F6940
+            model:
+              datasource:
+                type: loki
+                uid: P8E80F9AEF21F6940
+              editorMode: code
+              expr: sum(count_over_time({compose_service="adrion-dashboard"} |= "event=ollama_status" |= "status=offline" [5m]))
+              queryType: range
+              refId: A
+          - refId: C
+            queryType: ""
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              refId: C
+              type: threshold

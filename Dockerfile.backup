@@ -1,0 +1,13 @@
+# ADRION 369 - Backup Service Strategy
+# Healer x Architect Persona Collaboration
+
+FROM alpine:latest
+RUN apk add --no-cache sqlite bash curl gzip findutils
+COPY ./scripts/backups/backup-sqlite.sh /usr/local/bin/backup-sqlite.sh
+RUN chmod +x /usr/local/bin/backup-sqlite.sh
+
+# Cron setup: Run daily at 03:00 UTC
+RUN echo "0 3 * * * /usr/local/bin/backup-sqlite.sh >> /var/log/cron.log 2>&1" > /etc/crontabs/root
+RUN touch /var/log/cron.log
+
+CMD ["crond", "-f", "-l", "8"]
