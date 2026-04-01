@@ -5,11 +5,27 @@ All queries use parameterized statements to prevent SQL injection.
 """
 import sqlite3
 import json
+import os
+import logging
 from datetime import datetime
-from .config import DB_PATH
+from .config import DB_PATH, DB_ENGINE, DB_URL
 
+logger = logging.getLogger("adrion.db")
 
-def get_conn() -> sqlite3.Connection:
+def get_conn():
+    """Returns a connection based on the configured engine."""
+    if DB_ENGINE == "postgres" and DB_URL:
+        try:
+            import psycopg2
+            from psycopg2.extras import RealDictConnection
+            conn = psycopg2.connect(DB_URL, connection_factory=RealDictConnection)
+            return conn
+        except ImportError:
+            logger.error("psycopg2 not installed. Falling back to SQLite.")
+        except Exception as e:
+            logger.error(f"Postgres connection failed: {e}")
+
+    # Default to SQLite
     conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")

@@ -29,6 +29,12 @@
     "editor.tabSize": 2,
     "editor.formatOnSave": true
   },
+  "[go]": {
+    "editor.defaultFormatter": "golang.go",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  },
   "workbench.colorTheme": "Abyss",
   "git.autofetch": true,
   "git.confirmSync": false,
@@ -51,5 +57,8 @@
       "explanation": "Zasady 9 Niepodważalnych Praw ADRION. Audytor musi zatwierdzić każdy kod."
     }
   ],
-  "github.copilot.chat.agentStyle": "concise"
+  "github.copilot.chat.agentStyle": "concise",
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-containers"
+  }
 }

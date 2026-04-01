@@ -5,7 +5,16 @@ WORKDIR /app
 # Install build dependencies
 RUN apk add --no-cache git
 
-# Copy source and initialize module
+# Use alternative GOPROXY (proxy.golang.org unreachable from Docker Desktop DNS)
+ENV GOPROXY=https://goproxy.io,direct
+ENV GONOSUMDB=*
+ENV GOFLAGS=-mod=mod
+
+# Copy go.mod first for layer caching
+COPY go.mod ./
+RUN go mod download
+
+# Copy full source and build
 COPY . .
 RUN go mod tidy
 

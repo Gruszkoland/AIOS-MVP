@@ -20,10 +20,17 @@ type MarketData struct {
 
 // DecisionResponse represents 3-6-9 logic output
 type DecisionResponse struct {
-	State     quantum.DecisionState `json:"state"`
-	Resonance int                   `json:"resonance"`
-	Frequency int                   `json:"frequency"`
-	Message   string                `json:"message"`
+	State         float64 `json:"state"`
+	StateLabel    string  `json:"state_label"`
+	Resonance     int     `json:"resonance"`
+	Frequency     int     `json:"frequency"`
+	Action        string  `json:"action"`
+	MarginPct     float64 `json:"margin_pct"`
+	Confidence    float64 `json:"confidence"`
+	IsSingularity bool    `json:"is_singularity"`
+	VortexPass    bool    `json:"vortex_pass"`
+	Message       string  `json:"message"`
+	Timestamp     string  `json:"timestamp"`
 }
 
 // ScanRequest for sentinel scan endpoint
@@ -77,21 +84,34 @@ func (h *Handler) PostDecide(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid market data"})
 	}
 
-	state := h.Vortex.CalculateMarketResonance(data.PriceA, data.PriceB)
+	state, marginPct, is369, vortexPass := h.Vortex.CalculateMarketResonanceFull(data.PriceA, data.PriceB)
 	frequency := h.Oracle.GetFrequency(state)
 
 	response := DecisionResponse{
-		State:     state,
-		Resonance: h.Vortex.Resonance,
-		Frequency: frequency,
+		State:         float64(state),
+		Resonance:     h.Vortex.Resonance,
+		Frequency:     frequency,
+		MarginPct:     marginPct,
+		IsSingularity: is369 && state == quantum.StateTrue,
+		VortexPass:    vortexPass,
+		Timestamp:     time.Now().Format(time.RFC3339),
 	}
 
 	switch state {
 	case quantum.StateTrue:
+		response.StateLabel = "affirmation"
+		response.Action = "EXECUTE"
+		response.Confidence = 1.0
 		response.Message = "Singularity Detected (9): Execute Arbitrage"
 	case quantum.StateQuantum:
+		response.StateLabel = "superposition"
+		response.Action = "ANALYZE"
+		response.Confidence = 0.5
 		response.Message = "Harmonic Potential (3/6): Monitor Spread"
 	default:
+		response.StateLabel = "negation"
+		response.Action = "REJECT"
+		response.Confidence = 0.0
 		response.Message = "Neutral State: No Resonance"
 	}
 
@@ -160,12 +180,12 @@ func (h *Handler) SentinelScan(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"scanned":  len(results),
-		"execute":  executeCount,
-		"monitor":  monitorCount,
-		"reject":   len(results) - executeCount - monitorCount,
-		"results":  results,
-		"channel":  req.Channel,
+		"scanned":   len(results),
+		"execute":   executeCount,
+		"monitor":   monitorCount,
+		"reject":    len(results) - executeCount - monitorCount,
+		"results":   results,
+		"channel":   req.Channel,
 		"scannedAt": time.Now().Format(time.RFC3339),
 	})
 }
@@ -185,7 +205,7 @@ func (h *Handler) GetThreats(c echo.Context) error {
 		"active_alerts":            0,
 		"threats":                  threats,
 		"guardian_status":          "G7-G9 enforced",
-		"timestamp":               time.Now().Format(time.RFC3339),
+		"timestamp":                time.Now().Format(time.RFC3339),
 	})
 }
 

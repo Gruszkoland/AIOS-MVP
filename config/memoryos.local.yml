@@ -1,0 +1,58 @@
+# MemoryOS local policy for ADRION 369
+# Unified thresholds and retention settings for memory pipeline.
+
+memory:
+  mode: local-only
+  export_enabled: false
+  pii_masking_enabled: true
+
+short_term:
+  ttl_seconds: 86400
+  max_entries: 500
+  compaction_ratio: 0.10
+
+long_term:
+  max_entries: 2000
+  promotion_threshold: 3
+  promote_only_if_judge_not_blocked: true
+
+retrieval:
+  default_top_k: 5
+  include_short_term: true
+  max_distance: 0.80
+  latency_slo_ms: 2000
+
+feedback:
+  capture_rate_target: 0.95
+  score_min: -2
+  score_max: 2
+
+vera:
+  weights:
+    verifiable: 0.20
+    efficient: 0.15
+    relevant: 0.35
+    aligned: 0.30
+
+judge:
+  drift_window: 20
+  drift_threshold_accuracy: 0.40
+  drift_threshold_alignment: 0.30
+  block_rate_alert_threshold: 0.10
+
+audit:
+  genesis_logging_required: true
+  behavior_logging_required: true
+  retention_days:
+    behavior_log: 90
+    vera_log: 90
+    judge_log: 180
+
+events:
+  enabled: true
+  names:
+    - interaction_logged
+    - feedback_received
+    - promoted_to_long_term
+    - judge_warned
+    - judge_blocked

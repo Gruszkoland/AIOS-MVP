@@ -16,6 +16,8 @@ Mechanizmy:
 """
 import logging
 import time
+import requests
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal
@@ -79,17 +81,41 @@ def quantum_decide(
 ) -> QuantumDecision:
     """
     Główna funkcja decyzyjna — Logika Trójwartościowa.
-
-    Sygnał Rynkowy → Vortex Sentinel:
-      Brak marży         → Stan 0:   Negacja
-      Anomalia trendu    → Stan ½:   Superpozycja (wymaga analizy toroidalnej)
-      Czysty zysk > 15%  → Stan 1:   Afirmacja → EXECUTE
-
-    W stanie ½ — analiza redukcji cyfrowej 3-6-9 decyduje:
-      Rezonans 3,6,9     → Przejście do Stan 1
-      Inny rezonans      → Odrzucenie do Stan 0
+    Próbuje odpytać zewnętrzny Sentinel (Go) na porcie 1740.
+    Jeśli Sentinel nie odpowiada, używa logiki lokalnej (Python fallback).
     """
-    if price_source <= 0 or price_target <= 0:
+    vortex_url = os.getenv("VORTEX_API_URL", "http://localhost:1740/decide")
+    
+    try:
+        # 174ms timeout dla 174Hz synchronizacji
+        resp = requests.post(
+            vortex_url,
+            json={
+                "price_a": price_source,
+                "price_b": price_target,
+                "asset_a": "WHOLESALE",
+                "asset_b": "RETAIL"
+            },
+            timeout=0.174
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            return QuantumDecision(
+                state=data.get("state", 0),
+                state_label=data.get("state_label", "negation"),
+                margin_pct=data.get("margin_pct", 0.0),
+                resonance=data.get("resonance", 0),
+                is_369=data.get("is_singularity", False),
+                vortex_pass=data.get("vortex_pass", False),
+                channel_id=channel_id,
+                action=data.get("action", "REJECT"),
+                confidence=data.get("confidence", 0.0)
+            )
+    except Exception as e:
+        logger.debug(f"Sentinel (Go) unavailable, using Python fallback: {e}")
+
+    # ── FALLBACK LOKALNY (Python) ──
+    if price_source <= 0 or price_target <= 0 or price_target <= price_source:
         return QuantumDecision(
             state=0, state_label="negation",
             margin_pct=0, resonance=0, is_369=False, vortex_pass=False,
@@ -141,7 +167,7 @@ def quantum_decide(
         state=0, state_label="negation",
         margin_pct=margin_pct, resonance=resonance, is_369=is_369,
         vortex_pass=v_pass, channel_id=channel_id,
-        action="REJECT", confidence=1.0 - margin_pct,
+        action="REJECT", confidence=min(1.0, 1.0 - margin_pct),
     )
 
 
