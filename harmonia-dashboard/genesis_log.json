@@ -1,0 +1,110 @@
+[
+  {
+    "timestamp": "2026-03-30T20:57:59.515126+00:00",
+    "agent": "CHRONOS",
+    "action": "PIPELINE",
+    "detail": "Pipeline uruchomiony. Nisza: restauracje, Miasto: Krakow, Promień: 5km"
+  },
+  {
+    "timestamp": "2026-03-30T20:58:00.448932+00:00",
+    "agent": "SENTINEL",
+    "action": "PIPELINE",
+    "detail": "Scraping Google Maps — nisza: restauracje, Krakow..."
+  },
+  {
+    "timestamp": "2026-03-30T20:58:00.651499+00:00",
+    "agent": "SENTINEL",
+    "action": "PIPELINE",
+    "detail": "Wykryto 10 wizytówek."
+  },
+  {
+    "timestamp": "2026-03-30T20:58:01.154810+00:00",
+    "agent": "AUDYTOR",
+    "action": "PIPELINE",
+    "detail": "Filtracja jakości + sprawdzanie blacklisty (Guardian Law G8)..."
+  },
+  {
+    "timestamp": "2026-03-30T20:58:01.284937+00:00",
+    "agent": "AUDYTOR",
+    "action": "PIPELINE",
+    "detail": "Po filtracji: 10 kwalifikujących się. Odrzucono: 0."
+  },
+  {
+    "timestamp": "2026-03-30T20:58:01.467520+00:00",
+    "agent": "AUDYTOR",
+    "action": "PIPELINE",
+    "detail": "HOT: 5, WARM: 5"
+  },
+  {
+    "timestamp": "2026-03-30T20:58:01.588395+00:00",
+    "agent": "BOOSTERLEVER",
+    "action": "PIPELINE",
+    "detail": "Generacja maili pominięta (tryb testowy)."
+  },
+  {
+    "timestamp": "2026-03-30T20:58:01.636733+00:00",
+    "agent": "SAP",
+    "action": "PIPELINE",
+    "detail": "Zapisywanie 10 leadów do bazy..."
+  },
+  {
+    "timestamp": "2026-03-30T20:58:05.436087+00:00",
+    "agent": "SAP",
+    "action": "PIPELINE",
+    "detail": "Zapisano 10 leadów. Genesis Record zaktualizowany."
+  },
+  {
+    "timestamp": "2026-03-30T20:58:05.468166+00:00",
+    "agent": "SYSTEM",
+    "action": "PIPELINE",
+    "detail": "Pipeline zakończony. Scraped: 10, Filtered: 10, Mails: 0, Saved: 10"
+  },
+  {
+    "timestamp": "2026-03-30T20:58:58.803116+00:00",
+    "agent": "AGENT_INTERAKCJI",
+    "action": "REPORT_GENERATED",
+    "detail": "Klient: Pizzeria Roma, Okres: ostatni tydzien"
+  },
+  {
+    "timestamp": "2026-03-30T21:02:11.662634+00:00",
+    "agent": "AGENT_INTERAKCJI",
+    "action": "REPORT_GENERATED",
+    "detail": "Klient: Pizzeria Roma, Okres: ostatni tydzien"
+  },
+  {
+    "timestamp": "2026-03-30T21:04:23.524886+00:00",
+    "agent": "AGENT_INTERAKCJI",
+    "action": "REPORT_GENERATED",
+    "detail": "Klient: Pizzeria Roma, Okres: tydzien"
+  },
+  {
+    "timestamp": "2026-03-30T21:06:11.061260+00:00",
+    "agent": "AGENT_INTERAKCJI",
+    "action": "REPORT_GENERATED",
+    "detail": "Klient: Pizzeria Roma, Okres: tydzien"
+  },
+  {
+    "timestamp": "2026-03-30T21:10:38.589747+00:00",
+    "agent": "AGENT_INTERAKCJI",
+    "action": "REPORT_GENERATED",
+    "detail": "Klient: Pizzeria Roma, Okres: ostatni tydzien"
+  },
+  {
+    "timestamp": "2026-03-30T21:14:44.866572+00:00",
+    "agent": "AGENT_INTERAKCJI",
+    "action": "REPORT_GENERATED",
+    "detail": "Klient: Pizzeria Roma, Okres: tydzien"
+  },
+  {
+    "timestamp": "2026-03-30T21:31:41.451542+00:00",
+    "agent": "AUDYTOR",
+    "action": "BLACKLIST_ADD",
+    "detail": "Added: spam@test.com"
+  },
+  {
+    "timestamp": "2026-03-31T10:07:03.064027+00:00",
+    "agent": "BOOSTERLEVER",
+    "action": "OUTREACH_EMAIL",
+    "detail": "Generated for Pizzeria Roma (ID: 1, score: 38)"
+  }
+]

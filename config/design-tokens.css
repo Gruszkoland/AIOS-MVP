@@ -1,0 +1,215 @@
+/*
+ * ═══════════════════════════════════════════════════════════════
+ * ADRION 369 — Zunifikowane Tokeny Projektowe
+ * ═══════════════════════════════════════════════════════════════
+ *
+ * MOST INTEGRACYJNY: łączy dwa systemy tokenów:
+ *   - harmonia-dashboard/style.css  (--fs-* / --sp-* / --ease-*)
+ *   - vortex-phi.css                (--font-* / --space-* / --motion-*)
+ *
+ * MATEMATYKA:
+ *   φ ≈ 1.618 (Golden Ratio)
+ *   3-6-9 (Tesla/Rodin Vortex Math)
+ *   Solfeggio Hz → ms timing: 174, 396, 528
+ *
+ * UŻYCIE:
+ *   @import url('../config/design-tokens.css');
+ *   — lub —
+ *   <link rel="stylesheet" href="/config/design-tokens.css">
+ *
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+:root {
+  /* ─── ZŁOTY PODZIAŁ ─── */
+  --phi: 1.618;
+
+  /* ═══════════════════════════════════════════════════════════
+   * TYPOGRAFIA — Podwójna skala (rem + px)
+   * Harmonia: rem-based φ scale  |  Vortex: px-based 3-6-9
+   * ═══════════════════════════════════════════════════════════ */
+
+  /* Harmonia Scale (rem, φ-stepped) */
+  --fs-xs: 0.618rem; /* 1/φ² ≈ 9.9px — captions, meta */
+  --fs-sm: 0.764rem; /* 1/φ^1.5 ≈ 12.2px — small labels */
+  --fs-base: 0.875rem; /* body text baseline ≈ 14px */
+  --fs-md: 1rem; /* standard UI text = 16px */
+  --fs-lg: 1.125rem; /* φ^0.25 ≈ 18px — sub-headings */
+  --fs-xl: 1.618rem; /* φ¹ ≈ 25.9px — section titles */
+  --fs-2xl: 2.618rem; /* φ² ≈ 41.9px — hero values */
+  --fs-3xl: 4.236rem; /* φ³ ≈ 67.8px — score ring */
+
+  /* Vortex Scale (px, 3-6-9 reduction) */
+  --font-xs: 9px;
+  --font-sm: 12px;
+  --font-base: 15px;
+  --font-md: 24px;
+  --font-lg: 39px;
+  --font-xl: 63px;
+
+  /* Font Stacks */
+  --font-heading: "Rajdhani", "Michroma", sans-serif;
+  --font-data: "JetBrains Mono", "Space Mono", "Fira Code", monospace;
+  --font-body: "Inter", "Saira", system-ui, sans-serif;
+
+  /* ═══════════════════════════════════════════════════════════
+   * SPACING — 3-6-9 Spatial Rhythm
+   * Harmonia: pełna skala 3px  |  Vortex: 9px V-Unit
+   * ═══════════════════════════════════════════════════════════ */
+
+  /* Harmonia Scale (3px multiples — granular) */
+  --sp-3: 3px;
+  --sp-6: 6px;
+  --sp-9: 9px;
+  --sp-12: 12px;
+  --sp-18: 18px;
+  --sp-27: 27px;
+  --sp-36: 36px;
+  --sp-54: 54px;
+  --sp-81: 81px;
+
+  /* Vortex Scale (9px V-Unit — structural) */
+  --space-unit: 9px;
+  --space-xs: 9px; /* 1v */
+  --space-sm: 18px; /* 2v */
+  --space-md: 36px; /* 4v */
+  --space-lg: 72px; /* 8v */
+  --space-xl: 144px; /* 16v */
+
+  /* ═══════════════════════════════════════════════════════════
+   * GRID — Golden Ratio Proportions
+   * ═══════════════════════════════════════════════════════════ */
+  --grid-phi-major: 61.8%; /* φ/(1+φ) — sekcja główna */
+  --grid-phi-minor: 38.2%; /* 1/(1+φ) — sekcja pomocnicza */
+  --grid-major: 61.8%; /* alias vortex */
+  --grid-minor: 38.2%; /* alias vortex */
+
+  /* ═══════════════════════════════════════════════════════════
+   * MOTION — Dwa systemy taktowania
+   * Harmonia: Węzły 3-6-9  |  Vortex: Solfeggio Hz
+   * ═══════════════════════════════════════════════════════════ */
+
+  /* Harmonia Timing (3-6-9 nodes) */
+  --ease-3: 180ms; /* Węzeł 3: quick entry feedback */
+  --ease-6: 360ms; /* Węzeł 6: comparison transitions */
+  --ease-9: 540ms; /* Węzeł 9: finalization emphasis */
+
+  /* Vortex Solfeggio Timing */
+  --motion-fast: 174ms; /* 1+7+4=12→3 — uśmierzanie napięcia */
+  --motion-standard: 396ms; /* 3+9+6=18→9 — uwalnianie energii */
+  --motion-emphasis: 528ms; /* 5+2+8=15→6 — transformacja */
+
+  /* Easing */
+  --easing-vortex: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ═══════════════════════════════════════════════════════════
+   * GEOMETRY — Border Radius & Shadows
+   * ═══════════════════════════════════════════════════════════ */
+
+  /* Harmonia Scale */
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --radius-xl: 18px;
+
+  /* Vortex Scale */
+  --radius-phi: 1.618rem;
+  --radius-small: 3px;
+  --radius-medium: 6px;
+  --radius-large: 9px;
+
+  /* Shadows */
+  --shadow-vortex: 0 9px 27px rgba(0, 0, 0, 0.09);
+  --glow-cta:
+    0 0 18px rgba(99, 102, 241, 0.36), 0 0 54px rgba(167, 139, 250, 0.12);
+  --glow-369: 0 0 9px rgba(167, 139, 250, 0.18);
+
+  /* ═══════════════════════════════════════════════════════════
+   * KOLORY VORTEX-PHI (zunifikowana paleta)
+   * Punkt 9 = 60% (tło) | Punkt 6 = 30% (marka) | Punkt 3 = 10% (akcent)
+   *
+   * WCAG CONTRAST RATIOS:
+   *   --color-text-primary   on --color-bg-primary → 14.7:1 ✅ AAA
+   *   --color-text-secondary on --color-bg-primary →  7.2:1 ✅ AAA
+   *   --color-text-muted     on --color-bg-primary →  3.4:1 ⚠ AA-large
+   * ═══════════════════════════════════════════════════════════ */
+
+  /* === Tła (Punkt 9 — dominanta 60%) === */
+  --color-bg-deep: #020408;
+  --color-bg-primary: #0b0e14;
+  --color-bg-surface: #0f1117;
+  --color-bg-raised: #161b22;
+  --color-bg-overlay: rgba(10, 15, 30, 0.7);
+
+  /* === Tekst === */
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #475569;
+  --color-text-inverse: #272727;
+
+  /* === Akcenty (Punkt 3 — szok, CTA, 10%) === */
+  --color-accent-cyan: #00f3ff;
+  --color-accent-amber: #ffb800;
+  --color-accent-gold: #f59e0b;
+
+  /* === Marka (Punkt 6 — zaufanie, 30%) === */
+  --color-brand-indigo: #6366f1;
+  --color-brand-emerald: #10b981;
+  --color-brand-purple: #8b5cf6;
+
+  /* === Statusy === */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #6366f1;
+
+  /* === Interaktywne (hover/focus/active) === */
+  --color-hover-bg: rgba(99, 102, 241, 0.1);
+  --color-active-bg: rgba(99, 102, 241, 0.18);
+  --color-focus-ring: rgba(167, 139, 250, 0.15);
+  --color-card-bg: rgba(30, 41, 59, 0.8);
+  --color-card-border: rgba(99, 102, 241, 0.15);
+
+  /* === Gradienty === */
+  --gradient-vault: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  --gradient-brand: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --gradient-surface: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 100%
+  );
+  --gradient-body: linear-gradient(135deg, #0f172a 0%, #1a2b4a 100%);
+
+  /* === Borders === */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  /* ═══════════════════════════════════════════════════════════
+   * QUANTUM-FLUX — Dynamiczny HUD Pulsation System
+   * Źródło: PROGRAMATOR docs #1, #21, #26
+   * 1 = crystal clarity (pełna ostrość)
+   * 0.618 = φ pulsation (meditacyjny tryb)
+   * ═══════════════════════════════════════════════════════════ */
+  --quantum-flux: 1;
+  --quantum-pulse-speed: 396ms;
+  --quantum-blur-max: 4px;
+}
+
+/* Quantum-Flux HUD utility classes */
+.qf-element {
+  opacity: var(--quantum-flux);
+  filter: blur(calc((1 - var(--quantum-flux)) * var(--quantum-blur-max)));
+  transition:
+    opacity var(--quantum-pulse-speed) var(--easing-vortex),
+    filter var(--quantum-pulse-speed) var(--easing-vortex);
+}
+
+.qf-pulse {
+  animation: quantum-pulse calc(var(--quantum-pulse-speed) * 3) ease-in-out infinite;
+}
+
+@keyframes quantum-pulse {
+  0%, 100% { --quantum-flux: 1; }
+  50%      { --quantum-flux: 0.618; }
+}

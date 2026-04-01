@@ -1,0 +1,25 @@
+FROM golang:1.22-alpine AS builder
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache git
+
+# Copy source and initialize module
+COPY . .
+RUN go mod tidy
+
+# Build the binary
+RUN go build -o vortex-server ./cmd/vortex-server/main.go
+
+# Production stage
+FROM alpine:latest
+RUN apk add --no-cache ca-certificates
+
+WORKDIR /root/
+COPY --from=builder /app/vortex-server .
+
+# Port 1740 for 174Hz alignment
+EXPOSE 1740
+
+CMD ["./vortex-server"]

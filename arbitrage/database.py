@@ -1,0 +1,482 @@
+"""
+ADRION 369 - Freelance Arbitrage Database
+SQLite storage for jobs, bids, KPIs, earnings and XRP snapshots.
+All queries use parameterized statements to prevent SQL injection.
+"""
+import sqlite3
+import json
+from datetime import datetime
+from .config import DB_PATH
+
+
+def get_conn() -> sqlite3.Connection:
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    return conn
+
+
+def init_db():
+    """Create all tables if they don't exist."""
+    with get_conn() as conn:
+        conn.executescript("""
+        CREATE TABLE IF NOT EXISTS jobs (
+            id          TEXT PRIMARY KEY,
+            platform    TEXT NOT NULL,
+            title       TEXT NOT NULL,
+            description TEXT,
+            budget_min  REAL DEFAULT 0,
+            budget_max  REAL DEFAULT 0,
+            client      TEXT,
+            url         TEXT,
+            keywords    TEXT,
+            scouted_at  TEXT DEFAULT (datetime('now')),
+            status      TEXT DEFAULT 'new'
+        );
+
+        CREATE TABLE IF NOT EXISTS bids (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            job_id          TEXT REFERENCES jobs(id),
+            cover_letter    TEXT,
+            our_price       REAL,
+            est_profit_usd  REAL,
+            analyzer_score  INTEGER,
+            llm_backend     TEXT,
+            approved        INTEGER DEFAULT 0,
+            sent_at         TEXT,
+            created_at      TEXT DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS kpis (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            recorded_at   TEXT DEFAULT (datetime('now')),
+            jobs_scouted  INTEGER DEFAULT 0,
+            bids_sent     INTEGER DEFAULT 0,
+            bids_won      INTEGER DEFAULT 0,
+            revenue_usd   REAL DEFAULT 0,
+            profit_usd    REAL DEFAULT 0,
+            xrp_earned    REAL DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS settings (
+            key   TEXT PRIMARY KEY,
+            value TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS earnings (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id      TEXT,
+            amount_usd      REAL NOT NULL,
+            source_note     TEXT,
+            earned_at       TEXT DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS xrp_snapshots (
+            id               INTEGER PRIMARY KEY AUTOINCREMENT,
+            xrp_price_usd    REAL NOT NULL,
+            total_earned_usd REAL NOT NULL,
+            xrp_equivalent   REAL NOT NULL,
+            xrp_target       REAL NOT NULL DEFAULT 1000,
+            pct_complete     REAL NOT NULL,
+            snapshot_at      TEXT DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS autopilot_runs (
+            id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+            started_at         TEXT NOT NULL,
+            finished_at        TEXT,
+            success            INTEGER NOT NULL DEFAULT 0,
+            dry_run            INTEGER NOT NULL DEFAULT 0,
+            jobs_scouted       INTEGER DEFAULT 0,
+            new_jobs           INTEGER DEFAULT 0,
+            analyzed           INTEGER DEFAULT 0,
+            bids_created       INTEGER DEFAULT 0,
+            bids_today         INTEGER DEFAULT 0,
+            total_earned_usd   REAL DEFAULT 0,
+            error_message      TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS kpi_events (
+            id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+            stream             TEXT NOT NULL,
+            event_type         TEXT NOT NULL,
+            amount_usd         REAL DEFAULT 0,
+            est_cost_usd       REAL DEFAULT 0,
+            meta_json          TEXT,
+            created_at         TEXT DEFAULT (datetime('now'))
+        );
+        """)
+
+        # Wholesale arbitrage tables (PROGRAMATOR #11)
+        conn.executescript("""
+        CREATE TABLE IF NOT EXISTS deals (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            sku             TEXT NOT NULL,
+            product_name    TEXT NOT NULL,
+            channel_id      TEXT NOT NULL DEFAULT 'AUDIO_PREMIUM',
+            wholesale_price REAL NOT NULL,
+            retail_price_de REAL,
+            retail_price_pl REAL,
+            margin_pct      REAL,
+            vortex_resonance INTEGER,
+            vortex_pass     INTEGER DEFAULT 0,
+            source_url      TEXT,
+            supplier        TEXT,
+            stock_qty       INTEGER DEFAULT 0,
+            status          TEXT DEFAULT 'new',
+            scouted_at      TEXT DEFAULT (datetime('now')),
+            executed_at     TEXT,
+            UNIQUE(sku, supplier)
+        );
+
+        CREATE TABLE IF NOT EXISTS subscriptions (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email      TEXT NOT NULL UNIQUE,
+            tier            TEXT NOT NULL DEFAULT 'pilot' CHECK(tier IN ('pilot','agresor','dominator')),
+            stripe_customer_id TEXT,
+            stripe_sub_id   TEXT,
+            active          INTEGER DEFAULT 1,
+            channels_json   TEXT DEFAULT '["AUDIO_PREMIUM"]',
+            max_alerts_day  INTEGER DEFAULT 3,
+            created_at      TEXT DEFAULT (datetime('now')),
+            expires_at      TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS alerts (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            deal_id         INTEGER REFERENCES deals(id),
+            subscription_id INTEGER REFERENCES subscriptions(id),
+            channel_id      TEXT NOT NULL,
+            alert_type      TEXT DEFAULT 'price_drop',
+            margin_pct      REAL,
+            sent            INTEGER DEFAULT 0,
+            sent_at         TEXT,
+            created_at      TEXT DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS payment_events (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            stripe_event_id TEXT UNIQUE NOT NULL,
+            event_type      TEXT NOT NULL,
+            amount_cents    INTEGER NOT NULL DEFAULT 0,
+            currency        TEXT DEFAULT 'pln',
+            customer_email  TEXT,
+            subscription_id INTEGER REFERENCES subscriptions(id),
+            meta_json       TEXT,
+            created_at      TEXT DEFAULT (datetime('now'))
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_deals_channel ON deals(channel_id);
+        CREATE INDEX IF NOT EXISTS idx_deals_status ON deals(status);
+        CREATE INDEX IF NOT EXISTS idx_deals_margin ON deals(margin_pct);
+        CREATE INDEX IF NOT EXISTS idx_alerts_deal ON alerts(deal_id);
+        """)
+
+
+# ── Jobs ──────────────────────────────────────────────────────────────────────
+
+def upsert_job(job: dict) -> bool:
+    """Insert job, skip if already exists. Returns True if new."""
+    with get_conn() as conn:
+        existing = conn.execute("SELECT id FROM jobs WHERE id=?", (job["id"],)).fetchone()
+        if existing:
+            return False
+        conn.execute(
+            "INSERT INTO jobs "
+            "(id,platform,title,description,budget_min,budget_max,client,url,keywords,status) "
+            "VALUES (:id,:platform,:title,:description,:budget_min,:budget_max,:client,:url,:keywords,:status)",
+            {**job, "keywords": json.dumps(job.get("keywords", [])), "status": "new"},
+        )
+        return True
+
+
+def get_jobs(status: str = None, limit: int = 50) -> list[dict]:
+    with get_conn() as conn:
+        if status:
+            rows = conn.execute(
+                "SELECT * FROM jobs WHERE status=? ORDER BY scouted_at DESC LIMIT ?",
+                (status, limit),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM jobs ORDER BY scouted_at DESC LIMIT ?", (limit,)
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def set_job_status(job_id: str, status: str):
+    with get_conn() as conn:
+        conn.execute("UPDATE jobs SET status=? WHERE id=?", (status, job_id))
+
+
+# ── Bids ──────────────────────────────────────────────────────────────────────
+
+def insert_bid(bid: dict) -> int:
+    with get_conn() as conn:
+        cur = conn.execute(
+            "INSERT INTO bids "
+            "(job_id,cover_letter,our_price,est_profit_usd,analyzer_score,llm_backend) "
+            "VALUES (:job_id,:cover_letter,:our_price,:est_profit_usd,:analyzer_score,:llm_backend)",
+            bid,
+        )
+        return cur.lastrowid
+
+
+def get_pending_bids() -> list[dict]:
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT b.*, j.title, j.platform, j.url "
+            "FROM bids b JOIN jobs j ON b.job_id=j.id "
+            "WHERE b.approved=0 ORDER BY b.created_at DESC"
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def approve_bid(bid_id: int, approved: bool):
+    status = 1 if approved else -1
+    sent_at = datetime.now().isoformat() if approved else None
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE bids SET approved=?, sent_at=? WHERE id=?",
+            (status, sent_at, bid_id),
+        )
+
+
+def get_all_bids(limit: int = 100) -> list[dict]:
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT b.*, j.title, j.platform "
+            "FROM bids b JOIN jobs j ON b.job_id=j.id "
+            "ORDER BY b.created_at DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+# ── KPIs ──────────────────────────────────────────────────────────────────────
+
+def record_kpi(kpi: dict):
+    with get_conn() as conn:
+        conn.execute(
+            "INSERT INTO kpis "
+            "(jobs_scouted,bids_sent,bids_won,revenue_usd,profit_usd,xrp_earned) "
+            "VALUES (:jobs_scouted,:bids_sent,:bids_won,:revenue_usd,:profit_usd,:xrp_earned)",
+            kpi,
+        )
+
+
+def get_totals() -> dict:
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT "
+            "  (SELECT COUNT(*) FROM jobs) AS total_jobs, "
+            "  (SELECT COUNT(*) FROM jobs WHERE status='won') AS jobs_won, "
+            "  (SELECT COUNT(*) FROM bids WHERE approved=1) AS bids_sent, "
+            "  (SELECT COALESCE(SUM(profit_usd),0) FROM kpis) AS total_profit "
+        ).fetchone()
+        return dict(row) if row else {}
+
+
+def record_autopilot_run(run_data: dict):
+    """Persist one autopilot cycle result for observability and reporting."""
+    with get_conn() as conn:
+        conn.execute(
+            "INSERT INTO autopilot_runs "
+            "(started_at,finished_at,success,dry_run,jobs_scouted,new_jobs,analyzed,bids_created,bids_today,total_earned_usd,error_message) "
+            "VALUES (:started_at,:finished_at,:success,:dry_run,:jobs_scouted,:new_jobs,:analyzed,:bids_created,:bids_today,:total_earned_usd,:error_message)",
+            {
+                "started_at": run_data.get("started_at"),
+                "finished_at": run_data.get("finished_at"),
+                "success": 1 if run_data.get("success") else 0,
+                "dry_run": 1 if run_data.get("dry_run") else 0,
+                "jobs_scouted": run_data.get("jobs_scouted", 0),
+                "new_jobs": run_data.get("new_jobs", 0),
+                "analyzed": run_data.get("analyzed", 0),
+                "bids_created": run_data.get("bids_created", 0),
+                "bids_today": run_data.get("bids_today", 0),
+                "total_earned_usd": run_data.get("total_earned_usd", 0),
+                "error_message": run_data.get("error_message"),
+            },
+        )
+
+
+def get_recent_autopilot_runs(limit: int = 20) -> list[dict]:
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT * FROM autopilot_runs ORDER BY id DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_last_autopilot_run() -> dict | None:
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT * FROM autopilot_runs ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def record_kpi_event(
+    stream: str,
+    event_type: str,
+    amount_usd: float = 0,
+    est_cost_usd: float = 0,
+    meta: dict | None = None,
+):
+    with get_conn() as conn:
+        meta_dict = meta or {}
+        # Ensure 'source' is tracked
+        if "source" not in meta_dict:
+            meta_dict["source"] = "manual"
+            
+        conn.execute(
+            "INSERT INTO kpi_events (stream,event_type,amount_usd,est_cost_usd,meta_json) VALUES (?,?,?,?,?)",
+            (
+                stream,
+                event_type,
+                float(amount_usd or 0),
+                float(est_cost_usd or 0),
+                json.dumps(meta_dict, ensure_ascii=True),
+            ),
+        )
+
+
+def get_stream_kpis() -> dict:
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT stream, "
+            "COUNT(*) AS events, "
+            "COALESCE(SUM(amount_usd),0) AS revenue_usd, "
+            "COALESCE(SUM(est_cost_usd),0) AS est_cost_usd "
+            "FROM kpi_events "
+            "GROUP BY stream"
+        ).fetchall()
+
+        # Phase 2: Source Metrics
+        source_rows = conn.execute(
+            "SELECT COUNT(*) AS c, "
+            "CASE WHEN json_extract(meta_json, '$.source') = 'external' THEN 'external' "
+            "     WHEN json_extract(meta_json, '$.source') = 'seed' THEN 'seed' "
+            "     ELSE 'other' END AS src_group "
+            "FROM kpi_events "
+            "GROUP BY src_group"
+        ).fetchall()
+
+        daily_cost_row = conn.execute(
+            "SELECT COALESCE(SUM(est_cost_usd),0) AS daily_est_cost "
+            "FROM kpi_events WHERE DATE(created_at)=DATE('now')"
+        ).fetchone()
+
+    streams = {
+        "b2b": {"events": 0, "revenue_usd": 0.0, "est_cost_usd": 0.0},
+        "ugc": {"events": 0, "revenue_usd": 0.0, "est_cost_usd": 0.0},
+        "resale": {"events": 0, "revenue_usd": 0.0, "est_cost_usd": 0.0},
+    }
+
+    for r in rows:
+        stream = r["stream"]
+        if stream not in streams:
+            streams[stream] = {"events": 0, "revenue_usd": 0.0, "est_cost_usd": 0.0}
+        streams[stream] = {
+            "events": int(r["events"] or 0),
+            "revenue_usd": float(r["revenue_usd"] or 0),
+            "est_cost_usd": float(r["est_cost_usd"] or 0),
+        }
+
+    total_revenue = sum(v["revenue_usd"] for v in streams.values())
+    total_cost = sum(v["est_cost_usd"] for v in streams.values())
+
+    sources = {"external": 0, "seed": 0, "other": 0}
+    for sr in source_rows:
+        sources[sr["src_group"]] = int(sr["c"] or 0)
+
+    return {
+        "streams": streams,
+        "total_revenue_usd": round(total_revenue, 2),
+        "total_est_cost_usd": round(total_cost, 2),
+        "daily_est_cost_usd": round(float(daily_cost_row["daily_est_cost"] or 0), 2),
+        "total_margin_usd": round(total_revenue - total_cost, 2),
+        "sources": sources,
+    }
+
+
+def get_client_bid_count_today(client_name: str) -> int:
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT COUNT(*) AS c "
+            "FROM bids b JOIN jobs j ON b.job_id=j.id "
+            "WHERE DATE(b.created_at)=DATE('now') AND LOWER(COALESCE(j.client,''))=LOWER(?)",
+            (client_name or "",),
+        ).fetchone()
+        return int(row["c"] or 0) if row else 0
+
+
+# ── Deals (Wholesale) ────────────────────────────────────────────────────────
+
+def upsert_deal(deal: dict) -> bool:
+    """Insert or update a wholesale deal. Returns True if new."""
+    with get_conn() as conn:
+        existing = conn.execute(
+            "SELECT id FROM deals WHERE sku=? AND supplier=?",
+            (deal["sku"], deal.get("supplier", "")),
+        ).fetchone()
+        if existing:
+            conn.execute(
+                "UPDATE deals SET wholesale_price=?, retail_price_de=?, retail_price_pl=?, "
+                "margin_pct=?, vortex_resonance=?, vortex_pass=?, stock_qty=?, "
+                "source_url=?, status=? WHERE id=?",
+                (
+                    deal.get("wholesale_price"), deal.get("retail_price_de"),
+                    deal.get("retail_price_pl"), deal.get("margin_pct"),
+                    deal.get("vortex_resonance"), int(deal.get("vortex_pass", False)),
+                    deal.get("stock_qty", 0), deal.get("source_url"), "updated",
+                    existing["id"],
+                ),
+            )
+            return False
+        conn.execute(
+            "INSERT INTO deals "
+            "(sku,product_name,channel_id,wholesale_price,retail_price_de,retail_price_pl,"
+            "margin_pct,vortex_resonance,vortex_pass,source_url,supplier,stock_qty,status) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                deal["sku"], deal.get("product_name", deal["sku"]),
+                deal.get("channel_id", "AUDIO_PREMIUM"),
+                deal.get("wholesale_price", 0), deal.get("retail_price_de"),
+                deal.get("retail_price_pl"), deal.get("margin_pct"),
+                deal.get("vortex_resonance"), int(deal.get("vortex_pass", False)),
+                deal.get("source_url"), deal.get("supplier", ""),
+                deal.get("stock_qty", 0), "new",
+            ),
+        )
+        return True
+
+
+def get_deals(channel_id: str = None, status: str = None, min_margin: float = None,
+              limit: int = 50) -> list[dict]:
+    """Query deals with optional filters."""
+    clauses = []
+    params = []
+    if channel_id:
+        clauses.append("channel_id=?")
+        params.append(channel_id)
+    if status:
+        clauses.append("status=?")
+        params.append(status)
+    if min_margin is not None:
+        clauses.append("margin_pct>=?")
+        params.append(min_margin)
+    where = " WHERE " + " AND ".join(clauses) if clauses else ""
+    params.append(limit)
+    with get_conn() as conn:
+        rows = conn.execute(
+            f"SELECT * FROM deals{where} ORDER BY margin_pct DESC LIMIT ?", params
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def update_deal_status(deal_id: int, status: str):
+    with get_conn() as conn:
+        conn.execute("UPDATE deals SET status=?, executed_at=datetime('now') WHERE id=?",
+                      (status, deal_id))

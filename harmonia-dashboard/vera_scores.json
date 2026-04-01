@@ -1,0 +1,342 @@
+[
+  {
+    "interaction_id": "93d73599152fdf85",
+    "timestamp": "2026-03-30T21:54:39.170509+00:00",
+    "verifiable": 0.4,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.485,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3fcf366af7c1dcda",
+    "timestamp": "2026-03-30T21:54:46.213236+00:00",
+    "verifiable": 0.4,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.455,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3fcf366af7c1dcda_fb",
+    "timestamp": "2026-03-30T21:54:54.161225+00:00",
+    "verifiable": 0.4,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.575,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "57cee8acd05c2beb",
+    "timestamp": "2026-03-30T21:55:49.280034+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.525,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "15a9f71d74fe9ec2",
+    "timestamp": "2026-03-30T21:55:50.060853+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.525,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "deefc34768dca78a",
+    "timestamp": "2026-03-30T21:55:50.770896+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.505,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9906540a91efe756",
+    "timestamp": "2026-03-30T21:55:51.504891+00:00",
+    "verifiable": 0.55,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.515,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "90db9e73268eb4d7",
+    "timestamp": "2026-03-30T21:55:52.144599+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.505,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "57cee8acd05c2beb_fb",
+    "timestamp": "2026-03-30T21:55:52.758778+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.645,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "15a9f71d74fe9ec2_fb",
+    "timestamp": "2026-03-30T21:55:52.774808+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.645,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "deefc34768dca78a_fb",
+    "timestamp": "2026-03-30T21:55:52.790114+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.625,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9906540a91efe756_fb",
+    "timestamp": "2026-03-30T21:55:52.804905+00:00",
+    "verifiable": 0.55,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.635,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "90db9e73268eb4d7_fb",
+    "timestamp": "2026-03-30T21:55:52.818621+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.625,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e2ef1939e029173c",
+    "timestamp": "2026-03-30T21:55:58.246460+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.505,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b9d1d35b4300af07",
+    "timestamp": "2026-03-30T21:55:59.099040+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.525,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "76f5f2fb2e089d18",
+    "timestamp": "2026-03-30T21:55:59.888469+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.505,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e2ef1939e029173c_fb",
+    "timestamp": "2026-03-30T21:56:11.052840+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.625,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b9d1d35b4300af07_fb",
+    "timestamp": "2026-03-30T21:56:11.063489+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.645,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e95391399ad2a9b9",
+    "timestamp": "2026-03-30T21:57:01.485786+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.465,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "2d9e05245eb4b1ea",
+    "timestamp": "2026-03-30T21:57:44.674897+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "59ff427dd79bd283",
+    "timestamp": "2026-03-30T21:57:52.155705+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b4ed9a62312dede5",
+    "timestamp": "2026-03-30T23:59:01.378372+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.533,
+    "aligned": 0.5,
+    "total": 0.517,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "666830a70c20f816",
+    "timestamp": "2026-03-31T13:36:00.113988+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b74303e76a8d2dc0",
+    "timestamp": "2026-03-31T14:05:44.993119+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "7155bc7249232eab",
+    "timestamp": "2026-03-31T14:11:10.976967+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a9b0868e75503f8b",
+    "timestamp": "2026-03-31T14:14:48.278896+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a0f0fa797897536e",
+    "timestamp": "2026-04-01T05:15:43.592714+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a0f0fa797897536e_fb",
+    "timestamp": "2026-04-01T05:15:44.082692+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9e6268446ecd8c27",
+    "timestamp": "2026-04-01T05:16:56.467268+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9e6268446ecd8c27_fb",
+    "timestamp": "2026-04-01T05:16:56.750931+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e116bb0a4b9c1bdc",
+    "timestamp": "2026-04-01T05:17:49.520032+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e116bb0a4b9c1bdc_fb",
+    "timestamp": "2026-04-01T05:17:49.793606+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6a9b77c4be3f5dc4",
+    "timestamp": "2026-04-01T05:19:48.378281+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6a9b77c4be3f5dc4_fb",
+    "timestamp": "2026-04-01T05:19:48.615563+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  }
+]

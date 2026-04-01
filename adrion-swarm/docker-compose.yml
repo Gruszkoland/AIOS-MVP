@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: adrion-n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=adrion_pass
+      - WEBHOOK_URL=http://localhost:5678/
+      - N8N_LICENSE_ACTIVATION_KEY=f308dced-89fd-4c57-b8b0-639449f44052
+      - N8N_ENDPOINT_WEBHOOK=webhook
+      - N8N_ENDPOINT_WEBHOOK_TEST=webhook-test
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=adrion-db
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=genesis_record
+      - DB_POSTGRESDB_USER=adrion
+      - DB_POSTGRESDB_PASSWORD=adrion_pass
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    depends_on:
+      - postgres
+
+  # Korzysta z natywnej Ollamy na Twoim Windowsie (port 11434)
+  # Usunięto kontener, aby uniknąć konfliktu portów
+
+  postgres:
+    image: postgres:15
+    container_name: adrion-db
+    restart: always
+    environment:
+      - POSTGRES_USER=adrion
+      - POSTGRES_PASSWORD=adrion_pass
+      - POSTGRES_DB=genesis_record
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+  vortex-engine:
+    build:
+      context: ..
+      dockerfile: Dockerfile.vortex
+    container_name: adrion-vortex
+    restart: always
+    ports:
+      - "1740:1740"
+    environment:
+      - DB_HOST=adrion-db
+      - DB_USER=adrion
+      - DB_PASSWORD=adrion_pass
+      - DB_NAME=genesis_record
+    depends_on:
+      - postgres

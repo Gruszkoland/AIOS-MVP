@@ -1,0 +1,306 @@
+---
+title: "Trinity System Weights Configuration"
+description: "Central configuration for Material/Intellectual/Essential perspective scoring"
+version: "1.0"
+updated: "2026-03-29"
+---
+
+# Trinity Weights — Perspective Scoring Configuration
+
+## Global Trinity Parameters
+
+global:
+  # Aggregation methods per perspective
+  material_aggregation: "arithmetic_mean"    # Pragmatic, real-world focus
+  intellectual_aggregation: "harmonic_mean"  # Stricter (penalizes weak links)
+  essential_aggregation: "geometric_mean"    # All-or-nothing (requires all components)
+  
+  # Balance calculation: 1 - (σ/μ) where σ=std_dev, μ=mean
+  # Higher balance = perspectives in equilibrium
+  balance_threshold_caution: 0.6  # Warning if balance < 0.6
+  balance_threshold_critical: 0.4 # Escalate if balance < 0.4
+  
+  # Trinity Score formula
+  trinity_score_formula: "(M + I + E) / 3 × Balance"
+  trinity_score_threshold: 0.5    # Default acceptance threshold
+  trinity_score_high: 0.7         # High confidence
+  trinity_score_critical: 0.85    # Mission-critical
+  
+  # Dimension-specific thresholds
+  material_min: 0.3    # Don't proceed if Material score too low
+  intellectual_min: 0.4 # Truth & coherence requirement
+  essential_min: 0.2    # Always require some Essential consideration
+  
+  # Violation limits (from Guardian Laws)
+  triad_unity_max_violations: 1    # G1-G3: Max 1 violation
+  triad_truth_max_violations: 1    # G4-G6: Max 1 violation
+  triad_goodness_max_violations: 0 # G7-G9: ABSOLUTE, zero tolerance
+
+## Persona-Specific Trinity Weights
+
+personas:
+  
+  librarian:
+    name: "LIBRARIAN"
+    primary_focus: "Intellectual (Truth preservation)"
+    
+    weights:
+      material: 0.2      # Low: Context, not detailed resource analysis
+      intellectual: 0.6  # PRIMARY: Historical truth, knowledge coherence
+      essential: 0.2     # Low: Mission alignment of historical insights
+    
+    decision_path:
+      - "Gather Material context (git history, resources)"
+      - "FOCUS: Analyze Intellectual perspective (what is true?)"
+      - "Check Essential: Is historical insight mission-relevant?"
+    
+    trinity_score_target: ">= 0.55"  # Slightly above baseline
+    
+    # Per-task perspective requirements
+    task_git_analysis:
+      material: "Low (just context)"
+      intellectual: "HIGH (accuracy essential)"
+      essential: "Medium (how does it matter?)"
+    
+    escalation_triggers:
+      - "intellectual < 0.3"  # Truth integrity compromised
+      - "balance < 0.5"       # Perspectives too imbalanced
+      - "material < 0.2"      # Missing context entirely
+
+  sap:
+    name: "SAP"
+    primary_focus: "Balanced (Intellectual + Essential)"
+    
+    weights:
+      material: 0.3      # Pragmatic: Can we execute?
+      intellectual: 0.4  # Strong: Logical coherence, risk analysis
+      essential: 0.3     # Strong: Mission alignment, sustainability
+    
+    decision_path:
+      - "Evaluate Material: What resources do we have?"
+      - "Analyze Intellectual: What are the logical dependencies?"
+      - "Assess Essential: Does this align with mission?"
+      - "Balance all three perspectives"
+    
+    trinity_score_target: ">= 0.60"  # Higher bar (strategic decisions)
+    
+    task_planning:
+      material: "Medium (feasibility check)"
+      intellectual: "HIGH (logical coherence)"
+      essential: "HIGH (mission alignment)"
+    
+    escalation_triggers:
+      - "trinity_score < 0.50"     # Incoherent plan
+      - "balance < 0.55"           # Asymmetric perspectives
+      - "essential < 0.25"         # Mission drift
+      - "intellectual < 0.35"      # Logical inconsistency
+
+  auditor:
+    name: "AUDITOR"
+    primary_focus: "Intellectual + Essential (Quality + Safety)"
+    
+    weights:
+      material: 0.2      # Context: resource impact
+      intellectual: 0.5  # PRIMARY: Code quality, logical correctness
+      essential: 0.3     # Strong: Safety (Guardian G8), sustainability
+    
+    decision_path:
+      - "Check Material impact (performance, resources)"
+      - "FOCUS: Analyze Intellectual (code quality, correctness)"
+      - "Verify Essential (Guardian G8 Nonmaleficence, G7 Privacy)"
+    
+    trinity_score_target: ">= 0.65"  # High bar (auditing is strict)
+    
+    task_code_review:
+      material: "Medium (resource footprint)"
+      intellectual: "CRITICAL (quality, correctness)"
+      essential: "CRITICAL (safety, compliance)"
+    
+    task_security_audit:
+      material: "Low"
+      intellectual: "Medium (logic of vulnerabilities)"
+      essential: "CRITICAL (Guardian G8 enforcement)"
+    
+    escalation_triggers:
+      - "intellectual < 0.4"       # Quality compromised
+      - "guardian_check fails"     # Law violation
+      - "trinity_score < 0.60"     # Overall incoherence
+      - "regression_risk HIGH"     # Backward compatibility issue
+
+  sentinel:
+    name: "SENTINEL"
+    primary_focus: "Essential (Crisis + Safety)"
+    
+    weights:
+      material: 0.2      # Quick stability assessment
+      intellectual: 0.3  # Secondary: Rapid diagnosis
+      essential: 0.5     # PRIMARY: Guardian G8 (Nonmaleficence), G7 (Privacy)
+    
+    decision_path:
+      - "IMMEDIATE: Check Essential (Is safety threatened?)"
+      - "Quick Material: System stability?"
+      - "Rapid Intellectual: What's the root cause?"
+      - "Deploy hotfix if Essential > threshold"
+    
+    trinity_score_target: ">= 0.55"  # Slightly above baseline (speed prioritized)
+    crisis_mode_target: ">= 0.50"    # Even lower bar in crisis
+    
+    threat_response:
+      material: "Medium (system impact)"
+      intellectual: "Low (quick diagnosis, deep analysis deferred)"
+      essential: "CRITICAL (Guardian laws)"
+    
+    escalation_triggers:
+      - "essential < 0.3"          # Mission continuity threatened
+      - "threat_vector detected"   # Attack detected (A-01 to A-12)
+      - "recurrent_error > 3x"     # Systemic issue
+
+  architect:
+    name: "ARCHITECT"
+    primary_focus: "Balanced Intellectual + Essential"
+    
+    weights:
+      material: 0.2      # Resource efficiency, deployment topology
+      intellectual: 0.4  # Strong: Design coherence, patterns
+      essential: 0.4     # Strong: Long-term viability (Guardian G9)
+    
+    decision_path:
+      - "Evaluate Material: Deployment feasibility?"
+      - "Analyze Intellectual: Design coherence, patterns?"
+      - "Assess Essential: Long-term sustainability?"
+      - "Require balance across all three"
+    
+    trinity_score_target: ">= 0.70"  # High bar (foundational decisions)
+    
+    task_interface_design:
+      material: "Medium (API performance)"
+      intellectual: "HIGH (clarity, coherence)"
+      essential: "HIGH (future extensibility)"
+    
+    task_pattern_definition:
+      material: "Low"
+      intellectual: "CRITICAL (consistency)"
+      essential: "CRITICAL (sustainability)"
+    
+    escalation_triggers:
+      - "trinity_score < 0.65"     # Incoherent design
+      - "balance < 0.60"           # Asymmetric perspectives
+      - "essential < 0.35"         # Long-term viability questionable
+      - "intellectual < 0.35"      # Pattern inconsistency
+
+  healer:
+    name: "HEALER"
+    primary_focus: "Material + Essential (Performance + Sustainability)"
+    
+    weights:
+      material: 0.4      # PRIMARY: Performance, resource efficiency
+      intellectual: 0.2  # Secondary: Code clarity
+      essential: 0.4     # PRIMARY: Long-term system health (Guardian G9)
+    
+    decision_path:
+      - "Identify Material waste (performance, resources)"
+      - "Optimize Material impact"
+      - "Verify Essential: Doesn't compromise sustainability"
+      - "Check Intellectual: Code remains clear"
+    
+    trinity_score_target: ">= 0.60"  # Balanced bar (optimization)
+    
+    task_refactoring:
+      material: "HIGH (code health, performance)"
+      intellectual: "Medium (clarity improvement)"
+      essential: "HIGH (no regression, long-term)"
+    
+    task_technical_debt:
+      material: "HIGH (resource recovery)"
+      intellectual: "Medium (knowledge organization)"
+      essential: "HIGH (sustainability)"
+    
+    escalation_triggers:
+      - "trinity_score < 0.55"     # Optimization incoherent
+      - "essential < 0.3"          # Regression risk
+      - "material improvement < 5%"  # Marginal gains only
+
+## Trinity-Specific Guardian Law Mapping
+
+guardian_integration:
+  
+  unity_triad:
+    laws: ["G1: Unity", "G2: Harmony", "G3: Rhythm"]
+    perspective: "Material"
+    check: "Is collective good maintained? System in equilibrium?"
+    violation_limit: 1
+  
+  truth_triad:
+    laws: ["G4: Causality", "G5: Transparency", "G6: Authenticity"]
+    perspective: "Intellectual"
+    check: "Can we explain our decision? Are we truthful? Are sources authentic?"
+    violation_limit: 1
+  
+  goodness_triad:
+    laws: ["G7: Privacy", "G8: Nonmaleficence", "G9: Sustainability"]
+    perspective: "Essential"
+    check: "Are we safe? Are rights protected? Is future viable?"
+    violation_limit: 0  # ABSOLUTE
+
+## Harmonic Aggregation Formulas
+
+aggregation_formulas:
+  
+  material_arithmetic:
+    formula: "(M1 + M2 + M3) / 3"
+    use_case: "Pragmatic, real-world scoring"
+    characteristic: "All factors equally weighted"
+  
+  intellectual_harmonic:
+    formula: "3 / (1/I1 + 1/I2 + 1/I3)"
+    use_case: "Truth scoring (stricter)"
+    characteristic: "One weak link pulls entire score down"
+    example: "If I1=0.9, I2=0.9, I3=0.1 → Harmonic ≈ 0.26 (not 0.63)"
+  
+  essential_geometric:
+    formula: "(E1 × E2 × E3) ^ (1/3)"
+    use_case: "Mission alignment (all-or-nothing)"
+    characteristic: "All components must be strong"
+    example: "If E1=0.8, E2=0.8, E3=0.1 → Geometric ≈ 0.41 (not 0.57)"
+
+## Balance Scoring
+
+balance_calculation:
+  formula: "Balance = 1 - (σ/μ) where σ=std_dev(M,I,E), μ=mean(M,I,E)"
+  
+  examples:
+    - "Perfect balance (M=0.5, I=0.5, E=0.5): σ=0, Balance=1.0"
+    - "Good balance (M=0.4, I=0.5, E=0.6): σ≈0.082, μ=0.5, Balance≈0.836"
+    - "Poor balance (M=0.1, I=0.5, E=0.9): σ=0.4, μ=0.5, Balance=0.2"
+    - "Extreme balance (M=0.1, I=0.9, E=0.1): σ≈0.44, μ=0.37, Balance≈-0.2 (red flag)"
+
+## Decision Thresholds
+
+thresholds:
+  
+  normal_operations:
+    trinity_score_min: 0.50
+    balance_min: 0.60
+    individual_dimension_min: 0.20
+  
+  high_stakes_decisions:
+    trinity_score_min: 0.65
+    balance_min: 0.65
+    individual_dimension_min: 0.35
+  
+  critical_decisions:
+    trinity_score_min: 0.80
+    balance_min: 0.70
+    individual_dimension_min: 0.50
+  
+  crisis_mode:
+    trinity_score_min: 0.45  # Relaxed for speed
+    balance_min: 0.50
+    essential_dimension_min: 0.40  # Guardian G8 still required
+
+---
+
+**Version:** 1.0  
+**Authority:** Trinity System Configuration  
+**Integration:** Material/Intellectual/Essential weights + Guardian Laws  
+**Status:** Active

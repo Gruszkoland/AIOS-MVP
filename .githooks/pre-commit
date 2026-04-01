@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+set -eu
+
+# Block committing local env files
+if git diff --cached --name-only | grep -E '(^|/)\.env\.local$' >/dev/null 2>&1; then
+  echo "ERROR: Attempted to commit .env.local file. Remove it from staging."
+  git diff --cached --name-only | grep -E '(^|/)\.env\.local$' || true
+  exit 1
+fi
+
+# Scan staged content for Stripe-like secret patterns
+if git diff --cached | grep -nE '(sk_(live|test)_[A-Za-z0-9]{16,}|rk_live_[A-Za-z0-9]{16,}|whsec_[A-Za-z0-9]{16,})' >/dev/null 2>&1; then
+  echo "ERROR: Potential Stripe-like secret detected in staged changes."
+  echo "Remove secrets and use local .env/.env.local instead."
+  exit 1
+fi
+
+exit 0
