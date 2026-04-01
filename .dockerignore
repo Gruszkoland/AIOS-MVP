@@ -8,5 +8,21 @@ __pycache__/
 !.env.example
 .git/
 .vscode/
-.aider/logs/
+.aider/
+.aider.tags.cache.v4/
 node_modules/
+micro-saas/node_modules/
+micro-saas/.next/
+micro-saas/.turbo/
+adrion-swarm/postgres_data/
+adrion-swarm/n8n_data/
+adrion-swarm/ollama_data/
+data/
+monitoring/
+.venv/
+*.db
+*.sqlite
+b2b_extract/
+temp_extract/
+Genesis Record/
+arbitrage-core/

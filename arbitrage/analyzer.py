@@ -181,11 +181,15 @@ def vortex_filter(margin_pct: float, min_margin: float = 0.15) -> bool:
 
 
 def calculate_market_resonance(price_a: float, price_b: float) -> dict:
-    """Oblicz rezonans cenowy między dwoma rynkami (np. DE↔PL)."""
-    if price_a <= 0 or price_b <= 0:
-        return {"resonance": 0, "margin_pct": 0.0, "vortex_pass": False}
-    diff = abs(price_a - price_b)
-    margin_pct = diff / max(price_a, price_b)
+    """
+    Oblicz rezonans cenowy między dwoma rynkami.
+    price_a: source (wholesale)
+    price_b: target (retail)
+    """
+    if price_a <= 0 or price_b <= 0 or price_b <= price_a:
+        return {"resonance": 0, "margin_pct": 0.0, "vortex_pass": False, "is_369": False}
+    diff = price_b - price_a
+    margin_pct = diff / price_b
     resonance = digital_root(int(diff))
     return {
         "resonance": resonance,

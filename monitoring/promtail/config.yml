@@ -24,11 +24,21 @@ scrape_configs:
       - source_labels: ['__meta_docker_container_log_stream']
         target_label: stream
 
-  - job_name: waitress-runtime
-    static_configs:
-      - targets:
-          - localhost
-        labels:
-          job: waitress-runtime
-          host: windows-fallback
-          __path__: /var/log/adrion-runtime/*.log
+  - job_name: sentinel-vortex
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/adrion-vortex'
+        target_label: container
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: stream
+    pipeline_stages:
+      - regex:
+          expression: "^(?P<sentinel>\\[SENTINEL\\])\\s+(?P<time>\\S+)\\s+(?P<method>\\S+)\\s+(?P<path>\\S+)\\s+→\\s+(?P<status>\\d+)\\s+\\((?P<latency>[^\\)]+)\\)"
+      - labels:
+          method:
+          status:
+          path:
+

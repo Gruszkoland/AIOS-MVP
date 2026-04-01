@@ -1,0 +1,116 @@
+{
+  "name": "ADRION 369 - Vortex Logic Decision Bridge",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "price-update",
+        "options": {}
+      },
+      "name": "Webhook Price Sync",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://vortex-engine:1740/decide",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"asset_a\": \"{{ $node[\"Webhook Price Sync\"].json[\"body\"][\"symbol_a\"] }}\",\n  \"asset_b\": \"{{ $node[\"Webhook Price Sync\"].json[\"body\"][\"symbol_b\"] }}\",\n  \"price_a\": {{ $node[\"Webhook Price Sync\"].json[\"body\"][\"price_a\"] }},\n  \"price_b\": {{ $node[\"Webhook Price Sync\"].json[\"body\"][\"price_b\"] }}\n}",
+        "options": {}
+      },
+      "name": "Vortex Decision Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [350, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $node[\"Vortex Decision Call\"].json[\"state\"] }}",
+              "operation": "equal",
+              "value2": 1
+            }
+          ]
+        }
+      },
+      "name": "Is Singularity (9)?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://arbitrage-api:8000/execute",
+        "sendBody": true,
+        "contentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "strategy",
+              "value": "vortex-singularity"
+            },
+            {
+              "name": "reason",
+              "value": "={{ $node[\"Vortex Decision Call\"].json[\"message\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Execute Arbitrage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "content": "## ADRION 369 Vortex Bridge\nThis workflow connects incoming price signals to the Go Vortex Engine (Port 1740).\nIt filters for Singularity State (1.0) before triggering execution."
+      },
+      "name": "Bridge Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [100, 100]
+    }
+  ],
+  "connections": {
+    "Webhook Price Sync": {
+      "main": [
+        [
+          {
+            "node": "Vortex Decision Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vortex Decision Call": {
+      "main": [
+        [
+          {
+            "node": "Is Singularity (9)?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Singularity (9)?": {
+      "main": [
+        [
+          {
+            "node": "Execute Arbitrage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 load_dotenv()
 BASE_DIR = Path(__file__).parent.parent
 DB_PATH  = Path(os.getenv('DB_PATH', str(BASE_DIR / 'arbitrage.db')))
+DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')  # sqlite | postgres
+DB_URL    = os.getenv('DATABASE_URL', '')    # For Postgres connection
 LLM_BACKEND    = os.getenv('LLM_BACKEND', 'auto')
 OPENROUTER_KEY = os.getenv('OPENROUTER_API_KEY', '')
 OPENAI_KEY     = os.getenv('OPENAI_API_KEY', '')

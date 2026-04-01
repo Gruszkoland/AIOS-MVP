@@ -338,5 +338,195 @@
     "aligned": 0.9,
     "total": 0.708,
     "rag_used": false
+  },
+  {
+    "interaction_id": "b86a23ae4314af54",
+    "timestamp": "2026-04-01T08:09:22.422052+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b86a23ae4314af54_fb",
+    "timestamp": "2026-04-01T08:09:22.752911+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "81526c5b8c57fd3c",
+    "timestamp": "2026-04-01T08:42:33.089102+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "81526c5b8c57fd3c_fb",
+    "timestamp": "2026-04-01T08:42:34.017640+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "dc0b2f1ba8139f51",
+    "timestamp": "2026-04-01T08:43:31.379658+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "dc0b2f1ba8139f51_fb",
+    "timestamp": "2026-04-01T08:43:31.753402+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "126f05c5139b94e8",
+    "timestamp": "2026-04-01T08:49:05.422404+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "126f05c5139b94e8_fb",
+    "timestamp": "2026-04-01T08:49:05.558404+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "84b6a087e2c88e83",
+    "timestamp": "2026-04-01T08:50:54.665383+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "84b6a087e2c88e83_fb",
+    "timestamp": "2026-04-01T08:51:22.846874+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "be5f739d6a54b72b",
+    "timestamp": "2026-04-01T08:59:04.747034+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "be5f739d6a54b72b_fb",
+    "timestamp": "2026-04-01T08:59:31.158517+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "8b4c14d4fbf870ad",
+    "timestamp": "2026-04-01T09:14:30.031820+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "8b4c14d4fbf870ad_fb",
+    "timestamp": "2026-04-01T09:14:46.087139+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a8ba9734e1d562b1",
+    "timestamp": "2026-04-01T09:15:13.299556+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a8ba9734e1d562b1_fb",
+    "timestamp": "2026-04-01T09:15:29.197050+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "27cb9e2646ef34d6",
+    "timestamp": "2026-04-01T09:15:47.384304+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "199eb4f3117f9a16",
+    "timestamp": "2026-04-01T09:17:02.944167+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "199eb4f3117f9a16_fb",
+    "timestamp": "2026-04-01T09:17:10.326995+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
   }
 ]
