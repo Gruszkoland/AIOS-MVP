@@ -13,6 +13,14 @@ const REQUIRED = [
   "STRIPE_BACKUP_CODE",
 ];
 
+const INVALID_SUBSTRINGS = [
+  "YOUR_",
+  "PLACEHOLDER",
+  "CHANGE_ME",
+  "example",
+  "dummy",
+];
+
 function parseEnv(content) {
   const values = {};
   for (const rawLine of content.split(/\r?\n/)) {
@@ -37,6 +45,13 @@ if (!fs.existsSync(envPath)) {
 
 const parsed = parseEnv(fs.readFileSync(envPath, "utf8"));
 const missing = REQUIRED.filter((key) => !parsed[key]);
+const invalid = REQUIRED.filter((key) => {
+  const value = (parsed[key] || "").trim();
+  if (!value) return false;
+  return INVALID_SUBSTRINGS.some((token) =>
+    value.toLowerCase().includes(token.toLowerCase()),
+  );
+});
 
 console.log(`Loaded local env: ${envPath}`);
 if (missing.length > 0) {
@@ -44,7 +59,20 @@ if (missing.length > 0) {
   for (const key of missing) {
     console.error(`- ${key}`);
   }
-  console.error("Set values in .env.local or via your password manager sync process.");
+  console.error(
+    "Set values in .env.local or via your password manager sync process.",
+  );
+  process.exit(1);
+}
+
+if (invalid.length > 0) {
+  console.error("Invalid placeholder-like values detected in .env.local:");
+  for (const key of invalid) {
+    console.error(`- ${key}`);
+  }
+  console.error(
+    "Replace placeholder/test values with real local secrets before deploy.",
+  );
   process.exit(1);
 }
 
