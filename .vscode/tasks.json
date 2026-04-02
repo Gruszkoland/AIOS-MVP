@@ -136,6 +136,295 @@
         "reveal": "always",
         "panel": "shared"
       }
+    },
+    {
+      "label": "ADRION: Create Session Reports",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/create_session_reports.py",
+        "--topic",
+        "${input:sessionTopic}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Validate Session Reports",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": ["scripts/reporting/validate_session_reports.py"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Start Arbitrage API Test Port",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/testing/start_arbitrage_api_test_port.ps1",
+        "-Port",
+        "8011"
+      ],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*$",
+          "endsPattern": "^.*Arbitrage API running.*$"
+        }
+      },
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Predeploy A-11 Validation",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/testing/invoke_a11_predeploy_validation.ps1",
+        "-Port",
+        "8011"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Local Release Gate (A-11 + Reports)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "ADRION: Start Arbitrage API Test Port",
+        "ADRION: Predeploy A-11 Validation",
+        "ADRION: Validate Session Reports"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Check LLM KPI Gate",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/check_llm_kpi_gate.py",
+        "--window",
+        "200",
+        "--min-events",
+        "30",
+        "--rollback-on-fail"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show LLM Rollout Status",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_rollout_status.py",
+        "--window",
+        "200",
+        "--min-events",
+        "30"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show LLM Rollout Settings",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": ["scripts/reporting/set_llm_rollout_state.py", "show"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show LLM Ops Dashboard",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_ops_dashboard.py",
+        "--window",
+        "200",
+        "--min-events",
+        "30",
+        "--tail",
+        "8"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show LLM Rollout Alert",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_rollout_alert.py",
+        "--alert-path",
+        "monitoring/llm_rollout_alert.json"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Promote LLM Canary 5%",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/set_llm_rollout_state.py",
+        "promote",
+        "--percent",
+        "5",
+        "--backend",
+        "openrouter",
+        "--reason",
+        "manual_promote_5"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Disable LLM Canary",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/set_llm_rollout_state.py",
+        "disable",
+        "--reason",
+        "manual_disable"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Reset LLM Rollout Override",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": ["scripts/reporting/set_llm_rollout_state.py", "reset"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Monitor LLM KPI Gate (15m)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/reporting/run_llm_kpi_guard_loop.ps1",
+        "-IntervalMinutes",
+        "15",
+        "-Window",
+        "200",
+        "-MinEvents",
+        "30",
+        "-RollbackOnFail",
+        "-WarmupOk",
+        "-PromoteOnPass",
+        "-PromotePercent",
+        "5",
+        "-PromoteBackend",
+        "openrouter",
+        "-AlertOnReady",
+        "-AlertPath",
+        "monitoring/llm_rollout_alert.json"
+      ],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "ADRION: KPI Guard Loop Smoke (1x)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/reporting/run_llm_kpi_guard_loop.ps1",
+        "-IntervalMinutes",
+        "0.1",
+        "-Window",
+        "50",
+        "-MinEvents",
+        "1",
+        "-RollbackOnFail",
+        "-WarmupOk",
+        "-PromoteOnPass",
+        "-PromotePercent",
+        "5",
+        "-PromoteBackend",
+        "openrouter",
+        "-AlertOnReady",
+        "-AlertPath",
+        "monitoring/llm_rollout_alert.json",
+        "-MaxIterations",
+        "1"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Create + Validate Session Reports",
+      "dependsOn": [
+        "ADRION: Create Session Reports",
+        "ADRION: Validate Session Reports"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "sessionTopic",
+      "type": "promptString",
+      "description": "Temat sesji — zostanie zamieniony na Tytuł_Tematu_DD-MM-YYYY.md",
+      "default": "Chat Session"
     }
   ]
 }

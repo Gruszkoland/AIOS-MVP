@@ -4,7 +4,10 @@ Generates final deliverable content for won jobs.
 Uses LLM to produce ready-to-deliver work product.
 """
 from .config import (
-    OPENROUTER_KEY, OPENAI_KEY, ANTHROPIC_KEY, LLM_MODEL,
+    ANTHROPIC_KEY,
+    LLM_MODEL,
+    OPENAI_KEY,
+    OPENROUTER_KEY,
     get_active_llm_backend,
 )
 

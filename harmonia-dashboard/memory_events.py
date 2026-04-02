@@ -137,6 +137,10 @@ class MemoryEventBus:
             return len(self._subscribers.get(event_type, []))
         return sum(len(v) for v in self._subscribers.values())
 
+    def reset_metrics(self):
+        """Resetuj metryki operacyjne (głównie dla testów)."""
+        self._metrics = EventMetrics()
+
 
 # ===== SINGLETON =====
 _bus: Optional[MemoryEventBus] = None

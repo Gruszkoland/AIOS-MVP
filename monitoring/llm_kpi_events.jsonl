@@ -1,0 +1,11 @@
+{"ts": 1775152778, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 0.01, "prompt_len": 11, "system_len": 3}
+{"ts": 1775152784, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 0.01, "prompt_len": 11, "system_len": 3}
+{"ts": 1775154382, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 0.28, "prompt_len": 11, "system_len": 3}
+{"ts": 1775155332, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 0.85, "prompt_len": 11, "system_len": 3}
+{"ts": 1775155349, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 2.26, "prompt_len": 11, "system_len": 3}
+{"ts": 1775157782, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 2.85, "prompt_len": 11, "system_len": 3}
+{"ts": 1775157816, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 0.84, "prompt_len": 11, "system_len": 3}
+{"ts": 1775159895, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 18.74, "prompt_len": 11, "system_len": 3}
+{"ts": 1775159918, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.11, "prompt_len": 11, "system_len": 3}
+{"ts": 1775159957, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.25, "prompt_len": 11, "system_len": 3}
+{"ts": 1775160227, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 17.33, "prompt_len": 11, "system_len": 3}

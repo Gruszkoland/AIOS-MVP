@@ -1,6 +1,5 @@
 """
-"""
-ADRION 369 — Arbitrage HTTP API Server (port 8001)
+ADRION 369 - Arbitrage HTTP API Server (port 8001)
 Serves the dashboard arbitrage endpoints via stdlib only (no Flask/FastAPI).
 
 Endpoints:
@@ -26,15 +25,78 @@ Endpoints:
   GET  /api/arbitrage/mass-generate/manifest (Get current manifest)
 """
 
+import collections
 import json
 import logging
+import os
 import re
 import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import time
 from datetime import datetime
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 logger = logging.getLogger(__name__)
 ARB_PORT = 8001
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Rate Limiter — G8/A-11 fix: sliding-window per-IP, thread-safe
+# ──────────────────────────────────────────────────────────────────────────────
+
+class _SlidingWindowRateLimiter:
+    """Thread-safe sliding-window rate limiter keyed by client IP."""
+
+    def __init__(self, max_requests: int, window_seconds: float) -> None:
+        self._max = max_requests
+        self._window = window_seconds
+        self._lock = threading.Lock()
+        self._buckets: dict[str, collections.deque] = {}
+
+    def is_allowed(self, key: str) -> bool:
+        now = time.monotonic()
+        cutoff = now - self._window
+        with self._lock:
+            dq = self._buckets.setdefault(key, collections.deque())
+            while dq and dq[0] < cutoff:
+                dq.popleft()
+            if len(dq) >= self._max:
+                return False
+            dq.append(now)
+            return True
+
+
+def _env_positive_int(name: str, default: int) -> int:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        value = int(raw)
+        if value <= 0:
+            raise ValueError()
+        return value
+    except ValueError:
+        logger.warning("Invalid %s=%r, using default %d", name, raw, default)
+        return default
+
+
+def _env_positive_float(name: str, default: float) -> float:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        value = float(raw)
+        if value <= 0:
+            raise ValueError()
+        return value
+    except ValueError:
+        logger.warning("Invalid %s=%r, using default %.3f", name, raw, default)
+        return default
+
+
+_quantum_limiter = _SlidingWindowRateLimiter(
+    max_requests=_env_positive_int("QUANTUM_RATE_LIMIT_MAX", 30),
+    window_seconds=_env_positive_float("QUANTUM_RATE_LIMIT_WINDOW_SECONDS", 60.0),
+)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -42,7 +104,7 @@ ARB_PORT = 8001
 # ──────────────────────────────────────────────────────────────────────────────
 
 def _db():
-    from arbitrage.database import get_jobs, get_pending_bids, approve_bid, get_totals, init_db
+    from arbitrage.database import approve_bid, get_jobs, get_pending_bids, get_totals, init_db
     return get_jobs, get_pending_bids, approve_bid, get_totals, init_db
 
 
@@ -68,12 +130,21 @@ def _config():
 
 
 def _payments():
-    from arbitrage.payments import create_checkout_session, verify_webhook_signature, handle_webhook_event
+    from arbitrage.payments import (
+        create_checkout_session,
+        handle_webhook_event,
+        verify_webhook_signature,
+    )
     return create_checkout_session, verify_webhook_signature, handle_webhook_event
 
 
 def _quantum():
-    from arbitrage.quantum import quantum_decide, entangle_markets, get_autopojeza_status, run_quantum_scan
+    from arbitrage.quantum import (
+        entangle_markets,
+        get_autopojeza_status,
+        quantum_decide,
+        run_quantum_scan,
+    )
     return quantum_decide, entangle_markets, get_autopojeza_status, run_quantum_scan
 
 
@@ -83,8 +154,8 @@ def _oracle():
 
 
 def _wholesale():
-    from arbitrage.wholesale_scout import scout_wholesale
     from arbitrage.database import get_deals
+    from arbitrage.wholesale_scout import scout_wholesale
     return scout_wholesale, get_deals
 
 
@@ -94,7 +165,7 @@ def _wholesale_cycle():
 
 
 def _mass_generator():
-    from arbitrage.mass_generator import run_mass_generation, generate_manifest, MANIFEST_FILE
+    from arbitrage.mass_generator import MANIFEST_FILE, generate_manifest, run_mass_generation
     return run_mass_generation, generate_manifest, MANIFEST_FILE
 
 
@@ -315,6 +386,11 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_quantum_decide(self):
         """POST /api/arbitrage/quantum/decide — Kwantowy Moduł Decyzyjny."""
+        client_ip = self.client_address[0]
+        if not _quantum_limiter.is_allowed(client_ip):
+            self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
+            return
+
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}") if length else {}
         price_source = float(body.get("price_source", 0))
@@ -336,6 +412,11 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_quantum_scan(self):
         """POST /api/arbitrage/quantum/scan — Skan wszystkich kanałów."""
+        client_ip = self.client_address[0]
+        if not _quantum_limiter.is_allowed(client_ip):
+            self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
+            return
+
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}") if length else {}
         all_deals = body.get("deals", {})
@@ -399,7 +480,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_wholesale_deals(self):
         """GET /api/arbitrage/wholesale/deals — Query stored deals."""
-        from urllib.parse import urlparse, parse_qs
+        from urllib.parse import parse_qs, urlparse
         qs = parse_qs(urlparse(self.path).query)
         channel_id = qs.get("channel_id", [None])[0]
         status = qs.get("status", [None])[0]

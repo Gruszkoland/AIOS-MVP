@@ -16,9 +16,9 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Literal
 
-from .analyzer import digital_root, calculate_market_resonance
+from .analyzer import calculate_market_resonance
 from .config import QUANTUM_SCAN_CHANNELS
-from .database import upsert_deal, get_deals
+from .database import upsert_deal
 
 logger = logging.getLogger("adrion.wholesale_scout")
 

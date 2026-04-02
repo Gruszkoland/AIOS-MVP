@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import fs from "fs/promises";
 import path from "path";
 import { ProductCheckout } from "@/components/product-checkout";
@@ -57,10 +56,11 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  const { slug } = await params;
   const manifest = await loadManifest();
-  const product = manifest?.products.find((p) => p.slug === params.slug);
+  const product = manifest?.products.find((p) => p.slug === slug);
   if (!product) return {};
   const deMeta = product.markets["DE"];
   return {
@@ -88,9 +88,10 @@ const CHANNEL_LABELS: Record<string, string> = {
 export default async function WholesalePage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const product = await getWholesaleProduct(params.slug);
+  const { slug } = await params;
+  const product = await getWholesaleProduct(slug);
 
   if (!product) {
     notFound();

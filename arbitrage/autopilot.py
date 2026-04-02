@@ -4,13 +4,12 @@ Background scheduler for fully automated orchestrator cycles.
 """
 import logging
 import threading
-import time
 from datetime import datetime
 
-from .database import init_db, record_autopilot_run, get_last_autopilot_run
+from .config import RESALE_EVENTS_DAILY_CAP, UGC_EVENTS_DAILY_CAP
+from .database import get_last_autopilot_run, init_db, record_autopilot_run
 from .orchestrator import run_cycle
 from .stream_emitters import run_aux_streams
-from .config import UGC_EVENTS_DAILY_CAP, RESALE_EVENTS_DAILY_CAP
 
 log = logging.getLogger("autopilot")
 

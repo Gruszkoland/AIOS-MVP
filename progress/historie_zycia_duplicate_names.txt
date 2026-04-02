@@ -1,0 +1,18 @@
+ROOT=C:\Users\adiha\Mój dysk\Historie Życia
+FILE_COUNT=1891
+DUP_FILE_NAME_GROUPS=2
+DUP_FILE_NAME_INSTANCES=10
+
+TOP_DUPLICATE_FILE_NAMES
+[8x] Thumbs.db
+  C:\Users\adiha\Mój dysk\Historie Życia\Marta i Adi\Thumbs.db
+  C:\Users\adiha\Mój dysk\Historie Życia\Studniówka Adriana 9.02.2006\Thumbs.db
+  C:\Users\adiha\Mój dysk\Historie Życia\Studniówka Marty 6.01.2007\Thumbs.db
+  C:\Users\adiha\Mój dysk\Historie Życia\Sylwester 2006-2007\Thumbs.db
+  C:\Users\adiha\Mój dysk\Historie Życia\U Bebe w domku\Thumbs.db
+  C:\Users\adiha\Mój dysk\Historie Życia\U Bebe w domku\Martusia\Thumbs.db
+  C:\Users\adiha\Mój dysk\Historie Życia\zdjecia\Thumbs.db
+  C:\Users\adiha\Mój dysk\Historie Życia\Łysa Góra\Thumbs.db
+[2x] Martusia.JPG
+  C:\Users\adiha\Mój dysk\Historie Życia\Naprawde stare zdjecia\Martusia.JPG
+  C:\Users\adiha\Mój dysk\Historie Życia\zdjecia\Martusia.jpg

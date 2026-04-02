@@ -11,7 +11,6 @@ Usage:
     python -m arbitrage.main run             # full pipeline (scout→analyze→review)
 """
 
-import sys
 import logging
 import sys
 
@@ -21,12 +20,12 @@ if hasattr(sys.stdout, 'reconfigure'):
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
-from arbitrage.database import init_db, get_jobs, get_pending_bids, approve_bid, get_totals
-from arbitrage.scout    import run_scout
 from arbitrage.analyzer import analyze_job
-from arbitrage.bidder   import create_bid
-from arbitrage.xrp      import get_progress, print_progress, record_earning
-from arbitrage.config   import MIN_ANALYZER_SCORE, DAILY_BID_LIMIT
+from arbitrage.bidder import create_bid
+from arbitrage.config import DAILY_BID_LIMIT, MIN_ANALYZER_SCORE
+from arbitrage.database import approve_bid, get_jobs, get_pending_bids, get_totals, init_db
+from arbitrage.scout import run_scout
+from arbitrage.xrp import print_progress, record_earning
 
 logging.basicConfig(
     level=logging.INFO,

@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Optional
 
 from .config import BASE_DIR, QUANTUM_SCAN_CHANNELS
-from .database import init_db, get_deals, record_kpi_event
+from .database import get_deals, init_db, record_kpi_event
 
 logging.basicConfig(
     level=logging.INFO,
@@ -202,8 +202,8 @@ def trigger_revalidation(slugs: list[str], base_url: str = "http://localhost:300
     POST to Next.js revalidation endpoint for changed product pages.
     Requires the micro-saas app to be running with an /api/revalidate route.
     """
-    import urllib.request
     import urllib.error
+    import urllib.request
 
     results = {"revalidated": 0, "failed": 0, "errors": []}
 

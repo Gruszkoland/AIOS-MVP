@@ -39,6 +39,10 @@
   "git.autofetch": true,
   "git.confirmSync": false,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.automationProfile.windows": {
+    "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "args": ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass"]
+  },
   "terminal.integrated.profiles.windows": {
     "PowerShell": {
       "source": "PowerShell",
@@ -58,6 +62,7 @@
     }
   ],
   "github.copilot.chat.agentStyle": "concise",
+  "chat.viewSessions.enabled": true,
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-containers"
   }
