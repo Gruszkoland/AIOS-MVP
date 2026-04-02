@@ -3,10 +3,13 @@ ADRION 369 - Bidder Agent
 Generates cover letters and creates bid records (approved=False).
 Human must approve every bid before it is sent.
 """
-import json
 import logging
+
 from .config import (
-    OPENROUTER_KEY, OPENAI_KEY, ANTHROPIC_KEY, LLM_MODEL,
+    ANTHROPIC_KEY,
+    LLM_MODEL,
+    OPENAI_KEY,
+    OPENROUTER_KEY,
     get_active_llm_backend,
 )
 from .database import insert_bid, set_job_status

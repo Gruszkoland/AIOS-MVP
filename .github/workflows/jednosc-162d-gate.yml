@@ -1,0 +1,91 @@
+name: ADRION 162D Classification Gate
+
+on:
+  pull_request:
+    paths:
+      - "scripts/reporting/map_jednosc_to_162d.py"
+      - "scripts/reporting/merge_jednosc_decisions.py"
+      - "scripts/reporting/autofill_jednosc_pending.py"
+      - "scripts/reporting/validate_session_reports.py"
+      - "docs/JEDNOSC_162D_*.md"
+      - "docs/162D-DECISION-SPACE.md"
+      - "tests/test_jednosc_162d_final.py"
+      - ".github/workflows/jednosc-162d-gate.yml"
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "scripts/reporting/map_jednosc_to_162d.py"
+      - "scripts/reporting/merge_jednosc_decisions.py"
+      - "scripts/reporting/autofill_jednosc_pending.py"
+      - "scripts/reporting/validate_session_reports.py"
+      - "docs/JEDNOSC_162D_*.md"
+      - "docs/162D-DECISION-SPACE.md"
+      - "tests/test_jednosc_162d_final.py"
+      - ".github/workflows/jednosc-162d-gate.yml"
+  workflow_dispatch:
+
+jobs:
+  classification-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
+      - name: Smoke map generator and artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          CI_MAP="docs/JEDNOSC_162D_MAP.ci.md"
+          CI_APPROVED="docs/JEDNOSC_162D_APPROVED.ci.md"
+          CI_REVIEW="docs/JEDNOSC_162D_REVIEW_BACKLOG.ci.md"
+          CI_CHECKLIST="docs/JEDNOSC_162D_REVIEW_CHECKLIST.ci.md"
+          CI_PENDING="docs/JEDNOSC_162D_REVIEW_PENDING.ci.md"
+          python scripts/reporting/map_jednosc_to_162d.py \
+            --output "$CI_MAP" \
+            --approved-output "$CI_APPROVED" \
+            --review-output "$CI_REVIEW" \
+            --checklist-output "$CI_CHECKLIST" \
+            --pending-output "$CI_PENDING"
+          test -f "$CI_MAP"
+          test -f "$CI_APPROVED"
+          test -f "$CI_REVIEW"
+          test -f "$CI_CHECKLIST"
+          test -f "$CI_PENDING"
+          grep -q "## Tabela mapowania" "$CI_MAP"
+          grep -q "| # | Dokument | Perspektywa | Tryb | Prawo | Triada |" "$CI_MAP"
+          rm -f "$CI_MAP" "$CI_APPROVED" "$CI_REVIEW" "$CI_CHECKLIST" "$CI_PENDING"
+
+      - name: Smoke merge output and assert production state
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP_DIR="$(mktemp -d)"
+          python scripts/reporting/merge_jednosc_decisions.py \
+            --map docs/JEDNOSC_162D_MAP.md \
+            --checklist docs/JEDNOSC_162D_REVIEW_CHECKLIST.md \
+            --output "$TMP_DIR/JEDNOSC_162D_FINAL.md"
+          grep -q "Pozycji FINAL: 17 / 17" "$TMP_DIR/JEDNOSC_162D_FINAL.md"
+          grep -q "Pozycji PENDING: 0" "$TMP_DIR/JEDNOSC_162D_FINAL.md"
+
+      - name: Verify UTF-8 integrity for 162D artifacts
+        run: |
+          python -c "from pathlib import Path; files=['docs/JEDNOSC_162D_MAP.md','docs/JEDNOSC_162D_APPROVED.md','docs/JEDNOSC_162D_REVIEW_BACKLOG.md','docs/JEDNOSC_162D_REVIEW_CHECKLIST.md','docs/JEDNOSC_162D_REVIEW_PENDING.md','docs/JEDNOSC_162D_FINAL.md','docs/162D-DECISION-SPACE.md']; bad=[]; moj=[];\nfor f in files:\n p=Path(f); data=p.read_text(encoding='utf-8');\n if '\\ufffd' in data: moj.append(f);\n if 'Ã' in data or 'â' in data: moj.append(f);\nprint('UTF8_OK_FILES='+str(len(files)));\nimport sys;\nif moj: print('POTENTIAL_MOJIBAKE='+';'.join(sorted(set(moj)))); sys.exit(1)"
+
+      - name: Run Jednosc regression tests
+        run: python -m pytest tests/test_jednosc_162d_final.py -q --tb=no
+
+      - name: Validate session reports
+        run: python scripts/reporting/validate_session_reports.py

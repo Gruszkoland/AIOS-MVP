@@ -11,9 +11,15 @@ Vortex Extensions (PROGRAMATOR #9, #10, #19):
 import json
 import logging
 import random
+
 from .config import (
-    OPENROUTER_KEY, OPENAI_KEY, ANTHROPIC_KEY, LLM_MODEL,
-    MIN_ANALYZER_SCORE, MIN_PROFIT_USD, get_active_llm_backend,
+    ANTHROPIC_KEY,
+    LLM_MODEL,
+    MIN_ANALYZER_SCORE,
+    MIN_PROFIT_USD,
+    OPENAI_KEY,
+    OPENROUTER_KEY,
+    get_active_llm_backend,
 )
 
 logger = logging.getLogger("adrion.llm.analyzer")

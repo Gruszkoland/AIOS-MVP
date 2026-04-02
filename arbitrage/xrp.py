@@ -9,8 +9,8 @@ Fallback: cached price from last successful call stored in DB (kpis table).
 import json
 import logging
 from datetime import datetime
-from urllib.request import urlopen, Request
 from urllib.error import URLError
+from urllib.request import Request, urlopen
 
 from arbitrage.config import XRP_TARGET
 from arbitrage.database import get_conn

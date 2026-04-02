@@ -8,9 +8,9 @@ Endpoints added to ArbitrageHandler:
 
 Requires: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET in .env
 """
-import json
-import hmac
 import hashlib
+import hmac
+import json
 import logging
 import time
 from datetime import datetime
@@ -28,8 +28,9 @@ TIERS = {
 def _get_stripe():
     """Lazy import stripe to avoid hard dependency."""
     try:
-        import stripe
         import os
+
+        import stripe
         stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
         return stripe
     except ImportError:

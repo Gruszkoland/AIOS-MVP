@@ -5,12 +5,14 @@
 **ADRION 369 v2.0** is an elite, security-hardened autonomous execution environment based on the **Trinity-EBDI** framework. It orchestrates high-performance components across Go and Python to deliver predictive intelligence (Vortex Oracle) and real-time governance.
 
 ### 🚀 Key Innovations (v2.0)
+
 - **Go Sentinel 174Hz**: Low-latency execution monitoring and rapid-response logic in Go.
 - **Python Quantum**: Advanced decision-making and pattern recognition using high-dimensional modeling.
 - **162D Decision Space**: A 162-dimensional workspace for evaluating actions based on Material, Intellectual, and Essential perspectives.
 - **Trinity-EBDI Engine**: Blending emotional intelligence (EBDI) with logical purity for balanced decisions.
 
 ### 🎯 Core Philosophy
+
 - **Local-First**: All inference on your machine via Ollama (DeepSeek-Coder).
 - **Privacy-Centric**: Genesis Record ensures zero data export.
 - **Trinity Reasoning**: Every decision is weighted by ROI (Material), Logic (Intellectual), and Ethics (Essential).
@@ -29,25 +31,27 @@
 
 ## 🧠 The Swarm Personas
 
-| Persona | Role | Law | Trigger |
-|---------|------|-----|---------|
-| **LIBRARIAN** | Knowledge Archiver | 1: Historical Continuity | `@librarian` |
-| **SAP** | Strategic Planner | 2: Strategic Coherence | `@sap` |
-| **AUDITOR** | Quality Overseer | 3: Non-Regression | `@auditor` |
-| **SENTINEL** | Error Guardian | 4: Rapid Response | `@sentinel` |
-| **ARCHITECT** | Design Authority | 5: Unified Design | `@architect` |
-| **HEALER** | Optimization Engine | 6: Continuous Healing | `@healer` |
+| Persona       | Role                | Law                      | Trigger      |
+| ------------- | ------------------- | ------------------------ | ------------ |
+| **LIBRARIAN** | Knowledge Archiver  | 1: Historical Continuity | `@librarian` |
+| **SAP**       | Strategic Planner   | 2: Strategic Coherence   | `@sap`       |
+| **AUDITOR**   | Quality Overseer    | 3: Non-Regression        | `@auditor`   |
+| **SENTINEL**  | Error Guardian      | 4: Rapid Response        | `@sentinel`  |
+| **ARCHITECT** | Design Authority    | 5: Unified Design        | `@architect` |
+| **HEALER**    | Optimization Engine | 6: Continuous Healing    | `@healer`    |
 
 ---
 
 ## ⚡ Quick Start
 
 ### 1. Prerequisites
+
 - Ollama from [ollama.com](https://ollama.com)
 - Python 3.10+
 - Git
 
 ### 2. Setup Ollama
+
 ```bash
 # Start Ollama and download model
 ollama run deepseek-coder-v2:16b
@@ -55,6 +59,7 @@ ollama run deepseek-coder-v2:16b
 ```
 
 ### 3. Install Aider
+
 ```bash
 pip install aider-chat
 ```
@@ -62,12 +67,14 @@ pip install aider-chat
 ### 4. Start the System
 
 **Terminal 1 (Ollama):**
+
 ```bash
 ollama serve
 # Ollama will run on http://localhost:11434
 ```
 
 **Terminal 2 (Aider):**
+
 ```bash
 # In your project directory
 aider
@@ -110,16 +117,19 @@ Run an optimization cycle on technical debt.
 
 You can now connect the UGC and Resale streams to real external data sources.
 Update your `.env` with:
+
 - `UGC_SOURCE_URL`: URL to your UGC marketplace/n8n endpoint.
 - `RESALE_SOURCE_URL`: URL to your resale marketplace/n8n endpoint.
 - `STREAMS_CONNECTOR_TOKEN`: Optional Bearer token for authentication.
 
 To manually trigger a data pull:
+
 ```bash
 curl -X POST http://localhost:5000/api/arbitrage/streams/run
 ```
 
 ### Production Deployment
+
 For production-grade deployment of the Arbitrage API (Docker + Waitress + healthcheck), see:
 
 - [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)
@@ -151,9 +161,9 @@ python scripts/security/load_secrets.py
 
 - You can feed real UGC and resale events from n8n or marketplace webhooks.
 - Set these vars in local `.env`:
-   - `UGC_SOURCE_URL`
-   - `RESALE_SOURCE_URL`
-   - `STREAMS_CONNECTOR_TOKEN` (optional bearer token)
+  - `UGC_SOURCE_URL`
+  - `RESALE_SOURCE_URL`
+  - `STREAMS_CONNECTOR_TOKEN` (optional bearer token)
 - Trigger ingestion manually:
 
 ```bash
@@ -166,7 +176,42 @@ curl -X POST http://localhost:8001/api/arbitrage/streams/run \
 
 ---
 
-## 📁 Project Structure
+## �️ Maintenance & Self-Healing
+
+The **ADRION 369** system includes advanced autonomous maintenance components:
+
+### 1. Go-based Sentinel (174Hz)
+
+The system's "immune system" implemented in Go for maximum performance.
+
+- **Location**: `cmd/vortex-server/`
+- **Function**: Real-time monitoring of system integrity, logic stress detection, and sub-millisecond response to anomalies.
+- **Usage**: Automatically runs as part of the `vortex-core` stack. Monitor logs via:
+  ```bash
+  docker logs adrion-vortex-server
+  ```
+
+### 2. Adrion-Healer (Autonomous Optimization)
+
+A dedicated container focused on reducing technical debt and optimizing the codebase.
+
+- **Function**: Background analysis of code patterns, performance bottlenecks, and structural alignment with Trinity principles.
+- **Status Check**:
+  ```bash
+  docker ps -f name=adrion-healer
+  ```
+- **Manual Trigger**:
+  ```bash
+  @healer Run optimization cycle on latest modules.
+  ```
+
+### 3. Legacy Migration
+
+Old logic (e.g., `oracle.py`, `quantum.py`) has been moved to the `legacy/` directory to prevent interference with the new Go-based core. Always verify that high-speed logic is implemented in the `cmd/` or `internal/` Go directories.
+
+---
+
+## �📁 Project Structure
 
 ```
 .
@@ -201,6 +246,7 @@ curl -X POST http://localhost:8001/api/arbitrage/streams/run \
 ## 🚀 How It Works
 
 ### Normal Workflow
+
 ```
 User Query
    ↓
@@ -220,6 +266,7 @@ HEALER (Background) → Continuous Optimization & Debt Reduction
 ```
 
 ### Crisis Mode
+
 ```
 Critical Error Detected
    ↓
@@ -235,6 +282,7 @@ Escalate to HEALER (if recurring)
 ## 🔒 Privacy & Security
 
 ### Law 7: Genesis Record
+
 - ✅ All inference runs locally (Ollama on `localhost:11434`)
 - ✅ All code stays on your machine
 - ✅ All logs stored locally in `.aider/logs/`
@@ -265,18 +313,21 @@ Escalate to HEALER (if recurring)
 ## 🔧 Configuration
 
 ### Aider Settings (`.aider/config.yml`)
+
 ```yaml
 model: openai/deepseek-coder-v2:16b
 openai-api-base: http://localhost:11434/v1
 openai-api-key: ollama
-edit-format: architect              # Debate mode
-stream: true                        # Live streaming
+edit-format: architect # Debate mode
+stream: true # Live streaming
 context-limit: 16000
 auto-commits: true
 ```
 
 ### Persona Definitions (`config/personas.yml`)
+
 Each persona has:
+
 - System prompt (role, constraints, tools)
 - Allowed tools (what they can do)
 - Output format
@@ -287,6 +338,7 @@ Each persona has:
 ## 📊 Example Session
 
 ### Terminal Output
+
 ```
 user> @librarian
 Analyze this project's recent history and structure.
@@ -353,37 +405,41 @@ pkill ollama
 
 ## 📚 Documentation
 
-| Document | Purpose |
-|----------|---------|
-| [INSTALL.md](docs/INSTALL.md) | Step-by-step setup guide |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design & data flow |
-| [LAWS.md](docs/LAWS.md) | Detailed law descriptions |
-| [WORKFLOW.md](docs/WORKFLOW.md) | How to use the personas |
-| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues & fixes |
+| Document                                      | Purpose                   |
+| --------------------------------------------- | ------------------------- |
+| [INSTALL.md](docs/INSTALL.md)                 | Step-by-step setup guide  |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md)       | System design & data flow |
+| [LAWS.md](docs/LAWS.md)                       | Detailed law descriptions |
+| [WORKFLOW.md](docs/WORKFLOW.md)               | How to use the personas   |
+| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues & fixes     |
 
 ---
 
 ## 🚨 Troubleshooting
 
 ### Ollama not responding
+
 ```bash
 curl http://localhost:11434/api/tags
 # If fails, restart Ollama
 ```
 
 ### Model not found
+
 ```bash
 ollama pull deepseek-coder-v2:16b
 ollama list
 ```
 
 ### Aider slow
+
 ```yaml
 # In .aider/config.yml, reduce context:
-context-limit: 8000  # was 16000
+context-limit: 8000 # was 16000
 ```
 
 ### Out of memory
+
 ```bash
 # Use smaller model
 ollama run deepseek-coder-v2:lite
@@ -413,6 +469,7 @@ ollama run deepseek-coder-v2:lite
 ## 📝icense & Attribution
 
 ADRION 369 System created with:
+
 - **Ollama** (MIT License)
 - **Aider** (Apache 2.0)
 - **DeepSeek-Coder** (MIT License)

@@ -7,8 +7,7 @@ NOTE: XRP wallet is NEVER stored here — enter at transfer time only.
 import json
 import logging
 from datetime import datetime
-from urllib.request import urlopen, Request
-from urllib.error import URLError
+from urllib.request import Request, urlopen
 
 from .config import XRP_TARGET
 from .database import get_conn

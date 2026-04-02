@@ -1,0 +1,13 @@
+{
+  "ts": 1775163030,
+  "status": "READY_FOR_PROMOTION",
+  "ready_for_promotion": true,
+  "count": 11,
+  "min_events": 1,
+  "message": "KPI gate passed and promotion conditions met",
+  "promotion": {
+    "enabled": true,
+    "percent": 5.0,
+    "backend": "openrouter"
+  }
+}

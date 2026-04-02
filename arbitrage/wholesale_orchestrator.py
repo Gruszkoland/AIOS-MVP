@@ -16,14 +16,14 @@ import time
 from datetime import datetime
 
 from .database import (
-    init_db,
     get_deals,
-    update_deal_status,
+    init_db,
     record_kpi_event,
+    update_deal_status,
 )
+from .oracle import oracle_scan_products
+from .quantum import get_autopojeza_status
 from .wholesale_scout import scout_wholesale
-from .oracle import oracle_predict, oracle_scan_products
-from .quantum import get_autopojeza_status, record_decision_outcome
 
 logging.basicConfig(
     level=logging.INFO,

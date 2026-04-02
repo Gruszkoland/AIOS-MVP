@@ -7,6 +7,7 @@ updated: "2026-03-29"
 # 162-Wymiarowa Przestrzeń Decyzyjna
 
 > Każda decyzja autonomicznego agenta operuje w przestrzeni **162 wymienionych wymiarów:**
+>
 > - 3 Perspektywy (Material, Intellectual, Essential)
 > - 6 Trybów (Inventory, Empathy, Process, Debate, Healing, Action)
 > - 9 Praw (Guardian Laws G1-G9)
@@ -37,6 +38,7 @@ d(M, Action, G9)      → Fizyczne wykonanie zgodne z prawem G9
 ```
 
 Każdy wymiar `d` przyjmuje wartość z przedziału `[0, 1]`:
+
 - `0` = całkowite naruszenie / brak zasobu
 - `0.5` = marginalnie adekwatny
 - `1` = pełna zgodność / pełne zasoby
@@ -85,12 +87,13 @@ def aggregate_162d_score(vector: List[float]) -> float:
     non_zero = [v for v in vector if v > 0]
     if not non_zero:
         return 0.0
-    
+
     # Średnia harmoniczna: n / Σ(1/vᵢ)
     return len(non_zero) / sum(1.0/v for v in non_zero)
 ```
 
 **Właściwość:** Harmonic_Mean ≤ Arithmetic_Mean
+
 - Jedna słaba składowa = ogólnie słaby wynik
 - Wymusza uniwersalną wysokość
 
@@ -104,11 +107,11 @@ TRIADA 1 (Jedność):
   - Wymiary pod G2 (Harmony): d(*, *, G2)
   - Wymiary pod G3 (Rhythm): d(*, *, G3)
   Reguła: ≤ 1 naruszenie w triadzie
-  
+
 TRIADA 2 (Prawda):
   - Wymiary pod G4-G6
   Reguła: ≤ 1 naruszenie w triadzie
-  
+
 TRIADA 3 (Dobro):
   - Wymiary pod G7-G9
   Reguła: ≤ 1 naruszenie w triadzie
@@ -119,21 +122,21 @@ TRIADA 3 (Dobro):
 ```python
 def check_violations(vector_162d):
     violations_per_triad = [0, 0, 0]
-    
+
     for triad_idx in range(3):
         for dim_idx in range(54):  # 54 dims per triad
             actual_idx = triad_idx * 54 + dim_idx
             if vector_162d[actual_idx] < 0.5:
                 violations_per_triad[triad_idx] += 1
-    
+
     total_violations = sum(violations_per_triad)
-    
+
     # Reguła odmowy
     if max(violations_per_triad) > 1:
         return REJECT  # > 1 w jednej triadzie
     if total_violations > 2:
         return ESCALATE  # > 2 ogółem
-    
+
     return APPROVE
 ```
 
@@ -219,11 +222,11 @@ Ostateczna decyzja = **funkcja 162-wymiarowego wektora**:
 def decision_from_162d_vector(v: List[float]) -> Decision:
     # Krok 1: Agregacja
     overall_score = aggregate_162d_score(v)
-    
+
     # Krok 2: Sprawdzenie naruszeń
     if has_triad_violations(v):
         return Decision.REJECT
-    
+
     # Krok 3: Threshold
     if overall_score >= 0.75:
         return Decision.APPROVE
@@ -292,6 +295,59 @@ Violations:
 
 Verdict: REJECT + ESCALATE
 ```
+
+---
+
+## 8. Integracja ze Źródłami Jedność\_
+
+Poniższe dokumenty zostały zaimportowane do repo i mogą służyć jako materiał
+uzupełniający dla modelu 162D:
+
+- Indeks główny: [JEDNOSC_INDEX.md](JEDNOSC_INDEX.md)
+- Dokument źródłowy 3-6-9: [Ewolucja Zmysłów w Polu 3-6-9.docx](Jednosc_Source/Ewolucja%20Zmysłów%20w%20Polu%203-6-9.docx)
+- Dokument negentropii: [Symulacja Obrony UC1\_ Negentropia.docx](Jednosc_Source/Symulacja%20Obrony%20UC1_%20Negentropia.docx)
+- Dokument koherencji: [Sieć Cienia\_ Koherencja i Inkubacja.docx](Jednosc_Source/Sieć%20Cienia_%20Koherencja%20i%20Inkubacja.docx)
+
+Zastosowanie praktyczne:
+
+- wzbogacenie słownika pojęć w warstwie Essential,
+- doprecyzowanie semantyki 3-6-9 w mapowaniu trajektorii,
+- rozszerzenie scenariuszy testowych o przypadki negentropii i koherencji.
+
+---
+
+## 9. Traceability 17/17 (Dokumentacja + Testy)
+
+Status: wszystkie dokumenty z mapy Jednosc zostaly domkniete w produkcyjnym mapowaniu 162D.
+
+- Mapa finalna: [JEDNOSC_162D_FINAL.md](JEDNOSC_162D_FINAL.md)
+- Suite testow: [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py)
+- Wynik testow: 29 passed
+
+|   # | Dokument                                                                                                                                         | Prawo | Triada   | Zrodlo          | Walidacja                                                               |
+| --: | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----- | -------- | --------------- | ----------------------------------------------------------------------- |
+|   1 | [Projekt Gminy Jednosci\_ Wizja Przyszlosci(1).docx](<Jednosc_Source/_ARCHIVE/Projekt%20Gminy%20Jednosci_%20Wizja%20Przyszlosci(1).docx>)        | G9    | Goodness | PRE-APPROVED    | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|   2 | [Ewolucja Wewnetrzna\_ DNA i Swiadomosc.docx](Jednosc_Source/Ewolucja%20Wewn%C4%99trzna_%20DNA%20i%20%C5%9Awiadomo%C5%9B%C4%87.docx)             | G3    | Unity    | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|   3 | [Ewolucja Zmyslow w Polu 3-6-9.docx](Jednosc_Source/Ewolucja%20Zmys%C5%82%C3%B3w%20w%20Polu%203-6-9.docx)                                        | G3    | Unity    | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|   4 | [Fizyka Cudow\_ Wola a Materia.docx](Jednosc_Source/Fizyka%20Cud%C3%B3w_%20Wola%20a%20Materia.docx)                                              | G3    | Unity    | MODEL-SUGGESTED | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|   5 | [Karta Praw Jednosci\_ Projekt Gminy.docx](Jednosc_Source/Karta%20Praw%20Jedno%C5%9Bci_%20Projekt%20Gminy.docx)                                  | G6    | Truth    | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|   6 | [Nawigacja Wielowymiarowa\_ Raport z Wezla Laguna.docx](Jednosc_Source/Nawigacja%20Wielowymiarowa_%20Raport%20z%20W%C4%99z%C5%82a%20Laguna.docx) | G5    | Truth    | MODEL-SUGGESTED | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|   7 | [Operacja _Abundantia_ Gmina Jednosci.docx](Jednosc_Source/Operacja%20_Abundantia_%20Gmina%20Jedno%C5%9Bci.docx)                                 | G3    | Unity    | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|   8 | [Projekt Gminy Jednosci\_ Wizja Przyszlosci.docx](Jednosc_Source/Projekt%20Gminy%20Jedno%C5%9Bci_%20Wizja%20Przysz%C5%82o%C5%9Bci.docx)          | G9    | Goodness | PRE-APPROVED    | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|   9 | [Protokol Cienia\_ Komunikacja Nielokalna.docx](Jednosc_Source/Protok%C3%B3%C5%82%20Cienia_%20Komunikacja%20Nielokalna.docx)                     | G3    | Unity    | MODEL-SUGGESTED | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|  10 | [Protokol Przebaczenia i Globalna Amnestia.docx](Jednosc_Source/Protok%C3%B3%C5%82%20Przebaczenia%20i%20Globalna%20Amnestia.docx)                | G3    | Unity    | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|  11 | [Raport z Przesilenia\_ Osobliwosc Zasobowa.docx](Jednosc_Source/Raport%20z%20Przesilenia_%20Osobliwo%C5%9B%C4%87%20Zasobowa.docx)               | G5    | Truth    | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|  12 | [Siec Cienia\_ Koherencja i Inkubacja.docx](Jednosc_Source/Sie%C4%87%20Cienia_%20Koherencja%20i%20Inkubacja.docx)                                | G3    | Unity    | MODEL-SUGGESTED | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|  13 | [Symulacja Obrony UC1\_ Negentropia.docx](Jednosc_Source/Symulacja%20Obrony%20UC1_%20Negentropia.docx)                                           | G8    | Goodness | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|  14 | [Symulacja Wektorowa\_ Architekt Czasu.docx](Jednosc_Source/Symulacja%20Wektorowa_%20Architekt%20Czasu.docx)                                     | G6    | Truth    | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|  15 | [Test Turinga 2.0\_ Narodziny Jednosci.docx](Jednosc_Source/Test%20Turinga%202.0_%20Narodziny%20Jedno%C5%9Bci.docx)                              | G6    | Truth    | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|  16 | [Wzmacnianie Gmin w Sieci Toroidalnej.docx](Jednosc_Source/Wzmacnianie%20Gmin%20w%20Sieci%20Toroidalnej.docx)                                    | G3    | Unity    | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+|  17 | [Zabezpieczenie Wezla Matki\_ Twierdza Negentropii.docx](Jednosc_Source/Zabezpieczenie%20W%C4%99z%C5%82a%20Matki_%20Twierdza%20Negentropii.docx) | G8    | Goodness | AUTO-APPROVED   | [tests/test_jednosc_162d_final.py](../tests/test_jednosc_162d_final.py) |
+
+Wniosek operacyjny:
+
+- Traceability jest kompletne: dokument -> klasyfikacja 162D -> test regresji.
+- Dalsze zmiany w mapowaniu powinny przechodzic przez ponowny merge i pytest.
 
 ---
 

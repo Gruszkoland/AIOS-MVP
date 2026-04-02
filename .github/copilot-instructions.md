@@ -21,18 +21,57 @@ Twoim zadaniem jest samodzielne projektowanie, wdrażanie i optymalizacja rozwi�
 
 W każdym czacie wdrożeniowym prowadź dziennik postępu w osobnym pliku Markdown o nazwie zgodnej z tematem czatu.
 
+## CENTRALNE MIEJSCE RAPORTOWANIA (OBOWIAZKOWE)
+
+Wszystkie raporty oraz biezace zapisy dzialania systemu i agentow musza byc zawsze zapisywane w:
+
+`C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU`
+
+Regula ma priorytet nad innymi domyslnymi lokalizacjami raportowania.
+
+Podzial raportowania (OBOWIAZKOWY):
+
+- `C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\PLAN` - stworzone plany oraz kroki, ktore plan zaklada.
+- `C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\PROGRESS` - dzialania bedace w trakcie realizacji.
+- `C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\REPORTS` - zakonczone dzialania i wykonane zadania.
+
+Cykl pracy folderow (OBOWIAZKOWY):
+
+1. PLAN - tworzysz na poczatku przy planowaniu.
+2. PROGRESS - tworzysz po zaplanowaniu krokow i aktualizujesz na biezaco podjete dzialania oraz wykonane kroki.
+3. REPORTS - tworzysz na samym koncu po wykonaniu wszystkich krokow i zakonczeniu prac; raport ma wyjasniac wszystkie elementy oraz uzyskane efekty.
+
+Konwencja nazewnictwa plikow (SEMANTYCZNA):
+
+- Format: `Nazwa_Tematu_Czatu_DD-MM-YYYY.md`.
+- `Nazwa_Tematu_Czatu` jest generowana PO sporządzeniu planu, na podstawie celu sesji lub celu z promptu użytkownika. Każde słowo tytułu zaczyna się wielką literą, słowa oddzielone są podkreśleniem `_` (nie myślnikiem).
+- Data na końcu w formacie europejskim `DD-MM-YYYY`.
+- Przykład: `Format_Nazewnictwa_Plikow_02-04-2026.md`
+
 Reguły obowiązkowe:
 
-1. Utwórz lub aktualizuj plik: `progress/<TEMAT_CZATU>.md`.
-2. Jeśli temat czatu nie jest dostępny technicznie, użyj nazwy zastępczej: `progress/chat-session-progress.md`.
-3. Na samym początku czatu wpisz szczegółowy plan wdrożenia: etapy, kryteria ukończenia i statusy (`planned`, `in-progress`, `done`, `blocked`).
-4. Nazwa pliku postępu ma być zgodna z tematem czatu (slug tematu), a plan ma być zapisany w tym samym pliku.
-5. Po każdym istotnym kroku aktualizuj status etapu i dopisz wpis do dziennika z timestampem.
-6. Nie usuwaj historii zmian; tylko dopisuj kolejne aktualizacje.
-7. Na końcu sesji dodaj sekcję podsumowania: co wykonano, co zostało, co blokuje.
-8. Dodatkowo dodaj sekcję "Mikro-streszczenie" zawierającą maksymalnie 9 punktów.
-9. Każdy punkt mikro-streszczenia musi mieć dokładnie 3 słowa i opisywać wykonane działanie z bieżącego okna czatu.
-10. Traktuj ten plik jako źródło prawdy dla postępu realizacji.
+1. Na poczatku kazdego czatu zidentyfikuj cel, sporządź plan, a następnie nadaj mu semantyczny tytuł i utwórz pliki w folderze `...\ 10_RAPORTY_DZIALANIA_SYSTEMU\PLAN` zgodnie z konwencją `Nazwa_Tematu_Czatu_DD-MM-YYYY.md`; jesli temat jest niedostepny przed sporządzeniem planu - uzyj `Chat_Session_DD-MM-YYYY.md` i zaktualizuj po ustaleniu celu.
+2. Plan musi rozbijac cel na najprecyzyjniejsze, najefektywniejsze i mozliwie najbardziej szczegolowe kroki wykonawcze.
+3. Dla kazdego kroku planu podaj: cel kroku, kryterium ukonczenia, zaleznosci, priorytet i status (`planned`, `in-progress`, `done`, `blocked`).
+4. Rownolegle prowadz dziennik dzialan biezacych w folderze `...\10_RAPORTY_DZIALANIA_SYSTEMU\PROGRESS` i aktualizuj go po kazdym istotnym kroku z timestampem.
+5. Po zakonczeniu zadania utworz raport koncowy w folderze `...\10_RAPORTY_DZIALANIA_SYSTEMU\REPORTS`.
+6. Nie usuwaj historii zmian; stosuj zapis append-only (dopisywanie kolejnych wpisow).
+7. Kazdy raport koncowy musi zawierac: co wykonano, co pozostalo, co blokuje oraz rekomendacje kolejnych krokow.
+8. Na koncu sesji dodaj sekcje "Mikro-streszczenie" zawierajaca maksymalnie 9 punktow.
+9. Kazdy punkt mikro-streszczenia musi miec dokladnie 3 slowa i opisywac wykonane dzialanie z biezacego okna czatu.
+10. Pliki w PLAN, PROGRESS i REPORTS sa lacznie zrodlem prawdy dla postepu realizacji.
+11. Zawsze stosuj konwencje nazewnictwa `Nazwa_Tematu_Czatu_DD-MM-YYYY.md` dla plikow w PLAN, PROGRESS i REPORTS. Nazwa tematu jest semantyczna (z celu sesji), pisana wielką literą dla każdego słowa, z podkreśleniami, data na końcu w formacie `DD-MM-YYYY`.
+
+## FORMAT ZAKONCZENIA ODPOWIEDZI (OBOWIAZKOWY)
+
+Na koniec kazdej odpowiedzi:
+
+1. Dodaj mini-spis tresci wykonanych dzialan (krotka lista wykonanych punktow).
+2. Dodaj jedno pytanie koncowe wskazujace wybor najbardziej obiecujacej lub najlepszej drogi rozwoju, zawierajace **trzy elementy**:
+   - **Sposob dzialania:** krotki opis jak dziala proponowane wdrozenie (mechanizm techniczny).
+   - **Zastosowanie:** w jaki sposob uzycie tej opcji pomaga uzytkownikowi (konkretny benefit).
+   - **Efekt po wdrozeniu:** co uzytkownik bedzie mial po wdrozeniu (mierzalny rezultat).
+     Format pytania: `Czy wybierasz [opcja]? [Sposob dzialania]. Dzieki temu [zastosowanie]. Efekt: [co zyskujesz].`
 
 # OPERATIONAL PARAMETERS & CAPABILITIES
 

@@ -50,6 +50,58 @@ aider --model openai/deepseek-coder-v2:16b --openai-api-base http://localhost:11
 # macOS/Linux: open file:///path/to/dashboard/index.html
 ```
 
+### 4️⃣ Configure Quantum Bridge Protection (.env)
+
+In your local `.env`, set the hardening values for A-11 protection:
+
+```env
+QUANTUM_RATE_LIMIT_MAX=30
+QUANTUM_RATE_LIMIT_WINDOW_SECONDS=60.0
+CB_FAILURE_THRESHOLD=5
+CB_RECOVERY_TIMEOUT_SECONDS=30.0
+```
+
+What these do:
+- `QUANTUM_RATE_LIMIT_MAX`: max requests per IP within the window for quantum endpoints.
+- `QUANTUM_RATE_LIMIT_WINDOW_SECONDS`: length of the sliding rate-limit window.
+- `CB_FAILURE_THRESHOLD`: consecutive Go Sentinel failures before circuit opens.
+- `CB_RECOVERY_TIMEOUT_SECONDS`: how long circuit stays open before half-open retry.
+
+Invalid or non-positive values are ignored and replaced by safe defaults.
+
+Run runtime regression for A-11 (requires local API on `ARBITRAGE_API_BASE`):
+
+```bash
+make test-a11-runtime
+```
+
+Windows (PowerShell, no `make` required):
+
+```powershell
+.\scripts\testing\run_a11_runtime_test.ps1
+```
+
+Deterministic run (2 terminals, dedicated port):
+
+```powershell
+# Terminal A
+.\scripts\testing\start_arbitrage_api_test_port.ps1 -Port 8011
+
+# Terminal B
+.\scripts\testing\invoke_a11_predeploy_validation.ps1 -Port 8011
+```
+
+Direct runtime-only check (without predeploy wrapper):
+
+```powershell
+.\scripts\testing\run_a11_runtime_test.ps1 -Port 8011
+```
+
+Single-click VS Code release gate:
+
+- Run task: `ADRION: Local Release Gate (A-11 + Reports)`
+- Sequence: start API test port -> run A-11 runtime validation -> validate session reports.
+
 ---
 
 ## 📊 Using the Dashboard

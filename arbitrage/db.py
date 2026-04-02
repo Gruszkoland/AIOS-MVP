@@ -5,8 +5,8 @@ All queries use parameterized statements to prevent SQL injection.
 
 import sqlite3
 from contextlib import contextmanager
-from arbitrage.config import DB_PATH
 
+from arbitrage.config import DB_PATH
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Schema

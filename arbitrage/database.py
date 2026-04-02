@@ -3,12 +3,12 @@ ADRION 369 - Freelance Arbitrage Database
 SQLite storage for jobs, bids, KPIs, earnings and XRP snapshots.
 All queries use parameterized statements to prevent SQL injection.
 """
-import sqlite3
 import json
-import os
 import logging
+import sqlite3
 from datetime import datetime
-from .config import DB_PATH, DB_ENGINE, DB_URL
+
+from .config import DB_ENGINE, DB_PATH, DB_URL
 
 logger = logging.getLogger("adrion.db")
 
@@ -345,7 +345,7 @@ def record_kpi_event(
         # Ensure 'source' is tracked
         if "source" not in meta_dict:
             meta_dict["source"] = "manual"
-            
+
         conn.execute(
             "INSERT INTO kpi_events (stream,event_type,amount_usd,est_cost_usd,meta_json) VALUES (?,?,?,?,?)",
             (

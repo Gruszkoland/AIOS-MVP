@@ -1,0 +1,7 @@
+{
+  "canary_enabled": true,
+  "canary_percent": 5.0,
+  "canary_backend": "openrouter",
+  "reason": "kpi_gate_passed",
+  "ts": 1775163030
+}

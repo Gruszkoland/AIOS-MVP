@@ -3,11 +3,11 @@ ADRION 369 - Scout Agent
 Discovers freelance jobs from Fiverr/Upwork.
 Modes: apify (real) | mock (no API key needed)
 """
-import json
-import random
 import hashlib
+import random
 from datetime import datetime
-from .config import APIFY_TOKEN, SCOUT_KEYWORDS, SCOUT_MIN_BUDGET, SCOUT_MAX_BUDGET
+
+from .config import APIFY_TOKEN, SCOUT_KEYWORDS, SCOUT_MAX_BUDGET, SCOUT_MIN_BUDGET
 from .database import upsert_job
 
 try:

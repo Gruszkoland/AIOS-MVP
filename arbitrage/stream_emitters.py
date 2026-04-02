@@ -2,15 +2,14 @@
 ADRION 369 - Auxiliary Stream Emitters
 Automated KPI event emitters for UGC and resale streams.
 """
-from datetime import datetime
 import hashlib
 import json
+from datetime import datetime
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
 
-from .database import record_kpi_event, get_conn
-from .config import STREAMS_CONNECTOR_TOKEN, UGC_SOURCE_URL, RESALE_SOURCE_URL
-
+from .config import RESALE_SOURCE_URL, STREAMS_CONNECTOR_TOKEN, UGC_SOURCE_URL
+from .database import get_conn, record_kpi_event
 
 UGC_OPPORTUNITIES = [
     {"brand": "WellnessLab", "base_fee": 180.0},
@@ -50,7 +49,7 @@ def _fetch_external_payload(url: str | None, stream_name: str = "unknown") -> di
                 data_raw = resp.read(1024 * 1024)
                 data = data_raw.decode("utf-8")
                 return json.loads(data)
-        except (URLError, HTTPError, TimeoutError, json.JSONDecodeError) as e:
+        except (URLError, HTTPError, TimeoutError, json.JSONDecodeError):
             if attempt == 0:
                 continue # Retry once
             return None
@@ -85,7 +84,7 @@ def _normalize_external_events(stream: str, payload: dict | list | None) -> list
         # Sanity check: Avoid negative or impossible costs (Hardening)
         amount = max(0, amount)
         est_cost = max(0, est_cost)
-        
+
         event_type = str(item.get("event_type", "")).strip().lower()
         meta = item.get("meta") if isinstance(item.get("meta"), dict) else {}
 
