@@ -1,0 +1,103 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: uap-backend-sa
+  namespace: adrion
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uap-backend
+  namespace: adrion
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: uap-backend
+  template:
+    metadata:
+      labels:
+        app: uap-backend
+    spec:
+      serviceAccountName: uap-backend-sa
+      containers:
+      - name: uap-backend
+        image: uap-backend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8002
+        envFrom:
+        - configMapRef:
+            name: adrion-config
+        - secretRef:
+            name: adrion-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /mapi/v1/status
+            port: 8002
+            httpHeaders:
+            - name: X-API-Key
+              value: "local-dev-key-123"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /mapi/v1/status
+            port: 8002
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uap-backend
+  namespace: adrion
+spec:
+  type: ClusterIP
+  selector:
+    app: uap-backend
+  ports:
+  - port: 8002
+    targetPort: 8002
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: uap-backend-hpa
+  namespace: adrion
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: uap-backend
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
