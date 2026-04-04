@@ -8,13 +8,13 @@ Natychmiastowa reakcja na krytyczne naruszenie bezpieczeństwa — obecność li
 
 ## OCENA RYZYKA
 
-| Zasób                     | Status                                  | Ryzyko                                   |
-| ------------------------- | --------------------------------------- | ---------------------------------------- |
-| `STRIPE_SECRET_KEY_REDACTED` | **AKTYWNY** w chwili wykrycia        | KRYTYCZNE — pełny dostęp do konta Stripe |
-| `STRIPE_LOGIN_PASSWORD`   | Plain text w pliku                      | WYSOKIE                                  |
-| `STRIPE_BACKUP_CODE`      | 2FA backup code                         | WYSOKIE                                  |
-| Historia git `.env.local` | **NIE znaleziono** w historii           | NISKIE                                   |
-| `.gitignore` coverage     | `.env.local` jest wykluczony (linia 16) | BEZPIECZNE                               |
+| Zasób                        | Status                                  | Ryzyko                                   |
+| ---------------------------- | --------------------------------------- | ---------------------------------------- |
+| `STRIPE_SECRET_KEY_REDACTED` | **AKTYWNY** w chwili wykrycia           | KRYTYCZNE — pełny dostęp do konta Stripe |
+| `STRIPE_LOGIN_PASSWORD`      | Plain text w pliku                      | WYSOKIE                                  |
+| `STRIPE_BACKUP_CODE`         | 2FA backup code                         | WYSOKIE                                  |
+| Historia git `.env.local`    | **NIE znaleziono** w historii           | NISKIE                                   |
+| `.gitignore` coverage        | `.env.local` jest wykluczony (linia 16) | BEZPIECZNE                               |
 
 ---
 
