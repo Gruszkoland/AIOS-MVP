@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Admin Panel (UAP) — ADRION 369 v4.0</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 100%);
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .main-container {
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-online { background: var(--success-color); color: white; }
+        .status-offline { background: var(--danger-color); color: white; }
+        .status-pending { background: var(--warning-color); color: white; }
+
+        .score-display {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .heatmap-item {
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            margin: 5px;
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .agent-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .agent-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .input-group input, .input-group textarea {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #e2e8f0;
+        }
+
+        .input-group input::placeholder, .input-group textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            font-weight: 600;
+            padding: 10px 24px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .tab-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 20px;
+        }
+
+        .nav-tabs .nav-link {
+            color: #94a3b8;
+            border-color: transparent;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #667eea;
+            border-color: #667eea;
+            background: transparent;
+        }
+
+        #realtime-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .loader {
+            border: 3px solid rgba(102, 126, 234, 0.2);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert-close {
+            cursor: pointer;
+        }
+
+        /* ──────────────────────────────────────────────────────────────── */
+        /* REAL-TIME DASHBOARD ANIMATIONS (Phase 4) */
+        /* ──────────────────────────────────────────────────────────────── */
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(102, 126, 234, 0.6);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes colorShift {
+            0% { border-color: rgba(102, 126, 234, 0.3); }
+            50% { border-color: rgba(102, 126, 234, 0.6); }
+            100% { border-color: rgba(102, 126, 234, 0.3); }
+        }
+
+        /* Live stat updates */
+        .stat-updating {
+            animation: glow 0.6s ease-in-out;
+        }
+
+        /* EBDI heatmap smooth color transition */
+        .heatmap-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Crisis highlighted agent */
+        .agent-crisis {
+            animation: pulse 0.5s ease-in-out infinite;
+            border-left: 4px solid #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Live connection indicator */
+        .connection-live {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        /* Real-time telemetry stream */
+        .telemetry-stream {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* EBDI PAD visualization grid */
+        .ebdi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .ebdi-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            animation: slideInLeft 0.4s ease-out;
+        }
+
+        .ebdi-card.updated {
+            animation: glow 0.6s ease-out;
+        }
+
+        .ebdi-label {
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .ebdi-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .ebdi-bar {
+            background: rgba(102, 126, 234, 0.2);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .ebdi-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 3px;
+        }
+
+        /* Trinity score display */
+        .trinity-display {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .trinity-item {
+            flex: 1;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .trinity-score {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 8px 0;
+        }
+
+        .trinity-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Arousal level indicator */
+        .arousal-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .arousal-bar {
+            flex: 1;
+            background: rgba(102, 126, 234, 0.2);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .arousal-bar-fill {
+            height: 100%;
+            transition: all 0.3s ease-out;
+        }
+
+        .arousal-bar-fill.low {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 33%;
+        }
+
+        .arousal-bar-fill.medium {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            width: 66%;
+        }
+
+        .arousal-bar-fill.high {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            width: 100%;
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        .arousal-value {
+            font-weight: 700;
+            min-width: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="fas fa-cog"></i> UAP — Master Orchestrator
+            </span>
+            <div class="ms-auto">
+                <span id="connection-status" class="status-badge status-offline me-3">
+                    <i class="fas fa-circle me-2"></i>Connecting...
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container container-fluid" style="margin-top: 80px;">
+
+        <!-- TABS NAVIGATION -->
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="control-hq-tab" data-bs-toggle="tab" data-bs-target="#control-hq" type="button" role="tab">
+                    <i class="fas fa-gauge-high me-2"></i>Control HQ
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="delegator-tab" data-bs-toggle="tab" data-bs-target="#delegator" type="button" role="tab">
+                    <i class="fas fa-paper-plane me-2"></i>Agent Delegator
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="genesis-tab" data-bs-toggle="tab" data-bs-target="#genesis" type="button" role="tab">
+                    <i class="fas fa-book me-2"></i>Genesis Viewer
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="orchestrator-tab" data-bs-toggle="tab" data-bs-target="#orchestrator" type="button" role="tab">
+                    <i class="fas fa-sitemap me-2"></i>Orchestrator Console
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="healer-tab" data-bs-toggle="tab" data-bs-target="#healer" type="button" role="tab">
+                    <i class="fas fa-heart-pulse me-2"></i>Self-Healing
+                </button>
+            </li>
+        </ul>
+
+        <!-- TAB CONTENT -->
+        <div class="tab-content">
+
+            <!-- 1. CONTROL HQ -->
+            <div class="tab-pane fade show active" id="control-hq" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-star me-2"></i>Trinity Scores</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-4">
+                                        <p class="text-muted small">Material</p>
+                                        <div class="score-display" id="trinity-material">-</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="text-muted small">Intellectual</p>
+                                        <div class="score-display" id="trinity-intellectual">-</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="text-muted small">Essential</p>
+                                        <div class="score-display" id="trinity-essential">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-fire me-2"></i>System Arousal Level</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="arousal-indicator">
+                                    <div class="arousal-bar">
+                                        <div id="arousal-bar-fill" class="arousal-bar-fill low" style="width: 33%;"></div>
+                                    </div>
+                                    <span id="arousal-level" class="arousal-value">0.50</span>
+                                </div>
+                                <small class="text-muted d-block mt-2">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Crisis mode activated when Arousal > 0.7
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EBDI Heatmap -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-brain me-2"></i>EBDI Real-Time Telemetry (Pleasure / Arousal / Dominance)</h5>
+                                <small class="text-muted">Updates every 200ms via WebSocket</small>
+                            </div>
+                            <div class="card-body">
+                                <div id="ebdi-heatmap" class="ebdi-grid telemetry-stream"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                            </div>
+                            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                <div id="trust-scores-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-shield me-2"></i>Guardian Laws (9)</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="guardian-laws-list"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-exclamation-triangle me-2"></i>Threat Vectors (A-01 to A-12)</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Threat monitoring dashboard</p>
+                                <div id="threats-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-line me-2"></i>Real-Time Stats</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="realtime-stats">
+                                    <div class="stat-box">
+                                        <div class="stat-value" id="stat-tasks">0</div>
+                                        <div class="stat-label">Tasks Active</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-value" id="stat-genesis">0</div>
+                                        <div class="stat-label">Genesis Logs</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-value" id="stat-agents">0</div>
+                                        <div class="stat-label">Agents Online</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-value" id="stat-avg-ts">-</div>
+                                        <div class="stat-label">Avg Trust Score</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. AGENT DELEGATOR -->
+            <div class="tab-pane fade" id="delegator" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-paper-plane me-2"></i>Delegate Task to Agent</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="task-description" class="form-label">Task Description</label>
+                            <textarea class="form-control" id="task-description" rows="4" placeholder="e.g., Scout XRP opportunities under $5 with Scout agent..."></textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="agent-hint" class="form-label">Agent Hint (Optional)</label>
+                                <select class="form-select" id="agent-hint">
+                                    <option value="">Auto-route</option>
+                                    <option value="Librarian">Librarian</option>
+                                    <option value="SAP">SAP</option>
+                                    <option value="Auditor">Auditor</option>
+                                    <option value="Sentinel">Sentinel</option>
+                                    <option value="Architect">Architect</option>
+                                    <option value="Healer">Healer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="budget-max" class="form-label">Budget Max ($)</label>
+                                <input type="number" class="form-control" id="budget-max" value="1000" min="0">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="dry-run-check">
+                                <label class="form-check-label" for="dry-run-check">
+                                    Dry Run Mode (Preview without execution)
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg w-100" id="submit-task-btn">
+                            <i class="fas fa-rocket me-2"></i>Submit Task
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history me-2"></i>Task Execution Log</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="task-log" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
+                            <p class="text-muted">No tasks submitted yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. GENESIS VIEWER -->
+            <div class="tab-pane fade" id="genesis" role="tabpanel">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-filter me-2"></i>Advanced Search & Filter</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label small">Full-Text Search</label>
+                                <input type="text" class="form-control" id="genesis-search" placeholder="Search logs...">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Agent</label>
+                                <select class="form-select" id="genesis-agent-filter">
+                                    <option value="">All Agents</option>
+                                    <option value="Librarian">Librarian</option>
+                                    <option value="SAP">SAP</option>
+                                    <option value="Auditor">Auditor</option>
+                                    <option value="Sentinel">Sentinel</option>
+                                    <option value="Architect">Architect</option>
+                                    <option value="Healer">Healer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Time Range</label>
+                                <select class="form-select" id="genesis-time-filter">
+                                    <option value="1h">Last Hour</option>
+                                    <option value="24h">Last 24h</option>
+                                    <option value="7d">Last 7 Days</option>
+                                    <option value="30d">Last 30 Days</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Status</label>
+                                <select class="form-select" id="genesis-status-filter">
+                                    <option value="">All Status</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="failed">Failed</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end gap-2">
+                                <button class="btn btn-primary flex-grow-1" id="genesis-search-btn">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                                <button class="btn btn-outline-secondary" id="genesis-export-btn" title="Export as JSON">
+                                    <i class="fas fa-download me-2"></i>Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-scroll me-2"></i>Audit Trail</h5>
+                        <small class="text-muted d-block mt-2">Immutable Genesis Record with 9 Guardian Law compliance</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="genesis-logs-list" style="max-height: 600px; overflow-y: auto;">
+                            <p class="text-muted">Loading logs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ORCHESTRATOR CONSOLE -->
+            <div class="tab-pane fade" id="orchestrator" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-exclamation-circle me-2"></i>Crisis Mode Control</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-3">
+                                    <strong>System Arousal:</strong> <span id="orchestrator-arousal" class="badge bg-warning">0.50</span>
+                                    <small class="text-muted d-block mt-2">Crisis triggered at > 0.70</small>
+                                </p>
+                                <div id="crisis-status-badge" class="alert alert-info mb-3" role="alert">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Normal operation. Sentinel on standby.
+                                </div>
+                                <button class="btn btn-danger btn-lg w-100" id="crisis-activate-btn">
+                                    <i class="fas fa-bomb me-2"></i>Activate Crisis Mode
+                                </button>
+                                <small class="text-muted d-block mt-2">Requires operator approval. Bypasses rate limits.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-balance-scale me-2"></i>Conflict Resolution (Voting)</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">When 2+ agents propose conflicting actions...</p>
+                                <div id="conflict-proposals" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
+                                    <p class="text-muted small">No active conflicts</p>
+                                </div>
+                                <button class="btn btn-info w-100" id="conflict-resolver-btn">
+                                    <i class="fas fa-gavel me-2"></i>Resolve Conflicts
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-save me-2"></i>Rollback Checkpoints (RBC) — State Snapshots</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-sm btn-secondary mb-3" id="create-checkpoint-btn">
+                            <i class="fas fa-camera me-2"></i>Create Checkpoint
+                        </button>
+                        <div id="checkpoints-list" style="max-height: 400px; overflow-y: auto;">
+                            <p class="text-muted">No checkpoints created yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. SELF-HEALING DASHBOARD -->
+            <div class="tab-pane fade" id="healer" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-heart-pulse me-2"></i>Healer Suggestions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="healer-suggestions-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-bar me-2"></i>Performance Heatmap</h5>
+                            </div>
+                            <div class="card-body">
+                                <p id="perf-cpu">CPU: <strong>--</strong>%</p>
+                                <p id="perf-ram">RAM: <strong>--</strong>%</p>
+                                <p id="perf-db">DB Queries: <strong>--</strong>/min</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-history me-2"></i>Last 24h Fixes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="healer-history-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- WebSocket Real-Time Client -->
+    <script src="websocket_client.js"></script>
+
+    <!-- Main App -->
+    <script src="app.js"></script>
+</body>
+</html>
