@@ -21,6 +21,11 @@
 - Utwardzono CI smoke do wariantu niemutujacego artefaktow (tmp files w `docs/*.ci.md`).
 - Naprawiono skrypt autofill (`main()`), przywracajac przeplyw recovery do stanu 17/17.
 - Dodano guard UTF-8 w CI dla artefaktow 162D (detekcja mojibake + U+FFFD).
+- Przeniesiono guard UTF-8 do dedykowanego skryptu `scripts/reporting/check_utf8_artifacts.py`.
+- Dodano testy parsera UTF-8: `tests/test_utf8_artifacts_guard.py`.
+- Dodano automatyczny raport CI gate (`scripts/reporting/generate_ci_gate_report.py`) publikowany jako artifact workflow.
+- Utwardzono `verify_historie_to_pictures_copy.py` (tryb szybki `filename`, tryb dokladny `hash`, kontrola exit code).
+- Podpieto tryb strict do zadan VS Code (`.vscode/tasks.json`) dla kontroli operatorskiej.
 - Dodano integracje do dokumentu systemowego: `docs/162D-DECISION-SPACE.md`.
 - Dodano traceability 17/17 (dokument -> klasyfikacja -> test) w `docs/162D-DECISION-SPACE.md`.
 - Wykonano porownanie tekstowe wersji "Wizja Przyszłości" (brak roznic merytorycznych).
@@ -41,6 +46,10 @@ Status: wykonane dla mapowania 162D Jednosc (17/17).
 
 1. Po rotacji sekretow uruchomic ponownie walidacje bezpieczenstwa.
 2. Utrzymywac bramke CI 162D jako blokujaca przy naruszeniach UTF-8 i regresjach testow.
+3. Rozszerzyc check UTF-8 o whitelisty kontekstowe jesli pojawia sie uzasadnione false-positive.
+4. Dodac agregacje historii raportow CI gate (trend pass/fail + trend liczby testow).
+5. Dla zadan operatorskich uruchamiac verify kopii w trybie `--mode filename` i `--fail-on-missing` tylko w etapach gate.
+6. Rozwazyc dodanie osobnego taska `--mode hash` jako nocny audyt dokladny.
 
 ## Mikro-streszczenie
 
@@ -62,4 +71,8 @@ Status: wykonane dla mapowania 162D Jednosc (17/17).
 - CI gate wdrozony
 - CI smoke utwardzony
 - UTF-8 guard dodany
+- UTF-8 parser przetestowany
 - Traceability 17x dodane
+- CI raport dodany
+- Verify script utwardzony
+- VS Code strict task dodany

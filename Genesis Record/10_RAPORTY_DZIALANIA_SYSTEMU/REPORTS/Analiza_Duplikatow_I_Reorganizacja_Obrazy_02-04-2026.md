@@ -39,7 +39,7 @@ Zakres dodatkowy: bezpieczne odseparowanie plikow Thumbs.db z archiwum C:\Users\
 
 ## Wynik bezpiecznego czyszczenia Historie Zycia
 
-- Przeniesiono 8 plikow Thumbs.db do folderu _review_ThumbsDb_2026-04-02 wewnatrz archiwum Historie Zycia.
+- Przeniesiono 8 plikow Thumbs.db do folderu \_review_ThumbsDb_2026-04-02 wewnatrz archiwum Historie Zycia.
 - Licznik pozostalych Thumbs.db po skrypcie obejmuje pliki znajdujace sie juz w folderze review, poniewaz folder review jest osadzony w korzeniu analizowanego archiwum.
 - Material zdjeciowy nie byl usuwany ani modyfikowany.
 
@@ -52,12 +52,14 @@ Najpierw ustalic foldery kanoniczne i dopiero potem przenosic lub usuwac duplika
 ### Proponowany uklad docelowy
 
 1. 01_IMPORTY_ZRODLOWE
+
 - DCIM
 - drive-download-20260401T061135Z-3-001
 - ScreenShot
 - Zapasowe RAR
 
 2. 02_DO_SORTOWANIA_I_DEDUPLIKACJI
+
 - MIX
 - samojebki
 - Awatary i zdjęcia
@@ -65,6 +67,7 @@ Najpierw ustalic foldery kanoniczne i dopiero potem przenosic lub usuwac duplika
 - Pozostałe
 
 3. 03_WYDARZENIA
+
 - Studniowka Adriana 9.02.2006
 - Studniowka Marty 6.01.2007
 - Sylwester 2006-2007
@@ -72,16 +75,19 @@ Najpierw ustalic foldery kanoniczne i dopiero potem przenosic lub usuwac duplika
 - U Bebe w Domu
 
 4. 04_OSOBY_I_RELACJE
+
 - Marta i Adi
 - Love U Babe
 - Kuzynka Kuzynka
 - Tajne od Marty
 
 5. 05_ARCHIWUM_HISTORYCZNE
+
 - Naprawde Stare Zdjecia
 - Naprawde Stare Zdjecia Cz 2
 
 6. 06_PODROZE
+
 - Od Belgii Po przez Afryke az do Miedzynarodowki
 
 ### Proponowane decyzje porzadkujace
@@ -120,8 +126,35 @@ Najpierw ustalic foldery kanoniczne i dopiero potem przenosic lub usuwac duplika
 
 - Reorganizacja katalogu Pictures zostala wykonana na podstawie zatwierdzonego CSV.
 - Finalny top-level zawiera wylacznie docelowe kategorie: 01_IMPORTY_ZRODLOWE, 02_DO_SORTOWANIA_I_DEDUPLIKACJI, 03_WYDARZENIA, 04_OSOBY_I_RELACJE, 05_ARCHIWUM_HISTORYCZNE, 06_PODROZE.
-- Operacje scalania wykonano bez nadpisywania: przy kolizjach nazw zastosowano automatyczne dopiski __from_... do nazw plikow.
+- Operacje scalania wykonano bez nadpisywania: przy kolizjach nazw zastosowano automatyczne dopiski \__from_... do nazw plikow.
 - Szczegolowy log wykonania: C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\REPORTS\Wykonanie_Reorganizacji_Obrazy_02-04-2026.log.
+
+## Weryfikacja kompletności kopiowania
+
+- Sprawdzono, czy wszystkie pliki z Historie Zycia wystepuja w Obrazy.
+- Wynik pierwotny: kopiowanie nie bylo kompletne — 170 brakujacych plikow.
+- Raport brakow: C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\REPORTS\Braki_Kopii_Historie_Zycia_Do_Obrazy_02-04-2026.csv
+- Raport weryfikacji TXT: C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\REPORTS\Weryfikacja_Historie_Zycia_Do_Obrazy_02-04-2026.txt
+
+## Synchronizacja brakow (02-04-2026)
+
+- Zbadano przyczyne rozbieznosci mtime: pliki z Google Drive maja offset 32400s (9h) wzgledem lokalnych kopii.
+- Zmieniono metode porownania z name+size+mtime na name-only (zgodnie z verify script).
+- Skopiowano 170 brakujacych plikow do: C:\Users\adiha\Pictures\01_IMPORTY_ZRODLOWE\sync_missing_02-04-2026\
+  - Podkatalog: Od Belgii Po przez Afryke az do Miedzynarodowki (169 plikow)
+  - Podkatalog: Mix Awatary i Zdjecia (1 plik)
+- Bledy: 0.
+- Status synchronizacji: SYNC_COMPLETE.
+- Log: C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\REPORTS\Synchronizacja_Brakow_Historie_Do_Obrazy_02-04-2026.log
+- Skrypt: scripts/reporting/sync_missing_to_pictures.py
+
+## Re-weryfikacja po synchronizacji (02-04-2026)
+
+- SRC_FILES (Historie Zycia, bez review): 1883
+- DST_FILES (Pictures po synchronizacji): 2318
+- MISSING_GROUPS: 0
+- MISSING_INSTANCES: 0
+- **STATUS: OK_ALL_PRESENT** — wszystkie pliki z Historie Zycia sa teraz w Pictures.
 
 ## Mikro-streszczenie
 
@@ -131,5 +164,6 @@ Najpierw ustalic foldery kanoniczne i dopiero potem przenosic lub usuwac duplika
 - Potwierdzono kolizje folderow
 - Oczyszczono pliki pomocnicze
 - Przygotowano plan reorganizacji
-- Zachowano bezpieczny tryb
-- Zapisano raport koncowy
+- Zsynchronizowano braki Pictures
+- Potwierdzono kompletnosc kopii
+- STATUS OK_ALL_PRESENT

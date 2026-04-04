@@ -11,7 +11,8 @@
 Uzyskać `STRIPE_WEBHOOK_SECRET` i uzupełnić pozostałe 3 placeholder values w `micro-saas/.env.local`, aby osiągnąć 100% green validation pipeline.
 
 **Kryteria ukonczenia:**
-- ✓ STRIPE_WEBHOOK_SECRET: `whsec_...` (real value, not placeholder)
+
+- ✓ STRIPE*WEBHOOK_SECRET: `whsec*...` (real value, not placeholder)
 - ✓ STRIPE_PRICE_ID_PRO: valid product price ID
 - ✓ STRIPE_PRICE_ID_FOUNDING: valid product price ID
 - ✓ npm run check:secrets: PASS
@@ -22,25 +23,27 @@ Uzyskać `STRIPE_WEBHOOK_SECRET` i uzupełnić pozostałe 3 placeholder values w
 
 ## 🎯 Kroki Egzekucji
 
-| Krok | Cel | Kryteria Ukończenia | Zależności | Priorytet | Status |
-|------|-----|---------------------|------------|-----------|--------|
-| 1 | Verify webhook status | Check .env.local files for current state | None | P0 (CRITICAL) | DONE |
-| 2 | Guide Stripe CLI workflow | User completes device auth flow locally | User action required | P0 (CRITICAL) | IN PROGRESS |
-| 3 | Capture webhook secret | Paste `whsec_...` into both .env locations | Step 2 completion | P0 (CRITICAL) | BLOCKED |
-| 4 | Fill price IDs | User provides or agent fetches from Stripe | Step 3 completion | P1 (HIGH) | BLOCKED |
-| 5 | Run validation | npm run check:secrets → PASS | Step 3 + 4 | P0 (CRITICAL) | BLOCKED |
-| 6 | Final green | pytest + build verify | Step 5 + external tests | P0 (CRITICAL) | BLOCKED |
+| Krok | Cel                       | Kryteria Ukończenia                        | Zależności              | Priorytet     | Status      |
+| ---- | ------------------------- | ------------------------------------------ | ----------------------- | ------------- | ----------- |
+| 1    | Verify webhook status     | Check .env.local files for current state   | None                    | P0 (CRITICAL) | DONE        |
+| 2    | Guide Stripe CLI workflow | User completes device auth flow locally    | User action required    | P0 (CRITICAL) | IN PROGRESS |
+| 3    | Capture webhook secret    | Paste `whsec_...` into both .env locations | Step 2 completion       | P0 (CRITICAL) | BLOCKED     |
+| 4    | Fill price IDs            | User provides or agent fetches from Stripe | Step 3 completion       | P1 (HIGH)     | BLOCKED     |
+| 5    | Run validation            | npm run check:secrets → PASS               | Step 3 + 4              | P0 (CRITICAL) | BLOCKED     |
+| 6    | Final green               | pytest + build verify                      | Step 5 + external tests | P0 (CRITICAL) | BLOCKED     |
 
 ---
 
 ## 🔐 Current Secret State
 
 **Root `.env.local`:**
+
 - STRIPE_LOGIN_EMAIL: `YOUR_STRIPE_EMAIL_HERE` (placeholder, needs fill)
 - STRIPE_SECRET_KEY: `STRIPE_SECRET_KEY_REDACTED` (value redacted)
 - STRIPE_WEBHOOK_SECRET: **EMPTY** ← BLOCKER
 
 **micro-saas `/.env.local`:**
+
 - STRIPE_WEBHOOK_SECRET: `STRIPE_WEBHOOK_SECRET_PLACEHOLDER` (placeholder)
 - STRIPE_PRICE_ID_PRO: `price_test_pro_PLACEHOLDER` (placeholder)
 - STRIPE_PRICE_ID_FOUNDING: `price_test_founding_PLACEHOLDER` (placeholder)
@@ -50,6 +53,7 @@ Uzyskać `STRIPE_WEBHOOK_SECRET` i uzupełnić pozostałe 3 placeholder values w
 ## 🚀 Krok 2: Stripe CLI Device Auth Flow
 
 **Context:** Previous attempts failed because:
+
 1. API keys expired/invalid (rotated offline by user)
 2. Background terminal cannot complete interactive browser confirmation
 
