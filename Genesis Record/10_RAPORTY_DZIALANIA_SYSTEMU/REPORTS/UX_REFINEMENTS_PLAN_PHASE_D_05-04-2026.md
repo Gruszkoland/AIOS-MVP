@@ -1,4 +1,5 @@
 # UX Refinements Plan — Phase D
+
 **Data**: 2026-04-05 17:00 UTC
 **Status**: 📋 PLANNING
 **Celem**: Ulepszić doświadczenie użytkownika z zaawansowanymi filtami, sortowaniem i operacjami
@@ -8,6 +9,7 @@
 ## 🎯 PHASE D ENHANCEMENTS
 
 ### 1. Task Filtering & Search
+
 - Filter by status (all / pending / running / completed / failed)
 - Filter by agent
 - Search by task name
@@ -15,6 +17,7 @@
 - Show/hide completed tasks
 
 ### 2. Task Sorting
+
 - By name (A-Z)
 - By progress (%)
 - By status
@@ -23,12 +26,14 @@
 - By updated date
 
 ### 3. Agent Filtering
+
 - By capability level (basic/intermediate/expert)
 - By activity status (active/inactive)
 - By trust score range
 - Search by name/role
 
 ### 4. Agent Sorting
+
 - By name (A-Z)
 - By trust score
 - By success rate
@@ -36,6 +41,7 @@
 - By last activity
 
 ### 5. Bulk Operations — Tasks
+
 - Select multiple tasks (checkboxes)
 - Bulk actions:
   - Mark as completed
@@ -45,6 +51,7 @@
 - Progress indicator (X of Y tasks modified)
 
 ### 6. Bulk Operations — Agents
+
 - Select multiple agents (checkboxes)
 - Bulk actions:
   - Enable/disable
@@ -53,12 +60,14 @@
 - Confirmation dialogs
 
 ### 7. Export/Download
+
 - Export tasks as CSV/JSON
 - Export agent profiles
 - Export leaderboard
 - Export performance report
 
 ### 8. Dark Mode
+
 - Toggle for dark/light theme
 - Persistent (localStorage)
 - Smooth transitions
@@ -72,7 +81,11 @@
 ```html
 <!-- Filter Bar -->
 <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-  <select id="task-filter-status" class="form-select" style="flex: 0 1 auto; min-width: 150px;">
+  <select
+    id="task-filter-status"
+    class="form-select"
+    style="flex: 0 1 auto; min-width: 150px;"
+  >
     <option value="">All Status</option>
     <option value="pending">Pending</option>
     <option value="running">Running</option>
@@ -80,16 +93,30 @@
     <option value="failed">Failed</option>
   </select>
 
-  <select id="task-filter-agent" class="form-select" style="flex: 0 1 auto; min-width: 150px;">
+  <select
+    id="task-filter-agent"
+    class="form-select"
+    style="flex: 0 1 auto; min-width: 150px;"
+  >
     <option value="">All Agents</option>
     <option value="Architect">Architect</option>
     <option value="SAP">SAP</option>
     <!-- Populate dynamically -->
   </select>
 
-  <input type="text" id="task-search" class="form-control" placeholder="Search tasks..." style="flex: 1 1 200px;">
+  <input
+    type="text"
+    id="task-search"
+    class="form-control"
+    placeholder="Search tasks..."
+    style="flex: 1 1 200px;"
+  />
 
-  <select id="task-sort" class="form-select" style="flex: 0 1 auto; min-width: 150px;">
+  <select
+    id="task-sort"
+    class="form-select"
+    style="flex: 0 1 auto; min-width: 150px;"
+  >
     <option value="updated">Recently Updated</option>
     <option value="name">Name (A-Z)</option>
     <option value="progress">Progress (%)</option>
@@ -107,12 +134,26 @@
 </div>
 
 <!-- Bulk Actions (appears when items selected) -->
-<div id="task-bulk-actions" style="display: none; margin-bottom: 15px; padding: 10px; background: #e7f3ff; border-radius: 6px;">
+<div
+  id="task-bulk-actions"
+  style="display: none; margin-bottom: 15px; padding: 10px; background: #e7f3ff; border-radius: 6px;"
+>
   <span id="bulk-selection-count" style="margin-right: 15px;">0 selected</span>
-  <button class="btn btn-sm btn-success" onclick="bulkCompleteTask()">Complete</button>
-  <button class="btn btn-sm btn-warning" onclick="bulkCancelTask()">Cancel</button>
-  <button class="btn btn-sm btn-danger" onclick="bulkDeleteTask()">Delete</button>
-  <button class="btn btn-sm btn-secondary ms-auto" onclick="bulkClearSelection()">Clear</button>
+  <button class="btn btn-sm btn-success" onclick="bulkCompleteTask()">
+    Complete
+  </button>
+  <button class="btn btn-sm btn-warning" onclick="bulkCancelTask()">
+    Cancel
+  </button>
+  <button class="btn btn-sm btn-danger" onclick="bulkDeleteTask()">
+    Delete
+  </button>
+  <button
+    class="btn btn-sm btn-secondary ms-auto"
+    onclick="bulkClearSelection()"
+  >
+    Clear
+  </button>
 </div>
 ```
 
@@ -121,29 +162,50 @@
 ```html
 <!-- Filter Bar -->
 <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-  <input type="text" id="agent-search" class="form-control" placeholder="Search agents..." style="flex: 1 1 200px;">
+  <input
+    type="text"
+    id="agent-search"
+    class="form-control"
+    placeholder="Search agents..."
+    style="flex: 1 1 200px;"
+  />
 
-  <select id="agent-filter-capability" class="form-select" style="flex: 0 1 auto; min-width: 150px;">
+  <select
+    id="agent-filter-capability"
+    class="form-select"
+    style="flex: 0 1 auto; min-width: 150px;"
+  >
     <option value="">All Levels</option>
     <option value="basic">Basic</option>
     <option value="intermediate">Intermediate</option>
     <option value="expert">Expert</option>
   </select>
 
-  <select id="agent-filter-status" class="form-select" style="flex: 0 1 auto; min-width: 150px;">
+  <select
+    id="agent-filter-status"
+    class="form-select"
+    style="flex: 0 1 auto; min-width: 150px;"
+  >
     <option value="">All Status</option>
     <option value="active">Active</option>
     <option value="inactive">Inactive</option>
   </select>
 
-  <select id="agent-sort" class="form-select" style="flex: 0 1 auto; min-width: 150px;">
+  <select
+    id="agent-sort"
+    class="form-select"
+    style="flex: 0 1 auto; min-width: 150px;"
+  >
     <option value="name">Name (A-Z)</option>
     <option value="trust">Trust Score</option>
     <option value="success">Success Rate</option>
     <option value="tasks">Tasks Completed</option>
   </select>
 
-  <button class="btn btn-sm btn-outline-secondary" onclick="resetAgentFilters()">
+  <button
+    class="btn btn-sm btn-outline-secondary"
+    onclick="resetAgentFilters()"
+  >
     <i class="fas fa-redo me-1"></i>Reset
   </button>
 
@@ -153,12 +215,26 @@
 </div>
 
 <!-- Bulk Actions for Agents -->
-<div id="agent-bulk-actions" style="display: none; margin-bottom: 15px; padding: 10px; background: #e7f3ff; border-radius: 6px;">
+<div
+  id="agent-bulk-actions"
+  style="display: none; margin-bottom: 15px; padding: 10px; background: #e7f3ff; border-radius: 6px;"
+>
   <span id="bulk-agent-count" style="margin-right: 15px;">0 selected</span>
-  <button class="btn btn-sm btn-success" onclick="bulkEnableAgent()">Enable</button>
-  <button class="btn btn-sm btn-danger" onclick="bulkDisableAgent()">Disable</button>
-  <button class="btn btn-sm btn-warning" onclick="bulkResetTrust()">Reset Trust</button>
-  <button class="btn btn-sm btn-secondary ms-auto" onclick="bulkClearSelection()">Clear</button>
+  <button class="btn btn-sm btn-success" onclick="bulkEnableAgent()">
+    Enable
+  </button>
+  <button class="btn btn-sm btn-danger" onclick="bulkDisableAgent()">
+    Disable
+  </button>
+  <button class="btn btn-sm btn-warning" onclick="bulkResetTrust()">
+    Reset Trust
+  </button>
+  <button
+    class="btn btn-sm btn-secondary ms-auto"
+    onclick="bulkClearSelection()"
+  >
+    Clear
+  </button>
 </div>
 
 <!-- Agent Grid with Checkboxes -->
@@ -171,7 +247,11 @@
 
 ```html
 <!-- Add to navbar -->
-<button id="dark-mode-toggle" class="btn btn-sm btn-outline-secondary" style="margin-left: 15px;">
+<button
+  id="dark-mode-toggle"
+  class="btn btn-sm btn-outline-secondary"
+  style="margin-left: 15px;"
+>
   <i class="fas fa-moon"></i> Dark Mode
 </button>
 ```
@@ -192,10 +272,18 @@ let filteredTasks = [];
 let selectedTasks = [];
 
 function initializeTaskFilters() {
-  document.getElementById("task-filter-status").addEventListener("change", applyTaskFilters);
-  document.getElementById("task-filter-agent").addEventListener("change", applyTaskFilters);
-  document.getElementById("task-search").addEventListener("keyup", applyTaskFilters);
-  document.getElementById("task-sort").addEventListener("change", applyTaskFilters);
+  document
+    .getElementById("task-filter-status")
+    .addEventListener("change", applyTaskFilters);
+  document
+    .getElementById("task-filter-agent")
+    .addEventListener("change", applyTaskFilters);
+  document
+    .getElementById("task-search")
+    .addEventListener("keyup", applyTaskFilters);
+  document
+    .getElementById("task-sort")
+    .addEventListener("change", applyTaskFilters);
 }
 
 function applyTaskFilters() {
@@ -205,10 +293,11 @@ function applyTaskFilters() {
   const sortBy = document.getElementById("task-sort").value;
 
   // Filter
-  filteredTasks = allTasks.filter(task => {
+  filteredTasks = allTasks.filter((task) => {
     const statusMatch = !statusFilter || task.status === statusFilter;
     const agentMatch = !agentFilter || task.agent === agentFilter;
-    const searchMatch = !searchTerm || task.name.toLowerCase().includes(searchTerm);
+    const searchMatch =
+      !searchTerm || task.name.toLowerCase().includes(searchTerm);
     return statusMatch && agentMatch && searchMatch;
   });
 
@@ -243,14 +332,9 @@ function resetTaskFilters() {
 function exportTasks() {
   const csv = [
     ["ID", "Name", "Agent", "Status", "Progress", "ETA"].join(","),
-    ...filteredTasks.map(t => [
-      t.id,
-      t.name,
-      t.agent,
-      t.status,
-      t.progress,
-      t.eta_seconds
-    ].join(","))
+    ...filteredTasks.map((t) =>
+      [t.id, t.name, t.agent, t.status, t.progress, t.eta_seconds].join(","),
+    ),
   ].join("\n");
 
   const blob = new Blob([csv], { type: "text/csv" });
@@ -267,7 +351,9 @@ function exportTasks() {
 
 function renderTasksWithCheckboxes(tasks) {
   const container = document.getElementById("active-tasks-list");
-  container.innerHTML = tasks.map(task => `
+  container.innerHTML = tasks
+    .map(
+      (task) => `
     <div class="task-item" style="display: flex; gap: 10px; align-items: flex-start;">
       <input type="checkbox" class="task-checkbox" data-task-id="${task.id}" onchange="updateBulkSelection()">
       <div style="flex: 1;">
@@ -282,17 +368,21 @@ function renderTasksWithCheckboxes(tasks) {
         </div>
       </div>
     </div>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 function updateBulkSelection() {
-  selectedTasks = Array.from(document.querySelectorAll(".task-checkbox:checked"))
-    .map(cb => cb.dataset.taskId);
+  selectedTasks = Array.from(
+    document.querySelectorAll(".task-checkbox:checked"),
+  ).map((cb) => cb.dataset.taskId);
 
   const bulkActionsDiv = document.getElementById("task-bulk-actions");
   if (selectedTasks.length > 0) {
     bulkActionsDiv.style.display = "flex";
-    document.getElementById("bulk-selection-count").textContent = `${selectedTasks.length} selected`;
+    document.getElementById("bulk-selection-count").textContent =
+      `${selectedTasks.length} selected`;
   } else {
     bulkActionsDiv.style.display = "none";
   }
@@ -300,9 +390,10 @@ function updateBulkSelection() {
 
 function bulkCompleteTask() {
   if (confirm(`Mark ${selectedTasks.length} tasks as completed?`)) {
-    selectedTasks.forEach(taskId => {
-      apiCall(`/mapi/v1/tasks/${taskId}`, "PUT", { status: "completed" })
-        .then(() => console.log(`Task ${taskId} completed`));
+    selectedTasks.forEach((taskId) => {
+      apiCall(`/mapi/v1/tasks/${taskId}`, "PUT", { status: "completed" }).then(
+        () => console.log(`Task ${taskId} completed`),
+      );
     });
     setTimeout(applyTaskFilters, 1000);
     bulkClearSelection();
@@ -311,9 +402,10 @@ function bulkCompleteTask() {
 
 function bulkCancelTask() {
   if (confirm(`Cancel ${selectedTasks.length} tasks?`)) {
-    selectedTasks.forEach(taskId => {
-      apiCall(`/mapi/v1/tasks/${taskId}`, "PUT", { status: "cancelled" })
-        .then(() => console.log(`Task ${taskId} cancelled`));
+    selectedTasks.forEach((taskId) => {
+      apiCall(`/mapi/v1/tasks/${taskId}`, "PUT", { status: "cancelled" }).then(
+        () => console.log(`Task ${taskId} cancelled`),
+      );
     });
     setTimeout(applyTaskFilters, 1000);
     bulkClearSelection();
@@ -322,9 +414,10 @@ function bulkCancelTask() {
 
 function bulkDeleteTask() {
   if (confirm(`Delete ${selectedTasks.length} tasks? This cannot be undone.`)) {
-    selectedTasks.forEach(taskId => {
-      apiCall(`/mapi/v1/tasks/${taskId}`, "DELETE")
-        .then(() => console.log(`Task ${taskId} deleted`));
+    selectedTasks.forEach((taskId) => {
+      apiCall(`/mapi/v1/tasks/${taskId}`, "DELETE").then(() =>
+        console.log(`Task ${taskId} deleted`),
+      );
     });
     setTimeout(applyTaskFilters, 1000);
     bulkClearSelection();
@@ -332,7 +425,9 @@ function bulkDeleteTask() {
 }
 
 function bulkClearSelection() {
-  document.querySelectorAll(".task-checkbox").forEach(cb => cb.checked = false);
+  document
+    .querySelectorAll(".task-checkbox")
+    .forEach((cb) => (cb.checked = false));
   updateBulkSelection();
 }
 
@@ -343,23 +438,40 @@ function bulkClearSelection() {
 let selectedAgents = [];
 
 function initializeAgentFilters() {
-  document.getElementById("agent-search").addEventListener("keyup", applyAgentFilters);
-  document.getElementById("agent-filter-capability").addEventListener("change", applyAgentFilters);
-  document.getElementById("agent-filter-status").addEventListener("change", applyAgentFilters);
-  document.getElementById("agent-sort").addEventListener("change", applyAgentFilters);
+  document
+    .getElementById("agent-search")
+    .addEventListener("keyup", applyAgentFilters);
+  document
+    .getElementById("agent-filter-capability")
+    .addEventListener("change", applyAgentFilters);
+  document
+    .getElementById("agent-filter-status")
+    .addEventListener("change", applyAgentFilters);
+  document
+    .getElementById("agent-sort")
+    .addEventListener("change", applyAgentFilters);
 }
 
 function applyAgentFilters() {
-  const searchTerm = document.getElementById("agent-search").value.toLowerCase();
-  const capabilityFilter = document.getElementById("agent-filter-capability").value;
+  const searchTerm = document
+    .getElementById("agent-search")
+    .value.toLowerCase();
+  const capabilityFilter = document.getElementById(
+    "agent-filter-capability",
+  ).value;
   const statusFilter = document.getElementById("agent-filter-status").value;
   const sortBy = document.getElementById("agent-sort").value;
 
-  let filtered = agentsList.filter(agent => {
-    const searchMatch = !searchTerm || agent.name.toLowerCase().includes(searchTerm) ||
-                       agent.role.toLowerCase().includes(searchTerm);
-    const capabilityMatch = !capabilityFilter || agent.capability === capabilityFilter;
-    const statusMatch = !statusFilter || (statusFilter === "active" ? agent.active : !agent.active);
+  let filtered = agentsList.filter((agent) => {
+    const searchMatch =
+      !searchTerm ||
+      agent.name.toLowerCase().includes(searchTerm) ||
+      agent.role.toLowerCase().includes(searchTerm);
+    const capabilityMatch =
+      !capabilityFilter || agent.capability === capabilityFilter;
+    const statusMatch =
+      !statusFilter ||
+      (statusFilter === "active" ? agent.active : !agent.active);
     return searchMatch && capabilityMatch && statusMatch;
   });
 
@@ -401,7 +513,9 @@ function exportAgents() {
 
 function renderAgentsWithCheckboxes(agents) {
   const container = document.getElementById("agents-list-container");
-  container.innerHTML = agents.map(agent => `
+  container.innerHTML = agents
+    .map(
+      (agent) => `
     <div class="col-md-6 mb-4" style="position: relative;">
       <input type="checkbox" class="agent-checkbox" data-agent-id="${agent.id}"
              onchange="updateAgentSelection()"
@@ -412,24 +526,28 @@ function renderAgentsWithCheckboxes(agents) {
         </div>
       </div>
     </div>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 function updateAgentSelection() {
-  selectedAgents = Array.from(document.querySelectorAll(".agent-checkbox:checked"))
-    .map(cb => cb.dataset.agentId);
+  selectedAgents = Array.from(
+    document.querySelectorAll(".agent-checkbox:checked"),
+  ).map((cb) => cb.dataset.agentId);
 
   const bulkActionsDiv = document.getElementById("agent-bulk-actions");
   if (selectedAgents.length > 0) {
     bulkActionsDiv.style.display = "flex";
-    document.getElementById("bulk-agent-count").textContent = `${selectedAgents.length} selected`;
+    document.getElementById("bulk-agent-count").textContent =
+      `${selectedAgents.length} selected`;
   } else {
     bulkActionsDiv.style.display = "none";
   }
 }
 
 function bulkEnableAgent() {
-  selectedAgents.forEach(agentId => {
+  selectedAgents.forEach((agentId) => {
     apiCall(`/mapi/v1/agents/${agentId}`, "PUT", { active: true });
   });
   showAlert(`✅ ${selectedAgents.length} agents enabled`, "success");
@@ -437,7 +555,7 @@ function bulkEnableAgent() {
 }
 
 function bulkDisableAgent() {
-  selectedAgents.forEach(agentId => {
+  selectedAgents.forEach((agentId) => {
     apiCall(`/mapi/v1/agents/${agentId}`, "PUT", { active: false });
   });
   showAlert(`✅ ${selectedAgents.length} agents disabled`, "success");
@@ -446,7 +564,7 @@ function bulkDisableAgent() {
 
 function bulkResetTrust() {
   if (confirm("Reset trust scores to 0.8?")) {
-    selectedAgents.forEach(agentId => {
+    selectedAgents.forEach((agentId) => {
       apiCall(`/mapi/v1/agents/${agentId}`, "PUT", { trust_score: 0.8 });
     });
     showAlert(`✅ Trust scores reset`, "success");
@@ -476,32 +594,34 @@ function applyDarkMode() {
   document.body.classList.add("dark-mode");
   document.body.style.background = "#1a1a1a";
   document.body.style.color = "#e0e0e0";
-  document.querySelectorAll(".card").forEach(card => {
+  document.querySelectorAll(".card").forEach((card) => {
     card.style.background = "#2a2a2a";
     card.style.borderColor = "#444";
   });
-  document.querySelectorAll(".form-control, .form-select").forEach(input => {
+  document.querySelectorAll(".form-control, .form-select").forEach((input) => {
     input.style.background = "#333";
     input.style.color = "#e0e0e0";
     input.style.borderColor = "#444";
   });
-  document.getElementById("dark-mode-toggle").innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+  document.getElementById("dark-mode-toggle").innerHTML =
+    '<i class="fas fa-sun"></i> Light Mode';
 }
 
 function removeDarkMode() {
   document.body.classList.remove("dark-mode");
   document.body.style.background = "#F5F5F5";
   document.body.style.color = "#1E3A5F";
-  document.querySelectorAll(".card").forEach(card => {
+  document.querySelectorAll(".card").forEach((card) => {
     card.style.background = "#FFFFFF";
     card.style.borderColor = "#D5D8DC";
   });
-  document.querySelectorAll(".form-control, .form-select").forEach(input => {
+  document.querySelectorAll(".form-control, .form-select").forEach((input) => {
     input.style.background = "#FFFFFF";
     input.style.color = "#1E3A5F";
     input.style.borderColor = "#D5D8DC";
   });
-  document.getElementById("dark-mode-toggle").innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+  document.getElementById("dark-mode-toggle").innerHTML =
+    '<i class="fas fa-moon"></i> Dark Mode';
 }
 ```
 

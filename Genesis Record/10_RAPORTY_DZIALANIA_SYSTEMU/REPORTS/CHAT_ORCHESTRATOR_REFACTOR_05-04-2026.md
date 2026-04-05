@@ -1,4 +1,5 @@
 # Chat Orchestrator Refactor — Strona Główna + Minimalizacja
+
 **Data**: 2026-04-05 15:45 UTC
 **Status**: ✅ IMPLEMENTATION COMPLETE
 **Autorzy**: Claude AI + ADRION 369 Master Orchestrator
@@ -8,6 +9,7 @@
 ## 📋 STRESZCZENIE ZMIAN
 
 Przeprowadzono refaktoryzację Chat Orchestratora z celem:
+
 1. ✅ **Przeniesienie Chatu na stronę główną** — z osobnej zakładki do głównego panelu (Control HQ)
 2. ✅ **Split-Screen Layout** — Chat (50% lewej) + System Metrics (50% prawej)
 3. ✅ **Minimalizacja do Bubleczki** — jak portale społecznościowe (Messenger, WhatsApp Web)
@@ -18,6 +20,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
 ## 🎨 NOWY LAYOUT UAPA
 
 ### Przed (6 zakładek)
+
 ```
 ├─ Control HQ (metryki)
 ├─ Agent Delegator
@@ -28,6 +31,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
 ```
 
 ### Po (5 zakładek, Chat na stronie głównej)
+
 ```
 ├─ Chat (Home) ← GŁÓWNY ELEMENT, split-screen (lewa 50%)
 │   └─ Metrics Panel (prawa 50%)
@@ -44,6 +48,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
 ### A. HTML Struktura (`uap/frontend/index.html`)
 
 **Nowa sekcja: `.orchestrator-main-container`**
+
 ```html
 <div class="orchestrator-main-container">
   <!-- LEFT 50%: CHAT PANEL -->
@@ -54,7 +59,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
     </div>
     <div class="chat-messages-main" id="chat-messages-main"></div>
     <div class="chat-input-main">
-      <input type="text" id="chat-input-main" placeholder="...">
+      <input type="text" id="chat-input-main" placeholder="..." />
       <button onclick="sendChatMessageMain()">Send</button>
     </div>
   </div>
@@ -69,6 +74,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
 ```
 
 **Bubleczka (Fixed Position)**
+
 ```html
 <div class="chat-bubble" id="chat-bubble" style="display:none;">
   <div class="bubble-header" onclick="expandChatBubble()">
@@ -84,6 +90,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
 ```
 
 **Zmiana nawigacji (zakładki)**
+
 ```html
 <!-- Przed -->
 <button id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat">
@@ -99,6 +106,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
 ### B. CSS Styling (`uap/frontend/index.html` — `<style>`)
 
 **Główny layout (2-kolumnowy)**
+
 ```css
 .orchestrator-main-container {
   display: grid;
@@ -115,6 +123,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
 ```
 
 **Chat Panel**
+
 ```css
 .chat-panel-main {
   background: var(--white-bg);
@@ -136,6 +145,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
 ```
 
 **Bubleczka (Chat Bubble)**
+
 ```css
 .chat-bubble {
   position: fixed;
@@ -175,6 +185,7 @@ Przeprowadzono refaktoryzację Chat Orchestratora z celem:
 ### C. JavaScript (`uap/frontend/app.js` — +160 linii)
 
 **Inicjalizacja**
+
 ```javascript
 function initializeChatMain() {
   const inputField = document.getElementById("chat-input-main");
@@ -192,6 +203,7 @@ function initializeChatMain() {
 ```
 
 **Wysyłanie wiadomości**
+
 ```javascript
 function sendChatMessageMain() {
   const inputField = document.getElementById("chat-input-main");
@@ -204,7 +216,7 @@ function sendChatMessageMain() {
   apiCall("/mapi/v1/chat/message", "POST", {
     session_id: sessionId,
     message: message,
-  }).then(data => {
+  }).then((data) => {
     displayChatMessageMain("orchestrator", data.response, data.response_type);
     updateBubblePreview(data.response);
     updateMetricsDisplay();
@@ -213,6 +225,7 @@ function sendChatMessageMain() {
 ```
 
 **Minimalizacja/Ekspansja**
+
 ```javascript
 function minimizeChatPanel() {
   document.querySelector(".chat-panel-main").style.display = "none";
@@ -232,6 +245,7 @@ function updateBubblePreview(text) {
 ```
 
 **Aktualizacja Metryk (Trinity, Arousal, Guardian Laws)**
+
 ```javascript
 function updateMetricsDisplay() {
   // Trinity scores
@@ -241,14 +255,17 @@ function updateMetricsDisplay() {
     essential: (Math.random() * 0.8 + 0.1).toFixed(2),
   };
 
-  document.getElementById("trinity-material-card").textContent = trinity.material;
-  document.getElementById("trinity-intellectual-card").textContent = trinity.intellectual;
-  document.getElementById("trinity-essential-card").textContent = trinity.essential;
+  document.getElementById("trinity-material-card").textContent =
+    trinity.material;
+  document.getElementById("trinity-intellectual-card").textContent =
+    trinity.intellectual;
+  document.getElementById("trinity-essential-card").textContent =
+    trinity.essential;
 
   // Arousal level
   const arousal = (Math.random() * 0.6 + 0.2).toFixed(2);
   const arousalBar = document.getElementById("arousal-bar-fill-main");
-  arousalBar.style.width = (arousal * 100) + "%";
+  arousalBar.style.width = arousal * 100 + "%";
 
   // Color coding: low (green) -> medium (yellow) -> high (red)
   if (arousal > 0.7) {
@@ -266,35 +283,46 @@ function updateMetricsDisplay() {
 ### File: `vscode-extension-adrion/src/extension.ts`
 
 **HTML Panel (po nagłówku statusu)**
+
 ```html
 <!-- Chat Orchestrator Panel -->
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
     <span>Chat Orchestrator</span>
-    <button class="minimize-btn" onclick="minimizeChatPanel()" title="Minimize">−</button>
+    <button class="minimize-btn" onclick="minimizeChatPanel()" title="Minimize">
+      −
+    </button>
   </div>
   <div class="chat-messages" id="chatMessages">
     <div class="chat-msg ai">Click Send or type to start...</div>
   </div>
   <div class="chat-input-area">
-    <input type="text" id="chatInput" placeholder="Ask AI..."
-           onkeypress="if(event.key==='Enter') sendChatMessage()">
+    <input
+      type="text"
+      id="chatInput"
+      placeholder="Ask AI..."
+      onkeypress="if(event.key==='Enter') sendChatMessage()"
+    />
     <button onclick="sendChatMessage()">Send</button>
   </div>
 </div>
 
 <!-- Chat Bubble (hidden) -->
-<div id="chatBubble" style="display:none; background:#E8F4F8; padding:8px; cursor:pointer;"
-     onclick="expandChatPanel()">
+<div
+  id="chatBubble"
+  style="display:none; background:#E8F4F8; padding:8px; cursor:pointer;"
+  onclick="expandChatPanel()"
+>
   Click to expand
 </div>
 ```
 
 **CSS dla Extension**
+
 ```css
 .chat-panel {
-  background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
-  border: 1px solid #D5D8DC;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid #d5d8dc;
   border-radius: 6px;
   padding: 12px;
   margin-bottom: 16px;
@@ -311,47 +339,48 @@ function updateMetricsDisplay() {
 .chat-input-area input {
   flex: 1;
   padding: 6px 8px;
-  border: 1px solid #D5D8DC;
+  border: 1px solid #d5d8dc;
   border-radius: 3px;
   background: white;
-  color: #1E3A5F;
+  color: #1e3a5f;
 }
 ```
 
 **JavaScript dla Extension**
+
 ```javascript
 function sendChatMessage() {
-  const input = document.getElementById('chatInput');
+  const input = document.getElementById("chatInput");
   const message = input.value.trim();
   if (!message) return;
 
   // Display user message
-  const messagesDiv = document.getElementById('chatMessages');
-  const userMsg = document.createElement('div');
-  userMsg.className = 'chat-msg user';
-  userMsg.textContent = 'You: ' + message;
+  const messagesDiv = document.getElementById("chatMessages");
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-msg user";
+  userMsg.textContent = "You: " + message;
   messagesDiv.appendChild(userMsg);
 
   // Mock AI response
   setTimeout(() => {
-    const aiMsg = document.createElement('div');
-    aiMsg.className = 'chat-msg ai';
-    aiMsg.textContent = 'AI: Task queued for execution';
+    const aiMsg = document.createElement("div");
+    aiMsg.className = "chat-msg ai";
+    aiMsg.textContent = "AI: Task queued for execution";
     messagesDiv.appendChild(aiMsg);
   }, 300);
 
-  input.value = '';
+  input.value = "";
 }
 
 function minimizeChatPanel() {
-  document.getElementById('chatPanel').style.display = 'none';
-  document.getElementById('chatBubble').style.display = 'block';
+  document.getElementById("chatPanel").style.display = "none";
+  document.getElementById("chatBubble").style.display = "block";
 }
 
 function expandChatPanel() {
-  document.getElementById('chatPanel').style.display = 'flex';
-  document.getElementById('chatBubble').style.display = 'none';
-  document.getElementById('chatInput').focus();
+  document.getElementById("chatPanel").style.display = "flex";
+  document.getElementById("chatBubble").style.display = "none";
+  document.getElementById("chatInput").focus();
 }
 ```
 
@@ -359,30 +388,33 @@ function expandChatPanel() {
 
 ## 📊 STATYSTYKI ZMIAN
 
-| Komponent | Linie | Status |
-|-----------|-------|--------|
-| `uap/frontend/index.html` | +270 | ✅ CSS + HTML layout |
-| `uap/frontend/app.js` | +160 | ✅ Chat + minimize logic |
-| `vscode-extension-adrion/src/extension.ts` | +120 | ✅ Chat panel + bubble |
-| **Total** | **+550** | ✅ COMPLETE |
+| Komponent                                  | Linie    | Status                   |
+| ------------------------------------------ | -------- | ------------------------ |
+| `uap/frontend/index.html`                  | +270     | ✅ CSS + HTML layout     |
+| `uap/frontend/app.js`                      | +160     | ✅ Chat + minimize logic |
+| `vscode-extension-adrion/src/extension.ts` | +120     | ✅ Chat panel + bubble   |
+| **Total**                                  | **+550** | ✅ COMPLETE              |
 
 ---
 
 ## ✨ NOWE FUNKCJE
 
 ### 1. Chat Orchestrator na Stronie Głównej
+
 - **Główny element** kontroli systemu
 - **Integracja z Trinity/EBDI/Guardian Laws**
 - **Real-time metryki** po prawej stronie
 - **Responsywny** (split-screen na desktop, stack na mobile)
 
 ### 2. Minimalizacja do Bubleczki
+
 - **Podobnie do Messengera** — Chat można zminimalizować do rogu ekranu
 - **Fixed Position** — Bubleczka pozostaje widoczna podczas pracy z innymi komponentami
 - **Preview** — Ostatnia wiadomość AI wyświetlana w bubleczce
 - **Szybki dostęp** — Klikając na bubleczkę rozwijamy pełny chat
 
 ### 3. VS Code Integration
+
 - Chat dostępny w **Swarm Dashboard** (sidebar)
 - **Minimalizacja** dostępna także w extension
 - **Native UX** — Konsystentne z UI UAPA
@@ -392,6 +424,7 @@ function expandChatPanel() {
 ## 🔄 FLOW UŻYTKOWNIKA
 
 ### Standardowe Użycie (Chat rozwinięty)
+
 ```
 Użytkownik wpisze: "Deploy backend to prod"
                     ↓
@@ -405,6 +438,7 @@ Wyświetli się w chat panelu + bubleczka preview
 ```
 
 ### Minimalizacja (Podczas Other Tasks)
+
 ```
 Użytkownik klika "−" (minimize)
                     ↓
@@ -424,12 +458,14 @@ Użytkownik klika bubble → Chat expands
 ## 🚀 NASTĘPNE KROKI (TIER 2: NICE-TO-HAVE)
 
 ### Phase 5: Advanced Chat Features
+
 - [ ] **Real-time collaboration** — Presence indicators (kto jest online)
 - [ ] **Activity stream** — Historii zmian w real-time
 - [ ] **@mention notifications** — Ping agentów jako pomoc
 - [ ] **Typing indicators** — "AI is responding..."
 
 ### Phase 6: Mobile Support
+
 - [ ] **Responsive design** — Chat na telefonach (vertical stack)
 - [ ] **React Native app** — Native mobile access
 
@@ -454,11 +490,13 @@ Użytkownik klika bubble → Chat expands
 ## 📝 NOTATKA DLA DEVELOPERÓW
 
 Jeśli chcesz dodać nowe metryki do panelu:
+
 1. Dodaj `<div id="metric-xxx">` do `.metrics-card`
 2. W `updateMetricsDisplay()` update `document.getElementById("metric-xxx")`
 3. Animacje: `.stat-updating` class applies glow effect
 
 Jeśli chcesz permanentnie schować bubleczkę:
+
 ```javascript
 localStorage.setItem("adrion_chat_minimized", "false");
 ```

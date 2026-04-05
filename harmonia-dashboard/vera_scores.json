@@ -1668,5 +1668,345 @@
     "aligned": 0.9,
     "total": 0.708,
     "rag_used": false
+  },
+  {
+    "interaction_id": "49d72180a44cf1a1",
+    "timestamp": "2026-04-05T14:27:33.290671+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "49d72180a44cf1a1_fb",
+    "timestamp": "2026-04-05T14:27:40.099787+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6898bfaf14a8a8d1",
+    "timestamp": "2026-04-05T14:35:07.533025+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6898bfaf14a8a8d1_fb",
+    "timestamp": "2026-04-05T14:35:12.917873+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "395326462d969825",
+    "timestamp": "2026-04-05T14:49:11.359252+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "395326462d969825_fb",
+    "timestamp": "2026-04-05T14:49:15.859149+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "5fc67fb703bac7f9",
+    "timestamp": "2026-04-05T14:50:25.587596+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "5fc67fb703bac7f9_fb",
+    "timestamp": "2026-04-05T14:50:30.758621+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6385cae4c68bf783",
+    "timestamp": "2026-04-05T15:43:57.888752+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6385cae4c68bf783_fb",
+    "timestamp": "2026-04-05T15:43:57.941290+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6a6abd191539f04d",
+    "timestamp": "2026-04-05T15:45:45.200689+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6a6abd191539f04d_fb",
+    "timestamp": "2026-04-05T15:45:45.221207+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9bc941a9ef4a14f1",
+    "timestamp": "2026-04-05T15:46:25.780753+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9bc941a9ef4a14f1_fb",
+    "timestamp": "2026-04-05T15:46:25.796424+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "38219c0faa537a47",
+    "timestamp": "2026-04-05T15:48:18.501565+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "38219c0faa537a47_fb",
+    "timestamp": "2026-04-05T15:48:18.521361+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "4dc5eba551ce59a0",
+    "timestamp": "2026-04-05T15:49:04.131973+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "4dc5eba551ce59a0_fb",
+    "timestamp": "2026-04-05T15:49:04.172677+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ef099b2a48a122c6",
+    "timestamp": "2026-04-05T16:44:54.038939+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ef099b2a48a122c6_fb",
+    "timestamp": "2026-04-05T16:44:54.063041+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "034c4d7e761b1242",
+    "timestamp": "2026-04-05T16:45:33.834884+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "034c4d7e761b1242_fb",
+    "timestamp": "2026-04-05T16:45:33.851411+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f9269535a86838e9",
+    "timestamp": "2026-04-05T16:46:15.637788+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f9269535a86838e9_fb",
+    "timestamp": "2026-04-05T16:46:15.657626+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "35f8cff11f6b1f86",
+    "timestamp": "2026-04-05T16:47:05.878181+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "35f8cff11f6b1f86_fb",
+    "timestamp": "2026-04-05T16:47:05.919267+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a1cf1f830685e2c3",
+    "timestamp": "2026-04-05T17:17:56.652298+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a1cf1f830685e2c3_fb",
+    "timestamp": "2026-04-05T17:17:56.672571+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9f4b1a6a47426165",
+    "timestamp": "2026-04-05T17:29:18.383572+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9f4b1a6a47426165_fb",
+    "timestamp": "2026-04-05T17:29:18.575341+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "718229a5f5a79178",
+    "timestamp": "2026-04-05T17:30:17.709649+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "718229a5f5a79178_fb",
+    "timestamp": "2026-04-05T17:30:17.807979+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "86e81ad946ed2a1f",
+    "timestamp": "2026-04-05T17:31:31.852589+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "86e81ad946ed2a1f_fb",
+    "timestamp": "2026-04-05T17:31:31.883360+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
   }
 ]

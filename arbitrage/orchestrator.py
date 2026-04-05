@@ -27,7 +27,10 @@ from .database import (
     record_kpi_event,
     set_job_status,
 )
+from .guardian import build_context as build_guardian_context
+from .guardian import evaluate_guardians
 from .scout import run_scout
+from .trinity import evaluate_trinity
 from .xrp_tracker import get_progress, update_xrp_snapshot
 
 logging.basicConfig(
@@ -66,6 +69,8 @@ def run_cycle(dry_run: bool = False) -> dict:
     bids_today = _count_bids_today()
     bids_created = 0
     analyzed_count = 0
+    trinity_denied_count = 0
+    guardian_denied_count = 0
     stream_kpis = get_stream_kpis()
     daily_est_cost = float(stream_kpis.get("daily_est_cost_usd", 0))
 
@@ -112,6 +117,7 @@ def run_cycle(dry_run: bool = False) -> dict:
             log.info("[GUARDRAIL] Daily est. cost %.2f > %.2f — stopping", daily_est_cost, MAX_DAILY_EST_COST_USD)
             break
 
+        bids_for_client_today = 0
         if client_name:
             bids_for_client_today = get_client_bid_count_today(client_name)
             if bids_for_client_today >= MAX_BIDS_PER_CLIENT_PER_DAY:
@@ -122,6 +128,60 @@ def run_cycle(dry_run: bool = False) -> dict:
                 )
                 set_job_status(job["id"], "ignored")
                 continue
+
+        # ── Trinity Score — 3 perspectives: Material / Intellectual / Essential ──
+        trinity_eval = evaluate_trinity(job, analysis)
+        if not trinity_eval.approved:
+            log.info(
+                "  ↳ [TRINITY DENIED] M=%.2f I=%.2f E=%.2f combined=%.2f",
+                trinity_eval.material, trinity_eval.intellectual,
+                trinity_eval.essential, trinity_eval.combined,
+            )
+            set_job_status(job["id"], "trinity_denied")
+            record_kpi_event(
+                stream="b2b",
+                event_type="trinity_denied",
+                amount_usd=0,
+                est_cost_usd=0,
+                meta={
+                    "job_id": job["id"],
+                    "material": trinity_eval.material,
+                    "intellectual": trinity_eval.intellectual,
+                    "essential": trinity_eval.essential,
+                    "combined": trinity_eval.combined,
+                },
+            )
+            trinity_denied_count += 1
+            continue
+        log.info(
+            "  ↳ [TRINITY APPROVED] M=%.2f I=%.2f E=%.2f → combined=%.2f",
+            trinity_eval.material, trinity_eval.intellectual,
+            trinity_eval.essential, trinity_eval.combined,
+        )
+
+        # ── Guardian Laws — 9 ethical laws validated sequentially ──
+        guardian_eval = evaluate_guardians(
+            job,
+            analysis,
+            build_guardian_context(
+                bids_today=bids_today + bids_created,
+                daily_est_cost=daily_est_cost,
+                bids_for_client_today=bids_for_client_today,
+            ),
+        )
+        if not guardian_eval.approved:
+            log.info("  ↳ [GUARDIAN DENIED] %s", guardian_eval.denial_reason)
+            set_job_status(job["id"], "guardian_denied")
+            record_kpi_event(
+                stream="b2b",
+                event_type="guardian_denied",
+                amount_usd=0,
+                est_cost_usd=0,
+                meta={"job_id": job["id"], "denial": guardian_eval.denial_reason},
+            )
+            guardian_denied_count += 1
+            continue
+        log.info("  ↳ [GUARDIAN APPROVED] %d/9 laws passed", guardian_eval.compliance)
 
         log.info("  ↳ Score %d | $%.0f | profit $%.0f", score, our_price, est_profit)
         if not dry_run:
@@ -152,6 +212,8 @@ def run_cycle(dry_run: bool = False) -> dict:
         "jobs_scouted": len(raw_jobs),
         "new_jobs": new_count,
         "analyzed": analyzed_count,
+        "trinity_denied": trinity_denied_count,
+        "guardian_denied": guardian_denied_count,
         "bids_created": bids_created,
         "bids_today": bids_today + bids_created,
         "xrp_price": snap.get("xrp_price_usd", 0),

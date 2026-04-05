@@ -1,5 +1,6 @@
 """Tests for arbitrage/amplifier.py — AdrionAmplifier (G5/G6/G7 Guardian class)."""
 import pytest
+
 from arbitrage.amplifier import AdrionAmplifier
 
 

@@ -1720,6 +1720,41 @@ function loadAgentsList() {
   const container = document.getElementById("agents-list-container");
   if (!container) return;
 
+  fetch(`${API_BASE_URL}/agents`, {
+    headers: { "X-API-Key": "local-dev-key-123", "Content-Type": "application/json" }
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (!data.success || !data.agents) {
+        console.warn("Failed to fetch agents, using mock data:", data);
+        // Fallback to mock data
+        renderAgentsList(agentsList);
+        return;
+      }
+      // Normalize API response to match template expectations
+      const agents = data.agents.map(agent => ({
+        id: agent.id,
+        name: agent.name,
+        role: agent.role || 'Unknown',
+        personality: agent.personality || 'N/A',
+        description: agent.description || 'No description',
+        trustScore: agent.trust_score || 0.5,
+        capability: agent.capability_level || 'basic',
+        skills: Array.isArray(agent.skills) ? agent.skills : (typeof agent.skills === 'string' ? JSON.parse(agent.skills || '[]') : []),
+        active: agent.active !== false
+      }));
+      renderAgentsList(agents);
+    })
+    .catch(err => {
+      console.error("Failed to fetch agents:", err);
+      renderAgentsList(agentsList);
+    });
+}
+
+function renderAgentsList(agentsList) {
+  const container = document.getElementById("agents-list-container");
+  if (!container) return;
+
   container.innerHTML = agentsList
     .map(
       (agent) => `
