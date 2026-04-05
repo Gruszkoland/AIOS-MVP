@@ -11,6 +11,7 @@ CORE FEATURES:
 - Trust Score heatmap
 """
 import hmac
+import json
 import logging
 import os
 import sys
@@ -1119,6 +1120,204 @@ def auto_startup_status():
     except Exception as e:
         logger.error(f"❌ Auto-startup status failed: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# PHASE B: TASKS & AGENTS MANAGEMENT (NEW)
+# ════════════════════════════════════════════════════════════════════════════
+
+@app.route("/mapi/v1/tasks", methods=["GET"])
+def get_active_tasks():
+    """Fetch active tasks for current session"""
+    session_id = request.args.get("session_id", "default")
+
+    try:
+        if USE_DATABASE and db:
+            result = db.query("""
+                SELECT id, name, agent, status, progress, eta_seconds, created_at, updated_at
+                FROM tasks
+                WHERE session_id = %s AND status IN ('pending', 'running')
+                ORDER BY updated_at DESC LIMIT 50
+            """, [session_id])
+        else:
+            # Fallback: return sample data
+            result = [
+                {"id": "task-001", "name": "Deploy Backend", "agent": "Architect", "status": "running", "progress": 65, "eta_seconds": 120, "created_at": datetime.now().isoformat(), "updated_at": datetime.now().isoformat()},
+                {"id": "task-002", "name": "DB Migration", "agent": "SAP", "status": "running", "progress": 40, "eta_seconds": 300, "created_at": datetime.now().isoformat(), "updated_at": datetime.now().isoformat()},
+            ]
+
+        return jsonify({
+            "success": True,
+            "tasks": result if result else [],
+            "total": len(result) if result else 0
+        }), 200
+    except Exception as e:
+        logger.error(f"get_active_tasks error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/tasks/stats", methods=["GET"])
+def get_task_stats():
+    """Get task statistics"""
+    session_id = request.args.get("session_id", "default")
+
+    try:
+        if USE_DATABASE and db:
+            result = db.query("""
+                SELECT
+                    COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
+                    COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
+                    COUNT(CASE WHEN status = 'running' THEN 1 END) as running,
+                    COUNT(CASE WHEN status = 'failed' THEN 1 END) as failed
+                FROM tasks WHERE session_id = %s
+            """, [session_id])
+            stats = result[0] if result else {"completed": 0, "pending": 0, "running": 0, "failed": 0}
+        else:
+            stats = {"completed": 1, "pending": 0, "running": 2, "failed": 0}
+
+        total = sum([stats.get(k, 0) for k in ["completed", "pending", "running", "failed"]])
+
+        return jsonify({
+            "success": True,
+            "completed": stats.get("completed", 0),
+            "pending": stats.get("pending", 0),
+            "running": stats.get("running", 0),
+            "failed": stats.get("failed", 0),
+            "total": total,
+            "success_rate": stats.get("completed", 0) / max(1, total)
+        }), 200
+    except Exception as e:
+        logger.error(f"get_task_stats error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/agents", methods=["GET"])
+def list_agents():
+    """Fetch all agents"""
+    try:
+        if USE_DATABASE and db:
+            result = db.query("""
+                SELECT id, name, role, personality, description, trust_score, capability_level,
+                       skills, active, created_at, success_rate, tasks_completed
+                FROM agents ORDER BY active DESC, trust_score DESC
+            """, [])
+        else:
+            # Fallback: return sample agents
+            result = [
+                {"id": "agent-librarian", "name": "Librarian", "role": "Knowledge Management", "personality": "Organized, thorough", "description": "Manages knowledge base", "trust_score": 0.95, "capability_level": "expert", "skills": '["documentation"]', "active": True, "success_rate": 0.98, "tasks_completed": 342},
+                {"id": "agent-architect", "name": "Architect", "role": "System Design", "personality": "Strategic thinker", "description": "Designs systems", "trust_score": 0.88, "capability_level": "expert", "skills": '["design"]', "active": True, "success_rate": 0.92, "tasks_completed": 215},
+                {"id": "agent-auditor", "name": "Auditor", "role": "Security & Compliance", "personality": "Detail-oriented", "description": "Performs audits", "trust_score": 0.92, "capability_level": "expert", "skills": '["audit"]', "active": True, "success_rate": 0.95, "tasks_completed": 178},
+                {"id": "agent-sentinel", "name": "Sentinel", "role": "Monitoring & Alerts", "personality": "Vigilant watcher", "description": "Monitors system", "trust_score": 0.90, "capability_level": "expert", "skills": '["monitoring"]', "active": True, "success_rate": 0.97, "tasks_completed": 412},
+            ]
+
+        agents = []
+        for agent in (result if result else []):
+            agent_dict = dict(agent) if hasattr(agent, '__getitem__') else agent
+            if isinstance(agent_dict.get("skills"), str):
+                try:
+                    agent_dict["skills"] = json.loads(agent_dict["skills"])
+                except:
+                    agent_dict["skills"] = []
+            agents.append(agent_dict)
+
+        return jsonify({"success": True, "agents": agents}), 200
+    except Exception as e:
+        logger.error(f"list_agents error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/agents/create", methods=["POST"])
+def create_agent():
+    """Create new agent"""
+    data = request.get_json() or {}
+
+    try:
+        required = ['name', 'role', 'personality', 'description', 'capability_level']
+        if not all(f in data for f in required):
+            return jsonify({"success": False, "error": "Missing required fields"}), 400
+
+        agent_id = f"agent-{uuid.uuid4().hex[:8]}"
+
+        if USE_DATABASE and db:
+            skills_json = json.dumps(data.get('skills', []))
+            db.execute("""
+                INSERT INTO agents (id, name, role, personality, description, trust_score,
+                                  capability_level, skills, active)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, [
+                agent_id, data['name'], data['role'], data['personality'], data['description'],
+                float(data.get('trust_score', 0.8)), data['capability_level'], skills_json, data.get('active', True)
+            ])
+
+        return jsonify({"success": True, "id": agent_id, "message": f"Agent {data['name']} created"}), 201
+    except Exception as e:
+        logger.error(f"create_agent error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/agents/<agent_id>", methods=["PUT"])
+def update_agent(agent_id):
+    """Update agent"""
+    data = request.get_json() or {}
+
+    try:
+        if not data:
+            return jsonify({"success": False, "error": "No data provided"}), 400
+
+        if USE_DATABASE and db:
+            fields, values = [], []
+            for field in ['name', 'role', 'personality', 'description', 'trust_score', 'capability_level', 'skills', 'active']:
+                if field in data:
+                    fields.append(f"{field} = %s")
+                    values.append(json.dumps(data[field]) if field == 'skills' else data[field])
+
+            if not fields:
+                return jsonify({"success": False, "error": "No fields to update"}), 400
+
+            values.append(agent_id)
+            db.execute(f"UPDATE agents SET {', '.join(fields)} WHERE id = %s", values)
+
+        return jsonify({"success": True, "id": agent_id, "message": "Agent updated"}), 200
+    except Exception as e:
+        logger.error(f"update_agent error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/agents/<agent_id>", methods=["DELETE"])
+def delete_agent(agent_id):
+    """Delete agent (soft delete)"""
+    try:
+        if USE_DATABASE and db:
+            db.execute("UPDATE agents SET active = FALSE WHERE id = %s", [agent_id])
+
+        return jsonify({"success": True, "id": agent_id, "message": "Agent deleted"}), 200
+    except Exception as e:
+        logger.error(f"delete_agent error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/agents/<agent_id>", methods=["GET"])
+def get_agent(agent_id):
+    """Fetch single agent"""
+    try:
+        if USE_DATABASE and db:
+            result = db.query("SELECT * FROM agents WHERE id = %s", [agent_id])
+            if not result:
+                return jsonify({"success": False, "error": "Agent not found"}), 404
+            agent = dict(result[0]) if hasattr(result[0], '__getitem__') else result[0]
+        else:
+            agent = {"id": agent_id, "name": "Sample", "role": "Testing", "personality": "Test", "description": "Sample agent", "trust_score": 0.8, "capability_level": "expert", "skills": [], "active": True}
+
+        if isinstance(agent.get("skills"), str):
+            try:
+                agent["skills"] = json.loads(agent["skills"])
+            except:
+                agent["skills"] = []
+
+        return jsonify({"success": True, "agent": agent}), 200
+    except Exception as e:
+        logger.error(f"get_agent error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 # ────────────────────────────────────────────────────────────────────────────

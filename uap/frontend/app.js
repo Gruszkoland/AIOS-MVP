@@ -1582,86 +1582,77 @@ function initializeTasksPanel() {
 }
 
 function updateActiveTasksList() {
-  // Mock tasks data
-  const tasks = [
-    {
-      id: "task-001",
-      name: "Deploy Backend to Prod",
-      agent: "Architect",
-      status: "running",
-      progress: 65,
-      eta: "2min",
-    },
-    {
-      id: "task-002",
-      name: "Database Migration",
-      agent: "SAP",
-      status: "running",
-      progress: 40,
-      eta: "5min",
-    },
-    {
-      id: "task-003",
-      name: "Security Audit",
-      agent: "Auditor",
-      status: "pending",
-      progress: 0,
-      eta: "pending",
-    },
-    {
-      id: "task-004",
-      name: "Health Check",
-      agent: "Sentinel",
-      status: "completed",
-      progress: 100,
-      eta: "done",
-    },
-  ];
+  const sessionId = localStorage.getItem("adrion_session_id") || "default";
 
-  const container = document.getElementById("active-tasks-list");
-  if (!container) return;
+  // Fetch tasks from backend
+  fetch(`${API_BASE_URL}/tasks?session_id=${sessionId}`, {
+    headers: { "X-API-Key": "local-dev-key-123", "Content-Type": "application/json" }
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (!data.success || !data.tasks) {
+        console.warn("Failed to fetch tasks:", data);
+        return;
+      }
 
-  // Update stats
-  const completed = tasks.filter((t) => t.status === "completed").length;
-  const pending = tasks.filter((t) => t.status === "pending").length;
-  const failed = tasks.filter((t) => t.status === "failed").length;
+      const tasks = data.tasks;
+      const container = document.getElementById("active-tasks-list");
+      if (!container) return;
 
-  document.getElementById("stat-completed-tasks").textContent = completed;
-  document.getElementById("stat-pending-tasks").textContent = pending;
-  document.getElementById("stat-failed-tasks").textContent = failed;
+      // Fetch stats
+      fetch(`${API_BASE_URL}/tasks/stats?session_id=${sessionId}`, {
+        headers: { "X-API-Key": "local-dev-key-123" }
+      })
+        .then(r => r.json())
+        .then(stats => {
+          if (stats.success) {
+            document.getElementById("stat-completed-tasks").textContent = stats.completed;
+            document.getElementById("stat-pending-tasks").textContent = stats.running;
+            document.getElementById("stat-failed-tasks").textContent = stats.failed;
+          }
+        })
+        .catch(err => console.error("Failed to fetch stats:", err));
 
-  // Render tasks
-  if (tasks.length === 0) {
-    container.innerHTML =
-      '<p class="text-muted" style="text-align: center; padding: 20px 0;">Brak aktywnych zadań</p>';
-    return;
-  }
+      // Render tasks
+      if (tasks.length === 0) {
+        container.innerHTML =
+          '<p class="text-muted" style="text-align: center; padding: 20px 0;">Brak aktywnych zadań</p>';
+        return;
+      }
 
-  container.innerHTML = tasks
-    .map(
-      (task) => `
-        <div class="task-item">
-            <div class="task-item-header">
-                <span class="task-item-title">${task.name}</span>
-                <span class="task-item-status ${task.status}">${task.status.toUpperCase()}</span>
-            </div>
-            <div class="task-progress-container">
-                <div class="task-progress-bar">
-                    <div class="task-progress-fill" style="width: ${task.progress}%"></div>
+      container.innerHTML = tasks
+        .map(
+          (task) => `
+            <div class="task-item">
+                <div class="task-item-header">
+                    <span class="task-item-title">${task.name}</span>
+                    <span class="task-item-status ${task.status}">${task.status.toUpperCase()}</span>
                 </div>
-                <div class="task-progress-text">
-                    <span>${task.progress}%</span>
-                    <span>${task.eta}</span>
+                <div class="task-progress-container">
+                    <div class="task-progress-bar">
+                        <div class="task-progress-fill" style="width: ${task.progress}%"></div>
+                    </div>
+                    <div class="task-progress-text">
+                        <span>${task.progress}%</span>
+                        <span>${task.eta_seconds ? formatETA(task.eta_seconds) : 'pending'}</span>
+                    </div>
+                </div>
+                <div class="task-item-meta">
+                    <span class="task-item-agent">${task.agent}</span>
+                    <span style="margin-left: auto;">ID: ${task.id.substring(0, 8)}</span>
                 </div>
             </div>
-            <div class="task-item-meta">
-                <span class="task-item-agent">${task.agent}</span>
-                <span style="margin-left: auto;">ID: ${task.id.substring(0, 8)}</span>
-            </div>
-        </div>
-    `
-    )
-    .join("");
+        `
+        )
+        .join("");
+    })
+    .catch(err => console.error("Failed to fetch tasks:", err));
+}
+
+function formatETA(seconds) {
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+  return `${Math.floor(seconds / 3600)}h`;
 }
 
 // ──────────────────────────────────────────────────────────────────────────
