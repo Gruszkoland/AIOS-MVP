@@ -2,9 +2,9 @@
 Unit tests for arbitrage/wholesale_orchestrator.py — Wholesale Pipeline Orchestrator.
 All external calls mocked.
 """
-from unittest.mock import MagicMock, patch, call
-import pytest
+from unittest.mock import MagicMock
 
+import pytest
 
 # ---------------------------------------------------------------------------
 # Fixtures — mock all dependencies using monkeypatch
@@ -151,7 +151,7 @@ def test_run_wholesale_cycle_has_timestamps(mock_orchestrator_deps):
 
 def test_run_wholesale_cycle_with_channel_filter(mock_orchestrator_deps):
     from arbitrage.wholesale_orchestrator import run_wholesale_cycle
-    result = run_wholesale_cycle(use_mock=True, channel_filter="AUDIO_PREMIUM")
+    run_wholesale_cycle(use_mock=True, channel_filter="AUDIO_PREMIUM")
     mock_orchestrator_deps["scout"].assert_called_with(
         feed_data=None,
         feed_format="json",
@@ -245,8 +245,9 @@ def test_run_wholesale_cycle_buy_non_singularity(mock_orchestrator_deps, monkeyp
 
 def test_run_continuous_calls_cycle(monkeypatch):
     """run_continuous should call run_wholesale_cycle repeatedly."""
-    import arbitrage.wholesale_orchestrator as wo_mod
     import time as time_mod
+
+    import arbitrage.wholesale_orchestrator as wo_mod
     from arbitrage.wholesale_orchestrator import run_continuous
     call_count = 0
 

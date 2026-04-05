@@ -2,9 +2,9 @@
 Unit tests for arbitrage/stream_emitters.py — Auxiliary Stream Emitters.
 All DB and network calls are mocked.
 """
-from unittest.mock import MagicMock, patch, call
-import pytest
+from unittest.mock import MagicMock, patch
 
+import pytest
 
 # ---------------------------------------------------------------------------
 # _seeded_ratio — pure function
@@ -171,16 +171,18 @@ def test_fetch_returns_none_for_none_url():
 
 
 def test_fetch_returns_none_on_url_error():
-    from arbitrage.stream_emitters import _fetch_external_payload
     from urllib.error import URLError
+
+    from arbitrage.stream_emitters import _fetch_external_payload
     with patch("arbitrage.stream_emitters.urlopen", side_effect=URLError("connection failed")):
         result = _fetch_external_payload("http://localhost:1/test", "test")
     assert result is None
 
 
 def test_fetch_returns_parsed_json():
-    from arbitrage.stream_emitters import _fetch_external_payload
     import json as json_mod
+
+    from arbitrage.stream_emitters import _fetch_external_payload
     mock_response = MagicMock()
     mock_response.read.return_value = json_mod.dumps({"events": []}).encode()
     mock_response.__enter__ = MagicMock(return_value=mock_response)
