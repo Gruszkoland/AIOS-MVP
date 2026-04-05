@@ -37,9 +37,19 @@
     "**/node_modules/**": true,
     "**/.git/objects/**": true,
     "**/coverage/**": true,
-    "**/htmlcov/**": true
+    "**/htmlcov/**": true,
+    "**/logs/**": true,
+    "**/*.log": true,
+    "**/htmlcov/**": true,
+    "**/.pytest_cache/**": true,
+    "**/.ruff_cache/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/.mypy_cache/**": true
   },
   "files.maxMemoryForLargeFilesMB": 512,
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": true,
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
@@ -81,9 +91,7 @@
     "--max-line-length=120"
   ],
   "python.formatting.provider": "black",
-  "python.formatting.blackArgs": [
-    "--line-length=120"
-  ],
+  "python.formatting.blackArgs": ["--line-length=120"],
   "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": [
     "tests",

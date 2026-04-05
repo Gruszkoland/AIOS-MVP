@@ -37,6 +37,26 @@ load_dotenv(Path(__file__).parent.parent.parent / ".env")
 # Import database integration (SQLite fallback or PostgreSQL)
 from db import DatabaseEngine  # noqa: E402
 
+# Import Kubernetes integration for cluster monitoring
+try:
+    from kubernetes_integration import KubernetesIntegration
+    K8S_INTEGRATION = KubernetesIntegration()
+    K8S_ENABLED = True
+except Exception as e:
+    logger.warning(f"⚠️ Kubernetes integration not available: {e}")
+    K8S_INTEGRATION = None
+    K8S_ENABLED = False
+
+# Import Kubernetes WebSocket watcher for real-time updates
+try:
+    from k8s_websocket import get_k8s_watcher
+    K8S_WATCHER = get_k8s_watcher()
+    K8S_WATCHER_ENABLED = True
+except Exception as e:
+    logger.warning(f"⚠️ Kubernetes WebSocket watcher not available: {e}")
+    K8S_WATCHER = None
+    K8S_WATCHER_ENABLED = False
+
 # ────────────────────────────────────────────────────────────────────────────
 # CONFIG & LOGGING
 # ────────────────────────────────────────────────────────────────────────────
@@ -1494,6 +1514,450 @@ def log_agent_activity(agent_id):
     except Exception as e:
         logger.error(f"log_agent_activity error: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# KUBERNETES CLUSTER INTEGRATION (NEW)
+# ────────────────────────────────────────────────────────────────────────────
+
+@app.route("/mapi/v1/kubernetes/cluster-info", methods=["GET"])
+def kubernetes_cluster_info():
+    """Get Kubernetes cluster information."""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_ENABLED or not K8S_INTEGRATION:
+        return jsonify({"error": "Kubernetes integration not available"}), 503
+
+    try:
+        cluster_info = K8S_INTEGRATION.get_cluster_info()
+
+        # Log to Genesis Record
+        log_genesis_record(
+            task_id="system",
+            agent="Monitor",
+            status="success",
+            action="kubernetes_cluster_info_queried",
+            guards_passed=9,
+            notes=f"Cluster: {cluster_info.get('cluster_name', 'unknown')}"
+        )
+
+        return jsonify({
+            "status": "success",
+            "cluster": cluster_info,
+            "queried_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_cluster_info error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/pods", methods=["GET"])
+def kubernetes_pods_status():
+    """Get pod status listing by namespace."""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_ENABLED or not K8S_INTEGRATION:
+        return jsonify({"error": "Kubernetes integration not available"}), 503
+
+    try:
+        pods = K8S_INTEGRATION.get_pods_status()
+
+        # Log to Genesis Record
+        log_genesis_record(
+            task_id="system",
+            agent="Monitor",
+            status="success",
+            action="kubernetes_pods_query",
+            guards_passed=9,
+            notes=f"Retrieved {pods.get('total_pods', 0)} pods"
+        )
+
+        return jsonify({
+            "status": "success",
+            "pods": pods,
+            "queried_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_pods_status error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/services", methods=["GET"])
+def kubernetes_services():
+    """Get Kubernetes services by namespace."""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_ENABLED or not K8S_INTEGRATION:
+        return jsonify({"error": "Kubernetes integration not available"}), 503
+
+    try:
+        services = K8S_INTEGRATION.get_services()
+
+        # Log to Genesis Record
+        log_genesis_record(
+            task_id="system",
+            agent="Monitor",
+            status="success",
+            action="kubernetes_services_query",
+            guards_passed=9,
+            notes=f"Retrieved {len(services.get('services', []))} services"
+        )
+
+        return jsonify({
+            "status": "success",
+            "services": services,
+            "queried_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_services error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/deployments", methods=["GET"])
+def kubernetes_deployments():
+    """Get Kubernetes deployments by namespace."""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_ENABLED or not K8S_INTEGRATION:
+        return jsonify({"error": "Kubernetes integration not available"}), 503
+
+    try:
+        deployments = K8S_INTEGRATION.get_deployments()
+
+        # Log to Genesis Record
+        log_genesis_record(
+            task_id="system",
+            agent="Monitor",
+            status="success",
+            action="kubernetes_deployments_query",
+            guards_passed=9,
+            notes=f"Retrieved {len(deployments.get('deployments', []))} deployments"
+        )
+
+        return jsonify({
+            "status": "success",
+            "deployments": deployments,
+            "queried_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_deployments error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/pod/<pod_name>/logs", methods=["GET"])
+def kubernetes_pod_logs(pod_name: str):
+    """Get logs from a specific pod."""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_ENABLED or not K8S_INTEGRATION:
+        return jsonify({"error": "Kubernetes integration not available"}), 503
+
+    try:
+        lines = request.args.get("lines", default=50, type=int)
+        namespace = request.args.get("namespace", default="adrion-369")
+
+        logs = K8S_INTEGRATION.get_pod_logs(pod_name, namespace=namespace, lines=lines)
+
+        # Log to Genesis Record
+        log_genesis_record(
+            task_id="system",
+            agent="Monitor",
+            status="success",
+            action="kubernetes_pod_logs_retrieved",
+            guards_passed=9,
+            notes=f"Retrieved {len(logs.get('logs', ''))} bytes from pod {pod_name}"
+        )
+
+        return jsonify({
+            "status": "success",
+            "pod_name": pod_name,
+            "namespace": namespace,
+            "logs": logs.get("logs", ""),
+            "queried_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_pod_logs error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/pod/<pod_name>/restart", methods=["POST"])
+def kubernetes_pod_restart(pod_name: str):
+    """Restart a specific pod (delete and recreate)."""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_ENABLED or not K8S_INTEGRATION:
+        return jsonify({"error": "Kubernetes integration not available"}), 503
+
+    try:
+        namespace = request.args.get("namespace", default="adrion-369")
+
+        # Perform restart (critical operation)
+        result = K8S_INTEGRATION.restart_pod(pod_name, namespace=namespace)
+
+        # Log critical action to Genesis Record
+        log_genesis_record(
+            task_id=f"pod-restart-{datetime.now().timestamp()}",
+            agent="Sentinel",
+            status="completed",
+            action="kubernetes_pod_restart",
+            guards_passed=9,
+            notes=f"Pod {pod_name} forcefully restarted in namespace {namespace}"
+        )
+
+        return jsonify({
+            "status": "success",
+            "pod_name": pod_name,
+            "namespace": namespace,
+            "action": "restart",
+            "result": result,
+            "executed_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_pod_restart error: {str(e)}")
+
+        # Log error to Genesis Record
+        log_genesis_record(
+            task_id=f"pod-restart-error-{datetime.now().timestamp()}",
+            agent="Sentinel",
+            status="failed",
+            action="kubernetes_pod_restart_failed",
+            guards_passed=7,
+            notes=f"Failed to restart pod {pod_name}: {str(e)}"
+        )
+
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/metrics", methods=["GET"])
+def kubernetes_metrics():
+    """Get Kubernetes cluster metrics from Prometheus."""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_ENABLED or not K8S_INTEGRATION:
+        return jsonify({"error": "Kubernetes integration not available"}), 503
+
+    try:
+        metric = request.args.get("metric", default="cluster_health")
+
+        metrics = K8S_INTEGRATION.get_metrics(metric)
+
+        # Log to Genesis Record
+        log_genesis_record(
+            task_id="system",
+            agent="Monitor",
+            status="success",
+            action="kubernetes_metrics_query",
+            guards_passed=9,
+            notes=f"Queried metric: {metric}"
+        )
+
+        return jsonify({
+            "status": "success",
+            "metric": metric,
+            "data": metrics,
+            "queried_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_metrics error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/events", methods=["GET"])
+def kubernetes_events():
+    """Get recent Kubernetes cluster events."""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_ENABLED or not K8S_INTEGRATION:
+        return jsonify({"error": "Kubernetes integration not available"}), 503
+
+    try:
+        events = K8S_INTEGRATION.get_namespace_events()
+
+        # Log to Genesis Record
+        log_genesis_record(
+            task_id="system",
+            agent="Monitor",
+            status="success",
+            action="kubernetes_events_query",
+            guards_passed=9,
+            notes=f"Retrieved {len(events.get('events', []))} cluster events"
+        )
+
+        return jsonify({
+            "status": "success",
+            "events": events,
+            "queried_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_events error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# KUBERNETES REAL-TIME UPDATES (WebSocket Bridge via Server-Sent Events)
+# ────────────────────────────────────────────────────────────────────────────
+
+@app.route("/mapi/v1/kubernetes/watch/start", methods=["POST"])
+def kubernetes_watch_start():
+    """Start watching Kubernetes cluster for real-time updates"""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_WATCHER_ENABLED or not K8S_WATCHER:
+        return jsonify({"error": "Kubernetes WebSocket watcher not available"}), 503
+
+    try:
+        K8S_WATCHER.start_watching()
+
+        # Log to Genesis Record
+        log_genesis_record(
+            task_id="system",
+            agent="Monitor",
+            status="started",
+            action="kubernetes_watcher_start",
+            guards_passed=9,
+            notes="Real-time K8s cluster watcher started"
+        )
+
+        return jsonify({
+            "status": "success",
+            "message": "Kubernetes watcher started",
+            "watch_type": "streaming",
+            "started_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_watch_start error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/watch/stop", methods=["POST"])
+def kubernetes_watch_stop():
+    """Stop watching Kubernetes cluster"""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_WATCHER_ENABLED or not K8S_WATCHER:
+        return jsonify({"error": "Kubernetes WebSocket watcher not available"}), 503
+
+    try:
+        K8S_WATCHER.stop_watching()
+
+        # Log to Genesis Record
+        log_genesis_record(
+            task_id="system",
+            agent="Monitor",
+            status="stopped",
+            action="kubernetes_watcher_stop",
+            guards_passed=9,
+            notes="Real-time K8s cluster watcher stopped"
+        )
+
+        return jsonify({
+            "status": "success",
+            "message": "Kubernetes watcher stopped",
+            "stopped_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_watch_stop error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/watch/events", methods=["GET"])
+def kubernetes_watch_events():
+    """Get queued real-time events from watcher (polling fallback for SSE)"""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not K8S_WATCHER_ENABLED or not K8S_WATCHER:
+        return jsonify({"error": "Kubernetes WebSocket watcher not available"}), 503
+
+    try:
+        max_events = request.args.get("max", default=100, type=int)
+        events = K8S_WATCHER.get_queued_events(max_count=max_events)
+
+        return jsonify({
+            "status": "success",
+            "events": events,
+            "count": len(events),
+            "fetched_at": datetime.now().isoformat(),
+        }), 200
+
+    except Exception as e:
+        logger.error(f"kubernetes_watch_events error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/kubernetes/stream", methods=["GET"])
+def kubernetes_stream_sse():
+    """Server-Sent Events (SSE) stream for real-time K8s updates"""
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    def generate():
+        """Generator for SSE stream"""
+        # Start watcher if not running
+        if K8S_WATCHER and not K8S_WATCHER.watch_thread:
+            K8S_WATCHER.start_watching()
+
+        try:
+            yield f"data: {json.dumps({'type': 'connected', 'timestamp': datetime.now().isoformat()})}\n\n"
+
+            # Stream events
+            while True:
+                if K8S_WATCHER:
+                    events = K8S_WATCHER.get_queued_events(max_count=10)
+                    if events:
+                        for event in events:
+                            yield f"data: {json.dumps(event)}\n\n"
+
+                time.sleep(1)  # Poll every second
+
+        except GeneratorExit:
+            logger.info("SSE stream closed by client")
+        except Exception as e:
+            logger.error(f"SSE stream error: {e}")
+
+    if not K8S_WATCHER_ENABLED or not K8S_WATCHER:
+        return jsonify({"error": "Kubernetes WebSocket watcher not available"}), 503
+
+    # Log to Genesis Record
+    log_genesis_record(
+        task_id="system",
+        agent="Monitor",
+        status="opened",
+        action="kubernetes_sse_stream_opened",
+        guards_passed=9,
+        notes="SSE stream for real-time K8s updates opened"
+    )
+
+    return app.response_class(
+        response=generate(),
+        status=200,
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive",
+        }
+    )
 
 
 # ────────────────────────────────────────────────────────────────────────────
