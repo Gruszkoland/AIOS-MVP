@@ -602,19 +602,9 @@ services:
 networks:
   adrion-backend:
     driver: bridge
-    driver_opts:
-      com.docker.network.bridge.name: br-adrion-backend
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
 
   adrion-frontend:
     driver: bridge
-    driver_opts:
-      com.docker.network.bridge.name: br-adrion-frontend
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
 
 # ═════════════════════════════════════════════════════════════════════════════════
 # VOLUMES (persistent data storage)
