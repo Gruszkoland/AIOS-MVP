@@ -1,0 +1,95 @@
+{
+  "version": "1.0",
+  "generated": "2026-04-05",
+  "protocol": "TSPA (Trust Score Per Agent) Persistence",
+  "agents": {
+    "librarian": {
+      "name": "Librarian",
+      "role": "Knowledge/RAG",
+      "temperature": 0.4,
+      "trust_score": 0.80,
+      "history": [
+        {"date": "2026-04-05", "action": "session_init", "delta": "+0.80", "reason": "baseline"}
+      ]
+    },
+    "sap": {
+      "name": "Strategic Action Planner",
+      "role": "Orchestration/Planning",
+      "temperature": 0.6,
+      "trust_score": 0.85,
+      "history": [
+        {"date": "2026-04-05", "action": "session_init", "delta": "+0.85", "reason": "baseline"}
+      ]
+    },
+    "auditor": {
+      "name": "Auditor",
+      "role": "Compliance/Guardian Laws",
+      "temperature": 0.1,
+      "trust_score": 0.95,
+      "history": [
+        {"date": "2026-04-05", "action": "session_init", "delta": "+0.95", "reason": "baseline"}
+      ]
+    },
+    "sentinel": {
+      "name": "Sentinel",
+      "role": "Monitoring/Emergency",
+      "temperature": 0.8,
+      "trust_score": 0.75,
+      "history": [
+        {"date": "2026-04-05", "action": "session_init", "delta": "+0.75", "reason": "baseline"}
+      ]
+    },
+    "architect": {
+      "name": "Architect",
+      "role": "Design/Infrastructure",
+      "temperature": 0.6,
+      "trust_score": 0.82,
+      "history": [
+        {"date": "2026-04-05", "action": "session_init", "delta": "+0.82", "reason": "baseline"}
+      ]
+    },
+    "healer": {
+      "name": "Healer",
+      "role": "Self-Repair/Calibration",
+      "temperature": 0.5,
+      "trust_score": 0.70,
+      "history": [
+        {"date": "2026-04-05", "action": "session_init", "delta": "+0.70", "reason": "baseline"}
+      ]
+    },
+    "amplifier": {
+      "name": "Amplifier",
+      "role": "Scaling/Performance",
+      "temperature": 0.8,
+      "trust_score": 0.78,
+      "history": [
+        {"date": "2026-04-05", "action": "session_init", "delta": "+0.78", "reason": "baseline"}
+      ]
+    },
+    "boosterlever": {
+      "name": "BoosterLever",
+      "role": "Extreme Optimization/ROI",
+      "temperature": 0.9,
+      "trust_score": 0.65,
+      "history": [
+        {"date": "2026-04-05", "action": "session_init", "delta": "+0.65", "reason": "baseline - risky"}
+      ]
+    },
+    "chronos": {
+      "name": "Chronos",
+      "role": "Timing/Rhythm",
+      "temperature": 0.5,
+      "trust_score": 0.72,
+      "history": [
+        {"date": "2026-04-05", "action": "session_init", "delta": "+0.72", "reason": "baseline"}
+      ]
+    }
+  },
+  "metadata": {
+    "trust_score_scale": "0.0 (no trust) to 1.0 (absolute trust)",
+    "update_trigger": "Session end, task completion, error/failure (−0.20)",
+    "success_reward": "+0.05 per successful task",
+    "failure_penalty": "−0.20 per rejection or error",
+    "cascade_update": "Master Orchestrator applies weighted voting (CR [6])"
+  }
+}

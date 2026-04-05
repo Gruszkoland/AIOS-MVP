@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "protocol": "RBC (Rollback Checkpoint) Snapshots",
+  "latest_checkpoint": {
+    "id": "SPRINT1-STARTUP-2026-04-05",
+    "git_hash": "3218de1",
+    "datetime": "2026-04-05T00:00:00",
+    "type": "sprint_startup",
+    "files_changed": 0,
+    "active_todos": 7,
+    "rollback_command": "git reset --hard 3218de1"
+  },
+  "checkpoint_history": [
+    {
+      "id": "SPRINT1-STARTUP-2026-04-05",
+      "git_hash": "3218de1",
+      "datetime": "2026-04-05T00:00:00",
+      "type": "sprint_startup",
+      "reason": "TIER 0 implementation push",
+      "files_changed": 0
+    }
+  ],
+  "auto_checkpoint_config": {
+    "interval": 5,
+    "unit": "steps",
+    "description": "Auto-checkpoint every N=5 completed task steps",
+    "enabled": true
+  }
+}

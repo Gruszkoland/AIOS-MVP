@@ -142,3 +142,60 @@ def mock_requests_get_xrp():
             resp.json.return_value = {"price": "2.35"}
         return resp
     return _fake_get
+
+
+# ── TIER 0 Critical fixtures ─────────────────────────────────────────────────
+
+@pytest.fixture
+def tier0_ebdi_baseline():
+    """TIER 0: EBDI baseline state (Pleasure, Arousal, Dominance) per agent."""
+    return {
+        "librarian": {"P": 0.5, "A": 0.3, "D": 0.6},
+        "sap": {"P": 0.6, "A": 0.4, "D": 0.8},
+        "auditor": {"P": 0.3, "A": 0.1, "D": 0.5},
+        "sentinel": {"P": 0.4, "A": 0.7, "D": 0.9},
+        "architect": {"P": 0.6, "A": 0.5, "D": 0.7},
+        "healer": {"P": 0.7, "A": 0.3, "D": 0.6},
+    }
+
+
+@pytest.fixture
+def tier0_guardian_laws():
+    """TIER 0: 9 Guardian Laws for compliance checks."""
+    return {
+        "G1": "Unity",
+        "G2": "Harmony",
+        "G3": "Rhythm",
+        "G4": "Causality",
+        "G5": "Transparency",
+        "G6": "Authenticity",
+        "G7": "Privacy",
+        "G8": "Nonmaleficence",
+        "G9": "Sustainability",
+    }
+
+
+@pytest.fixture
+def tier0_crisis_mode_trigger():
+    """TIER 0: Crisis mode activates when Arousal > 0.7 (Sentinel only)."""
+    return 0.7
+
+
+# ── Helper pytest markers and utilities ──────────────────────────────────────
+
+def pytest_configure(config):
+    """Register TIER 0 marker for critical tests."""
+    config.addinivalue_line(
+        "markers", "tier0: TIER 0 critical system tests (must pass)"
+    )
+
+
+@pytest.fixture
+def assert_guardian_law_compliance():
+    """TIER 0: Helper to verify Guardian Law compliance in assertions."""
+    def _check(operation, law_ids: list, description: str):
+        """Verify operation message mentions Guardian Laws."""
+        msg = str(operation)
+        for law_id in law_ids:
+            assert law_id in msg, f"Operation {description} missing {law_id} compliance info"
+    return _check
