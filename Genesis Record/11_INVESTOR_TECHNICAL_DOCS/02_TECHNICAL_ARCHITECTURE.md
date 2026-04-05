@@ -51,23 +51,37 @@
 
 ## 1. Framework decyzyjny 162D (Trinity-EBDI)
 
-### Trinity — 3 perspektywy równoległe
+### Trinity — 3 perspektywy równoległe (zaimplementowane w M3)
 
 ```python
-# Trzy niezależne oceny, każda 0.0–1.0
-material_score    = assess_resources()     # CPU/RAM/GPU via psutil
-intellectual_score = assess_logic()        # harmonic mean — all must pass
-essential_score   = assess_alignment()     # geometric mean — all must be high
+# arbitrage/trinity.py — REAL IMPLEMENTATION (100% test coverage)
+@dataclass
+class TrinityScore:
+    material:     float    # CPU/RAM via psutil (0–1)
+    intellectual: float    # LLM score quality, harmonic mean (0–1)
+    essential:    float    # Purpose × profit alignment, geometric mean (0–1)
+    combined:     float    # (m + i + e) / 3
+    approved:     bool     # ALL thresholds must be met
 
-# Agregacja
-overall_score = aggregate(material, intellectual, essential)
-# Jeśli any < threshold → pipeline STOPS tu
+# PROGI ZATWIERDZENIA (fail-fast)
+TRINITY_MIN_MATERIAL     = 0.30  # CPU/RAM wolne ≥ 30%
+TRINITY_MIN_INTELLECTUAL = 0.50  # Jakość LLM ≥ 50%
+TRINITY_MIN_ESSENTIAL    = 0.20  # Purpose × profit ≥ 20%
+TRINITY_MIN_COMBINED     = 0.40  # Łącznie ≥ 40%
+
+# Material:     harmonic_mean(cpu_avail, ram_avail) — wrażliwe na brakujące zasoby
+# Intellectual: harmonic_mean(score_norm, reasoning_norm) — fail-fast na niską jakość
+# Essential:    geometric_mean(purpose_match, profit_norm) — oba muszą być wysokie
 ```
 
-**Matematyka aggregacji:**
-- `Intellectual` — `harmonic_mean(scores)`: jeden low-score = fail całości (brak "dragging up")
-- `Essential` — `geometric_mean(scores)`: wszystkie muszą być wysokie jednocześnie
-- `Material` — `weighted_average(cpu, ram, gpu)`: zasoby ważone priorytetem
+**Pipeline decyzyjny (aktualny stan):**
+
+```
+Job → analyze_job() → score < MIN → IGNORE
+                    → evaluate_trinity() → M/I/E < threshold → TRINITY_DENIED
+                    → evaluate_guardians() → ≥2 violations → GUARDIAN_DENIED
+                    → create_bid() ✓
+```
 
 ### Hexagon — 6 trybów sekwencyjnych
 

@@ -22,6 +22,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# PRIORITY: Setup Python path FIRST before any local imports
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT / "backend"))
+
 # Load .env variables
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
@@ -45,9 +50,6 @@ logger = logging.getLogger("adrion.uap.api")
 app = Flask(__name__)
 _CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "*")  # Allow all origins for development
 CORS(app, origins=[_CORS_ORIGIN])
-
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
 
 # Initialize PostgreSQL database
 try:

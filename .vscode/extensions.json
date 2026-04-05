@@ -6,6 +6,7 @@
     "ms-vscode.powershell",
     "ms-azuretools.vscode-docker",
     "esbenp.prettier-vscode",
-    "dbaeumer.vscode-eslint"
+    "dbaeumer.vscode-eslint",
+    "adrion.adrion-369-extension"
   ]
 }

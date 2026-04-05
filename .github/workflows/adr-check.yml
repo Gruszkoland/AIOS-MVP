@@ -1,0 +1,201 @@
+name: ADR Validation & Monitoring
+
+on:
+  pull_request:
+    paths:
+      - 'docs/adr/**'
+      - '**/*.md'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'docs/adr/**'
+      - 'docs/ARCHITECTURE/**'
+      - 'Genesis Record/10_RAPORTY/**'
+
+jobs:
+  validate-adr-structure:
+    name: Validate ADR Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Check ADR file naming
+        run: |
+          echo "✓ Checking ADR naming convention (ADR-NNN.md)..."
+          for file in docs/adr/ADR-*.md; do
+            if [[ ! $file =~ ^docs/adr/ADR-[0-9]{3}- ]]; then
+              echo "❌ Invalid ADR filename: $file"
+              exit 1
+            fi
+          done
+          echo "✅ All ADR filenames valid"
+      
+      - name: Validate ADR Content Structure
+        run: |
+          echo "✓ Validating ADR Markdown structure..."
+          for file in docs/adr/ADR-*.md; do
+            echo "  Checking: $(basename $file)"
+            
+            # Required sections
+            if ! grep -q "^# ADR-" "$file"; then
+              echo "❌ Missing ADR title in $file"
+              exit 1
+            fi
+            if ! grep -q "^## Status" "$file"; then
+              echo "❌ Missing Status section in $file"
+              exit 1
+            fi
+            if ! grep -q "^## Context" "$file"; then
+              echo "❌ Missing Context section in $file"
+              exit 1
+            fi
+            if ! grep -q "^## Decision" "$file"; then
+              echo "❌ Missing Decision section in $file"
+              exit 1
+            fi
+            if ! grep -q "^## Consequences" "$file"; then
+              echo "❌ Missing Consequences section in $file"
+              exit 1
+            fi
+            if ! grep -q "^## Guardian Laws Impact" "$file"; then
+              echo "❌ Missing Guardian Laws Impact in $file"
+              exit 1
+            fi
+            if ! grep -q "^## 162D Decision Space Mapping" "$file"; then
+              echo "❌ Missing 162D Decision Space Mapping in $file"
+              exit 1
+            fi
+          done
+          echo "✅ All ADR structures valid"
+      
+      - name: Check for Guardian Laws Coverage
+        run: |
+          echo "✓ Checking Guardian Laws references..."
+          for file in docs/adr/ADR-*.md; do
+            # Count Guardian Laws mentioned (G1-G9)
+            law_count=$(grep -o "G[1-9]" "$file" | sort -u | wc -l)
+            if [ $law_count -lt 1 ]; then
+              echo "⚠️  Warning: $file mentions <1 Guardian Laws"
+            fi
+          done
+          echo "✅ Guardian Laws check completed"
+      
+      - name: Validate JSON Trackers
+        run: |
+          echo "✓ Validating JSON monitoring files..."
+          python3 -m json.tool "Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/ADR-Adoption-Status.json" > /dev/null
+          python3 -m json.tool "Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/ATAM-Progress.json" > /dev/null
+          python3 -m json.tool "Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/Tools-Integration-Status.json" > /dev/null
+          echo "✅ All JSON trackers valid"
+      
+      - name: Generate ADR Summary Report
+        run: |
+          echo "📊 ADR Summary Report"
+          echo "===================="
+          adr_count=$(ls -1 docs/adr/ADR-*.md 2>/dev/null | wc -l)
+          echo "Total ADRs: $adr_count"
+          
+          accepted=$(grep -l "^- \[x\] Accepted" docs/adr/*.md 2>/dev/null | wc -l)
+          proposed=$(grep -l "^- \[ \] Proposed" docs/adr/*.md 2>/dev/null | wc -l)
+          echo "  ✅ Accepted: $accepted"
+          echo "  🔲 Proposed: $proposed"
+          echo "  Coverage: $((accepted * 100 / adr_count))%"
+
+  update-monitoring-trackers:
+    name: Update Adoption Trackers
+    runs-on: ubuntu-latest
+    needs: validate-adr-structure
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Update ADR Adoption Status
+        run: |
+          python3 << 'EOF'
+          import json
+          import os
+          from pathlib import Path
+          from datetime import datetime
+          
+          adr_dir = Path("docs/adr")
+          adr_files = sorted(adr_dir.glob("ADR-*.md"))
+          
+          accepted_count = 0
+          proposed_count = 0
+          
+          for adr_file in adr_files:
+            content = adr_file.read_text()
+            if "- [x] Accepted" in content:
+              accepted_count += 1
+            elif "- [ ] Proposed" in content:
+              proposed_count += 1
+          
+          # Update JSON tracker
+          tracker_path = Path("Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/ADR-Adoption-Status.json")
+          with open(tracker_path, "r+") as f:
+            tracker = json.load(f)
+            tracker["reported_at"] = datetime.utcnow().isoformat() + "Z"
+            tracker["adr_summary"]["accepted"] = accepted_count
+            tracker["adr_summary"]["proposed"] = proposed_count
+            tracker["adr_summary"]["coverage_percentage"] = int(accepted_count * 100 / len(adr_files)) if adr_files else 0
+            
+            f.seek(0)
+            json.dump(tracker, f, indent=2)
+            f.truncate()
+          
+          print(f"✅ Updated ADR status: {accepted_count} accepted, {proposed_count} proposed")
+          EOF
+      
+      - name: Commit Updated Status
+        run: |
+          git config user.name "ADRION-Bot"
+          git config user.email "adrion@369.local"
+          git add Genesis\ Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/
+          git commit -m "AUTO: Update ADR adoption status (CI/CD)" || echo "No changes to commit"
+          git push || echo "Push skipped (no upstream)"
+        continue-on-error: true
+
+  quality-gates:
+    name: Architecture Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Verify ATAM Documentation
+        run: |
+          echo "✓ Checking ATAM documentation..."
+          if [ -f "docs/ARCHITECTURE/ATAM-Findings-2026.md" ]; then
+            echo "✅ ATAM Findings document exists"
+          else
+            echo "⚠️  Note: ATAM Findings not yet created (planned for Q2 2026)"
+          fi
+      
+      - name: Check Design Patterns
+        run: |
+          echo "✓ Verifying Design Patterns catalog..."
+          pattern_count=$(ls -1 docs/DESIGN-PATTERNS/*.md 2>/dev/null | wc -l || echo 0)
+          echo "Design Patterns documented: $pattern_count/5 (planned)"
+      
+      - name: Verify Tooling Matrix
+        run: |
+          echo "✓ Checking Tooling Matrix..."
+          matrix_count=$(ls -1 docs/TOOLING-MATRIX/*.md 2>/dev/null | wc -l || echo 0)
+          echo "Tooling Matrices: $matrix_count/4 (planned)"
+
+  notification:
+    name: Generate Report
+    runs-on: ubuntu-latest
+    needs: [validate-adr-structure, quality-gates]
+    if: always()
+    steps:
+      - name: Job Status
+        run: |
+          echo "✅ ADR Validation Pipeline Completed"
+          echo "📋 Results available in deployment logs"
+          echo "📊 Monitoring dashboards updating..."

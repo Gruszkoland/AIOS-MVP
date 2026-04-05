@@ -21,7 +21,13 @@ services:
         tag: "{{.Name}}"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/api/arbitrage/status', timeout=3)"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/api/arbitrage/status', timeout=3)",
+        ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -30,7 +36,7 @@ services:
       resources:
         limits:
           memory: 512m
-          cpus: '0.5'
+          cpus: "0.5"
 
   adrion-dashboard:
     build:
@@ -64,7 +70,13 @@ services:
         condition: service_started
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/api/system/info', timeout=3)"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/api/system/info', timeout=3)",
+        ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -73,7 +85,7 @@ services:
       resources:
         limits:
           memory: 256m
-          cpus: '0.25'
+          cpus: "0.25"
 
   loki:
     image: grafana/loki:3.1.1
@@ -95,7 +107,7 @@ services:
       resources:
         limits:
           memory: 512m
-          cpus: '0.5'
+          cpus: "0.5"
 
   promtail:
     image: grafana/promtail:3.1.1
@@ -117,7 +129,7 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-adrion369}
-      - GRAFANA_ALERT_WEBHOOK_URL=${GRAFANA_ALERT_WEBHOOK_URL:-http://alert-sink:8080/adrion-alert}
+      - GRAFANA_ALERT_WEBHOOK_URL=${GRAFANA_ALERT_WEBHOOK_URL:-http://alert-handler:8090/alert}
       - GF_USERS_ALLOW_SIGN_UP=false
     ports:
       - "3000:3000"
@@ -130,29 +142,45 @@ services:
     depends_on:
       loki:
         condition: service_healthy
-      alert-sink:
+      alert-handler:
         condition: service_healthy
     restart: unless-stopped
     deploy:
       resources:
         limits:
           memory: 512m
-          cpus: '0.5'
+          cpus: "0.5"
 
-  alert-sink:
-    image: mendhak/http-https-echo:35
-    container_name: adrion-alert-sink
+  # ── Alert Handler (Slack/Pagerduty/Webhook Integration) ────────────────
+  alert-handler:
+    build:
+      context: .
+      dockerfile: Dockerfile.alert-handler
+    container_name: adrion-alert-handler
+    env_file:
+      - .env
     environment:
-      - HTTP_PORT=8080
+      - HANDLER_PORT=8090
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+      - PAGERDUTY_KEY=${PAGERDUTY_KEY:-}
+      - ALERT_LOG_PATH=/app/logs/alerts.log
     ports:
-      - "8081:8080"
+      - "8090:8090"
+    volumes:
+      - ./monitoring/alerts:/app/logs
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080"]
+      test: ["CMD", "curl", "-f", "-s", "http://127.0.0.1:8090/health"]
       interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "{{.Name}}"
 
   adrion-backup:
     build:
@@ -164,13 +192,14 @@ services:
     environment:
       - DB_PATH=/app/data/arbitrage.db
       - BACKUP_DIR=/backups
-      - ALERT_URL=http://alert-sink:8080/adrion-backup-alert
+      - ALERT_URL=http://alert-handler:8090/alert
+      - ALERT_SEVERITY=info
     volumes:
       - ./data:/app/data:ro
       - ./backups:/backups
       - ./scripts/backups/backup-sqlite.sh:/usr/local/bin/backup-sqlite.sh:ro
     depends_on:
-      alert-sink:
+      alert-handler:
         condition: service_healthy
     restart: unless-stopped
     logging:
@@ -223,7 +252,7 @@ services:
       resources:
         limits:
           memory: 128m
-          cpus: '0.25'
+          cpus: "0.25"
 
   # ── UAP Master Orchestrator API ───────────────────────────────────────────
   adrion-uap:
@@ -244,7 +273,13 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/mapi/v1/health', timeout=3)"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/mapi/v1/health', timeout=3)",
+        ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -259,7 +294,7 @@ services:
       resources:
         limits:
           memory: 512m
-          cpus: '0.5'
+          cpus: "0.5"
 
   # ── Prometheus Metrics Collector ──────────────────────────────────────────
   adrion-prometheus:

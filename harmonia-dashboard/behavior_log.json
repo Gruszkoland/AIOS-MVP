@@ -1496,5 +1496,33 @@
     "model": "test",
     "rag_context_used": false,
     "vera_score": null
+  },
+  {
+    "id": "e6652bf15fa03481",
+    "timestamp": "2026-04-05T17:35:27.026171+00:00",
+    "prompt": "Test prompt",
+    "response": "Test response",
+    "correction": null,
+    "accepted": true,
+    "feedback_score": 2,
+    "category": "general",
+    "latency_ms": 100,
+    "model": "test",
+    "rag_context_used": false,
+    "vera_score": null
+  },
+  {
+    "id": "77efd9aef608278b",
+    "timestamp": "2026-04-05T17:36:36.291447+00:00",
+    "prompt": "Test prompt",
+    "response": "Test response",
+    "correction": null,
+    "accepted": true,
+    "feedback_score": 2,
+    "category": "general",
+    "latency_ms": 100,
+    "model": "test",
+    "rag_context_used": false,
+    "vera_score": null
   }
 ]

@@ -64,3 +64,5 @@
 {"ts": 1775410159, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 2.39, "prompt_len": 11, "system_len": 3}
 {"ts": 1775410218, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.33, "prompt_len": 11, "system_len": 3}
 {"ts": 1775410292, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.38, "prompt_len": 11, "system_len": 3}
+{"ts": 1775410528, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 2.01, "prompt_len": 11, "system_len": 3}
+{"ts": 1775410597, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.46, "prompt_len": 11, "system_len": 3}
