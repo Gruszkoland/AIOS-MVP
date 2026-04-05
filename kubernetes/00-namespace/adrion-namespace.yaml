@@ -1,0 +1,102 @@
+---
+# ADRION 369 Kubernetes Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: adrion-369
+  labels:
+    app.kubernetes.io/name: adrion
+    app.kubernetes.io/version: v4.0
+    environment: production
+
+---
+# RBAC: Service Account for ADRION services
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: adrion-system
+  namespace: adrion-369
+  labels:
+    app: adrion-system
+
+---
+# ClusterRole for ADRION Pod management
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: adrion-system
+  labels:
+    app: adrion-system
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "services"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "daemonsets"]
+    verbs: ["get", "list", "watch"]
+
+---
+# ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: adrion-system
+  labels:
+    app: adrion-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: adrion-system
+subjects:
+  - kind: ServiceAccount
+    name: adrion-system
+    namespace: adrion-369
+
+---
+# NetworkPolicy for security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: adrion-network-policy
+  namespace: adrion-369
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 3100 # Loki
+        - protocol: TCP
+          port: 3000 # Grafana
+        - protocol: TCP
+          port: 5678 # N8N
+        - protocol: TCP
+          port: 1740 # Vortex
+        - protocol: TCP
+          port: 8001 # API
+        - protocol: TCP
+          port: 8090 # Alert Handler
+        - protocol: TCP
+          port: 5432 # PostgreSQL
+        - protocol: TCP
+          port: 11434 # Ollama
+        - protocol: TCP
+          port: 9090 # Prometheus
+        - protocol: TCP
+          port: 80 # HTTP
+        - protocol: TCP
+          port: 443 # HTTPS
+  egress:
+    - to:
+        - podSelector: {}
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53 # DNS
+        - protocol: UDP
+          port: 53 # DNS

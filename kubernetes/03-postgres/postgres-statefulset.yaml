@@ -1,0 +1,208 @@
+---
+# PersistentVolumeClaim for PostgreSQL
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: adrion-369
+  labels:
+    app: postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  volumeName: pv-postgres-data
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+# PostgreSQL StatefulSet (TIER 0 - dependency root)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: adrion-369
+  labels:
+    app: postgres
+    tier: database
+    version: "15-alpine"
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        tier: database
+    spec:
+      serviceAccountName: adrion-system
+      securityContext:
+        fsGroup: 999
+        runAsNonRoot: true
+        runAsUser: 999
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_DB
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2000m"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            - name: postgres-init
+              mountPath: /docker-entrypoint-initdb.d
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+        - name: postgres-init
+          configMap:
+            name: postgres-init-sql
+            defaultMode: 0755
+
+---
+# ConfigMap for PostgreSQL initialization SQL
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-sql
+  namespace: adrion-369
+  labels:
+    app: postgres
+data:
+  init.sql: |
+    CREATE SCHEMA IF NOT EXISTS adrion;
+    CREATE TABLE IF NOT EXISTS adrion.system_log (
+      id SERIAL PRIMARY KEY,
+      timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      level VARCHAR(20),
+      message TEXT,
+      component VARCHAR(100),
+      details JSONB
+    );
+    CREATE TABLE IF NOT EXISTS adrion.service_health (
+      id SERIAL PRIMARY KEY,
+      service_name VARCHAR(100) UNIQUE NOT NULL,
+      status VARCHAR(50),
+      last_check TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      uptime_seconds BIGINT
+    );
+    CREATE TABLE IF NOT EXISTS adrion.alerts (
+      id SERIAL PRIMARY KEY,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      severity VARCHAR(20),
+      title TEXT,
+      description TEXT,
+      service_name VARCHAR(100),
+      resolved_at TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS adrion.workflow_executions (
+      id SERIAL PRIMARY KEY,
+      workflow_id VARCHAR(100),
+      execution_id VARCHAR(100),
+      status VARCHAR(50),
+      started_at TIMESTAMP,
+      ended_at TIMESTAMP,
+      result JSONB
+    );
+    CREATE TABLE IF NOT EXISTS adrion.arbitrage_opportunities (
+      id SERIAL PRIMARY KEY,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      pair VARCHAR(20),
+      exchange_a VARCHAR(50),
+      exchange_b VARCHAR(50),
+      price_a DECIMAL(18, 8),
+      price_b DECIMAL(18, 8),
+      spread_percent DECIMAL(10, 4),
+      status VARCHAR(50),
+      executed_at TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS adrion.vortex_state (
+      id SERIAL PRIMARY KEY,
+      harmonic_frequency DECIMAL(10, 2),
+      phase_offset DECIMAL(10, 4),
+      amplitude DECIMAL(10, 4),
+      last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      status VARCHAR(50)
+    );
+    CREATE TABLE IF NOT EXISTS adrion.guardian_laws_compliance (
+      id SERIAL PRIMARY KEY,
+      law_id INTEGER,
+      law_name VARCHAR(100),
+      compliance_score DECIMAL(5, 2),
+      last_check TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      violations INTEGER DEFAULT 0
+    );
+    CREATE INDEX IF NOT EXISTS idx_system_log_timestamp ON adrion.system_log(timestamp);
+    CREATE INDEX IF NOT EXISTS idx_alerts_service ON adrion.alerts(service_name);
+    CREATE INDEX IF NOT EXISTS idx_workflow_status ON adrion.workflow_executions(status);
+    CREATE INDEX IF NOT EXISTS idx_arbitrage_pair ON adrion.arbitrage_opportunities(pair);
+
+---
+# Service for PostgreSQL
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: adrion-369
+  labels:
+    app: postgres
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres

@@ -83,6 +83,7 @@ services:
     volumes:
       - ./monitoring/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
       - loki_data:/loki
+      - loki_wal:/wal
     healthcheck:
       test:
         [
@@ -122,9 +123,6 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - promtail_positions:/tmp/promtail
-    depends_on:
-      loki:
-        condition: service_healthy
     restart: unless-stopped
     logging:
       driver: json-file
@@ -473,8 +471,6 @@ services:
       - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - grafana_data:/var/lib/grafana
     depends_on:
-      loki:
-        condition: service_healthy
       alert-handler:
         condition: service_healthy
     healthcheck:
@@ -624,6 +620,13 @@ volumes:
       type: none
       o: bind
       device: ./data/loki
+
+  loki_wal:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/loki_wal
 
   promtail_positions:
     driver: local

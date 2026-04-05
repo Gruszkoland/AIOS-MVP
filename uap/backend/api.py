@@ -34,8 +34,8 @@ from flask_cors import CORS
 
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
-# Import PostgreSQL integration
-from db import PostgresDB  # noqa: E402
+# Import database integration (SQLite fallback or PostgreSQL)
+from db import DatabaseEngine  # noqa: E402
 
 # ────────────────────────────────────────────────────────────────────────────
 # CONFIG & LOGGING
@@ -51,13 +51,13 @@ app = Flask(__name__)
 _CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "*")  # Allow all origins for development
 CORS(app, origins=[_CORS_ORIGIN])
 
-# Initialize PostgreSQL database
+# Initialize database (SQLite or PostgreSQL)
 try:
-    db = PostgresDB()
-    logger.info("✅ PostgreSQL connected successfully")
+    db = DatabaseEngine  # DatabaseEngine is already an instance from db.py factory
+    logger.info("✅ Database initialized successfully")
     USE_DATABASE = True
 except Exception as e:
-    logger.warning(f"⚠️ PostgreSQL connection failed: {e}. Falling back to in-memory storage.")
+    logger.warning(f"⚠️ Database connection failed: {e}. Falling back to in-memory storage.")
     db = None
     USE_DATABASE = False
 

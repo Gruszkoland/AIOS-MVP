@@ -1,6 +1,14 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
+  "editor.renderWhitespace": "selection",
+  "editor.rulers": [88, 120],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "editor.linkedEditing": true,
+  "editor.minimap.enabled": false,
   "files.autoSave": "onFocusChange",
   "files.exclude": {
     "**/.aider": false,
@@ -13,8 +21,25 @@
   "search.exclude": {
     ".aider": false,
     "node_modules": true,
-    ".git": true
+    ".git": true,
+    "**/.venv": true,
+    "**/__pycache__": true,
+    "**/coverage": true,
+    "**/htmlcov": true,
+    "**/*.pyc": true
   },
+  "search.useIgnoreFiles": true,
+  "search.smartCase": true,
+  "search.followSymlinks": false,
+  "files.watcherExclude": {
+    "**/.venv/**": true,
+    "**/__pycache__/**": true,
+    "**/node_modules/**": true,
+    "**/.git/objects/**": true,
+    "**/coverage/**": true,
+    "**/htmlcov/**": true
+  },
+  "files.maxMemoryForLargeFilesMB": 512,
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
@@ -38,11 +63,50 @@
   "workbench.colorTheme": "Visual Studio Dark",
   "git.autofetch": true,
   "git.confirmSync": false,
+  "git.fetchOnPull": true,
+  "git.pruneOnFetch": true,
+  "git.showFetchOutput": false,
+  "python.terminal.useEnvFile": true,
+  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.diagnosticMode": "all",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/arbitrage",
+    "${workspaceFolder}/persona-agents",
+    "${workspaceFolder}/scripts"
+  ],
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": [
+    "--disable=W0212,C0111",
+    "--max-line-length=120"
+  ],
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": [
+    "--line-length=120"
+  ],
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "tests",
+    "--timeout=60",
+    "-v",
+    "--tb=short",
+    "-x"
+  ],
+  "python.debugging.logToFile": true,
+  "python.debugging.logDir": "${workspaceFolder}/.debug-logs",
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminal.integrated.automationProfile.windows": {
     "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
     "args": ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass"]
   },
+  "terminal.integrated.env.windows": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONPATH": "${workspaceFolder}",
+    "ADRION_MODE": "development"
+  },
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.bufferSize": 5000,
   "terminal.integrated.profiles.windows": {
     "PowerShell": {
       "source": "PowerShell",
@@ -63,13 +127,49 @@
   ],
   "github.copilot.chat.agentStyle": "concise",
   "chat.viewSessions.enabled": true,
+  "chat.agent.sandbox.enabled": true,
+  "chat.agent.sandbox.fileSystem.allowed": [
+    "${workspaceFolder}/**/*.py",
+    "${workspaceFolder}/**/*.md",
+    "${workspaceFolder}/.venv/**",
+    "${workspaceFolder}/arbitrage/**",
+    "${workspaceFolder}/persona-agents/**",
+    "${workspaceFolder}/Genesis Record/**",
+    "${workspaceFolder}/scripts/**"
+  ],
+  "chat.agent.sandbox.network.allowedDomains": [
+    "github.com",
+    "pypi.org",
+    "openrouter.ai",
+    "localhost",
+    "127.0.0.1"
+  ],
   "workbench.hover.enabled": false,
+  "workbench.editor.tabSizing": "shrink",
+  "workbench.editor.closeOnFileDelete": true,
+  "workbench.editor.enablePreview": false,
+  "workbench.startupEditor": "none",
+  "workbench.panel.defaultLocation": "bottom",
+  "workbench.sideBar.location": "left",
+  "workbench.tree.indent": 16,
+  "debug.console.wordWrap": false,
+  "debug.console.historySize": 100,
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-containers"
   },
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell"
   },
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.rulers": [88]
+  },
+  "pylance.analysis.typeCheckingMode": "strict",
+  "pylance.diagnosticMode": "workspace",
   "hooks": {
     "SessionStart": [
       {

@@ -1,9 +1,11 @@
 # 📧 PHASE 2 EMAIL TEMPLATES — 6 Personalized Versions
+
 ## Ready to send on Apr 8, 2026
 
 ---
 
 ## EMAIL TEMPLATE 1️⃣ — ARCHITECT
+
 **To:** [Architect Name/Email]  
 **Subject:** 🏛️ ADRION 369 Phase 2 — Your Role: Design Leader (Materials + Apr 15 Workshop)  
 **Send Date:** Apr 8, 2026, 09:00 UTC
@@ -41,12 +43,12 @@ This email includes 7 essential documents:
 
 **📅 CRITICAL DATES (Lock Your Calendar):**
 
-| Date | Event | Your Part | Status |
-|------|-------|-----------|--------|
-| **Apr 8** | Confirm receipt | Reply "Got it" | 👈 TODAY |
-| **Apr 12** | RSVP for workshop | Click "Yes" | 🔵 DEADLINE |
-| **Apr 15** | **ATAM WORKSHOP** | Facilitate (09:00-13:00 UTC) | 🔴 LOCKED |
-| **Apr 22** | **Phase 2 Kickoff** | Lead design review (09:00-10:30) | 🔴 LOCKED |
+| Date       | Event               | Your Part                        | Status      |
+| ---------- | ------------------- | -------------------------------- | ----------- |
+| **Apr 8**  | Confirm receipt     | Reply "Got it"                   | 👈 TODAY    |
+| **Apr 12** | RSVP for workshop   | Click "Yes"                      | 🔵 DEADLINE |
+| **Apr 15** | **ATAM WORKSHOP**   | Facilitate (09:00-13:00 UTC)     | 🔴 LOCKED   |
+| **Apr 22** | **Phase 2 Kickoff** | Lead design review (09:00-10:30) | 🔴 LOCKED   |
 
 **⏰ YOUR NEXT ACTIONS:**
 
@@ -85,6 +87,7 @@ P.S. — If you can't make Apr 15 or Apr 22, let me know ASAP so we can assign b
 ---
 
 ## EMAIL TEMPLATE 2️⃣ — SAP (Critical Path Lead)
+
 **To:** [SAP Name/Email]  
 **Subject:** ⚙️ ADRION 369 Phase 2 — Your Role: Schedule Master (Materials + Apr 15 Workshop)  
 **Send Date:** Apr 8, 2026, 09:00 UTC
@@ -120,12 +123,12 @@ As **SAP** (schedule/project lead), you own the critical path: keeping us on sch
 
 **📅 CRITICAL DATES:**
 
-| Date | Event | Your Action | Status |
-|------|-------|-------------|--------|
-| **Apr 8** | Confirm receipt | Reply "Got it" | 👈 TODAY |
-| **Apr 12** | RSVP workshop | Confirm attendance | 🔵 DEADLINE |
-| **Apr 15** | **ATAM WORKSHOP** | Attend, take notes | 🔴 LOCKED |
-| **Apr 22** | **Phase 2 Kickoff** | Run standup (08:30), blocker discussion (10:30) | 🔴 LOCKED |
+| Date       | Event               | Your Action                                     | Status      |
+| ---------- | ------------------- | ----------------------------------------------- | ----------- |
+| **Apr 8**  | Confirm receipt     | Reply "Got it"                                  | 👈 TODAY    |
+| **Apr 12** | RSVP workshop       | Confirm attendance                              | 🔵 DEADLINE |
+| **Apr 15** | **ATAM WORKSHOP**   | Attend, take notes                              | 🔴 LOCKED   |
+| **Apr 22** | **Phase 2 Kickoff** | Run standup (08:30), blocker discussion (10:30) | 🔴 LOCKED   |
 
 **⏰ YOUR NEXT ACTIONS:**
 
@@ -165,6 +168,7 @@ P.S. — Attached: PHASE2_MASTER_TIMELINE_2026-Apr-Jul.md (your roadmap) + all 6
 ---
 
 ## EMAIL TEMPLATE 3️⃣ — AUDITOR
+
 **To:** [Auditor Name/Email]  
 **Subject:** 🔍 ADRION 369 Phase 2 — Your Role: Compliance Guardian (Materials + Apr 15 Workshop)  
 **Send Date:** Apr 8, 2026, 09:00 UTC
@@ -200,12 +204,12 @@ As **Auditor**, you're the Guardian Laws enforcer. Your job: make sure every ADR
 
 **📅 CRITICAL DATES:**
 
-| Date | Event | Your Action | Status |
-|------|-------|-------------|--------|
-| **Apr 8** | Confirm receipt | Reply "Got it" | 👈 TODAY |
-| **Apr 12** | RSVP workshop | Confirm attendance | 🔵 DEADLINE |
-| **Apr 15** | **ATAM WORKSHOP** | Lead Guardian Laws block (40 min) | 🔴 LOCKED |
-| **Apr 22** | **Phase 2 Kickoff** | Audit design, no exceptions | 🔴 LOCKED |
+| Date       | Event               | Your Action                       | Status      |
+| ---------- | ------------------- | --------------------------------- | ----------- |
+| **Apr 8**  | Confirm receipt     | Reply "Got it"                    | 👈 TODAY    |
+| **Apr 12** | RSVP workshop       | Confirm attendance                | 🔵 DEADLINE |
+| **Apr 15** | **ATAM WORKSHOP**   | Lead Guardian Laws block (40 min) | 🔴 LOCKED   |
+| **Apr 22** | **Phase 2 Kickoff** | Audit design, no exceptions       | 🔴 LOCKED   |
 
 **⏰ YOUR NEXT ACTIONS:**
 
@@ -244,6 +248,7 @@ P.S. — Guardian Laws are non-negotiable. If you see a violation, flag it immed
 ---
 
 ## EMAIL TEMPLATE 4️⃣ — SENTINEL
+
 **To:** [Sentinel Name/Email]  
 **Subject:** 🚨 ADRION 369 Phase 2 — Your Role: Threat & Implementation Lead (Materials + Apr 15 Workshop)  
 **Send Date:** Apr 8, 2026, 09:00 UTC
@@ -280,13 +285,13 @@ As **Sentinel**, you own security, threats, and risk detection. You're also **le
 
 **📅 CRITICAL DATES:**
 
-| Date | Event | Your Action | Status |
-|------|-------|-------------|--------|
-| **Apr 8** | Confirm receipt | Reply "Got it" | 👈 TODAY |
-| **Apr 12** | RSVP workshop | Confirm attendance | 🔵 DEADLINE |
-| **Apr 15** | **ATAM WORKSHOP** | Assess risks, build register | 🔴 LOCKED |
-| **Apr 22** | **Phase 2 Kickoff** | Begin ADR-002 implementation | 🔴 LOCKED |
-| **May 15** | ADR-002 MERGE TARGET | Code + tests complete | 🔴 LOCKED |
+| Date       | Event                | Your Action                  | Status      |
+| ---------- | -------------------- | ---------------------------- | ----------- |
+| **Apr 8**  | Confirm receipt      | Reply "Got it"               | 👈 TODAY    |
+| **Apr 12** | RSVP workshop        | Confirm attendance           | 🔵 DEADLINE |
+| **Apr 15** | **ATAM WORKSHOP**    | Assess risks, build register | 🔴 LOCKED   |
+| **Apr 22** | **Phase 2 Kickoff**  | Begin ADR-002 implementation | 🔴 LOCKED   |
+| **May 15** | ADR-002 MERGE TARGET | Code + tests complete        | 🔴 LOCKED   |
 
 **⏰ YOUR NEXT ACTIONS:**
 
@@ -325,6 +330,7 @@ P.S. — ADR-002 is our proof-of-concept for adaptive logic. If this works, we u
 ---
 
 ## EMAIL TEMPLATE 5️⃣ — LIBRARIAN
+
 **To:** [Librarian Name/Email]  
 **Subject:** 💡 ADRION 369 Phase 2 — Your Role: Knowledge Keeper (Materials + Apr 15 Workshop)  
 **Send Date:** Apr 8, 2026, 09:00 UTC
@@ -361,13 +367,13 @@ As **Librarian**, you own knowledge: documentation, decision logs, runbooks, ope
 
 **📅 CRITICAL DATES:**
 
-| Date | Event | Your Action | Status |
-|------|-------|-------------|--------|
-| **Apr 8** | Confirm receipt | Reply "Got it" | 👈 TODAY |
-| **Apr 12** | RSVP workshop | Confirm attendance | 🔵 DEADLINE |
-| **Apr 15** | **ATAM WORKSHOP** | Facilitate note-taking | 🔴 LOCKED |
-| **Apr 16** | Post-workshop synthesis | Publish ATAM notes by EOD | 🔴 DUE |
-| **Apr 22** | **Phase 2 Kickoff** | Setup implementation log | 🔴 LOCKED |
+| Date       | Event                   | Your Action               | Status      |
+| ---------- | ----------------------- | ------------------------- | ----------- |
+| **Apr 8**  | Confirm receipt         | Reply "Got it"            | 👈 TODAY    |
+| **Apr 12** | RSVP workshop           | Confirm attendance        | 🔵 DEADLINE |
+| **Apr 15** | **ATAM WORKSHOP**       | Facilitate note-taking    | 🔴 LOCKED   |
+| **Apr 16** | Post-workshop synthesis | Publish ATAM notes by EOD | 🔴 DUE      |
+| **Apr 22** | **Phase 2 Kickoff**     | Setup implementation log  | 🔴 LOCKED   |
 
 **⏰ YOUR NEXT ACTIONS:**
 
@@ -407,6 +413,7 @@ P.S. — If it's not documented, it didn't happen. Make documentation sacred.
 ---
 
 ## EMAIL TEMPLATE 6️⃣ — HEALER
+
 **To:** [Healer Name/Email]  
 **Subject:** 🏥 ADRION 369 Phase 2 — Your Role: Resilience Engineer (Materials + Apr 15 Workshop)  
 **Send Date:** Apr 8, 2026, 09:00 UTC
@@ -443,13 +450,13 @@ As **Healer**, you own resilience, recovery, and remediation. You design fallbac
 
 **📅 CRITICAL DATES:**
 
-| Date | Event | Your Action | Status |
-|------|-------|-------------|--------|
-| **Apr 8** | Confirm receipt | Reply "Got it" | 👈 TODAY |
-| **Apr 12** | RSVP workshop | Confirm attendance | 🔵 DEADLINE |
-| **Apr 15** | **ATAM WORKSHOP** | Assess remediation needs | 🔴 LOCKED |
-| **Apr 22** | **Phase 2 Kickoff** | Deploy health monitoring | 🔴 LOCKED |
-| **Jun 16** | ADR-008 implementation | EBDI calibration live | 🔴 LOCKED |
+| Date       | Event                  | Your Action              | Status      |
+| ---------- | ---------------------- | ------------------------ | ----------- |
+| **Apr 8**  | Confirm receipt        | Reply "Got it"           | 👈 TODAY    |
+| **Apr 12** | RSVP workshop          | Confirm attendance       | 🔵 DEADLINE |
+| **Apr 15** | **ATAM WORKSHOP**      | Assess remediation needs | 🔴 LOCKED   |
+| **Apr 22** | **Phase 2 Kickoff**    | Deploy health monitoring | 🔴 LOCKED   |
+| **Jun 16** | ADR-008 implementation | EBDI calibration live    | 🔴 LOCKED   |
 
 **⏰ YOUR NEXT ACTIONS:**
 
