@@ -6,7 +6,6 @@ Uruchomienie: pytest tests/test_smoke.py -v
 import json
 import sys
 import os
-import types
 
 # Add harmonia-dashboard to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'harmonia-dashboard'))
@@ -75,7 +74,7 @@ class TestLeadSearch:
             {"business_name": "Auto-Fix", "city": "Warszawa", "email": "af@x.pl"},
         ]
         query = "roma"
-        results = [l for l in leads if query.lower() in l["business_name"].lower()]
+        results = [lead for lead in leads if query.lower() in lead["business_name"].lower()]
         assert len(results) == 1
         assert results[0]["business_name"] == "Pizzeria Roma"
 
@@ -85,13 +84,13 @@ class TestLeadSearch:
             {"business_name": "B", "city": "Warszawa", "email": "b@x.pl"},
         ]
         query = "kraków"
-        results = [l for l in leads if query.lower() in l["city"].lower()]
+        results = [lead for lead in leads if query.lower() in lead["city"].lower()]
         assert len(results) == 1
 
     def test_search_empty_query_returns_all(self):
         leads = [{"business_name": "A"}, {"business_name": "B"}]
         query = ""
-        results = leads if not query else [l for l in leads if query.lower() in l["business_name"].lower()]
+        results = leads if not query else [lead for lead in leads if query.lower() in lead["business_name"].lower()]
         assert len(results) == 2
 
 

@@ -15,9 +15,7 @@ from arbitrage.mass_generator import (
     generate_seo_description,
     build_product_entry,
     generate_manifest,
-    export_manifest,
     MARKETS,
-    MIN_MARGIN_DEFAULT,
     MIN_STOCK_DEFAULT,
 )
 
@@ -194,7 +192,6 @@ class TestGenerateManifest:
         db_file = str(tmp_path / "manifest_test.db")
         import arbitrage.config as cfg
         import arbitrage.database as db_mod
-        import arbitrage.mass_generator as mg_mod
         monkeypatch.setattr(cfg, "DB_PATH", db_file)
         monkeypatch.setattr(db_mod, "DB_PATH", db_file)
         import sqlite3

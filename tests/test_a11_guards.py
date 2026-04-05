@@ -3,22 +3,21 @@
 These tests validate core protections without requiring live HTTP services.
 """
 
-import pytest
 
 
 def test_sliding_window_rate_limiter_blocks_after_limit(monkeypatch):
     """Limiter allows max requests in window, then blocks, then recovers."""
-    from arbitrage.api import _SlidingWindowRateLimiter
-    import arbitrage.api as api_module
+    from arbitrage.rate_limiter import SlidingWindowRateLimiter
+    import arbitrage.rate_limiter as rate_limiter_module
 
     now = {"t": 1000.0}
 
     def _fake_monotonic():
         return now["t"]
 
-    monkeypatch.setattr(api_module.time, "monotonic", _fake_monotonic)
+    monkeypatch.setattr(rate_limiter_module.time, "monotonic", _fake_monotonic)
 
-    limiter = _SlidingWindowRateLimiter(max_requests=3, window_seconds=10.0)
+    limiter = SlidingWindowRateLimiter(max_requests=3, window_seconds=10.0)
 
     assert limiter.is_allowed("127.0.0.1") is True
     assert limiter.is_allowed("127.0.0.1") is True

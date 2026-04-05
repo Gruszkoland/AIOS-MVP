@@ -1,39 +1,11 @@
 services:
-  n8n:
-    image: n8nio/n8n:latest
-    container_name: adrion-n8n
-    restart: always
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=adrion_pass
-      - WEBHOOK_URL=http://localhost:5678/
-      - N8N_LICENSE_ACTIVATION_KEY=f308dced-89fd-4c57-b8b0-639449f44052
-      - N8N_ENDPOINT_WEBHOOK=webhook
-      - N8N_ENDPOINT_WEBHOOK_TEST=webhook-test
-      - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=adrion-db
-      - DB_POSTGRESDB_PORT=5432
-      - DB_POSTGRESDB_DATABASE=genesis_record
-      - DB_POSTGRESDB_USER=adrion
-      - DB_POSTGRESDB_PASSWORD=adrion_pass
-    volumes:
-      - ./n8n_data:/home/node/.n8n
-    networks:
-      - adrion-frontend
-      - adrion-backend
-    depends_on:
-      - postgres
-
   postgres:
     image: postgres:15
     container_name: adrion-db
-    restart: always
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=adrion
-      - POSTGRES_PASSWORD=adrion_pass
+      - POSTGRES_PASSWORD=${ADRION_DB_PASSWORD}
       - POSTGRES_DB=genesis_record
     ports:
       - "5432:5432"
@@ -41,13 +13,68 @@ services:
       - ./postgres_data:/var/lib/postgresql/data
     networks:
       - adrion-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adrion -d genesis_record"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: adrion-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_ADMIN_PASSWORD}
+      - WEBHOOK_URL=http://localhost:5678/
+      - N8N_LICENSE_ACTIVATION_KEY=${N8N_LICENSE_KEY}
+      - N8N_ENDPOINT_WEBHOOK=webhook
+      - N8N_ENDPOINT_WEBHOOK_TEST=webhook-test
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=adrion-db
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=genesis_record
+      - DB_POSTGRESDB_USER=adrion
+      - DB_POSTGRESDB_PASSWORD=${ADRION_DB_PASSWORD}
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    networks:
+      - adrion-frontend
+      - adrion-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q --spider http://localhost:5678/healthz 2>/dev/null || exit 0",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   vortex-engine:
     build:
       context: ..
       dockerfile: Dockerfile.vortex
     container_name: adrion-vortex
-    restart: always
+    restart: unless-stopped
     ports:
       - "1740:1740"
     environment:
@@ -56,20 +83,49 @@ services:
     networks:
       - adrion-frontend
       - adrion-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget -q --spider http://localhost:1740/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   adrion-healer:
     build:
       context: ..
       dockerfile: Dockerfile.healer
     container_name: adrion-healer
-    restart: always
+    restart: unless-stopped
     environment:
       - DB_HOST=adrion-db
       - DB_USER=adrion
-      - DB_PASSWORD=adrion_pass
+      - DB_PASSWORD=${ADRION_DB_PASSWORD}
       - DB_NAME=genesis_record
     networks:
       - adrion-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", 'python -c "import sys; sys.exit(0)"']
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   adrion-frontend:
@@ -80,5 +136,3 @@ networks:
 volumes:
   n8n_data:
   postgres_data:
-
-

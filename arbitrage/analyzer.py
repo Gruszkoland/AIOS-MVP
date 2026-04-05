@@ -13,6 +13,8 @@ import logging
 import random
 
 from .config import (
+    ANALYZER_SYSTEM,
+    ANALYZER_USER,
     ANTHROPIC_KEY,
     LLM_MODEL,
     MIN_ANALYZER_SCORE,
@@ -24,27 +26,6 @@ from .config import (
 
 logger = logging.getLogger("adrion.llm.analyzer")
 
-SYSTEM_PROMPT = """You are a freelance content writing expert evaluating job opportunities.
-Analyze the job and return ONLY a JSON object with:
-{
-  "score": <1-10>,
-  "fit": "<why this job fits a content writer>",
-  "risks": "<main risks or concerns>",
-  "est_hours": <estimated hours to complete>,
-  "our_price": <our recommended bid in USD>,
-  "est_cost": <estimated LLM/tools cost in USD, usually 0-5>,
-  "est_profit": <our_price minus est_cost>
-}
-Score criteria: 10=perfect fit, high budget, clear scope; 1=off-topic, too complex, red flags.
-"""
-
-USER_TEMPLATE = """Job Title: {title}
-Platform: {platform}
-Budget: ${budget_min} - ${budget_max}
-Description: {description}
-
-Evaluate this job opportunity."""
-
 
 def _call_openrouter(prompt: str, model: str = LLM_MODEL) -> str:
     from openai import OpenAI
@@ -55,7 +36,7 @@ def _call_openrouter(prompt: str, model: str = LLM_MODEL) -> str:
     response = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": ANALYZER_SYSTEM},
             {"role": "user",   "content": prompt},
         ],
         temperature=0.3,
@@ -70,7 +51,7 @@ def _call_openai(prompt: str) -> str:
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": ANALYZER_SYSTEM},
             {"role": "user",   "content": prompt},
         ],
         temperature=0.3,
@@ -85,7 +66,7 @@ def _call_anthropic(prompt: str) -> str:
     message = client.messages.create(
         model="claude-haiku-20240307",
         max_tokens=400,
-        system=SYSTEM_PROMPT,
+        system=ANALYZER_SYSTEM,
         messages=[{"role": "user", "content": prompt}],
     )
     return message.content[0].text
@@ -121,12 +102,12 @@ def analyze_job(job: dict) -> dict:
         logger.info("event=llm_analyze backend=mock mode=mock job_id=%s", job_id)
         return result
 
-    prompt = USER_TEMPLATE.format(
+    prompt = ANALYZER_USER.format(
         title=job.get("title", ""),
         platform=job.get("platform", ""),
         budget_min=job.get("budget_min", 0),
-        budget_max=job.get("budget_max", 0),
-        description=(job.get("description", "") or "")[:600],
+        budget_max=job.get("budget_max", 100),
+        description=(job.get("description", "") or "")[:800],
     )
 
     try:

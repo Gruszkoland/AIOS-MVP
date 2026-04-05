@@ -7,6 +7,8 @@ import logging
 
 from .config import (
     ANTHROPIC_KEY,
+    COVER_LETTER_SYSTEM,
+    COVER_LETTER_USER,
     LLM_MODEL,
     OPENAI_KEY,
     OPENROUTER_KEY,
@@ -15,25 +17,6 @@ from .config import (
 from .database import insert_bid, set_job_status
 
 logger = logging.getLogger("adrion.llm.bidder")
-
-COVER_LETTER_SYSTEM = """You are a professional freelance content writer with 5+ years of experience.
-Write a concise, personalized cover letter for a freelance job proposal.
-Rules:
-- Max 200 words
-- Start with a specific hook about THEIR project (not generic opening)
-- Mention 1-2 relevant examples or skills
-- Include proposed timeline
-- End with a soft call to action
-- Tone: professional but approachable
-Return ONLY the cover letter text, no JSON, no headers.
-"""
-
-COVER_LETTER_USER = """Write a cover letter for this job:
-Title: {title}
-Platform: {platform}
-Description: {description}
-Our bid price: ${our_price}
-Estimated delivery: {est_days} days"""
 
 
 def _days_estimate(est_hours: float) -> int:

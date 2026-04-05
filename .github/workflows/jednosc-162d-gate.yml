@@ -6,10 +6,13 @@ on:
       - "scripts/reporting/map_jednosc_to_162d.py"
       - "scripts/reporting/merge_jednosc_decisions.py"
       - "scripts/reporting/autofill_jednosc_pending.py"
+      - "scripts/reporting/check_utf8_artifacts.py"
+      - "scripts/reporting/generate_ci_gate_report.py"
       - "scripts/reporting/validate_session_reports.py"
       - "docs/JEDNOSC_162D_*.md"
       - "docs/162D-DECISION-SPACE.md"
       - "tests/test_jednosc_162d_final.py"
+      - "tests/test_utf8_artifacts_guard.py"
       - ".github/workflows/jednosc-162d-gate.yml"
   push:
     branches:
@@ -19,10 +22,13 @@ on:
       - "scripts/reporting/map_jednosc_to_162d.py"
       - "scripts/reporting/merge_jednosc_decisions.py"
       - "scripts/reporting/autofill_jednosc_pending.py"
+      - "scripts/reporting/check_utf8_artifacts.py"
+      - "scripts/reporting/generate_ci_gate_report.py"
       - "scripts/reporting/validate_session_reports.py"
       - "docs/JEDNOSC_162D_*.md"
       - "docs/162D-DECISION-SPACE.md"
       - "tests/test_jednosc_162d_final.py"
+      - "tests/test_utf8_artifacts_guard.py"
       - ".github/workflows/jednosc-162d-gate.yml"
   workflow_dispatch:
 
@@ -81,11 +87,40 @@ jobs:
           grep -q "Pozycji PENDING: 0" "$TMP_DIR/JEDNOSC_162D_FINAL.md"
 
       - name: Verify UTF-8 integrity for 162D artifacts
+        id: utf8
+        shell: bash
         run: |
-          python -c "from pathlib import Path; files=['docs/JEDNOSC_162D_MAP.md','docs/JEDNOSC_162D_APPROVED.md','docs/JEDNOSC_162D_REVIEW_BACKLOG.md','docs/JEDNOSC_162D_REVIEW_CHECKLIST.md','docs/JEDNOSC_162D_REVIEW_PENDING.md','docs/JEDNOSC_162D_FINAL.md','docs/162D-DECISION-SPACE.md']; bad=[]; moj=[];\nfor f in files:\n p=Path(f); data=p.read_text(encoding='utf-8');\n if '\\ufffd' in data: moj.append(f);\n if 'Ã' in data or 'â' in data: moj.append(f);\nprint('UTF8_OK_FILES='+str(len(files)));\nimport sys;\nif moj: print('POTENTIAL_MOJIBAKE='+';'.join(sorted(set(moj)))); sys.exit(1)"
+          set -euo pipefail
+          LOG="$(mktemp)"
+          python scripts/reporting/check_utf8_artifacts.py | tee "$LOG"
+          UTF8_OK_FILES="$(grep '^UTF8_OK_FILES=' "$LOG" | tail -n1 | cut -d= -f2)"
+          echo "utf8_ok_files=${UTF8_OK_FILES}" >> "$GITHUB_OUTPUT"
 
       - name: Run Jednosc regression tests
-        run: python -m pytest tests/test_jednosc_162d_final.py -q --tb=no
+        run: |
+          TMP_DIR="$(mktemp -d)"
+          python -m pytest tests/test_jednosc_162d_final.py tests/test_utf8_artifacts_guard.py -q --tb=no --junitxml "$TMP_DIR/jednosc-tests.xml"
+          cp "$TMP_DIR/jednosc-tests.xml" jednosc-tests.xml
 
       - name: Validate session reports
         run: python scripts/reporting/validate_session_reports.py
+
+      - name: Generate CI gate report markdown
+        run: |
+          python scripts/reporting/generate_ci_gate_report.py \
+            --workflow "ADRION 162D Classification Gate" \
+            --run-id "${{ github.run_id }}" \
+            --sha "${{ github.sha }}" \
+            --ref "${{ github.ref_name }}" \
+            --actor "${{ github.actor }}" \
+            --utf8-ok-files "${{ steps.utf8.outputs.utf8_ok_files }}" \
+            --pytest-xml "jednosc-tests.xml" \
+            --output "Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/CI_Gate_Jednosc_${{ github.run_id }}.md"
+
+      - name: Upload CI gate report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-gate-jednosc-report-${{ github.run_id }}
+          path: |
+            Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/CI_Gate_Jednosc_${{ github.run_id }}.md
+            jednosc-tests.xml

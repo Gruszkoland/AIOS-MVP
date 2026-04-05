@@ -35,7 +35,7 @@
     "editor.insertSpaces": false,
     "editor.tabSize": 4
   },
-  "workbench.colorTheme": "Abyss",
+  "workbench.colorTheme": "Visual Studio Dark",
   "git.autofetch": true,
   "git.confirmSync": false,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
@@ -63,7 +63,44 @@
   ],
   "github.copilot.chat.agentStyle": "concise",
   "chat.viewSessions.enabled": true,
+  "workbench.hover.enabled": false,
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-containers"
+  },
+  "[powershell]": {
+    "editor.defaultFormatter": "ms-vscode.powershell"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "-",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "try { $baseDir = 'Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU'; @('PLAN', 'PROGRESS', 'REPORTS') | ForEach-Object { $path = Join-Path $baseDir $_; if (-not (Test-Path $path)) { New-Item -ItemType Directory -Path $path -Force | Out-Null } }; $dateStr = (Get-Date -Format 'dd-MM-yyyy'); $sessionFile = Join-Path $baseDir 'PLAN' \"Chat_Session_$dateStr.md\"; if (-not (Test-Path $sessionFile)) { \"# Chat Session $dateStr`n`nStarting new session. Topic will be determined from first message.`n`n## Status: PENDING`n\" | Out-File -FilePath $sessionFile -Encoding UTF8 }; @(Join-Path $baseDir 'PROGRESS' \"Chat_Session_$dateStr.md\") | ForEach-Object { if (-not (Test-Path $_)) { \"# Progress Log $dateStr`n`n## Session Started\n- Timestamp: $(Get-Date -Format 'HH:mm:ss')`n- Status: waiting_for_first_message`n\" | Out-File -FilePath $_ -Encoding UTF8 } } } catch { }",
+            "timeout": 10,
+            "statusMessage": "Initializing progress tracking...",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "-",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "try { $payload = [Console]::In.ReadToEnd() | ConvertFrom-Json -ErrorAction SilentlyContinue; if ($payload.tool_input.message) { $msg = $payload.tool_input.message | Select-Object -First 100; $words = ($msg -split '\\s+' | Select-Object -First 4) -join '_'; $words = $words -replace '[^a-zA-Z0-9_]', '' | Select-Object -First 40; if ($words.Length -gt 0) { $baseDir = 'Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU'; $dateStr = (Get-Date -Format 'dd-MM-yyyy'); $oldPlanFile = Join-Path $baseDir 'PLAN' \"Chat_Session_$dateStr.md\"; $newPlanFile = Join-Path $baseDir 'PLAN' \"${words}_$dateStr.md\"; if ((Test-Path $oldPlanFile) -and $words -ne 'Chat_Session') { Rename-Item -Path $oldPlanFile -NewName (Split-Path $newPlanFile -Leaf) -Force -ErrorAction SilentlyContinue; $oldProgressFile = Join-Path $baseDir 'PROGRESS' \"Chat_Session_$dateStr.md\"; $newProgressFile = Join-Path $baseDir 'PROGRESS' \"${words}_$dateStr.md\"; Rename-Item -Path $oldProgressFile -NewName (Split-Path $newProgressFile -Leaf) -Force -ErrorAction SilentlyContinue } } } } catch { }",
+            "timeout": 5,
+            "statusMessage": "Recording chat topic...",
+            "async": true,
+            "once": false
+          }
+        ]
+      }
+    ]
   }
 }

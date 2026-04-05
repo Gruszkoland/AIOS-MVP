@@ -1028,5 +1028,185 @@
     "aligned": 0.9,
     "total": 0.708,
     "rag_used": false
+  },
+  {
+    "interaction_id": "ccbcaf7af79e4dc7",
+    "timestamp": "2026-04-04T13:26:58.287691+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ccbcaf7af79e4dc7_fb",
+    "timestamp": "2026-04-04T13:26:58.306886+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "cc3e50165b4c2b18",
+    "timestamp": "2026-04-04T13:32:16.445138+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "cc3e50165b4c2b18_fb",
+    "timestamp": "2026-04-04T13:32:16.476379+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e8cd11b12bcf4d07",
+    "timestamp": "2026-04-04T13:33:50.692868+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e8cd11b12bcf4d07_fb",
+    "timestamp": "2026-04-04T13:33:50.708475+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "5540da0e3e5a40d1",
+    "timestamp": "2026-04-04T13:48:38.326603+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "5540da0e3e5a40d1_fb",
+    "timestamp": "2026-04-04T13:48:38.359905+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "0ec9eff25cf248ac",
+    "timestamp": "2026-04-04T13:52:39.475644+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "0ec9eff25cf248ac_fb",
+    "timestamp": "2026-04-04T13:52:39.551698+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "23afc01d1609e230",
+    "timestamp": "2026-04-04T13:53:40.686107+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "23afc01d1609e230_fb",
+    "timestamp": "2026-04-04T13:53:40.702811+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3625a6f4de51b6fd",
+    "timestamp": "2026-04-04T13:54:21.753967+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3625a6f4de51b6fd_fb",
+    "timestamp": "2026-04-04T13:54:21.771584+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e3d74cd2db447d0f",
+    "timestamp": "2026-04-04T13:55:07.154480+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e3d74cd2db447d0f_fb",
+    "timestamp": "2026-04-04T13:55:07.170692+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "822052c21c7a3e76",
+    "timestamp": "2026-04-04T13:55:42.547546+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "822052c21c7a3e76_fb",
+    "timestamp": "2026-04-04T13:55:42.563166+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
   }
 ]

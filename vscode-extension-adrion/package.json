@@ -1,0 +1,50 @@
+{
+  "name": "adrion-369-extension",
+  "displayName": "ADRION 369 Control Panel",
+  "description": "Activity Bar with dedicated tools for ADRION 369 Swarm",
+  "version": "1.0.0",
+  "publisher": "adrion",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:adrion-control-view"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "adrion-sidebar",
+          "title": "ADRION 369",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "adrion-sidebar": [
+        {
+          "type": "webview",
+          "id": "adrion-control-view",
+          "name": "Swarm Dashboard"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4"
+  }
+}

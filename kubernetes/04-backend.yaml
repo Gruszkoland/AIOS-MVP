@@ -30,7 +30,7 @@ spec:
       containers:
       - name: uap-backend
         image: uap-backend:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Never
         ports:
         - containerPort: 8002
         envFrom:

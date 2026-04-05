@@ -1,0 +1,8 @@
+{
+  "ts": 1775163364,
+  "status": "WARMUP",
+  "ready_for_promotion": false,
+  "count": 11,
+  "min_events": 30,
+  "message": "insufficient events (11 < 30)"
+}

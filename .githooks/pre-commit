@@ -27,4 +27,15 @@ if printf '%s\n' "$staged_diff" \
   exit 1
 fi
 
+# Run full deployment gate before every commit unless explicitly skipped.
+if [ "${ADRION_ENABLE_FINAL_GATE:-1}" = "1" ] && [ "${ADRION_SKIP_FINAL_GATE:-0}" != "1" ]; then
+  echo "INFO: Running ADRION Final Deployment Gate..."
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File "scripts/security/run-final-deployment-gate.ps1"
+  gate_exit=$?
+  if [ "$gate_exit" -ne 0 ]; then
+    echo "ERROR: ADRION Final Deployment Gate failed. Commit blocked."
+    exit "$gate_exit"
+  fi
+fi
+
 exit 0

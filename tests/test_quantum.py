@@ -3,7 +3,6 @@ Unit tests for arbitrage/quantum.py — Lukasiewicz 3-state logic (PROGRAMATOR #
 """
 import sys
 import os
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 os.environ.setdefault("DB_PATH", ":memory:")
@@ -15,8 +14,6 @@ from arbitrage.quantum import (
     run_quantum_scan,
     AutopoiezaTracker,
     QuantumDecision,
-    MARGIN_THRESHOLD_AFFIRM,
-    MARGIN_THRESHOLD_SUPERPOSITION,
     AUTOPOJEZA_ERROR_LIMIT,
 )
 
@@ -223,7 +220,7 @@ class TestAutopoiezaTracker:
     def test_reset_after_limit(self):
         tracker = AutopoiezaTracker()
         for _ in range(AUTOPOJEZA_ERROR_LIMIT):
-            result = self._make_error(tracker)
+            self._make_error(tracker)
         # After AUTOPOJEZA_ERROR_LIMIT errors, autopojeza reset triggered
         status = tracker.get_status()
         assert status["consecutive_errors"] == 0

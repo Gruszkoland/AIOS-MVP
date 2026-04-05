@@ -396,6 +396,90 @@
             font-weight: bold;
         }
 
+        /* ── V3.0 MASTER ORCHESTRATOR VISUALS ── */
+        .orchestrator-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-v3-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(129, 140, 248, 0.3);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-v3-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+
+        .stat-v3-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #e0e7ff;
+            font-family: var(--font-data);
+        }
+
+        .health-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ef4444 0%, #22c55e 100%);
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+        }
+
+        .ebdi-vector-viz {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .ebdi-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ebdi-node-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(129, 140, 248, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.5s ease;
+        }
+
+        .pulse-147 {
+            animation: pulse-147hz 0.0068s infinite; /* Representing high frequency conceptually */
+        }
+
+        @keyframes pulse-147hz {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         .scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -657,6 +741,53 @@
 
         <!-- System Status -->
         <section class="system-status">
+            <div id="v3-master-orchestrator-card" class="status-card" style="border-color: #818cf8; background: linear-gradient(145deg, rgba(15,23,42,0.9), rgba(30,41,59,0.7)); grid-column: span 2;">
+                <h3 style="color: #a5b4fc;"><span id="v3-pulse-indicator" class="status-indicator online pulse-147"></span> 🧠 Master Orchestrator ADRION 369 v3.0</h3>
+                <div class="orchestrator-stats">
+                    <div class="stat-v3-card">
+                        <div class="stat-v3-label">Logic Mode</div>
+                        <div id="v3-mode" class="stat-v3-value" style="color:#fbbf24;">GoT / 162D</div>
+                    </div>
+                    <div class="stat-v3-card">
+                        <div class="stat-v3-label">Vortex Pulse</div>
+                        <div id="v3-pulse" class="stat-v3-value" style="color:#38bdf8;">147 Hz</div>
+                    </div>
+                    <div class="stat-v3-card">
+                        <div class="stat-v3-label">System Health</div>
+                        <div id="v3-health-pct" class="stat-v3-value" style="color:#22c55e;">100%</div>
+                    </div>
+                    <div class="stat-v3-card">
+                        <div class="stat-v3-label">Active Law</div>
+                        <div id="v3-law" class="stat-v3-value" style="font-size: 1rem; color:#f87171;">G8: Nonmaleficence</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <div style="display:flex; justify-content:space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px;">
+                        <span>Vortex 3-6-9 Resonance Stability</span>
+                        <span id="v3-health-val">1.00</span>
+                    </div>
+                    <div class="health-bar-container">
+                        <div id="v3-health-bar" class="health-bar-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="ebdi-vector-viz">
+                    <div class="ebdi-node">
+                        <div id="ebdi-p-circle" class="ebdi-node-circle" style="color: #4ade80; border-color: rgba(74, 222, 128, 0.5);">0.8</div>
+                        <div style="font-size: 0.65rem; color: #64748b; margin-top: 5px;">Pleasure</div>
+                    </div>
+                    <div class="ebdi-node">
+                        <div id="ebdi-a-circle" class="ebdi-node-circle" style="color: #fca5a5; border-color: rgba(252, 165, 165, 0.5);">0.3</div>
+                        <div style="font-size: 0.65rem; color: #64748b; margin-top: 5px;">Arousal</div>
+                    </div>
+                    <div class="ebdi-node">
+                        <div id="ebdi-d-circle" class="ebdi-node-circle" style="color: #fcd34d; border-color: rgba(252, 211, 77, 0.5);">1.0</div>
+                        <div style="font-size: 0.65rem; color: #64748b; margin-top: 5px;">Dominance</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="status-card">
                 <h3><span id="ollama-indicator" class="status-indicator loading"></span> Ollama Server</h3>
                 <div class="status-info">
@@ -1400,6 +1531,17 @@
     </div>
 
     <script>
+        // XSS-safe escaping for all server-supplied values
+        function escapeHtml(s) {
+            if (s == null) return '';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         // Update timestamp
         function updateTimestamp() {
             const now = new Date();
@@ -1418,6 +1560,57 @@
         async function checkOllamaStatus() {
             const indicator = document.getElementById('ollama-indicator');
             const statusElement = document.getElementById('ollama-status');
+            
+            // ── Integration: Update V3 Orchestrator Data ──
+            try {
+                const v3Resp = await fetch('/api/arbitrage/status');
+                const v3Data = await v3Resp.json();
+                
+                if (v3Data.master_orchestrator === 'v3.0' || v3Data.status === 'ok') {
+                    // Update Pulse/Mode
+                    const modeEl = document.getElementById('v3-mode');
+                    const pulseEl = document.getElementById('v3-pulse');
+                    const healthPctEl = document.getElementById('v3-health-pct');
+                    const healthBarEl = document.getElementById('v3-health-bar');
+                    const healthValEl = document.getElementById('v3-health-val');
+                    
+                    if (v3Data.mode) modeEl.textContent = v3Data.mode;
+                    if (v3Data.pulse) pulseEl.textContent = v3Data.pulse;
+                    
+                    if (v3Data.health !== undefined) {
+                        const h = v3Data.health;
+                        const pct = (h * 100).toFixed(0);
+                        healthPctEl.textContent = `${pct}%`;
+                        healthBarEl.style.width = `${pct}%`;
+                        healthValEl.textContent = h.toFixed(2);
+                        
+                        // Dynamic color
+                        if (h > 0.8) healthPctEl.style.color = '#22c55e';
+                        else if (h > 0.4) healthPctEl.style.color = '#f59e0b';
+                        else healthPctEl.style.color = '#ef4444';
+                    }
+                    
+                    if (v3Data.ebdi) {
+                        const ebdi = v3Data.ebdi;
+                        const pCircle = document.getElementById('ebdi-p-circle');
+                        const aCircle = document.getElementById('ebdi-a-circle');
+                        const dCircle = document.getElementById('ebdi-d-circle');
+                        
+                        if (ebdi.pleasure !== undefined) pCircle.textContent = ebdi.pleasure.toFixed(1);
+                        if (ebdi.arousal !== undefined) aCircle.textContent = ebdi.arousal.toFixed(1);
+                        if (ebdi.dominance !== undefined) dCircle.textContent = ebdi.dominance.toFixed(1);
+                        
+                        // Active Law logic (simplified visual)
+                        const lawEl = document.getElementById('v3-law');
+                        if (ebdi.arousal > 0.7) lawEl.textContent = 'G4: Causality (Active)';
+                        else if (ebdi.dominance > 0.8) lawEl.textContent = 'G8: Nonmaleficence';
+                        else lawEl.textContent = 'G1: Unity';
+                    }
+                }
+            } catch (err) {
+                console.warn('V3 API status fetch failed', err);
+            }
+
             try {
                 const response = await fetch('/api/ollama/status');
                 const data = await response.json();
@@ -1514,21 +1707,21 @@
                 }
 
                 meta.innerHTML = (data.app_containers || []).map(container => {
-                    const ports = (container.ports || []).map(port => `${port.host || '—'} → ${port.container}`).join(', ');
+                    const ports = (container.ports || []).map(port => `${escapeHtml(port.host) || '—'} → ${escapeHtml(port.container)}`).join(', ');
                     return `
                       <div style="background:rgba(15,23,42,0.45);border:1px solid #334155;border-radius:8px;padding:10px 12px;">
-                        <div style="font-weight:700;color:#e0e7ff;">${container.name}</div>
-                        <div style="color:#94a3b8;">Ports: ${ports || 'none'}</div>
-                        <div style="color:#64748b;">State: ${container.status} | Health: ${container.health}</div>
+                        <div style="font-weight:700;color:#e0e7ff;">${escapeHtml(container.name)}</div>
+                        <div style="color:#94a3b8;">Ports: ${escapeHtml(ports) || 'none'}</div>
+                        <div style="color:#64748b;">State: ${escapeHtml(container.status)} | Health: ${escapeHtml(container.health)}</div>
                       </div>`;
                 }).join('');
 
                 monitoringMeta.innerHTML = (data.monitoring_containers || []).map(container => {
-                    const ports = (container.ports || []).map(port => `${port.host || '—'} → ${port.container}`).join(', ');
+                    const ports = (container.ports || []).map(port => `${escapeHtml(port.host) || '—'} → ${escapeHtml(port.container)}`).join(', ');
                     return `
                       <div style="background:rgba(15,23,42,0.45);border:1px solid #334155;border-radius:8px;padding:10px 12px;">
-                        <div style="font-weight:700;color:#e0e7ff;">${container.name}</div>
-                        <div style="color:#94a3b8;">Ports: ${ports || 'none'}</div>
+                        <div style="font-weight:700;color:#e0e7ff;">${escapeHtml(container.name)}</div>
+                        <div style="color:#94a3b8;">Ports: ${escapeHtml(ports) || 'none'}</div>
                         <div style="color:#64748b;">State: ${container.status} | Health: ${container.health}</div>
                       </div>`;
                 }).join('') || '<div style="color:#64748b;">No monitoring services configured</div>';
@@ -1598,7 +1791,7 @@
                         entry.innerHTML = `
                             <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
                             <span class="log-level-INFO">INFO</span>
-                            <span style="color: #cbd5e1;">${log.content}</span>
+                            <span style="color: #cbd5e1;">${escapeHtml(log.content)}</span>
                         `;
                         logsContainer.appendChild(entry);
                     });
@@ -1872,8 +2065,8 @@
             const ts = new Date().toLocaleTimeString();
             entry.innerHTML = `
               <span class="log-timestamp">[${ts}]</span>
-              <span class="log-level-${level}">${level}</span>
-              <span style="color:#cbd5e1;"> ${text}</span>`;
+              <span class="log-level-${escapeHtml(level)}">${escapeHtml(level)}</span>
+              <span style="color:#cbd5e1;"> ${escapeHtml(text)}</span>`;
             container.prepend(entry);
             // Keep max 50
             while (container.children.length > 50) container.removeChild(container.lastChild);
@@ -2075,11 +2268,11 @@
                         const actCol = ACTION_COLORS[p.action] || '#64748b';
                         const isSing = p.is_singularity ? '⚡' : '';
                         return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                            <td style="padding:8px;color:var(--color-text-primary);">${isSing} ${p.name || '—'}</td>
-                            <td style="padding:8px;text-align:center;color:${sigCol};font-weight:700;">${p.signal || '—'}</td>
-                            <td style="padding:8px;text-align:center;color:${actCol};font-weight:700;">${p.action || '—'}</td>
+                            <td style="padding:8px;color:var(--color-text-primary);">${isSing} ${escapeHtml(p.name) || '—'}</td>
+                            <td style="padding:8px;text-align:center;color:${sigCol};font-weight:700;">${escapeHtml(p.signal) || '—'}</td>
+                            <td style="padding:8px;text-align:center;color:${actCol};font-weight:700;">${escapeHtml(p.action) || '—'}</td>
                             <td style="padding:8px;text-align:right;color:var(--color-text-primary);font-family:var(--font-data);">${((p.margin_pct || 0) * 100).toFixed(1)}%</td>
-                            <td style="padding:8px;text-align:center;color:#d97706;font-family:var(--font-data);">${p.solfeggio_hz || '—'}Hz</td>
+                            <td style="padding:8px;text-align:center;color:#d97706;font-family:var(--font-data);">${escapeHtml(p.solfeggio_hz) || '—'}Hz</td>
                             <td style="padding:8px;text-align:center;">
                                 <div style="background:rgba(245,158,11,${(p.confidence || 0).toFixed(1)});width:100%;height:6px;border-radius:3px;"></div>
                                 <span style="font-size:0.65rem;color:var(--color-text-muted);">${((p.confidence || 0) * 100).toFixed(0)}%</span>
@@ -2351,6 +2544,321 @@
         arbLoadJobs();
         setInterval(() => { arbCheckStatus(); arbLoadKpis(); arbLoadPendingBids(); checkRuntimeHealth(); loadRuntimeStackMeta(); }, 15000);
 
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         UAP ADMIN PANELS (Control HQ · Agent Delegator · Genesis · Orchestrator · Healer)
+         Powered by dashboard/server.py on port 8003
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <style>
+        .uap-section { margin-top: 50px; }
+        .uap-section h2 {
+            color: #818cf8; font-size: 1.3rem;
+            margin-bottom: 18px; padding-bottom: 8px;
+            border-bottom: 1px solid rgba(99,102,241,0.4);
+        }
+        .uap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 20px; margin-bottom: 40px;
+        }
+        .uap-card {
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(99,102,241,0.35);
+            border-radius: 12px; padding: 20px;
+            backdrop-filter: blur(12px);
+        }
+        .uap-card h3 {
+            color: #a5b4fc; font-size: 1.05rem;
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .uap-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .uap-btn {
+            padding: 7px 16px; border-radius: 6px; cursor: pointer;
+            font-size: 0.85rem; font-weight: 600; border: none;
+            transition: all 0.2s;
+        }
+        .uap-btn.green  { background: rgba(34,197,94,0.2);  color: #4ade80; border: 1px solid #22c55e; }
+        .uap-btn.red    { background: rgba(239,68,68,0.2);  color: #f87171; border: 1px solid #ef4444; }
+        .uap-btn.blue   { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid #6366f1; }
+        .uap-btn.gold   { background: rgba(251,191,36,0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .uap-btn:hover  { transform: translateY(-1px); filter: brightness(1.2); }
+        .uap-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .uap-output {
+            background: rgba(15,23,42,0.9);
+            border: 1px solid #1e293b; border-radius: 6px;
+            padding: 10px; margin-top: 10px;
+            font-family: 'Courier New', monospace; font-size: 0.78rem;
+            max-height: 160px; overflow-y: auto; color: #94a3b8;
+            white-space: pre-wrap;
+        }
+        .uap-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 12px;
+            font-size: 0.72rem; font-weight: 700; margin-left: 6px;
+        }
+        .uap-badge.ok   { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .uap-badge.warn { background: rgba(245,158,11,0.2); color: #fbbf24; }
+        .uap-badge.err  { background: rgba(239,68,68,0.2);  color: #f87171; }
+        .uap-agent-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 6px 0; border-bottom: 1px solid rgba(30,41,59,0.6);
+            font-size: 0.85rem;
+        }
+        .uap-agent-row:last-child { border: none; }
+        .uap-genesis-item {
+            padding: 6px 0; border-bottom: 1px solid rgba(30,41,59,0.5);
+            font-size: 0.8rem;
+        }
+        .uap-genesis-item:last-child { border: none; }
+        .uap-genesis-name { color: #a5b4fc; }
+        .uap-genesis-meta { color: #64748b; font-size: 0.72rem; margin-top: 2px; }
+        .uap-status-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 0; font-size: 0.85rem;
+            border-bottom: 1px solid rgba(30,41,59,0.4);
+        }
+        .uap-status-row:last-child { border: none; }
+    </style>
+
+    <div class="container uap-section">
+        <h2>⚙️ UAP Admin Panels</h2>
+
+        <div class="uap-grid">
+
+            <!-- ── Control HQ ──────────────────────────────────────────────── -->
+            <div class="uap-card" id="panel-control-hq">
+                <h3>🖥️ Control HQ
+                    <span class="uap-badge ok" id="ctrl-badge">LIVE</span>
+                </h3>
+                <div id="ctrl-status-list"></div>
+                <div class="uap-btn-row">
+                    <button class="uap-btn green" onclick="uapControl('start')">▶ Start All</button>
+                    <button class="uap-btn red"   onclick="uapControl('stop')">■ Stop All</button>
+                    <button class="uap-btn blue"  onclick="uapControl('restart')">↺ Restart</button>
+                    <button class="uap-btn gold"  onclick="uapControl('backup')">💾 Backup</button>
+                </div>
+                <div class="uap-output" id="ctrl-output" style="display:none"></div>
+            </div>
+
+            <!-- ── Agent Delegator ─────────────────────────────────────────── -->
+            <div class="uap-card" id="panel-agent-delegator">
+                <h3>🤖 Agent Delegator</h3>
+                <div id="agent-list"></div>
+                <div class="uap-btn-row">
+                    <button class="uap-btn blue" onclick="uapLoadAgents()">↺ Refresh</button>
+                </div>
+            </div>
+
+            <!-- ── Genesis Viewer ──────────────────────────────────────────── -->
+            <div class="uap-card" id="panel-genesis">
+                <h3>📜 Genesis Viewer</h3>
+                <div id="genesis-list"></div>
+                <div class="uap-btn-row">
+                    <button class="uap-btn blue" onclick="uapLoadGenesis()">↺ Refresh</button>
+                </div>
+            </div>
+
+            <!-- ── Orchestrator ────────────────────────────────────────────── -->
+            <div class="uap-card" id="panel-orchestrator">
+                <h3>🔮 Orchestrator
+                    <span class="uap-badge" id="orch-badge" style="background:rgba(99,102,241,0.2);color:#a5b4fc">3·6·9</span>
+                </h3>
+                <div id="orch-vortex-state"></div>
+                <div class="uap-btn-row">
+                    <button class="uap-btn blue"  onclick="uapLoadOrchestrator()">↺ Refresh</button>
+                    <button class="uap-btn green" onclick="uapRunCycle()">▶ Run Cycle</button>
+                    <button class="uap-btn gold"  onclick="uapOptimize()">✦ Optimize DB</button>
+                </div>
+                <div class="uap-output" id="orch-output" style="display:none"></div>
+            </div>
+
+            <!-- ── Healer ──────────────────────────────────────────────────── -->
+            <div class="uap-card" id="panel-healer">
+                <h3>💊 Healer
+                    <span class="uap-badge ok" id="healer-badge">READY</span>
+                </h3>
+                <div id="healer-log-list"></div>
+                <div class="uap-btn-row">
+                    <button class="uap-btn blue"  onclick="uapLoadLogs()">↺ Reload Logs</button>
+                    <button class="uap-btn green" onclick="uapHeal()">🔧 Heal All</button>
+                </div>
+            </div>
+
+        </div><!-- /uap-grid -->
+    </div><!-- /uap-section -->
+
+    <script>
+    // ── UAP Panel JS ──────────────────────────────────────────────────────────
+    const UAP = window.location.origin; // same server on port 8003 (or fallback)
+
+    async function uapFetch(path, opts = {}) {
+        try {
+            const r = await fetch(UAP + path, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers||{}) } });
+            return await r.json();
+        } catch { return { error: 'Dashboard server offline. Start: python dashboard/server.py' }; }
+    }
+
+    // ── Control HQ ────────────────────────────────────────────────────────────
+    async function uapLoadStatus() {
+        const data = await uapFetch('/api/status');
+        const el = document.getElementById('ctrl-status-list');
+        if (data.error) { el.innerHTML = `<div style="color:#f87171;font-size:.8rem">${escapeHtml(data.error)}</div>`; return; }
+
+        const badge = document.getElementById('ctrl-badge');
+        const allOk = (data.containers || []).every(c => c.status === 'running');
+        badge.textContent = allOk ? 'OK' : 'WARN';
+        badge.className = 'uap-badge ' + (allOk ? 'ok' : 'warn');
+
+        let html = '';
+        (data.containers || []).forEach(c => {
+            const ok = c.status === 'running';
+            const dot = ok ? '🟢' : '🔴';
+            html += `<div class="uap-status-row"><span>${dot} ${c.name}</span><span style="color:#64748b">${c.status}${c.health ? ' / ' + c.health : ''}</span></div>`;
+        });
+        const arbOk = data.arbitrage_api?.running;
+        html += `<div class="uap-status-row"><span>${arbOk?'🟢':'🔴'} arbitrage-api</span><span style="color:#64748b">${arbOk?'running':'stopped'}</span></div>`;
+        const olOk = data.ollama?.running;
+        html += `<div class="uap-status-row"><span>${olOk?'🟢':'🟡'} ollama</span><span style="color:#64748b">${olOk?`${data.ollama.model_count} models`:'not running'}</span></div>`;
+        if (data.sqlite) {
+            html += `<div class="uap-status-row"><span>🗄 SQLite</span><span style="color:#64748b">${data.sqlite.size_mb} MB</span></div>`;
+        }
+        if (data.latest_backup) {
+            html += `<div class="uap-status-row"><span>💾 Backup</span><span style="color:#64748b">${data.latest_backup.age_hours}h ago</span></div>`;
+        }
+        el.innerHTML = html;
+    }
+
+    async function uapControl(action) {
+        const out = document.getElementById('ctrl-output');
+        out.style.display = 'block';
+        out.textContent = `Running: ${action}...`;
+        const endpointMap = { start: '/api/control/start', stop: '/api/control/stop', restart: '/api/control/restart', backup: '/api/control/backup' };
+        const ep = endpointMap[action] || '/api/control/' + action;
+        const data = await uapFetch(ep, { method: 'POST', body: '{}' });
+        out.textContent = data.stdout || data.error || JSON.stringify(data, null, 2);
+        setTimeout(uapLoadStatus, 3000);
+    }
+
+    // ── Agent Delegator ───────────────────────────────────────────────────────
+    async function uapLoadAgents() {
+        const data = await uapFetch('/api/agents');
+        const el = document.getElementById('agent-list');
+        if (data.error) { el.innerHTML = `<div style="color:#f87171;font-size:.8rem">${escapeHtml(data.error)}</div>`; return; }
+        const vx = data.vortex || {};
+        const health = vx.health ?? vx.vortexHealth ?? null;
+        let html = '';
+        (data.agents || []).forEach(a => {
+            html += `<div class="uap-agent-row">
+                <span>${a.icon} <strong style="color:#e2e8f0">${a.name}</strong></span>
+                <span style="color:#64748b;font-size:.75rem">${a.role}</span>
+                <span class="uap-badge ok">ACTIVE</span>
+            </div>`;
+        });
+        if (health !== null) {
+            html += `<div style="margin-top:10px;font-size:.8rem;color:#a5b4fc">Vortex Health: <strong style="color:#fbbf24">${(health*100).toFixed(1)}%</strong></div>`;
+        }
+        el.innerHTML = html;
+    }
+
+    // ── Genesis Viewer ────────────────────────────────────────────────────────
+    async function uapLoadGenesis() {
+        const data = await uapFetch('/api/genesis');
+        const el = document.getElementById('genesis-list');
+        if (data.error) { el.innerHTML = `<div style="color:#f87171;font-size:.8rem">${escapeHtml(data.error)}</div>`; return; }
+        const reports = (data.reports || []).slice(0, 12);
+        if (!reports.length) { el.innerHTML = '<div style="color:#64748b;font-size:.8rem">No reports found.</div>'; return; }
+        let html = '';
+        reports.forEach(r => {
+            const catColor = r.category === 'REPORTS' ? '#818cf8' : r.category === 'PROGRESS' ? '#34d399' : '#fbbf24';
+            html += `<div class="uap-genesis-item">
+                <div class="uap-genesis-name">${r.name}</div>
+                <div class="uap-genesis-meta">
+                    <span style="color:${catColor}">${r.category}</span>
+                    &nbsp;·&nbsp;${r.size_kb} KB
+                    &nbsp;·&nbsp;${r.modified}
+                </div>
+            </div>`;
+        });
+        el.innerHTML = html;
+    }
+
+    // ── Orchestrator ──────────────────────────────────────────────────────────
+    async function uapLoadOrchestrator() {
+        const data = await uapFetch('/api/agents');
+        const el = document.getElementById('orch-vortex-state');
+        const vx = data.vortex || {};
+        let html = '';
+        if (vx.error) {
+            html = `<div style="color:#f87171;font-size:.8rem">Vortex offline: ${vx.error}</div>`;
+        } else {
+            const items = [
+                ['Health',    vx.health != null   ? (vx.health*100).toFixed(1) + '%' : '—'],
+                ['EBDI-E',    vx.ebdi?.emotion     != null ? vx.ebdi.emotion.toFixed(3) : (vx.emotion != null ? vx.emotion.toFixed(3) : '—')],
+                ['EBDI-B',    vx.ebdi?.behavior    != null ? vx.ebdi.behavior.toFixed(3) : '—'],
+                ['EBDI-D',    vx.ebdi?.desire      != null ? vx.ebdi.desire.toFixed(3) : '—'],
+                ['EBDI-I',    vx.ebdi?.intention   != null ? vx.ebdi.intention.toFixed(3) : '—'],
+                ['Frequency', vx.frequency         != null ? vx.frequency + ' Hz' : '174 Hz'],
+                ['State',     vx.state ?? vx.status ?? '—'],
+            ];
+            html = items.map(([k,v]) =>
+                `<div class="uap-status-row"><span style="color:#94a3b8">${k}</span><span style="color:#fbbf24">${v}</span></div>`
+            ).join('');
+        }
+        el.innerHTML = html;
+    }
+
+    async function uapRunCycle() {
+        const out = document.getElementById('orch-output');
+        out.style.display = 'block'; out.textContent = 'Running cycle...';
+        const data = await uapFetch('/api/arbitrage/cycle/run', { method: 'POST', body: '{}' });
+        out.textContent = JSON.stringify(data, null, 2).slice(0, 800);
+    }
+
+    async function uapOptimize() {
+        const out = document.getElementById('orch-output');
+        out.style.display = 'block'; out.textContent = 'Optimizing DB...';
+        const data = await uapFetch('/api/control/optimize', { method: 'POST', body: '{}' });
+        out.textContent = data.stdout || data.error || 'Done.';
+    }
+
+    // ── Healer ────────────────────────────────────────────────────────────────
+    async function uapLoadLogs() {
+        const data = await uapFetch('/api/logs?n=20');
+        const el = document.getElementById('healer-log-list');
+        if (data.error) { el.innerHTML = `<div style="color:#f87171;font-size:.8rem">${escapeHtml(data.error)}</div>`; return; }
+        const logs = data.logs || [];
+        if (!logs.length) { el.innerHTML = '<div style="color:#64748b;font-size:.8rem">No logs.</div>'; return; }
+        const colorMap = { OK: '#4ade80', SUCCESS: '#4ade80', FAIL: '#f87171', ERROR: '#f87171', WARN: '#fbbf24', INFO: '#94a3b8' };
+        let html = '<div style="font-family:Courier New,monospace;font-size:0.75rem;max-height:140px;overflow-y:auto">';
+        logs.slice(-12).forEach(e => {
+            const c = colorMap[e.level] || '#94a3b8';
+            html += `<div style="color:${c};padding:2px 0;border-bottom:1px solid #1e293b">${e.raw}</div>`;
+        });
+        html += '</div>';
+        el.innerHTML = html;
+
+        const errs = logs.filter(e => e.level === 'FAIL' || e.level === 'ERROR').length;
+        const badge = document.getElementById('healer-badge');
+        if (errs > 0) { badge.textContent = `${errs} ERR`; badge.className = 'uap-badge err'; }
+        else { badge.textContent = 'HEALTHY'; badge.className = 'uap-badge ok'; }
+    }
+
+    async function uapHeal() {
+        const data = await uapFetch('/api/control/restart', { method: 'POST', body: '{"service":"all"}' });
+        document.getElementById('healer-badge').textContent = 'HEALING';
+        document.getElementById('healer-badge').className = 'uap-badge warn';
+        setTimeout(() => { uapLoadStatus(); uapLoadLogs(); }, 5000);
+    }
+
+    // ── Init all UAP panels ───────────────────────────────────────────────────
+    uapLoadStatus();
+    uapLoadAgents();
+    uapLoadGenesis();
+    uapLoadOrchestrator();
+    uapLoadLogs();
+    setInterval(() => { uapLoadStatus(); uapLoadLogs(); }, 30000);
+    setInterval(() => { uapLoadAgents(); uapLoadOrchestrator(); }, 60000);
     </script>
 </body>
 </html>

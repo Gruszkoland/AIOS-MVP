@@ -1,0 +1,20 @@
+[run]
+source = arbitrage
+omit =
+    */tests/*
+    */__pycache__/*
+    */site-packages/*
+    arbitrage/__init__.py
+
+[report]
+fail_under = 37
+skip_covered = False
+precision = 1
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
+    raise AssertionError
+
+[html]
+directory = tests/results/coverage_html

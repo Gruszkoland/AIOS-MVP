@@ -9,6 +9,8 @@ param(
     [string]$PromoteBackend = "openrouter",
     [switch]$AlertOnReady,
     [string]$AlertPath = "monitoring/llm_rollout_alert.json",
+    [switch]$HistoryOnChange,
+    [string]$HistoryPath = "monitoring/llm_rollout_alert_history.jsonl",
     [int]$MaxIterations = 0
 )
 
@@ -39,6 +41,8 @@ while ($true) {
     Write-Host "[KPI-GUARD][$ts] Iteration $iter starting..."
 
     $checkerArgs = @($checker, "--window", "$Window", "--min-events", "$MinEvents")
+    $checkerArgs += "--monitor-iteration"
+    $checkerArgs += "$iter"
     if ($RollbackOnFail) {
         $checkerArgs += "--rollback-on-fail"
     }
@@ -56,6 +60,11 @@ while ($true) {
         $checkerArgs += "--alert-on-ready"
         $checkerArgs += "--alert-path"
         $checkerArgs += "$AlertPath"
+    }
+    if ($HistoryOnChange) {
+        $checkerArgs += "--history-on-change"
+        $checkerArgs += "--history-path"
+        $checkerArgs += "$HistoryPath"
     }
 
     & $python @checkerArgs

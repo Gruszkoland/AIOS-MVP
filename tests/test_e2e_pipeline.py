@@ -90,12 +90,12 @@ def test_full_pipeline():
     # Final summary
     print("\n" + "=" * 60)
     print("ALL E2E TESTS PASSED ✅")
-    print(f"  DB:        13 tables initialized")
+    print("  DB:        13 tables initialized")
     print(f"  Scout:     {scout_result['total_parsed']} products parsed")
     print(f"  Oracle:    {summary['buys']} buy signals, {summary['singularities']} singularities")
     print(f"  Pipeline:  {p3['executed']} executed, {p3['held']} held")
     print(f"  Manifest:  {mass_result['total_products']} products for Next.js SPP")
-    print(f"  Endpoints: 25+ API routes on port 8001")
+    print("  Endpoints: 25+ API routes on port 8001")
     print("=" * 60)
 
 

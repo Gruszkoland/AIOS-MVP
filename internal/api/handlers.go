@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -89,7 +90,7 @@ func (h *Handler) PostDecide(c echo.Context) error {
 
 	response := DecisionResponse{
 		State:         float64(state),
-		Resonance:     h.Vortex.Resonance,
+		Resonance:     h.Vortex.GetResonance(),
 		Frequency:     frequency,
 		MarginPct:     marginPct,
 		IsSingularity: is369 && state == quantum.StateTrue,
@@ -115,16 +116,32 @@ func (h *Handler) PostDecide(c echo.Context) error {
 		response.Message = "Neutral State: No Resonance"
 	}
 
+	// 162D decision space trace — structured log for Genesis Record
+	log.Printf(
+		`{"trace":"decision","asset_a":%q,"asset_b":%q,"price_a":%g,"price_b":%g,"state":%g,"state_label":%q,"resonance":%d,"action":%q,"margin_pct":%g,"confidence":%g,"timestamp":%q}`,
+		data.AssetA, data.AssetB, data.PriceA, data.PriceB,
+		float64(state), response.StateLabel, h.Vortex.GetResonance(),
+		response.Action, marginPct, response.Confidence,
+		response.Timestamp,
+	)
+
 	return c.JSON(http.StatusOK, response)
 }
 
-// GetStatus returns current engine oscillations
+// GetStatus returns current engine oscillations v3.0
 func (h *Handler) GetStatus(c echo.Context) error {
+	ebdi := h.Vortex.GetEBDI()
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"resonance": h.Vortex.Resonance,
-		"pulse":     "174Hz",
-		"mode":      "Trinity-Enabled",
-		"uptime":    time.Now().Format(time.RFC3339),
+		"resonance": h.Vortex.GetResonance(),
+		"health":    h.Vortex.GetHealth(),
+		"pulse":     "147Hz",
+		"mode":      "Master-Orchestrator-v3",
+		"ebdi": map[string]float64{
+			"dominance": ebdi.Dominance,
+			"arousal":   ebdi.Arousal,
+			"pleasure":  ebdi.Pleasure,
+		},
+		"uptime": time.Now().Format(time.RFC3339),
 	})
 }
 
@@ -132,7 +149,7 @@ func (h *Handler) GetStatus(c echo.Context) error {
 func (h *Handler) HealthCheck(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":    "healthy",
-		"resonance": h.Vortex.Resonance,
+		"resonance": h.Vortex.GetResonance(),
 		"engine":    "vortex-369",
 		"timestamp": time.Now().Format(time.RFC3339),
 	})
@@ -172,7 +189,7 @@ func (h *Handler) SentinelScan(c echo.Context) error {
 			SKU:       p.SKU,
 			Name:      p.Name,
 			State:     state,
-			Resonance: h.Vortex.Resonance,
+			Resonance: h.Vortex.GetResonance(),
 			Frequency: freq,
 			Action:    action,
 			MarginPct: margin,
@@ -231,7 +248,7 @@ func (h *Handler) OraclePredict(c echo.Context) error {
 		"state":     state,
 		"signal":    signal,
 		"frequency": freq,
-		"resonance": h.Vortex.Resonance,
+		"resonance": h.Vortex.GetResonance(),
 		"channel":   req.Channel,
 		"timestamp": time.Now().Format(time.RFC3339),
 	})

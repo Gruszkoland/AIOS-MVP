@@ -9,21 +9,6 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 os.environ["DB_PATH"] = ":memory:"
 
-from arbitrage.database import (
-    init_db,
-    get_conn,
-    upsert_job,
-    get_jobs,
-    set_job_status,
-    insert_bid,
-    get_pending_bids,
-    approve_bid,
-    record_kpi_event,
-    get_stream_kpis,
-    upsert_deal,
-    get_deals,
-    update_deal_status,
-)
 
 
 @pytest.fixture(autouse=True)
@@ -32,16 +17,13 @@ def fresh_db(monkeypatch, tmp_path):
     db_file = str(tmp_path / "test.db")
     monkeypatch.setenv("DB_PATH", db_file)
     # Reload the module so DB_PATH is picked up
-    import importlib
     import arbitrage.config as cfg
     import arbitrage.database as db_mod
     monkeypatch.setattr(cfg, "DB_PATH", db_file)
     monkeypatch.setattr(db_mod, "DB_PATH", db_file)
     # Patch get_conn to use new path
-    original_get_conn = db_mod.get_conn
     import sqlite3
     def patched_conn():
-        import sqlite3
         conn = sqlite3.connect(db_file)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode=WAL")
