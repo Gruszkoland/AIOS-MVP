@@ -1,0 +1,175 @@
+---
+# StorageClass for Local Storage (on-node storage)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+  namespace: adrion-369
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+
+---
+# StorageClass for Fast SSD storage
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast-ssd
+  namespace: adrion-369
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+parameters:
+  type: ssd
+
+---
+# PersistentVolume for PostgreSQL data (100Gi)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-postgres-data
+  namespace: adrion-369
+  labels:
+    app: postgres
+    type: database
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  hostPath:
+    path: /data/postgres
+
+---
+# PersistentVolume for Loki data (50Gi)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-loki-data
+  namespace: adrion-369
+  labels:
+    app: loki
+    type: logging
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  hostPath:
+    path: /data/loki
+
+---
+# PersistentVolume for Loki WAL (20Gi)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-loki-wal
+  namespace: adrion-369
+  labels:
+    app: loki
+    type: wal
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  hostPath:
+    path: /data/loki_wal
+
+---
+# PersistentVolume for Ollama data (50Gi)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-ollama-data
+  namespace: adrion-369
+  labels:
+    app: ollama
+    type: model-cache
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  hostPath:
+    path: /data/ollama
+
+---
+# PersistentVolume for Grafana data (10Gi)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-grafana-data
+  namespace: adrion-369
+  labels:
+    app: grafana
+    type: dashboards
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  hostPath:
+    path: /data/grafana
+
+---
+# PersistentVolume for Prometheus data (30Gi)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-prometheus-data
+  namespace: adrion-369
+  labels:
+    app: prometheus
+    type: metrics
+spec:
+  capacity:
+    storage: 30Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  hostPath:
+    path: /data/prometheus
+
+---
+# PersistentVolume for N8N data (20Gi)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-n8n-data
+  namespace: adrion-369
+  labels:
+    app: n8n
+    type: workflows
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  hostPath:
+    path: /data/n8n
+
+---
+# PersistentVolume for Promtail positions (5Gi)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-promtail-positions
+  namespace: adrion-369
+  labels:
+    app: promtail
+    type: logging
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  hostPath:
+    path: /data/promtail
