@@ -47,6 +47,13 @@ config/nginx/certs/
 # ── adrion-swarm secrets ──────────────────────────────────────────────────
 adrion-swarm/.env
 
+# ── Docker data volumes (NEVER track databases) ───────────────────────────
+adrion-swarm/postgres_data/
+adrion-swarm/n8n_data/
+adrion-swarm/ollama_data/
+harmonia-dashboard/chroma_db/
+harmonia-dashboard/.chromadb/
+
 # Runtime monitoring data
 monitoring/*.jsonl
 monitoring/*_history*.jsonl
