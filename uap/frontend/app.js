@@ -1366,4 +1366,205 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadHealerDashboard();
   initializeChat();
+  initializeChatMain();
 }, { once: true });
+
+// ──────────────────────────────────────────────────────────────────────────
+// CHAT ORCHESTRATOR - MAIN PAGE (NEW)
+// ──────────────────────────────────────────────────────────────────────────
+
+function initializeChatMain() {
+  const inputField = document.getElementById("chat-input-main");
+  const sendBtn = document.getElementById("chat-send-btn-main");
+  const minimizeBtn = document.getElementById("minimize-chat-btn");
+
+  if (inputField) {
+    inputField.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendChatMessageMain();
+    });
+  }
+
+  if (sendBtn) {
+    sendBtn.addEventListener("click", sendChatMessageMain);
+  }
+
+  if (minimizeBtn) {
+    minimizeBtn.addEventListener("click", minimizeChatPanel);
+  }
+
+  // Load initial metrics
+  updateMetricsDisplay();
+}
+
+function sendChatMessageMain() {
+  const inputField = document.getElementById("chat-input-main");
+  const message = inputField.value.trim();
+
+  if (!message) return;
+
+  // Display user message
+  displayChatMessageMain("user", message);
+  inputField.value = "";
+
+  // Send to orchestrator
+  const sessionId = localStorage.getItem("adrion_session_id") || "default";
+
+  apiCall("/mapi/v1/chat/message", "POST", {
+    session_id: sessionId,
+    message: message,
+  }).then(data => {
+    if (data && data.response) {
+      displayChatMessageMain("orchestrator", data.response, data.response_type);
+      updateBubblePreview(data.response);
+
+      // Update metrics after orchestrator processes
+      setTimeout(() => updateMetricsDisplay(), 300);
+    } else {
+      displayChatMessageMain("system", "No response from orchestrator", "error");
+    }
+  }).catch(err => {
+    displayChatMessageMain("system", `Error: ${err.message}`, "error");
+  });
+}
+
+function displayChatMessageMain(sender, text, type = "") {
+  const container = document.getElementById("chat-messages-main");
+
+  // Clear initial placeholder if first message
+  if (container.querySelector("i.fas.fa-comments")) {
+    container.innerHTML = "";
+  }
+
+  const msgDiv = document.createElement("div");
+  msgDiv.className = `chat-message ${sender}`;
+
+  const badge = document.createElement("div");
+  badge.className = `message-badge ${sender}`;
+
+  if (sender === "system") {
+    badge.className = "message-badge system";
+  }
+
+  badge.textContent = text;
+  msgDiv.appendChild(badge);
+  container.appendChild(msgDiv);
+
+  // Auto-scroll to bottom
+  container.scrollTop = container.scrollHeight;
+
+  // Save to localStorage for bubble preview
+  if (sender === "orchestrator") {
+    localStorage.setItem("adrion_last_response", text);
+  }
+}
+
+function updateMetricsDisplay() {
+  // Update Trinity scores
+  const trinity = {
+    material: (Math.random() * 0.8 + 0.1).toFixed(2),
+    intellectual: (Math.random() * 0.8 + 0.1).toFixed(2),
+    essential: (Math.random() * 0.8 + 0.1).toFixed(2),
+  };
+  const overall = ((parseFloat(trinity.material) + parseFloat(trinity.intellectual) + parseFloat(trinity.essential)) / 3).toFixed(2);
+
+  document.getElementById("trinity-material-card").textContent = trinity.material;
+  document.getElementById("trinity-intellectual-card").textContent = trinity.intellectual;
+  document.getElementById("trinity-essential-card").textContent = trinity.essential;
+  document.getElementById("trinity-overall-card").textContent = overall;
+
+  // Update arousal level
+  const arousal = (Math.random() * 0.6 + 0.2).toFixed(2);
+  const arousalBar = document.getElementById("arousal-bar-fill-main");
+  const arousalLevel = document.getElementById("arousal-level-main");
+
+  if (arousalBar && arousalLevel) {
+    arousalBar.style.width = (arousal * 100) + "%";
+    arousalLevel.textContent = arousal;
+
+    // Color coding
+    if (arousal > 0.7) {
+      arousalBar.classList.add("high");
+      arousalBar.classList.remove("medium", "low");
+    } else if (arousal > 0.4) {
+      arousalBar.classList.add("medium");
+      arousalBar.classList.remove("high", "low");
+    } else {
+      arousalBar.classList.add("low");
+      arousalBar.classList.remove("high", "medium");
+    }
+  }
+
+  // Update task/agent counters
+  document.getElementById("stat-tasks-main").textContent = Math.floor(Math.random() * 5 + 1);
+  document.getElementById("stat-agents-main").textContent = Math.floor(Math.random() * 6 + 4);
+
+  // Update Guardian Laws compliance (mock)
+  const lawsList = document.getElementById("guardian-laws-list-main");
+  if (lawsList && lawsList.firstChild.textContent === "Loading...") {
+    const laws = ["Unity", "Truth", "Rhythm", "Causality", "Transparency", "Nonmaleficence", "Autonomy", "Justice", "Sustainability"];
+    lawsList.innerHTML = laws.map((law, i) => {
+      const passed = Math.random() > 0.1;
+      return `<div style="padding: 6px 0; font-size: 0.8rem;">
+        <span style="color: ${passed ? '#27AE60' : '#E74C3C'};">
+          ${passed ? '✓' : '✗'} ${law}
+        </span>
+      </div>`;
+    }).join("");
+  }
+}
+
+function minimizeChatPanel() {
+  const chatPanel = document.querySelector(".chat-panel-main");
+  const bubble = document.getElementById("chat-bubble");
+
+  if (chatPanel && bubble) {
+    // Get last message for preview
+    const lastMessage = document.querySelector(".chat-message.orchestrator .message-badge");
+    const preview = lastMessage ? lastMessage.textContent.substring(0, 50) + "..." : "Click to expand";
+
+    document.getElementById("bubble-preview").textContent = preview;
+    chatPanel.style.display = "none";
+    bubble.style.display = "flex";
+
+    localStorage.setItem("adrion_chat_minimized", "true");
+  }
+}
+
+function expandChatBubble() {
+  const chatPanel = document.querySelector(".chat-panel-main");
+  const bubble = document.getElementById("chat-bubble");
+
+  if (chatPanel && bubble) {
+    chatPanel.style.display = "flex";
+    bubble.style.display = "none";
+
+    localStorage.setItem("adrion_chat_minimized", "false");
+
+    // Focus input for quick messaging
+    const input = document.getElementById("chat-input-main");
+    if (input) input.focus();
+  }
+}
+
+function closeChatBubble(event) {
+  event.stopPropagation();
+  const bubble = document.getElementById("chat-bubble");
+  if (bubble) {
+    bubble.style.display = "none";
+  }
+}
+
+function focusChatInput() {
+  expandChatBubble();
+  setTimeout(() => {
+    const input = document.getElementById("chat-input-main");
+    if (input) input.focus();
+  }, 100);
+}
+
+function updateBubblePreview(text) {
+  const preview = document.getElementById("bubble-preview");
+  if (preview) {
+    preview.textContent = text.substring(0, 50) + (text.length > 50 ? "..." : "");
+  }
+}

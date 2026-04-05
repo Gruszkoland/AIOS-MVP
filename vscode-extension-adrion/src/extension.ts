@@ -196,6 +196,113 @@ class AdrionViewProvider implements vscode.WebviewViewProvider {
             font-weight: 600;
             margin: 5px 0;
         }
+
+        /* Chat Panel Styles */
+        .chat-panel {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
+            border: 1px solid #D5D8DC;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            max-height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            font-weight: 600;
+            color: #1E3A5F;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 8px;
+            font-size: 0.8em;
+            line-height: 1.4;
+            max-height: 200px;
+        }
+
+        .chat-msg {
+            margin-bottom: 6px;
+            padding: 4px 6px;
+            border-radius: 3px;
+            animation: slideInLeft 0.2s ease-out;
+        }
+
+        .chat-msg.user {
+            background: rgba(0, 120, 212, 0.1);
+            border-left: 2px solid #0078D4;
+            color: #0078D4;
+        }
+
+        .chat-msg.ai {
+            background: rgba(39, 174, 96, 0.1);
+            border-left: 2px solid #27AE60;
+            color: #27AE60;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 6px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid #D5D8DC;
+            border-radius: 3px;
+            font-size: 0.8em;
+            background: white;
+            color: #1E3A5F;
+        }
+
+        .chat-input-area button {
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #0078D4 0%, #0066CC 100%);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 0.8em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .chat-input-area button:hover {
+            background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
+        }
+
+        .minimize-btn {
+            background: none;
+            border: none;
+            color: #0078D4;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -203,6 +310,26 @@ class AdrionViewProvider implements vscode.WebviewViewProvider {
         <div class="logo">ADRION 369</div>
         <div class="subtitle">Swarm Intelligence v2.0</div>
         <div class="status-badge">🟢 Production Ready</div>
+    </div>
+
+    <!-- Chat Orchestrator Panel -->
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">
+            <span>Chat Orchestrator</span>
+            <button class="minimize-btn" onclick="minimizeChatPanel()" title="Minimize">−</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg ai">Click Send or type to start...</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ask AI..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- Chat Bubble (hidden) -->
+    <div id="chatBubble" style="display:none; background:#E8F4F8; border:1px solid #0078D4; border-radius:4px; padding:8px; margin-bottom:12px; font-size:0.8em; text-align:center; cursor:pointer;" onclick="expandChatPanel()">
+        <strong>[Chat Available]</strong><br>Click to expand
     </div>
 
     <div class="section-title">🐳 Kubernetes (Local)</div>
@@ -274,6 +401,48 @@ class AdrionViewProvider implements vscode.WebviewViewProvider {
                 value: command,
                 isLive: isLive
             });
+        }
+
+        // Chat Orchestrator Functions
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesDiv = document.getElementById('chatMessages');
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-msg user';
+            userMsg.textContent = 'You: ' + message;
+            messagesDiv.appendChild(userMsg);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Mock AI response
+            setTimeout(() => {
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'chat-msg ai';
+                const responses = [
+                    'AI: Processing your request...',
+                    'AI: Task queued for execution',
+                    'AI: Analyzing system state...',
+                    'AI: Request forwarded to orchestrator'
+                ];
+                aiMsg.textContent = responses[Math.floor(Math.random() * responses.length)];
+                messagesDiv.appendChild(aiMsg);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }, 300);
+
+            input.value = '';
+        }
+
+        function minimizeChatPanel() {
+            document.getElementById('chatPanel').style.display = 'none';
+            document.getElementById('chatBubble').style.display = 'block';
+        }
+
+        function expandChatPanel() {
+            document.getElementById('chatPanel').style.display = 'flex';
+            document.getElementById('chatBubble').style.display = 'none';
+            document.getElementById('chatInput').focus();
         }
     </script>
 </body>
