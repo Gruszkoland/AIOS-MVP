@@ -2,9 +2,9 @@
 Unit tests for arbitrage/wholesale_scout.py — B2B Wholesale Scout Bridge.
 All DB calls mocked.
 """
-from unittest.mock import MagicMock, patch
-import pytest
+from unittest.mock import patch
 
+import pytest
 
 # ---------------------------------------------------------------------------
 # _make_deal_id
@@ -59,8 +59,9 @@ def test_parse_json_feed_dict_with_products():
 
 
 def test_parse_json_feed_from_string():
-    from arbitrage.wholesale_scout import parse_json_feed
     import json
+
+    from arbitrage.wholesale_scout import parse_json_feed
     data = json.dumps([{"sku": "S-1", "wholesale_price": 80.0, "retail_price_de": 160.0, "stock": 3}])
     result = parse_json_feed(data)
     assert len(result) == 1
@@ -162,15 +163,17 @@ def test_parse_csv_feed_skips_empty_lines():
 # ---------------------------------------------------------------------------
 
 def test_xml_text_returns_text():
-    from arbitrage.wholesale_scout import _xml_text
     import xml.etree.ElementTree as ET
+
+    from arbitrage.wholesale_scout import _xml_text
     root = ET.fromstring("<product><sku>TEST-SKU</sku></product>")
     assert _xml_text(root, "sku") == "TEST-SKU"
 
 
 def test_xml_text_returns_none_missing():
-    from arbitrage.wholesale_scout import _xml_text
     import xml.etree.ElementTree as ET
+
+    from arbitrage.wholesale_scout import _xml_text
     root = ET.fromstring("<product><name>X</name></product>")
     assert _xml_text(root, "sku") is None
 
@@ -227,8 +230,8 @@ def test_filter_by_channel_unknown_channel():
 
 
 def test_filter_by_channel_explicit_channel_id():
-    from arbitrage.wholesale_scout import filter_by_channel
     from arbitrage.config import QUANTUM_SCAN_CHANNELS
+    from arbitrage.wholesale_scout import filter_by_channel
     if not QUANTUM_SCAN_CHANNELS:
         pytest.skip("No channels configured")
     ch = QUANTUM_SCAN_CHANNELS[0]

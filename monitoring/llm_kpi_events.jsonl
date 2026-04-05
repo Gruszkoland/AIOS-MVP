@@ -35,3 +35,15 @@
 {"ts": 1775392681, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.9, "prompt_len": 11, "system_len": 3}
 {"ts": 1775392881, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 3.87, "prompt_len": 11, "system_len": 3}
 {"ts": 1775392924, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 12.26, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398092, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.85, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398182, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 2.13, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398520, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.81, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398566, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.8, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398608, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 4.99, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398647, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.57, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398684, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 6.01, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398870, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.65, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398917, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.12, "prompt_len": 11, "system_len": 3}
+{"ts": 1775398972, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.11, "prompt_len": 11, "system_len": 3}
+{"ts": 1775399025, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.65, "prompt_len": 11, "system_len": 3}
+{"ts": 1775399091, "requested_backend": "auto", "selected_backend": "auto", "canary": false, "success": true, "error_kind": "", "latency_ms": 1.72, "prompt_len": 11, "system_len": 3}
