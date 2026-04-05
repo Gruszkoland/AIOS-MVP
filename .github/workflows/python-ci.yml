@@ -38,12 +38,25 @@ jobs:
         run: |
           python -m pytest tests/ \
             --cov=arbitrage \
+            --cov=uap \
+            --cov=internal \
             --cov-report=xml:tests/results/coverage.xml \
+            --cov-report=json:tests/results/coverage.json \
             --cov-report=term-missing \
             --cov-fail-under=80 \
             --ignore=tests/security_simulation.py \
             -m "not e2e and not runtime" \
-            -q
+            -v --tb=short
+
+      - name: Check TIER 0 Critical Tests
+        run: |
+          python -m pytest tests/ -m "tier0" -v --tb=short
+          echo "TIER 0 tests passed"
+
+      - name: Validate Guardian Law Compliance
+        run: |
+          echo "Validating Guardian Laws (G1-G9) in codebase..."
+          grep -r "G1.*Unity\|G2.*Harmony\|G7.*Privacy" arbitrage/ || echo "Warning: Guardian Laws not fully tagged"
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
