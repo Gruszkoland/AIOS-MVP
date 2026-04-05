@@ -7,8 +7,8 @@ These tests validate core protections without requiring live HTTP services.
 
 def test_sliding_window_rate_limiter_blocks_after_limit(monkeypatch):
     """Limiter allows max requests in window, then blocks, then recovers."""
-    from arbitrage.rate_limiter import SlidingWindowRateLimiter
     import arbitrage.rate_limiter as rate_limiter_module
+    from arbitrage.rate_limiter import SlidingWindowRateLimiter
 
     now = {"t": 1000.0}
 
@@ -31,8 +31,8 @@ def test_sliding_window_rate_limiter_blocks_after_limit(monkeypatch):
 
 def test_circuit_breaker_opens_after_threshold_and_recovers(monkeypatch):
     """Breaker opens after N failures and closes after recovery + success."""
-    from arbitrage.circuit_breaker import CircuitBreaker, CircuitBreakerOpen
     import arbitrage.circuit_breaker as cb_module
+    from arbitrage.circuit_breaker import CircuitBreaker
 
     now = {"t": 2000.0}
 
@@ -51,14 +51,20 @@ def test_circuit_breaker_opens_after_threshold_and_recovers(monkeypatch):
         return "ok"
 
     assert breaker.state == "CLOSED"
-    try: breaker.call(_fail)
-    except RuntimeError: pass
-    try: breaker.call(_fail)
-    except RuntimeError: pass
+    try:
+        breaker.call(_fail)
+    except RuntimeError:
+        pass
+    try:
+        breaker.call(_fail)
+    except RuntimeError:
+        pass
     assert breaker.state == "CLOSED"
 
-    try: breaker.call(_fail)
-    except RuntimeError: pass
+    try:
+        breaker.call(_fail)
+    except RuntimeError:
+        pass
     assert breaker.state == "OPEN"
 
     now["t"] += 10.1  # backoff doubles on OPEN transition: 5.0 -> 10.0
@@ -71,8 +77,8 @@ def test_circuit_breaker_opens_after_threshold_and_recovers(monkeypatch):
 
 def test_circuit_breaker_stays_open_within_recovery_window(monkeypatch):
     """Breaker remains open until configured recovery timeout elapses."""
-    from arbitrage.circuit_breaker import CircuitBreaker, CircuitBreakerOpen
     import arbitrage.circuit_breaker as cb_module
+    from arbitrage.circuit_breaker import CircuitBreaker
 
     now = {"t": 3000.0}
 
@@ -86,10 +92,14 @@ def test_circuit_breaker_stays_open_within_recovery_window(monkeypatch):
     def _fail():
         raise RuntimeError("err")
 
-    try: breaker.call(_fail)
-    except RuntimeError: pass
-    try: breaker.call(_fail)
-    except RuntimeError: pass
+    try:
+        breaker.call(_fail)
+    except RuntimeError:
+        pass
+    try:
+        breaker.call(_fail)
+    except RuntimeError:
+        pass
 
     assert breaker.state == "OPEN"
     now["t"] += 7.9

@@ -1320,6 +1320,180 @@ def get_agent(agent_id):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+# ──────────────────────────────────────────────────────────────────────────
+# PHASE C: ANALYTICS ENDPOINTS
+# ──────────────────────────────────────────────────────────────────────────
+
+@app.route("/mapi/v1/agents/<agent_id>/history", methods=["GET"])
+def get_agent_history(agent_id):
+    """Get agent activity history"""
+    try:
+        limit = request.args.get("limit", 50, type=int)
+
+        if USE_DATABASE and db:
+            history = db.query("""
+                SELECT id, activity_type, description, result, duration_seconds, created_at, metadata
+                FROM agent_activity
+                WHERE agent_id = %s
+                ORDER BY created_at DESC
+                LIMIT %s
+            """, [agent_id, limit])
+        else:
+            # Fallback sample data
+            history = [
+                {"id": 1, "activity_type": "task_execution", "description": f"Executed task for {agent_id}", "result": "success", "duration_seconds": 45, "created_at": "2026-04-05T10:00:00"},
+                {"id": 2, "activity_type": "analysis", "description": f"Analyzed system for {agent_id}", "result": "success", "duration_seconds": 120, "created_at": "2026-04-05T11:30:00"},
+            ]
+
+        activities = []
+        for activity in (history if history else []):
+            activity_dict = dict(activity) if hasattr(activity, '__getitem__') else activity
+            activities.append(activity_dict)
+
+        return jsonify({"success": True, "agent_id": agent_id, "history": activities, "total": len(activities)}), 200
+    except Exception as e:
+        logger.error(f"get_agent_history error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/agents/<agent_id>/performance", methods=["GET"])
+def get_agent_performance(agent_id):
+    """Get agent performance metrics"""
+    try:
+        if USE_DATABASE and db:
+            perf = db.query("""
+                SELECT tasks_completed, tasks_failed, avg_duration_seconds, success_rate,
+                       last_activity, monthly_tasks, arousal_level, dominance_level, pleasure_level
+                FROM agent_performance
+                WHERE agent_id = %s
+            """, [agent_id])
+            perf = perf[0] if perf else None
+        else:
+            # Fallback
+            perf = {
+                "tasks_completed": 42,
+                "tasks_failed": 3,
+                "avg_duration_seconds": 65.5,
+                "success_rate": 0.93,
+                "last_activity": "2026-04-05T17:00:00",
+                "monthly_tasks": 18,
+                "arousal_level": 0.65,
+                "dominance_level": 0.72,
+                "pleasure_level": 0.80
+            }
+
+        if not perf:
+            return jsonify({"success": False, "error": "Agent not found"}), 404
+
+        perf_dict = dict(perf) if hasattr(perf, '__getitem__') else perf
+
+        return jsonify({"success": True, "agent_id": agent_id, "performance": perf_dict}), 200
+    except Exception as e:
+        logger.error(f"get_agent_performance error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/agents/<agent_id>/feedback", methods=["POST"])
+def add_agent_feedback(agent_id):
+    """Submit feedback for an agent"""
+    data = request.get_json() or {}
+
+    try:
+        rating = data.get("rating", 3)
+        comment = data.get("comment", "")
+        session_id = data.get("session_id", "default")
+
+        if not (1 <= rating <= 5):
+            return jsonify({"success": False, "error": "Rating must be 1-5"}), 400
+
+        # Determine feedback type based on rating
+        feedback_type = "positive" if rating >= 4 else ("negative" if rating <= 2 else "neutral")
+        trust_adjustment = (rating - 3) * 0.02  # -0.04 to +0.1
+
+        if USE_DATABASE and db:
+            db.execute("""
+                INSERT INTO agent_feedback (agent_id, session_id, rating, comment, trust_adjustment, feedback_type)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, [agent_id, session_id, rating, comment, trust_adjustment, feedback_type])
+
+            # Update agent trust score
+            db.execute("""
+                UPDATE agents
+                SET trust_score = GREATEST(0, LEAST(1, trust_score + %s))
+                WHERE id = %s
+            """, [trust_adjustment, agent_id])
+
+        return jsonify({"success": True, "message": f"Feedback added", "trust_adjustment": trust_adjustment}), 201
+    except Exception as e:
+        logger.error(f"add_agent_feedback error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/agents/leaderboard", methods=["GET"])
+def get_leaderboard():
+    """Get agent leaderboard ranked by trust score and performance"""
+    try:
+        limit = request.args.get("limit", 10, type=int)
+
+        if USE_DATABASE and db:
+            leaderboard = db.query("""
+                SELECT a.id, a.name, a.trust_score, a.success_rate, ap.tasks_completed,
+                       (a.trust_score * 0.4 + a.success_rate * 0.6) as overall_score
+                FROM agents a
+                LEFT JOIN agent_performance ap ON a.id = ap.agent_id
+                WHERE a.active = TRUE
+                ORDER BY overall_score DESC, a.trust_score DESC
+                LIMIT %s
+            """, [limit])
+        else:
+            # Fallback
+            leaderboard = [
+                {"id": "agent-1", "name": "Librarian", "trust_score": 0.95, "success_rate": 0.98, "tasks_completed": 342, "overall_score": 0.967},
+                {"id": "agent-4", "name": "Sentinel", "trust_score": 0.92, "success_rate": 0.95, "tasks_completed": 421, "overall_score": 0.938},
+                {"id": "agent-2", "name": "Architect", "trust_score": 0.88, "success_rate": 0.92, "tasks_completed": 187, "overall_score": 0.904},
+                {"id": "agent-3", "name": "Auditor", "trust_score": 0.87, "success_rate": 0.91, "tasks_completed": 156, "overall_score": 0.891},
+            ]
+
+        agents = []
+        for i, agent in enumerate((leaderboard if leaderboard else []), 1):
+            agent_dict = dict(agent) if hasattr(agent, '__getitem__') else agent
+            agent_dict["rank"] = i
+            agents.append(agent_dict)
+
+        return jsonify({"success": True, "leaderboard": agents, "total": len(agents)}), 200
+    except Exception as e:
+        logger.error(f"get_leaderboard error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/mapi/v1/agents/<agent_id>/log-activity", methods=["POST"])
+def log_agent_activity(agent_id):
+    """Log an agent activity"""
+    data = request.get_json() or {}
+
+    try:
+        activity_type = data.get("activity_type", "unknown")
+        description = data.get("description", "")
+        result = data.get("result", "pending")
+        duration = data.get("duration_seconds", 0)
+        session_id = data.get("session_id", "default")
+        metadata = data.get("metadata", {})
+
+        if USE_DATABASE and db:
+            activity_id = db.execute("""
+                INSERT INTO agent_activity (agent_id, session_id, activity_type, description, result, duration_seconds, metadata)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                RETURNING id
+            """, [agent_id, session_id, activity_type, description, result, duration, json.dumps(metadata)])
+        else:
+            activity_id = 999
+
+        return jsonify({"success": True, "activity_id": activity_id, "message": "Activity logged"}), 201
+    except Exception as e:
+        logger.error(f"log_agent_activity error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 # ────────────────────────────────────────────────────────────────────────────
 # ERROR HANDLERS
 # ────────────────────────────────────────────────────────────────────────────

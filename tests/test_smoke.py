@@ -4,8 +4,8 @@ Minimalne testy pokrywające krytyczne ścieżki.
 Uruchomienie: pytest tests/test_smoke.py -v
 """
 import json
-import sys
 import os
+import sys
 
 # Add harmonia-dashboard to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'harmonia-dashboard'))

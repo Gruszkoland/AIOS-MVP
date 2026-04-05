@@ -1,5 +1,7 @@
 import time
+
 import requests
+
 
 def simulate_attack(vector="A-01", description="Sentiment drift via flattery"):
     print(f"--- [SENTINEL TEST] Symulacja ataku: {vector} ({description}) ---")

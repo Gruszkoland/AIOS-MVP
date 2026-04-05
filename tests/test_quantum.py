@@ -1,22 +1,21 @@
 """
 Unit tests for arbitrage/quantum.py — Lukasiewicz 3-state logic (PROGRAMATOR #9)
 """
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 os.environ.setdefault("DB_PATH", ":memory:")
 
 from arbitrage.quantum import (
-    quantum_decide,
-    entangle_markets,
-    scan_channel,
-    run_quantum_scan,
+    AUTOPOJEZA_ERROR_LIMIT,
     AutopoiezaTracker,
     QuantumDecision,
-    AUTOPOJEZA_ERROR_LIMIT,
+    entangle_markets,
+    quantum_decide,
+    run_quantum_scan,
+    scan_channel,
 )
-
 
 # ── quantum_decide ─────────────────────────────────────────────────────────────
 

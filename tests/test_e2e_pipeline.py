@@ -3,6 +3,7 @@ ADRION 369 — End-to-End Pipeline Test
 Tests: DB Reset → Wholesale Scout → Oracle → Orchestrator → Mass Generator
 """
 import json
+
 import pytest
 
 
@@ -15,7 +16,7 @@ def test_full_pipeline():
 
     # Step 1: Reset deals table
     print("\n[1/6] Resetting deals table...")
-    from arbitrage.database import init_db, get_conn, get_deals
+    from arbitrage.database import get_conn, get_deals, init_db
     init_db()
     with get_conn() as conn:
         conn.execute("DELETE FROM deals")

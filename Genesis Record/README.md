@@ -17,6 +17,7 @@ Kompleksowa dokumentacja, plany, specyfikacje i raporty projektu **ADRION 369** 
 | **07_RESOURCES_MEDIA** | 3.0 MB | Zasoby multimedialne | ✅ Wspierające |
 | **08_HISTORY_ARCHIVE** | 80 KB | Historia i poprzednie wersje | ✅ Archiwalne |
 | **10_RAPORTY_DZIALANIA_SYSTEMU** | 708 KB | Raporty, postęp, plany (PLAN→PROGRESS→REPORTS) | ✅ Bieżące |
+| **11_INVESTOR_TECHNICAL_DOCS** | ~80 KB | Dokumentacja techniczna dla inwestorów (8 dokumentów) | ✅ Nowe 2026-04-05 |
 | **99_ARCHIVE_RUBBISH** | 4 KB | Stare archiwa (prawie puste) | ♻️ Do usunięcia |
 
 **Całkowity rozmiar**: ~23 MB (po optymalizacji)
@@ -64,6 +65,12 @@ cat 03_TECHNICAL_SPECS/adrion_369_architecture.md
 ### Bieżące raporty
 - `10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/Master_Orchestrator_v3_Final_Release_03-04-2026.md` — ostatni release
 - `10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/ANALIZA_WIELOSTRONNEGO_PANELU_ADMINISTRACYJNEGO_04-04-2026.md` — panel admin
+- `10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/ATAM_ADR_Analiza_Architektury_05-04-2026.md` — analiza architektoniczna
+
+### Dokumentacja inwestorska (NOWE 2026-04-05)
+- `11_INVESTOR_TECHNICAL_DOCS/01_EXECUTIVE_SUMMARY.md` — dla inwestorów i C-suite
+- `11_INVESTOR_TECHNICAL_DOCS/02_TECHNICAL_ARCHITECTURE.md` — architektura systemu
+- `11_INVESTOR_TECHNICAL_DOCS/08_TECHNICAL_DUE_DILIGENCE.md` — pełny pakiet DD
 
 ---
 
@@ -151,7 +158,7 @@ Użyj ścieżek relatywnych:
 
 ## 📅 Ostatnia aktualizacja
 
-- **Data**: 2026-04-04
-- **Wersja**: ADRION 369 v2.0 (Production-Grade)
-- **Status**: ✅ Gotowa do wdrażania
-- **Następna przegląd**: 2026-05-04
+- **Data**: 2026-04-05
+- **Wersja**: ADRION 369 v4.0 (Master Orchestrator)
+- **Status**: ✅ Gotowa do wdrażania + Dokumentacja inwestorska
+- **Następna przegląd**: 2026-05-05

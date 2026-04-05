@@ -1,9 +1,11 @@
 """Quick validation of slim webhook_server."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "harmonia-dashboard"))
 
 from webhook_server import _router
+
 
 def test_router_routes_registered():
     routes = _router.list_routes()

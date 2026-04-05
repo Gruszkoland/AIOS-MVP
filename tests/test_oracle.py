@@ -1,27 +1,26 @@
 """
 Unit tests for arbitrage/oracle.py — Predykcyjna Wyrocznia AI (PROGRAMATOR #19/20)
 """
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 os.environ.setdefault("DB_PATH", ":memory:")
 
 from arbitrage.oracle import (
+    FIBONACCI_RATIOS,
+    FREQ_174_HZ,
+    FREQ_396_HZ,
+    FREQ_528_HZ,
+    OraclePrediction,
+    assign_solfeggio,
     classify_enneagram_node,
     detect_turning_point,
     fibonacci_levels,
     find_spiral_eye,
-    assign_solfeggio,
     oracle_predict,
     oracle_scan_products,
-    FIBONACCI_RATIOS,
-    FREQ_528_HZ,
-    FREQ_396_HZ,
-    FREQ_174_HZ,
 )
-from arbitrage.oracle import OraclePrediction
-
 
 # ── classify_enneagram_node ────────────────────────────────────────────────────
 

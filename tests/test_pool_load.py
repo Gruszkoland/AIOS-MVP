@@ -14,7 +14,6 @@ import pytest
 import arbitrage.database as db_mod
 from arbitrage.metrics import PoolMetrics, track_query
 
-
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
 @pytest.fixture()

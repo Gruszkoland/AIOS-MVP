@@ -1,14 +1,23 @@
 """Smoke test for memory event bus."""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "harmonia-dashboard"))
 
 from memory_events import (
-    get_event_bus, INTERACTION_LOGGED, FEEDBACK_RECEIVED,
-    PROMOTED_TO_LONG_TERM, JUDGE_WARNED, JUDGE_BLOCKED,
-    emit_interaction_logged, emit_feedback_received,
-    emit_promoted_to_long_term, emit_judge_warned, emit_judge_blocked,
+    FEEDBACK_RECEIVED,
+    INTERACTION_LOGGED,
+    JUDGE_BLOCKED,
+    JUDGE_WARNED,
+    PROMOTED_TO_LONG_TERM,
+    emit_feedback_received,
+    emit_interaction_logged,
+    emit_judge_blocked,
+    emit_judge_warned,
+    emit_promoted_to_long_term,
+    get_event_bus,
 )
+
 
 def test_event_bus_smoke():
     received = []

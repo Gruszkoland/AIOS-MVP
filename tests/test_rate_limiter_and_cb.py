@@ -8,7 +8,6 @@ import pytest
 from arbitrage.circuit_breaker import CircuitBreaker, CircuitBreakerOpen, all_statuses
 from arbitrage.rate_limiter import SlidingWindowRateLimiter
 
-
 # ── SlidingWindowRateLimiter ──────────────────────────────────────────────────
 
 

@@ -6,8 +6,8 @@ Weryfikuje:
   3. Tworzenie instancji i przepływ OODA
   4. Event bus integration
 """
-import sys
 import os
+import sys
 
 # Ensure harmonia-dashboard is on the path
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "harmonia-dashboard"))
@@ -32,7 +32,7 @@ def test_feedback_split_all():
     check("behavior.BehaviorLogger", BehaviorLogger is not None)
     check("behavior.Interaction", Interaction is not None)
 
-    from vera import VERAScorer, VERAScore
+    from vera import VERAScore, VERAScorer
     check("vera.VERAScorer", VERAScorer is not None)
     check("vera.VERAScore", VERAScore is not None)
 
@@ -47,9 +47,21 @@ def test_feedback_split_all():
     print("\n=== 2. Re-exports from feedback_engine ===")
 
     from feedback_engine import (
-        BehaviorLogger as BL2, VERAScorer as VS2,
-        Judge as J2, GoldenAnswerStore as GA2,
-        FeedbackLoop, get_feedback_loop, HAS_EVENT_BUS,
+        HAS_EVENT_BUS,
+        FeedbackLoop,
+        get_feedback_loop,
+    )
+    from feedback_engine import (
+        BehaviorLogger as BL2,
+    )
+    from feedback_engine import (
+        GoldenAnswerStore as GA2,
+    )
+    from feedback_engine import (
+        Judge as J2,
+    )
+    from feedback_engine import (
+        VERAScorer as VS2,
     )
     check("feedback_engine re-exports BehaviorLogger", BL2 is BehaviorLogger)
     check("feedback_engine re-exports VERAScorer", VS2 is VERAScorer)

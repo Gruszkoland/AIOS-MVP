@@ -1,24 +1,24 @@
 """
 Unit tests for arbitrage/mass_generator.py — Mass Generator v2.6 (PROGRAMATOR #14)
 """
-import sys
-import os
 import json
+import os
+import sys
+
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 os.environ.setdefault("DB_PATH", ":memory:")
 
 from arbitrage.mass_generator import (
-    slugify,
-    generate_seo_title,
-    generate_seo_description,
-    build_product_entry,
-    generate_manifest,
     MARKETS,
     MIN_STOCK_DEFAULT,
+    build_product_entry,
+    generate_manifest,
+    generate_seo_description,
+    generate_seo_title,
+    slugify,
 )
-
 
 # ── slugify ────────────────────────────────────────────────────────────────────
 

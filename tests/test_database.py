@@ -2,8 +2,9 @@
 Unit tests for arbitrage/database.py — SQLite ORM (13 tables)
 Uses in-memory SQLite to avoid touching the real DB.
 """
-import sys
 import os
+import sys
+
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))

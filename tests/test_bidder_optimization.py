@@ -1,9 +1,10 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 # Import modules from arbitrage
 from arbitrage.bidder import _generate_cover_letter
 from arbitrage.config import COVER_LETTER_SYSTEM
+
 
 class TestBidderPrompts(unittest.TestCase):
 
