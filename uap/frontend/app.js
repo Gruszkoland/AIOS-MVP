@@ -4,7 +4,7 @@
  * Phase 4: WebSocket Real-Time + JWT Auth
  */
 
-const API_BASE_URL = "http://localhost:8002/mapi/v1";
+const API_BASE_URL = "http://adrion-uap-backend:8002/mapi/v1";
 
 // ──────────────────────────────────────────────────────────────────────────
 // AUTHENTICATION & API UTILITIES
