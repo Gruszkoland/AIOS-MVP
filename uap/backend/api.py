@@ -43,7 +43,7 @@ logging.basicConfig(
 logger = logging.getLogger("adrion.uap.api")
 
 app = Flask(__name__)
-_CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "http://localhost:8003")
+_CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "*")  # Allow all origins for development
 CORS(app, origins=[_CORS_ORIGIN])
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
