@@ -633,6 +633,32 @@
       ],
       "problemMatcher": [],
       "group": "test"
+    },
+    {
+      "label": "📊 System Performance Monitor (Live)",
+      "type": "shell",
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoLogo",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/monitor_system.ps1",
+        "-RefreshInterval",
+        "5"
+      ],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
     }
   ],
   "inputs": [

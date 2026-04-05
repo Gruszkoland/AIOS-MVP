@@ -1,4 +1,5 @@
 # Raport Wdrażania: Kubernetes Full Stack Deployment
+
 **Data:** 2026-04-06 00:07 UTC  
 **Status:** ✅ DEPLOYMENT COMPLETE  
 **Namespace:** adrion-369  
@@ -9,8 +10,9 @@
 ## 📊 PODSUMOWANIE WDRAŻANIA
 
 ### Fazy Deploymentu
+
 1. ✅ **Namespace & RBAC** — Utworzona przestrzeń `adrion-369` z rolami bezpieczeństwa
-2. ✅ **Konfiguracja** — ConfigMaps i Secrets załadowane  
+2. ✅ **Konfiguracja** — ConfigMaps i Secrets załadowane
 3. ✅ **PostgreSQL** — StatefulSet z inicjalizacją schematu
 4. ✅ **Tier-1 Services** — Redis, Ollama, Promtail, Loki wdrożone
 5. ✅ **Core Services** — N8N, Vortex, Healer, Alert-Handler, API wdrożone
@@ -23,24 +25,26 @@
 ## 🎯 STATUS ZASOBÓW
 
 ### Running (✅ Operacyjne)
-| Pod | Status | IP | Replicas |
-|-----|--------|----|----|
-| alert-handler | Running | 10.1.0.28 | 1/1 |
-| api | Running | 10.1.0.26-27 | 2/2 |
-| healer | Running | 10.1.0.25 | 1/1 |
-| nginx (Ingress) | Running | 10.1.0.29-30 | 2/2 |
-| vortex | Running | 10.1.0.24 | 1/1 |
+
+| Pod             | Status  | IP           | Replicas |
+| --------------- | ------- | ------------ | -------- |
+| alert-handler   | Running | 10.1.0.28    | 1/1      |
+| api             | Running | 10.1.0.26-27 | 2/2      |
+| healer          | Running | 10.1.0.25    | 1/1      |
+| nginx (Ingress) | Running | 10.1.0.29-30 | 2/2      |
+| vortex          | Running | 10.1.0.24    | 1/1      |
 
 ### Pending (⏳ Startowanie/ograniczenia zasobów)
-| Pod | Reason | Action |
-|-----|--------|--------|
-| postgres-0 | PVC binding | Wait for initialization (first boot) |
-| grafana | Image pull | Normal, pulling from registry |
-| loki | Image pull | Normal, pulling from registry |
-| ollama | Image pull | Normal, pulling from registry (2.8GB) |
-| prometheus | PVC mount | Waiting for volume attachment |
-| promtail | Dependencies | Waiting for Loki readiness |
-| n8n | Dependencies | Waiting for PostgreSQL readiness |
+
+| Pod        | Reason       | Action                                |
+| ---------- | ------------ | ------------------------------------- |
+| postgres-0 | PVC binding  | Wait for initialization (first boot)  |
+| grafana    | Image pull   | Normal, pulling from registry         |
+| loki       | Image pull   | Normal, pulling from registry         |
+| ollama     | Image pull   | Normal, pulling from registry (2.8GB) |
+| prometheus | PVC mount    | Waiting for volume attachment         |
+| promtail   | Dependencies | Waiting for Loki readiness            |
+| n8n        | Dependencies | Waiting for PostgreSQL readiness      |
 
 **Note:** Pods w stanie Pending to NORMALNE zachowanie — jest to Docker Desktop z ograniczonymi zasobami
 
@@ -49,16 +53,19 @@
 ## 🔧 KONFIGURACJA WDRAŻANIA
 
 ### Services (10x)
+
 - **LoadBalancer (nginx):** localhost:80 (HTTP), localhost:443 (HTTPS)
 - **ClusterIP Services:** API (8001), Grafana (3000), Prometheus (9090), Loki (3100), N8N (5678)
 - **StatefulSet Service:** postgres (5432) — Single endpoint do bazy
 
 ### Networking
+
 - **Ingress Controller:** nginx (2 replicas)
 - **NetworkPolicy:** Default DENY + explicit allow rules
-- **Service Discovery:** DNS within cluster (*.svc.cluster.local)
+- **Service Discovery:** DNS within cluster (\*.svc.cluster.local)
 
 ### Storage
+
 - **PostgreSQL PVC:** 100Gi (postgres-pvc)
 - **Loki WAL PVC:** 20Gi (loki-wal-pvc)
 - **Loki Data PVC:** 50Gi (loki-data-pvc)
@@ -67,6 +74,7 @@
 - **Prometheus PVC:** 10Gi (prometheus-data-pvc)
 
 ### Resource Allocation
+
 - **API:** 1-2 CPU, 512Mi RAM
 - **Healer:** 500m CPU, 256Mi RAM
 - **Alert-Handler:** 500m CPU, 256Mi RAM
@@ -78,18 +86,18 @@
 
 ## 📈 DEPLOYMENT METRICS
 
-| Kategoria | Liczba |
-|-----------|--------|
-| **Namespaces** | 1 (adrion-369) |
-| **Deployments** | 9 |
-| **StatefulSets** | 1 (postgres) |
-| **Services** | 10 |
-| **ConfigMaps** | 6 |
-| **Secrets** | 4 |
-| **PVCs** | 6 |
-| **CronJobs** | 2 |
-| **Pods (Running)** | 5/14 |
-| **Pods (Pending)** | 9/14 |
+| Kategoria          | Liczba         |
+| ------------------ | -------------- |
+| **Namespaces**     | 1 (adrion-369) |
+| **Deployments**    | 9              |
+| **StatefulSets**   | 1 (postgres)   |
+| **Services**       | 10             |
+| **ConfigMaps**     | 6              |
+| **Secrets**        | 4              |
+| **PVCs**           | 6              |
+| **CronJobs**       | 2              |
+| **Pods (Running)** | 5/14           |
+| **Pods (Pending)** | 9/14           |
 
 ---
 
@@ -134,17 +142,20 @@ kubectl port-forward -n adrion-369 svc/ollama 11434:11434
 ## 🚀 NASTĘPNE KROKI
 
 ### Natychmiast (0-5 minut)
+
 1. Poczekać aż wszystkie pody przejdą w stan Running
 2. Sprawdzić inicjalizację PostgreSQL
 3. Walidować health checks
 
 ### Krótkoterminowy setup (5-30 minut)
+
 1. Zalogować się do Grafana i załadować dashboards
 2. Skonfigurować data sources (Prometheus, Loki)
 3. Sprawdzić N8N workflows execution
 4. Walidować API endpoints
 
 ### Production hardening (następna sesja)
+
 1. Wdrożyć persistent logging
 2. Skonfigurować Prometheus scraping rules
 3. Ustawić alert rules
@@ -154,32 +165,32 @@ kubectl port-forward -n adrion-369 svc/ollama 11434:11434
 
 ## 🔐 SECURITY STATUS
 
-| Aspekt | Status | Uwagi |
-|--------|--------|-------|
-| RBAC | ✅ Enabled | Service accounts per tier |
-| Network Policies | ✅ Active | Default DENY + explicit allow |
-| Secrets Encryption | ✅ Enabled | Via Kubernetes secrets |
-| Non-root Containers | ✅ Enforced | UID 1000+ |
-| Resource Limits | ✅ Set | Per deployment requests/limits |
-| Pod Security Policy | ⏳ Manual | Can be hardened further |
+| Aspekt              | Status      | Uwagi                          |
+| ------------------- | ----------- | ------------------------------ |
+| RBAC                | ✅ Enabled  | Service accounts per tier      |
+| Network Policies    | ✅ Active   | Default DENY + explicit allow  |
+| Secrets Encryption  | ✅ Enabled  | Via Kubernetes secrets         |
+| Non-root Containers | ✅ Enforced | UID 1000+                      |
+| Resource Limits     | ✅ Set      | Per deployment requests/limits |
+| Pod Security Policy | ⏳ Manual   | Can be hardened further        |
 
 ---
 
 ## 📝 KNOWN ISSUES & MITIGATIONS
 
-| Problem | Cause | Mitigation |
-|---------|-------|-----------|
-| Postgres Pending | First PVC init | Wait 5-10 min, check: `kubectl describe pvc postgres-pvc` |
-| Ollama Pending | Large image (~2.8GB) | Patient image pull, monitor: `kubectl logs -f ollama-*` |
-| Grafana Pending | Image pull backoff | Usually resolves after image caches |
-| High RAM usage | Docker Desktop limit | Allocate more RAM in Docker settings |
+| Problem          | Cause                | Mitigation                                                |
+| ---------------- | -------------------- | --------------------------------------------------------- |
+| Postgres Pending | First PVC init       | Wait 5-10 min, check: `kubectl describe pvc postgres-pvc` |
+| Ollama Pending   | Large image (~2.8GB) | Patient image pull, monitor: `kubectl logs -f ollama-*`   |
+| Grafana Pending  | Image pull backoff   | Usually resolves after image caches                       |
+| High RAM usage   | Docker Desktop limit | Allocate more RAM in Docker settings                      |
 
 ---
 
 ## 📋 MICRO-SUMMARY (9x3 Słowa)
 
 1. **Deployment sekwencja:** Namespace, Config, Postgres, Tier1
-2. **Core usługi:** API, Vortex, Healer, Alert-Handler  
+2. **Core usługi:** API, Vortex, Healer, Alert-Handler
 3. **Monitoring stack:** Prometheus, Grafana, Loki
 4. **Networking layer:** Nginx Ingress, LoadBalancer
 5. **Storage management:** 6 PVCs, persistent volumes
@@ -193,6 +204,7 @@ kubectl port-forward -n adrion-369 svc/ollama 11434:11434
 ## 🎯 DECYZJE ARCHITEKTURALNE
 
 ### Co Zadziałało Dobrze
+
 - ✅ Systematic 8-layer manifest structure
 - ✅ Proper dependency ordering (postgres → n8n)
 - ✅ ConfigMaps + Secrets separation
@@ -200,12 +212,15 @@ kubectl port-forward -n adrion-369 svc/ollama 11434:11434
 - ✅ Resource requests/limits properly set
 
 ### Co Wymaga Uwagi
+
 - ⚠️ Docker Desktop memory constraints
 - ⚠️ Large image pulls (Ollama 2.8GB)
 - ⚠️ PVC initialization time
 
 ### Decyzja Wdrożenia
+
 **Verdict:** ✅ **PRODUCTION READY** (with monitoring)
+
 - All manifests deployed successfully
 - Services operational and discoverable
 - Health checks configured
@@ -221,5 +236,5 @@ kubectl port-forward -n adrion-369 svc/ollama 11434:11434
 
 ---
 
-*Generated by ADRION 369 Master Orchestrator v4.0*  
-*Kubernetes Deployment Engine | Genesis Record System*
+_Generated by ADRION 369 Master Orchestrator v4.0_  
+_Kubernetes Deployment Engine | Genesis Record System_
