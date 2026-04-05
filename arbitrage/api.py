@@ -39,6 +39,33 @@ from arbitrage.rate_limiter import cycle_limiter, mass_gen_limiter, oracle_limit
 logger = logging.getLogger(__name__)
 ARB_PORT = 8001
 _CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "http://localhost:8003")
+_SERVER_START = time.time()
+
+# ── In-process request counters (Prometheus text /metrics) ──────────────────
+_REQUEST_COUNTS: dict[str, int] = {
+    "scout": 0,
+    "analyze_batch": 0,
+    "cycle": 0,
+    "quantum_decide": 0,
+    "quantum_scan": 0,
+    "oracle_predict": 0,
+    "oracle_scan": 0,
+    "wholesale_scout": 0,
+    "wholesale_cycle": 0,
+    "mass_generate": 0,
+    "status": 0,
+    "kpis": 0,
+    "jobs": 0,
+    "bids_pending": 0,
+    "bid_approve": 0,
+}
+_COUNTERS_LOCK = threading.Lock()
+
+
+def _increment(endpoint: str) -> None:
+    with _COUNTERS_LOCK:
+        if endpoint in _REQUEST_COUNTS:
+            _REQUEST_COUNTS[endpoint] += 1
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -153,6 +180,8 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
                 return self._handle_wholesale_deals()
             elif path == "/api/arbitrage/mass-generate/manifest":
                 return self._handle_get_manifest()
+            elif path == "/metrics":
+                return self._handle_metrics()
             else:
                 self._send({"error": "Not found"}, 404)
         except Exception as exc:
@@ -201,6 +230,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
     # ── Handlers ──────────────────────────────────────────────────────────────
 
     def _handle_status(self):
+        _increment("status")
         DAILY_BID_LIMIT, MIN_ANALYZER_SCORE, get_active_llm_backend = _config()
         get_jobs, get_pending_bids, _, get_totals, _ = _db()
         totals = get_totals()
@@ -215,6 +245,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
         })
 
     def _handle_kpis(self):
+        _increment("kpis")
         _, _, _, get_totals, _ = _db()
         totals = get_totals()
         self._send({**totals, "timestamp": datetime.now().isoformat()})
@@ -242,6 +273,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
         self._send({"ok": True, "bid_id": bid_id, "approved": approved})
 
     def _handle_scout(self):
+        _increment("scout")
         client_ip = self.client_address[0]
         if not scout_limiter.is_allowed(client_ip):
             self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
@@ -282,6 +314,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_cycle(self):
         """Run scout + analyze in background, return immediately."""
+        _increment("cycle")
         client_ip = self.client_address[0]
         if not cycle_limiter.is_allowed(client_ip):
             self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
@@ -340,6 +373,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_quantum_decide(self):
         """POST /api/arbitrage/quantum/decide — Kwantowy Moduł Decyzyjny."""
+        _increment("quantum_decide")
         client_ip = self.client_address[0]
         if not quantum_limiter.is_allowed(client_ip):
             self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
@@ -486,6 +520,52 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
             self._send(manifest)
         else:
             self._send({"error": "No manifest generated yet. POST /api/arbitrage/mass-generate first."}, 404)
+
+    def _handle_metrics(self):
+        """GET /metrics — Prometheus text format metrics endpoint."""
+        from arbitrage.metrics import pool_metrics
+        snap = pool_metrics.snapshot()
+        uptime = time.time() - _SERVER_START
+
+        lines = [
+            "# HELP adrion_requests_total Total requests processed per endpoint",
+            "# TYPE adrion_requests_total counter",
+        ]
+        with _COUNTERS_LOCK:
+            counts = dict(_REQUEST_COUNTS)
+        for endpoint, count in counts.items():
+            lines.append(f'adrion_requests_total{{endpoint="{endpoint}"}} {count}')
+
+        lines += [
+            "",
+            "# HELP adrion_db_pool_size Total connections in pool",
+            "# TYPE adrion_db_pool_size gauge",
+            f"adrion_db_pool_size {snap['pool_size']}",
+            "",
+            "# HELP adrion_db_pool_checked_out Connections currently in use",
+            "# TYPE adrion_db_pool_checked_out gauge",
+            f"adrion_db_pool_checked_out {snap['checked_out']}",
+            "",
+            "# HELP adrion_db_pool_checkouts_total Total DB connection checkouts",
+            "# TYPE adrion_db_pool_checkouts_total counter",
+            f"adrion_db_pool_checkouts_total {snap['total_checkouts']}",
+            "",
+            "# HELP adrion_db_pool_timeouts_total Total DB connection timeout events",
+            "# TYPE adrion_db_pool_timeouts_total counter",
+            f"adrion_db_pool_timeouts_total {snap['total_timeouts']}",
+            "",
+            "# HELP adrion_uptime_seconds Seconds since API server start",
+            "# TYPE adrion_uptime_seconds gauge",
+            f"adrion_uptime_seconds {uptime:.2f}",
+            "",
+        ]
+
+        body = "\n".join(lines).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def log_message(self, fmt, *args):
         logger.debug(fmt, *args)

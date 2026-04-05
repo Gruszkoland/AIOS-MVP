@@ -102,18 +102,100 @@ class AdrionViewProvider implements vscode.WebviewViewProvider {
     <link href="${styleMainUri}" rel="stylesheet">
     <title>ADRION 369 Control Panel</title>
     <style>
-        body { padding: 10px; font-family: var(--vscode-font-family); color: var(--vscode-foreground); background-color: var(--vscode-sideBar-background); }
-        .btn { width: 100%; padding: 8px; margin-bottom: 8px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: none; text-align: left; border-radius: 2px; }
-        .btn:hover { background: var(--vscode-button-hoverBackground); }
-        .section-title { font-size: 0.8em; font-weight: bold; margin: 15px 0 8px 0; color: var(--vscode-descriptionForeground); text-transform: uppercase; }
-        .status-header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--vscode-divider); padding-bottom: 10px; }
-        .logo { font-size: 1.5em; font-weight: 900; letter-spacing: 2px; color: #00FFCC; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            padding: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: #2C3E50;
+            background-color: #F5F5F5;
+            line-height: 1.5;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0078D4 0%, #0066CC 100%);
+            color: #FFFFFF;
+            border: 1px solid #0066CC;
+            text-align: left;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.95em;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
+            box-shadow: 0 2px 6px rgba(0, 102, 204, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn.success:hover { background: linear-gradient(135deg, #27AE60 0%, #229954 100%); }
+        .btn.danger:hover { background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%); }
+
+        .section-title {
+            font-size: 0.75em;
+            font-weight: 700;
+            margin: 18px 0 10px 0;
+            color: #1E3A5F;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-left: 3px solid #0078D4;
+            padding-left: 8px;
+        }
+
+        .status-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0078D4;
+            padding-bottom: 12px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
+            border-radius: 4px;
+            padding: 12px;
+        }
+
+        .logo {
+            font-size: 1.6em;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #0078D4 0%, #0066CC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #E8F4F8;
+            color: #0078D4;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <div class="status-header">
         <div class="logo">ADRION 369</div>
-        <small>Swarm Intelligence v2.0</small>
+        <div class="subtitle">Swarm Intelligence v2.0</div>
+        <div class="status-badge">🟢 Production Ready</div>
     </div>
 
     <div class="section-title">🐳 Kubernetes (Local)</div>

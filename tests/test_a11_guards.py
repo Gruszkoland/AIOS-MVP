@@ -31,50 +31,66 @@ def test_sliding_window_rate_limiter_blocks_after_limit(monkeypatch):
 
 def test_circuit_breaker_opens_after_threshold_and_recovers(monkeypatch):
     """Breaker opens after N failures and closes after recovery + success."""
-    from arbitrage.quantum import _CircuitBreaker
-    import arbitrage.quantum as quantum_module
+    from arbitrage.circuit_breaker import CircuitBreaker, CircuitBreakerOpen
+    import arbitrage.circuit_breaker as cb_module
 
     now = {"t": 2000.0}
 
     def _fake_monotonic():
         return now["t"]
 
-    monkeypatch.setattr(quantum_module.time, "monotonic", _fake_monotonic)
+    monkeypatch.setattr(cb_module.time, "monotonic", _fake_monotonic)
 
-    breaker = _CircuitBreaker(failure_threshold=3, recovery_timeout=5.0)
+    breaker = CircuitBreaker(name="test", failure_threshold=3, recovery_timeout=5.0,
+                             success_threshold=1)
 
-    assert breaker.is_open() is False
-    breaker.record_failure()
-    breaker.record_failure()
-    assert breaker.is_open() is False
+    def _fail():
+        raise RuntimeError("downstream error")
 
-    breaker.record_failure()
-    assert breaker.is_open() is True
+    def _ok():
+        return "ok"
 
-    now["t"] += 5.1
-    # After recovery timeout, breaker allows probing (half-open behavior).
-    assert breaker.is_open() is False
+    assert breaker.state == "CLOSED"
+    try: breaker.call(_fail)
+    except RuntimeError: pass
+    try: breaker.call(_fail)
+    except RuntimeError: pass
+    assert breaker.state == "CLOSED"
 
-    breaker.record_success()
-    assert breaker.is_open() is False
+    try: breaker.call(_fail)
+    except RuntimeError: pass
+    assert breaker.state == "OPEN"
+
+    now["t"] += 10.1  # backoff doubles on OPEN transition: 5.0 -> 10.0
+    # After recovery timeout, breaker enters HALF_OPEN — allows one probe.
+    assert breaker.state == "HALF_OPEN"
+
+    breaker.call(_ok)
+    assert breaker.state == "CLOSED"
 
 
 def test_circuit_breaker_stays_open_within_recovery_window(monkeypatch):
     """Breaker remains open until configured recovery timeout elapses."""
-    from arbitrage.quantum import _CircuitBreaker
-    import arbitrage.quantum as quantum_module
+    from arbitrage.circuit_breaker import CircuitBreaker, CircuitBreakerOpen
+    import arbitrage.circuit_breaker as cb_module
 
     now = {"t": 3000.0}
 
     def _fake_monotonic():
         return now["t"]
 
-    monkeypatch.setattr(quantum_module.time, "monotonic", _fake_monotonic)
+    monkeypatch.setattr(cb_module.time, "monotonic", _fake_monotonic)
 
-    breaker = _CircuitBreaker(failure_threshold=2, recovery_timeout=8.0)
-    breaker.record_failure()
-    breaker.record_failure()
+    breaker = CircuitBreaker(name="test2", failure_threshold=2, recovery_timeout=8.0)
 
-    assert breaker.is_open() is True
+    def _fail():
+        raise RuntimeError("err")
+
+    try: breaker.call(_fail)
+    except RuntimeError: pass
+    try: breaker.call(_fail)
+    except RuntimeError: pass
+
+    assert breaker.state == "OPEN"
     now["t"] += 7.9
-    assert breaker.is_open() is True
+    assert breaker.state == "OPEN"

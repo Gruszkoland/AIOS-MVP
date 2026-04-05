@@ -1,3 +1,5 @@
+> Canonical definitions: see GUARDIAN_LAWS_CANONICAL.json
+
 # The Nine Governing Laws of ADRION 369
 ## Principles That Guide All Personas
 

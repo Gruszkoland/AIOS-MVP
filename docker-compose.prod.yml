@@ -26,6 +26,11 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: '0.5'
 
   adrion-dashboard:
     build:
@@ -64,6 +69,11 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: '0.25'
 
   loki:
     image: grafana/loki:3.1.1
@@ -81,6 +91,11 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: '0.5'
 
   promtail:
     image: grafana/promtail:3.1.1
@@ -118,6 +133,11 @@ services:
       alert-sink:
         condition: service_healthy
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: '0.5'
 
   alert-sink:
     image: mendhak/http-https-echo:35
@@ -199,6 +219,11 @@ services:
         max-size: "10m"
         max-file: "3"
         tag: "{{.Name}}"
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+          cpus: '0.25'
 
   # ── UAP Master Orchestrator API ───────────────────────────────────────────
   adrion-uap:
@@ -230,6 +255,27 @@ services:
         max-size: "10m"
         max-file: "3"
         tag: "{{.Name}}"
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: '0.5'
+
+  # ── Prometheus Metrics Collector ──────────────────────────────────────────
+  adrion-prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: adrion-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9090/-/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
 volumes:
   loki-data:

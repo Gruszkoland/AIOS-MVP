@@ -16,8 +16,6 @@ Mechanizmy:
 """
 import logging
 import os
-import threading
-import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal
@@ -25,6 +23,7 @@ from typing import Literal
 import requests
 
 from .analyzer import calculate_market_resonance
+from .circuit_breaker import CircuitBreaker, CircuitBreakerOpen
 from .config import QUANTUM_SCAN_CHANNELS
 
 logger = logging.getLogger("adrion.quantum")
@@ -73,53 +72,11 @@ def _env_positive_float(name: str, default: float) -> float:
 
 # ═══════════════════════════════════════════════════════════════
 # CIRCUIT BREAKER — G8/A-11 fix: ochrona przed avalanche failover
+# Uses shared CircuitBreaker from arbitrage.circuit_breaker
 # ═══════════════════════════════════════════════════════════════
 
-class _CircuitBreaker:
-    """
-    Prosty Circuit Breaker dla wywołań HTTP do Go Sentinel.
-
-    Stany:
-      CLOSED     — normalny ruch, zapytania przechodzą.
-      OPEN       — zbyt wiele błędów; zapytania pomijane (fallback).
-      HALF-OPEN  — po recovery_timeout jedna próba; jeśli OK → CLOSED.
-    """
-
-    def __init__(self, failure_threshold: int = 5, recovery_timeout: float = 30.0) -> None:
-        self._threshold = failure_threshold
-        self._recovery = recovery_timeout
-        self._failures = 0
-        self._opened_at: float | None = None
-        self._lock = threading.Lock()
-
-    def is_open(self) -> bool:
-        with self._lock:
-            if self._opened_at is None:
-                return False
-            elapsed = time.monotonic() - self._opened_at
-            if elapsed >= self._recovery:
-                # Half-open: zezwól na jedną próbę (nie resetuj tutaj)
-                return False
-            return True
-
-    def record_success(self) -> None:
-        with self._lock:
-            self._failures = 0
-            self._opened_at = None
-
-    def record_failure(self) -> None:
-        with self._lock:
-            self._failures += 1
-            if self._failures >= self._threshold and self._opened_at is None:
-                self._opened_at = time.monotonic()
-                logger.warning(
-                    "Circuit Breaker OPEN — Go Sentinel offline (%d failures). "
-                    "Fallback aktywny przez %.0fs.",
-                    self._failures, self._recovery,
-                )
-
-
-_sentinel_breaker = _CircuitBreaker(
+_sentinel_breaker = CircuitBreaker(
+    name="sentinel",
     failure_threshold=_env_positive_int("CB_FAILURE_THRESHOLD", 5),
     recovery_timeout=_env_positive_float("CB_RECOVERY_TIMEOUT_SECONDS", 30.0),
 )
@@ -171,38 +128,43 @@ def quantum_decide(
     use_sentinel = os.getenv("USE_SENTINEL_QUANTUM", "0") == "1"
     vortex_url = os.getenv("VORTEX_API_URL", "http://localhost:1740/decide")
 
-    if use_sentinel and not _sentinel_breaker.is_open():
+    if use_sentinel:
         try:
-            # 174ms timeout dla 174Hz synchronizacji
-            resp = requests.post(
-                vortex_url,
-                json={
-                    "price_a": price_source,
-                    "price_b": price_target,
-                    "asset_a": "WHOLESALE",
-                    "asset_b": "RETAIL",
-                },
-                timeout=0.174,
-            )
-            if resp.status_code == 200:
+            def _call_sentinel():
+                # 174ms timeout dla 174Hz synchronizacji
+                resp = requests.post(
+                    vortex_url,
+                    json={
+                        "price_a": price_source,
+                        "price_b": price_target,
+                        "asset_a": "WHOLESALE",
+                        "asset_b": "RETAIL",
+                    },
+                    timeout=0.174,
+                )
+                if resp.status_code != 200:
+                    raise ConnectionError(f"Sentinel HTTP {resp.status_code}")
                 data = resp.json()
-                if all(k in data for k in ("state", "margin_pct", "action")):
-                    _sentinel_breaker.record_success()
-                    return QuantumDecision(
-                        state=data.get("state", 0),
-                        state_label=data.get("state_label", "negation"),
-                        margin_pct=data.get("margin_pct", 0.0),
-                        resonance=data.get("resonance", 0),
-                        is_369=data.get("is_singularity", False),
-                        vortex_pass=data.get("vortex_pass", False),
-                        channel_id=channel_id,
-                        action=data.get("action", "REJECT"),
-                        confidence=data.get("confidence", 0.0),
-                    )
-            _sentinel_breaker.record_failure()
+                if not all(k in data for k in ("state", "margin_pct", "action")):
+                    raise ValueError("Sentinel response missing required fields")
+                return data
+
+            data = _sentinel_breaker.call(_call_sentinel)
+            return QuantumDecision(
+                state=data.get("state", 0),
+                state_label=data.get("state_label", "negation"),
+                margin_pct=data.get("margin_pct", 0.0),
+                resonance=data.get("resonance", 0),
+                is_369=data.get("is_singularity", False),
+                vortex_pass=data.get("vortex_pass", False),
+                channel_id=channel_id,
+                action=data.get("action", "REJECT"),
+                confidence=data.get("confidence", 0.0),
+            )
+        except CircuitBreakerOpen:
+            logger.debug("Sentinel circuit OPEN — using Python fallback")
         except Exception as e:
-            _sentinel_breaker.record_failure()
-            logger.debug(f"Sentinel (Go) unavailable, using Python fallback: {e}")
+            logger.debug("Sentinel (Go) unavailable, using Python fallback: %s", e)
 
     # ── FALLBACK LOKALNY (Python) ──
     if price_source <= 0 or price_target <= 0 or price_target <= price_source:

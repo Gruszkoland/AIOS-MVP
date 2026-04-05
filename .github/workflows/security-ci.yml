@@ -23,6 +23,7 @@ jobs:
         run: pip install bandit[toml]
 
       - name: Bandit SAST scan
+        continue-on-error: false
         run: |
           bandit -r arbitrage/ \
             -f json -o bandit-report.json \
@@ -50,6 +51,7 @@ jobs:
         run: pip install safety
 
       - name: Safety dependency check
+        continue-on-error: false
         run: |
           pip install -r requirements-arbitrage.txt
           safety check --json -o safety-report.json

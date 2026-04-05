@@ -32,7 +32,7 @@ jobs:
         run: |
           python -m pytest tests/ \
             --cov=arbitrage \
-            --cov-fail-under=37 \
+            --cov-fail-under=65 \
             --ignore=tests/security_simulation.py \
             -m "not e2e and not runtime" \
             -q
