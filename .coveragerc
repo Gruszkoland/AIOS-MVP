@@ -7,7 +7,7 @@ omit =
     arbitrage/__init__.py
 
 [report]
-fail_under = 37
+fail_under = 65
 skip_covered = False
 precision = 1
 exclude_lines =

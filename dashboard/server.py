@@ -29,11 +29,9 @@ import logging
 import os
 import pathlib
 import subprocess
-import sys
-import threading
 import time
-import urllib.request
 import urllib.parse
+import urllib.request
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
 

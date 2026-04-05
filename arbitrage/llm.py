@@ -3,9 +3,9 @@ LLM abstraction layer — tries Ollama (local) first, falls back to OpenRouter.
 Provides a single `chat(prompt)` function for all agents.
 """
 
+import hashlib
 import json
 import logging
-import hashlib
 import os
 import re
 import time

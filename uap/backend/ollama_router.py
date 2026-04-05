@@ -6,10 +6,10 @@ Replaces keyword-based routing with LLM-powered decision
 """
 import os
 import sys
-import json
-import requests
-from typing import Optional, Tuple
 from pathlib import Path
+from typing import Optional, Tuple
+
+import requests
 
 sys.path.insert(0, str(Path(__file__).parent))
 from db import get_db
