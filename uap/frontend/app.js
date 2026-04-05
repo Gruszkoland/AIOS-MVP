@@ -1367,6 +1367,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadHealerDashboard();
   initializeChat();
   initializeChatMain();
+  initializeTasksPanel();
+  loadAgentsList();
 }, { once: true });
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -1566,5 +1568,311 @@ function updateBubblePreview(text) {
   const preview = document.getElementById("bubble-preview");
   if (preview) {
     preview.textContent = text.substring(0, 50) + (text.length > 50 ? "..." : "");
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// ACTIVE TASKS PANEL (RIGHT SIDE)
+// ──────────────────────────────────────────────────────────────────────────
+
+function initializeTasksPanel() {
+  updateActiveTasksList();
+  // Refresh tasks every 5 seconds
+  setInterval(updateActiveTasksList, 5000);
+}
+
+function updateActiveTasksList() {
+  // Mock tasks data
+  const tasks = [
+    {
+      id: "task-001",
+      name: "Deploy Backend to Prod",
+      agent: "Architect",
+      status: "running",
+      progress: 65,
+      eta: "2min",
+    },
+    {
+      id: "task-002",
+      name: "Database Migration",
+      agent: "SAP",
+      status: "running",
+      progress: 40,
+      eta: "5min",
+    },
+    {
+      id: "task-003",
+      name: "Security Audit",
+      agent: "Auditor",
+      status: "pending",
+      progress: 0,
+      eta: "pending",
+    },
+    {
+      id: "task-004",
+      name: "Health Check",
+      agent: "Sentinel",
+      status: "completed",
+      progress: 100,
+      eta: "done",
+    },
+  ];
+
+  const container = document.getElementById("active-tasks-list");
+  if (!container) return;
+
+  // Update stats
+  const completed = tasks.filter((t) => t.status === "completed").length;
+  const pending = tasks.filter((t) => t.status === "pending").length;
+  const failed = tasks.filter((t) => t.status === "failed").length;
+
+  document.getElementById("stat-completed-tasks").textContent = completed;
+  document.getElementById("stat-pending-tasks").textContent = pending;
+  document.getElementById("stat-failed-tasks").textContent = failed;
+
+  // Render tasks
+  if (tasks.length === 0) {
+    container.innerHTML =
+      '<p class="text-muted" style="text-align: center; padding: 20px 0;">Brak aktywnych zadań</p>';
+    return;
+  }
+
+  container.innerHTML = tasks
+    .map(
+      (task) => `
+        <div class="task-item">
+            <div class="task-item-header">
+                <span class="task-item-title">${task.name}</span>
+                <span class="task-item-status ${task.status}">${task.status.toUpperCase()}</span>
+            </div>
+            <div class="task-progress-container">
+                <div class="task-progress-bar">
+                    <div class="task-progress-fill" style="width: ${task.progress}%"></div>
+                </div>
+                <div class="task-progress-text">
+                    <span>${task.progress}%</span>
+                    <span>${task.eta}</span>
+                </div>
+            </div>
+            <div class="task-item-meta">
+                <span class="task-item-agent">${task.agent}</span>
+                <span style="margin-left: auto;">ID: ${task.id.substring(0, 8)}</span>
+            </div>
+        </div>
+    `
+    )
+    .join("");
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// AGENT MANAGER
+// ──────────────────────────────────────────────────────────────────────────
+
+let agentsList = [
+  {
+    id: "agent-1",
+    name: "Librarian",
+    role: "Knowledge Management",
+    personality:
+      "Organizowany, precyzyjny, obserwator. Gromadzi i kataloguje wszystkie informacje.",
+    description:
+      "Odpowiedzialny za przechowywanie, wyszukiwanie i organizację wiedzy. Zarządza Genesis Record.",
+    trustScore: 0.95,
+    capability: "expert",
+    skills: ["documentation", "knowledge-base", "archival", "search"],
+    active: true,
+  },
+  {
+    id: "agent-2",
+    name: "Architect",
+    role: "System Architecture",
+    personality:
+      "Visionarist, strategiczny, planuje na daleką przyszłość. Myśli w systemach.",
+    description:
+      "Projektuje architekturę systemu, planuje skalowanie, definiuje interfejsy agentów.",
+    trustScore: 0.88,
+    capability: "expert",
+    skills: ["design", "scaling", "orchestration", "optimization"],
+    active: true,
+  },
+  {
+    id: "agent-3",
+    name: "Auditor",
+    role: "Risk & Compliance",
+    personality:
+      "Skrupulatny, konserwatywny, skupiony na zagrożeniach. Zawsze znajduje błędy.",
+    description:
+      "Sprawdza zgodność z Guardian Laws, identyfikuje ryzyka bezpieczeństwa.",
+    trustScore: 0.92,
+    capability: "expert",
+    skills: ["audit", "compliance", "risk-assessment", "threat-detection"],
+    active: true,
+  },
+  {
+    id: "agent-4",
+    name: "Sentinel",
+    role: "Real-Time Monitoring",
+    personality:
+      "Czujny, reaktywny, zawsze gotów do działania. Nigdy nie śpi.",
+    description:
+      "Monitoruje system w real-time, reaguje na incydenty, aktywuje tryb kryzysowy.",
+    trustScore: 0.9,
+    capability: "expert",
+    skills: ["monitoring", "alerting", "incident-response", "crisis-mode"],
+    active: true,
+  },
+];
+
+let editingAgentId = null;
+
+function loadAgentsList() {
+  const container = document.getElementById("agents-list-container");
+  if (!container) return;
+
+  container.innerHTML = agentsList
+    .map(
+      (agent) => `
+        <div class="col-md-6 mb-4">
+            <div class="card" style="border-left: 4px solid ${agent.active ? "#0078D4" : "#999"};">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <h5 class="card-title" style="margin: 0;">${agent.name}</h5>
+                        <span style="background: ${agent.active ? "#D4EDDA" : "#F8D7DA"}; color: ${agent.active ? "#27AE60" : "#E74C3C"}; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                            ${agent.active ? "AKTYWNY" : "NIEAKTYWNY"}
+                        </span>
+                    </div>
+
+                    <p style="color: #0078D4; font-weight: 600; margin: 5px 0; font-size: 0.9rem;">${agent.role}</p>
+
+                    <p style="font-size: 0.9rem; color: #666; margin: 8px 0; font-style: italic;">
+                        <strong>Osobowość:</strong> ${agent.personality}
+                    </p>
+
+                    <p style="font-size: 0.85rem; color: #555; margin: 8px 0;">
+                        ${agent.description}
+                    </p>
+
+                    <div style="margin: 10px 0; display: flex; gap: 8px; flex-wrap: wrap;">
+                        ${agent.skills
+                          .map(
+                            (skill) =>
+                              `<span style="background: #E8F4F8; color: #0078D4; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem;">${skill}</span>`
+                          )
+                          .join("")}
+                    </div>
+
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.85rem;">
+                            <strong>Trust Score:</strong>
+                            <span style="color: #0078D4; font-weight: 700;">${(agent.trustScore * 100).toFixed(0)}%</span>
+                        </span>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editAgent('${agent.id}')">
+                                <i class="fas fa-edit"></i> Edytuj
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAgent('${agent.id}')">
+                                <i class="fas fa-trash"></i> Usuń
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+    )
+    .join("");
+}
+
+function openCreateAgentModal() {
+  editingAgentId = null;
+  document.getElementById("agentForm").reset();
+  document.getElementById("agentModalTitle").textContent = "Utwórz Nowego Agenta";
+  document.getElementById("agent-name").value = "";
+  document.getElementById("agent-trust-score").value = 0.8;
+  document.getElementById("agent-active").checked = true;
+
+  const modal = new bootstrap.Modal(document.getElementById("agentModal"));
+  modal.show();
+}
+
+function editAgent(agentId) {
+  const agent = agentsList.find((a) => a.id === agentId);
+  if (!agent) return;
+
+  editingAgentId = agentId;
+  document.getElementById("agentModalTitle").textContent = `Edytuj Agenta: ${agent.name}`;
+  document.getElementById("agent-name").value = agent.name;
+  document.getElementById("agent-role").value = agent.role;
+  document.getElementById("agent-personality").value = agent.personality;
+  document.getElementById("agent-description").value = agent.description;
+  document.getElementById("agent-trust-score").value = agent.trustScore;
+  document.getElementById("agent-capability-level").value = agent.capability;
+  document.getElementById("agent-skills").value = agent.skills.join(", ");
+  document.getElementById("agent-active").checked = agent.active;
+
+  const modal = new bootstrap.Modal(document.getElementById("agentModal"));
+  modal.show();
+}
+
+function saveAgent() {
+  const name = document.getElementById("agent-name").value.trim();
+  const role = document.getElementById("agent-role").value.trim();
+  const personality = document.getElementById("agent-personality").value.trim();
+  const description = document.getElementById("agent-description").value.trim();
+  const trustScore = parseFloat(
+    document.getElementById("agent-trust-score").value
+  );
+  const capability = document.getElementById("agent-capability-level").value;
+  const skills = document
+    .getElementById("agent-skills")
+    .value.split(",")
+    .map((s) => s.trim());
+  const active = document.getElementById("agent-active").checked;
+
+  if (!name || !role || !personality || !description) {
+    showAlert("⚠️ Wszystkie pola są wymagane", "warning");
+    return;
+  }
+
+  if (editingAgentId) {
+    // Update existing agent
+    const agent = agentsList.find((a) => a.id === editingAgentId);
+    if (agent) {
+      agent.name = name;
+      agent.role = role;
+      agent.personality = personality;
+      agent.description = description;
+      agent.trustScore = trustScore;
+      agent.capability = capability;
+      agent.skills = skills;
+      agent.active = active;
+    }
+    showAlert(`✅ Agent ${name} zaktualizowany`, "success");
+  } else {
+    // Create new agent
+    const newAgent = {
+      id: `agent-${agentsList.length + 1}`,
+      name,
+      role,
+      personality,
+      description,
+      trustScore,
+      capability,
+      skills,
+      active,
+    };
+    agentsList.push(newAgent);
+    showAlert(`✅ Agent ${name} utworzony`, "success");
+  }
+
+  loadAgentsList();
+  bootstrap.Modal.getInstance(document.getElementById("agentModal")).hide();
+}
+
+function deleteAgent(agentId) {
+  if (confirm("Czy na pewno chcesz usunąć tego agenta?")) {
+    agentsList = agentsList.filter((a) => a.id !== agentId);
+    showAlert("✅ Agent usunięty", "success");
+    loadAgentsList();
   }
 }
