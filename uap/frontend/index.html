@@ -556,6 +556,13 @@
             gap: 20px;
         }
 
+        /* TASKS PANEL (RIGHT 50% - NEW) */
+        .tasks-panel-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
         .metrics-card {
             background: var(--white-bg);
             border: 1px solid var(--border-light);
@@ -602,6 +609,103 @@
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        /* TASK ITEM STYLING */
+        .task-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            animation: slideInLeft 0.3s ease-out;
+        }
+
+        .task-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .task-item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .task-item-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .task-item-status.pending {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .task-item-status.running {
+            background: #E7F3FF;
+            color: #0078D4;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        .task-item-status.completed {
+            background: #D4EDDA;
+            color: #27AE60;
+        }
+
+        .task-item-status.failed {
+            background: #F8D7DA;
+            color: #E74C3C;
+        }
+
+        .task-progress-container {
+            margin-bottom: 6px;
+        }
+
+        .task-progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .task-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0078D4 0%, #0066CC 100%);
+            transition: width 0.4s ease-out;
+            border-radius: 3px;
+        }
+
+        .task-progress-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .task-item-meta {
+            display: flex;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .task-item-agent {
+            display: inline-block;
+            background: rgba(0, 120, 212, 0.1);
+            padding: 3px 6px;
+            border-radius: 3px;
+            color: #0078D4;
         }
 
         /* MINIMALIZOWANA BUBLECZKA CHATU */
@@ -698,6 +802,33 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* AGENT CARDS STYLING */
+        .agent-card {
+            border-left: 4px solid #0078D4;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 120, 212, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .agent-card.inactive {
+            border-left-color: #999;
+            opacity: 0.7;
+        }
+
+        .agent-skill-badge {
+            display: inline-block;
+            background: #E8F4F8;
+            color: #0078D4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
     </style>
 </head>
 <body>
@@ -718,7 +849,6 @@
     <!-- MAIN CONTAINER -->
     <div class="main-container container-fluid" style="margin-top: 80px;">
 
-        <!-- TABS NAVIGATION -->
         <ul class="nav nav-tabs mb-4" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="control-hq-tab" data-bs-toggle="tab" data-bs-target="#control-hq" type="button" role="tab">
@@ -728,6 +858,11 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="delegator-tab" data-bs-toggle="tab" data-bs-target="#delegator" type="button" role="tab">
                     <i class="fas fa-paper-plane me-2"></i>Agent Delegator
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="agents-tab" data-bs-toggle="tab" data-bs-target="#agents" type="button" role="tab">
+                    <i class="fas fa-robot me-2"></i>Agent Manager
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -776,72 +911,65 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT PANEL: SYSTEM METRICS (50%) -->
-                    <div class="metrics-panel-main">
-
-                        <!-- Trinity Scores Card -->
+                    <!-- RIGHT PANEL: ACTIVE TASKS (50%) -->
+                    <div class="tasks-panel-main">
                         <div class="metrics-card">
                             <div class="metrics-card-title">
-                                <i class="fas fa-star me-2" style="color: var(--primary-blue);"></i>Trinity Analysis
+                                <i class="fas fa-tasks me-2" style="color: var(--primary-blue);"></i>Bieżące Zadania
+                            </div>
+                            <div id="active-tasks-list" style="font-size: 0.9rem;">
+                                <p class="text-muted" style="text-align: center; padding: 20px 0;">Brak aktywnych zadań</p>
+                            </div>
+                        </div>
+
+                        <!-- Task Stats -->
+                        <div class="metrics-card">
+                            <div class="metrics-card-title">
+                                <i class="fas fa-chart-pie me-2" style="color: var(--success-color);"></i>Statystyka
                             </div>
                             <div class="metrics-grid">
                                 <div class="metric-item">
-                                    <div class="metric-value" id="trinity-material-card">0.00</div>
-                                    <div class="metric-label">Material</div>
+                                    <div class="metric-value" id="stat-completed-tasks">0</div>
+                                    <div class="metric-label">Ukończone</div>
                                 </div>
                                 <div class="metric-item">
-                                    <div class="metric-value" id="trinity-intellectual-card">0.00</div>
-                                    <div class="metric-label">Intellectual</div>
+                                    <div class="metric-value" id="stat-pending-tasks">0</div>
+                                    <div class="metric-label">W Toku</div>
                                 </div>
                                 <div class="metric-item">
-                                    <div class="metric-value" id="trinity-essential-card">0.00</div>
-                                    <div class="metric-label">Essential</div>
-                                </div>
-                                <div class="metric-item">
-                                    <div class="metric-value" id="trinity-overall-card">0.00</div>
-                                    <div class="metric-label">Overall</div>
+                                    <div class="metric-value" id="stat-failed-tasks">0</div>
+                                    <div class="metric-label">Błędy</div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- System Arousal & Real-Time Stats -->
-                        <div class="metrics-card">
-                            <div class="metrics-card-title">
-                                <i class="fas fa-fire me-2" style="color: var(--warning-color);"></i>System Status
-                            </div>
-                            <div class="arousal-indicator">
-                                <div class="arousal-bar">
-                                    <div id="arousal-bar-fill-main" class="arousal-bar-fill low" style="width: 33%;"></div>
-                                </div>
-                                <span id="arousal-level-main" class="arousal-value">0.50</span>
-                            </div>
-                            <small style="color: var(--text-secondary); display: block; margin-top: 8px;">
-                                <i class="fas fa-info-circle me-1"></i>Crisis mode: Arousal > 0.7
-                            </small>
-                            <div class="metrics-grid" style="margin-top: 12px;">
-                                <div class="metric-item">
-                                    <div class="metric-value" id="stat-tasks-main">0</div>
-                                    <div class="metric-label">Active Tasks</div>
-                                </div>
-                                <div class="metric-item">
-                                    <div class="metric-value" id="stat-agents-main">0</div>
-                                    <div class="metric-label">Agents</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Guardian Laws & Quick Actions -->
-                        <div class="metrics-card">
-                            <div class="metrics-card-title">
-                                <i class="fas fa-shield me-2" style="color: var(--success-color);"></i>Guardian Compliance
-                            </div>
-                            <div id="guardian-laws-list-main" style="font-size: 0.85rem;">
-                                <p class="text-muted">Loading...</p>
-                            </div>
-                        </div>
-
                     </div>
 
+                </div>
+            </div>
+
+            <!-- 2. AGENT MANAGER (NEW) -->
+            <div class="tab-pane fade" id="agents" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <button class="btn btn-primary" id="create-agent-btn" onclick="openCreateAgentModal()">
+                            <i class="fas fa-plus me-2"></i>Utwórz Nowego Agenta
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-robot me-2"></i>Lista Agentów</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="agents-list-container" class="row">
+                                    <p class="text-muted text-center" style="padding: 40px 0;">Ładowanie listy agentów...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1085,6 +1213,72 @@
         <div class="bubble-action">
             <button onclick="expandChatBubble()">Open Chat</button>
             <button class="primary" onclick="focusChatInput()">Message</button>
+        </div>
+    </div>
+
+    <!-- MODAL: CREATE/EDIT AGENT -->
+    <div class="modal fade" id="agentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agentModalTitle">Utwórz Nowego Agenta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agentForm">
+                        <div class="mb-3">
+                            <label for="agent-name" class="form-label">Nazwa Agenta</label>
+                            <input type="text" class="form-control" id="agent-name" placeholder="np. Librarian, Architect..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="agent-role" class="form-label">Rola/Specjalizacja</label>
+                            <input type="text" class="form-control" id="agent-role" placeholder="np. Knowledge Management, System Architecture..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="agent-personality" class="form-label">Osobowość / Charakterystyka</label>
+                            <textarea class="form-control" id="agent-personality" rows="3" placeholder="Opisz osobowość agenta, jego style decyzyjny..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="agent-description" class="form-label">Opis Pełny</label>
+                            <textarea class="form-control" id="agent-description" rows="3" placeholder="Szczegółowy opis funkcji, zdolności, zakresu..." required></textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="agent-trust-score" class="form-label">Początkowy Trust Score (0-1)</label>
+                                <input type="number" class="form-control" id="agent-trust-score" min="0" max="1" step="0.1" value="0.8" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="agent-capability-level" class="form-label">Poziom Możliwości</label>
+                                <select class="form-select" id="agent-capability-level" required>
+                                    <option value="basic">Podstawowy</option>
+                                    <option value="intermediate">Zaawansowany</option>
+                                    <option value="expert">Ekspert</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="agent-skills" class="form-label">Umiejętności (oddzielone przecinkami)</label>
+                            <input type="text" class="form-control" id="agent-skills" placeholder="np. audit, risk-assessment, threat-detection" required>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="agent-active" checked>
+                            <label class="form-check-label" for="agent-active">
+                                Aktywny / Dostępny
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAgent()">Zapisz Agenta</button>
+                </div>
+            </div>
         </div>
     </div>
 
