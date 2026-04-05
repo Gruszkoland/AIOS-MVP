@@ -10,9 +10,9 @@
 ```
 M1 Wymagania        ████████████████████ 100% ✅
 M2 Architektura     ████████████████████ 100% ✅
-M3 Dane / ML Core   ████████░░░░░░░░░░░░  40% ⚠️
+M3 Dane / ML Core   ████████████████░░░░  75% ⚠️ (Trinity+Guardian ✅, PostgreSQL INSERT 🔜)
 M4 Skalowalność     ████████████░░░░░░░░  60% ⚠️
-M5 CI/CD Quality    ████████████████████ 100% ✅ (67% coverage)
+M5 CI/CD Quality    ████████████████████ 100% ✅ (83.7% coverage)
 M6 Produkcja K8s    ░░░░░░░░░░░░░░░░░░░░   0% 🔜
 ```
 
@@ -36,6 +36,10 @@ M6 Produkcja K8s    ░░░░░░░░░░░░░░░░░░░░
 | Apify/Upwork scout integration | ✅ | 2026-04-03 |
 | ATAM Analysis + 5 ADRs | ✅ | 2026-04-05 |
 | Investor Technical Docs | ✅ | 2026-04-05 |
+| **Guardian Laws Engine (9 praw, 100% cov.)** | ✅ | **2026-04-05** |
+| **Trinity Score Engine (M/I/E, 100% cov.)** | ✅ | **2026-04-05** |
+| **Integracja Trinity+Guardian z orchestratorem** | ✅ | **2026-04-05** |
+| **Coverage 83.7%, 668 testów, ruff 0** | ✅ | **2026-04-05** |
 
 ---
 
@@ -43,22 +47,25 @@ M6 Produkcja K8s    ░░░░░░░░░░░░░░░░░░░░
 
 ### Priorytet P0: Core ML implementation (M3)
 
-| Zadanie | Opis | Estymacja |
-|---------|------|-----------|
-| **Trinity real scoring** | Zastąpienie SIMULACJI prawdziwym ML (resource assessment via psutil, logical reasoning via Ollama, alignment scoring) | 2 tygodnie |
-| **PostgreSQL insert w app.py** | Rzeczywisty Genesis Record write (nie mock) | 3 dni |
-| **Hexagon real pipeline** | Implementacja 6 trybów z rzeczywistą logiką | 2 tygodnie |
-| **Guardian weighted laws** | Ważone prawa: Nonmaleficence = instant DENY | 3 dni |
+| Zadanie | Opis | Status |
+|---------|------|--------|
+| **Trinity real scoring** | psutil (material) + LLM quality (intellectual) + keywords×profit (essential) | ✅ DONE 2026-04-05 |
+| **Guardian weighted laws** | 9 praw: Nonmaleficence=CRITICAL instant DENY; ≥2 = DENY | ✅ DONE 2026-04-05 |
+| **Trinity+Guardian → orchestrator** | Pipeline: analyze→Trinity→Guardian→bid | ✅ DONE 2026-04-05 |
+| **PostgreSQL insert w app.py** | Rzeczywisty Genesis Record write (nie mock) | 🔜 2 tygodnie |
+| **Hexagon real pipeline** | Implementacja 6 trybów z rzeczywistą logiką | 🔜 3 tygodnie |
 
 ### Priorytet P1: Test coverage rozszerzenie
 
 | Moduł | Obecna coverage | Cel |
 |-------|----------------|-----|
+| `guardian.py` | **100%** ✅ | — |
+| `trinity.py` | **100%** ✅ | — |
+| `orchestrator.py` | **81.7%** ✅ | ≥70% |
 | `db.py` | 0% | ≥60% |
 | `main.py` | 0% | ≥60% |
-| `orchestrator.py` | 0% | ≥70% |
 | `executor.py` | 0% | ≥70% |
-| Coverage łączna | 67% | ≥75% |
+| Coverage łączna | **83.7%** ✅ | ≥85% |
 
 ### Priorytet P1: Ollama optimizacja
 

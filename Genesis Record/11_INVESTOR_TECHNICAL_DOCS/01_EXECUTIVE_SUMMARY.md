@@ -76,9 +76,10 @@ Każda decyzja jest **w pełni uzasadniona, audytowalna i etyczna**.
 | Wymiar                                          | Status                           |
 | ----------------------------------------------- | -------------------------------- |
 | Infrastruktura (Docker, CI/CD, monitoring)      | ✅ Production-ready              |
-| Warstwa testowa (coverage 67%, 463 testów)      | ✅ Solidna                       |
+| Warstwa testowa (coverage 83.7%, 668 testów)    | ✅ Solidna                       |
 | API arbitrażowe (scout, analyze, bid, payments) | ✅ Działające                    |
-| Trinity/Guardians core logic                    | ⚠️ Alpha simulation — M3 Roadmap |
+| Trinity/Guardians core logic                    | ✅ ZAIMPLEMENTOWANE (M3)         |
+| PostgreSQL Genesis Record INSERT                | ⚠️ Planowane M3 Faza 3          |
 | K8s produkcyjny deployment                      | ⚠️ Planowany Q2 2026             |
 
 ---

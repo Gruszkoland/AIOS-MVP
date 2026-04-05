@@ -1,19 +1,82 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+  external_labels:
+    cluster: "adrion-162d"
+    environment: "production"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
 
 scrape_configs:
-  - job_name: 'adrion-api'
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['adrion-api:8001']
-    metrics_path: '/metrics'
+      - targets: ["localhost:9090"]
 
-  - job_name: 'adrion-uap'
+  # ADRION API
+  - job_name: "adrion-api"
     static_configs:
-      - targets: ['adrion-uap:8002']
-    metrics_path: '/mapi/v1/metrics'
+      - targets: ["adrion-api:8001"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
 
-  - job_name: 'vortex-sentinel'
+  # ADRION UAP
+  - job_name: "adrion-uap"
     static_configs:
-      - targets: ['adrion-vortex:1740']
-    metrics_path: '/metrics'
+      - targets: ["adrion-api:8001"]
+    metrics_path: "/mapi/v1/metrics"
+    scrape_interval: 30s
+
+  # Vortex Engine (174Hz)
+  - job_name: "vortex-engine"
+    static_configs:
+      - targets: ["vortex-engine:1740"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
+  # Ollama LLM
+  - job_name: "ollama"
+    static_configs:
+      - targets: ["ollama:11434"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
+  # PostgreSQL (via postgres_exporter if available)
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres:5432"]
+    scrape_interval: 60s
+
+  # N8N Workflow
+  - job_name: "n8n"
+    static_configs:
+      - targets: ["n8n:5678"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
+  # Loki Log Aggregation
+  - job_name: "loki"
+    static_configs:
+      - targets: ["loki:3100"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
+  # Grafana Monitoring
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
+    metrics_path: "/api/health"
+    scrape_interval: 30s
+
+  # Alert Handler
+  - job_name: "alert-handler"
+    static_configs:
+      - targets: ["alert-handler:8090"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s

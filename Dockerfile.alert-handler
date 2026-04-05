@@ -1,0 +1,28 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependencies
+COPY requirements-arbitrage.txt ./requirements.txt
+
+# Install Python packages
+RUN pip install --no-cache-dir -r requirements.txt || true && \
+    pip install --no-cache-dir requests python-dotenv
+
+# Copy alert handler code
+COPY scripts/monitoring/alert_handler.py ./app.py
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+EXPOSE 8090
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 --start-period=15s \
+    CMD curl -f -s http://localhost:8090/health || exit 1
+
+CMD ["python", "-u", "app.py"]
