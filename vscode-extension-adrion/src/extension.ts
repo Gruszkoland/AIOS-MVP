@@ -8,6 +8,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   const provider = new AdrionViewProvider(context.extensionUri);
 
+  // Shared terminal instance (reuse across commands)
+  let sharedTerminal: vscode.Terminal | undefined;
+
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       AdrionViewProvider.viewType,
@@ -30,19 +33,23 @@ export function activate(context: vscode.ExtensionContext) {
     ),
   );
 
-  // Command for kubectl operations
+  // Command for kubectl operations with shared terminal
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "adrion.runKubectl",
       async (command: string, isLive: boolean = false) => {
-        const terminal = vscode.window.createTerminal("ADRION K8s");
-        terminal.show();
-
-        if (isLive) {
-          terminal.sendText(`# Live output (Ctrl+C to stop)`);
+        // Reuse existing terminal if still exists
+        if (!sharedTerminal || sharedTerminal.exitStatus !== undefined) {
+          sharedTerminal = vscode.window.createTerminal("ADRION K8s");
         }
 
-        terminal.sendText(command);
+        sharedTerminal.show();
+
+        if (isLive) {
+          sharedTerminal.sendText(`# Live output (Ctrl+C to stop)`);
+        }
+
+        sharedTerminal.sendText(command);
       },
     ),
   );
@@ -235,24 +242,24 @@ class AdrionViewProvider implements vscode.WebviewViewProvider {
     <button class="btn" onclick="runTask('🚀 Start Ollama Server')">Start Ollama Server</button>
     <button class="btn" onclick="runTask('🤖 Start Aider (Librarian Mode)')">Start Aider (Swarm Mode)</button>
     <button class="btn" onclick="runTask('✅ Check System Status')">System Status Check</button>
-    <button class="btn" onclick="runTask('shell: ADRION: Start Arbitrage API Test Port')">Start Arbitrage API</button>
+    <button class="btn" onclick="runTask('ADRION: Start Arbitrage API Test Port')">Start Arbitrage API</button>
 
     <div class="section-title">Protocols</div>
     <button class="btn" onclick="runTask('ADRION: /audit - Audyt Bezpieczeństwa (Sentinel/Auditor)')">Audit Security</button>
     <button class="btn" onclick="runTask('ADRION: /boost - Dźwignie ROI (Booster)')">Boost ROI (Levers)</button>
     <button class="btn" onclick="runTask('ADRION: /heal - Samonaprawa (Healer)')">Self-Heal System</button>
     <button class="btn" onclick="runTask('ADRION: /sync - Synchronizacja Chronos (SAP)')">Sync Chronos</button>
-    <button class="btn" onclick="runTask('shell: ADRION: Predeploy A-11 Validation')">Predeploy A-11</button>
+    <button class="btn" onclick="runTask('ADRION: Predeploy A-11 Validation')">Predeploy A-11</button>
 
     <div class="section-title">Models & LLM Rollout</div>
-    <button class="btn" onclick="runTask('shell: ADRION: Show LLM Ops Dashboard')">LLM Ops Dashboard</button>
-    <button class="btn" onclick="runTask('shell: ADRION: Promote LLM Canary 5%')">Promote Canary +5%</button>
-    <button class="btn" onclick="runTask('shell: ADRION: Disable LLM Canary')">Emergency Disable LLM</button>
+    <button class="btn" onclick="runTask('ADRION: Show LLM Ops Dashboard')">LLM Ops Dashboard</button>
+    <button class="btn" onclick="runTask('ADRION: Promote LLM Canary 5%')">Promote Canary +5%</button>
+    <button class="btn" onclick="runTask('ADRION: Disable LLM Canary')">Emergency Disable LLM</button>
     <button class="btn" onclick="runTask('📊 Show Ollama Models')">List Local Models</button>
 
     <div class="section-title">Critical Gates</div>
     <button class="btn" onclick="runTask('ADRION: Local Release Gate (A-11 + Reports)')">Local Release Gate (A-11)</button>
-    <button class="btn" onclick="runTask('shell: ADRION: Monitor LLM KPI Gate (15m)')">Start KPI Guard (15m)</button>
+    <button class="btn" onclick="runTask('ADRION: Monitor LLM KPI Gate (15m)')">Start KPI Guard (15m)</button>
 
     <script>
         const vscode = acquireVsCodeApi();

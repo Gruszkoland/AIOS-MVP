@@ -4,17 +4,15 @@ Monte Carlo Tree Search for task execution planning
 
 Implements Drafting step with node exploration, backpropagation, UCT
 """
-import sys
 import math
-import random
-import json
-from typing import Optional, List, Dict, Any
-from dataclasses import dataclass, asdict
+import sys
+from dataclasses import dataclass
 from pathlib import Path
-from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).parent))
 from db import get_db
+
 
 @dataclass
 class MCTSNode:
@@ -149,7 +147,6 @@ class MCTSPlanner:
             children_count = len(node.children_ids)
 
             if children_count < 3:  # Node is expandable
-                action = ["analyze", "scout", "validate", "optimize"][children_count]
                 return self.expand_node(node, ["analyze", "scout", "validate", "optimize"])
 
             best = self.best_child(node)

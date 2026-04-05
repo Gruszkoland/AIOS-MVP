@@ -2,14 +2,13 @@
 Unified Admin Panel (UAP) — Phase 3
 Middleware for JWT validation & Rate Limiting
 """
-import sys
-import os
 import logging
+import sys
 from functools import wraps
 from pathlib import Path
-from typing import Callable, Tuple
+from typing import Callable
 
-from flask import request, jsonify, g
+from flask import g, jsonify, request
 
 sys.path.insert(0, str(Path(__file__).parent))
 

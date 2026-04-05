@@ -8,14 +8,13 @@ Database Schema:
 - checkpoints table
 - agent_metrics table
 """
-import os
 import json
 import logging
-import psycopg2
-from psycopg2 import sql, pool
+import os
 from contextlib import contextmanager
-from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
+from psycopg2 import pool
 
 logger = logging.getLogger("adrion.uap.db")
 

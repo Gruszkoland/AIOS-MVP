@@ -34,7 +34,13 @@ import time
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from arbitrage.rate_limiter import cycle_limiter, mass_gen_limiter, oracle_limiter, quantum_limiter, scout_limiter
+from arbitrage.rate_limiter import (
+    cycle_limiter,
+    mass_gen_limiter,
+    oracle_limiter,
+    quantum_limiter,
+    scout_limiter,
+)
 
 logger = logging.getLogger(__name__)
 ARB_PORT = 8001

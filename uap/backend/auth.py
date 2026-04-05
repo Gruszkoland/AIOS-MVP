@@ -5,16 +5,14 @@ Multi-Tenant Authentication Module (JWT + RBAC)
 JWT tokens with role-based access control
 Multi-tenant organization isolation
 """
+import hashlib
 import os
 import re
 import sys
-import hashlib
-import hmac
-import json
 import uuid
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Tuple
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 import jwt
 

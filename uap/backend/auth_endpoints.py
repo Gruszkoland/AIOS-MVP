@@ -5,12 +5,12 @@ Authentication & Authorization Endpoints
 import sys
 from pathlib import Path
 
-from flask import Flask, request, jsonify, g
+from flask import Flask, g, jsonify, request
 
 sys.path.insert(0, str(Path(__file__).parent))
 
 from auth import get_auth, get_rate_limiter
-from middleware import auth_required, require_permission, scope_to_tenant, rate_limit_user_tasks
+from middleware import auth_required, require_permission
 
 
 def register_auth_endpoints(app: Flask):

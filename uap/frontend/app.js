@@ -1200,7 +1200,170 @@ document.addEventListener("click", event => {
   }
 });
 
-// Initial load
+// ════════════════════════════════════════════════════════════════════════════
+// CHAT ORCHESTRATOR
+// ════════════════════════════════════════════════════════════════════════════
+
+let currentSessionId = null;
+let chatMessages = [];
+
+function initializeChat() {
+  const chatInput = document.getElementById("chat-input");
+  const chatSendBtn = document.getElementById("chat-send-btn");
+
+  if (!chatInput || !chatSendBtn) return;
+
+  // Create or recover session
+  currentSessionId = localStorage.getItem("adrion_session_id");
+
+  if (!currentSessionId) {
+    // Create new session
+    apiCall("/mapi/v1/session/create", "POST", {
+      user_id: getUserRole(),
+      metadata: { platform: "firefox", timestamp: new Date().toISOString() }
+    }).then(data => {
+      currentSessionId = data.session_id;
+      localStorage.setItem("adrion_session_id", currentSessionId);
+      loadPreviousSessions();
+      showAlert(`✅ Session created: ${data.session_id.substring(0, 8)}...`, "success");
+    });
+  } else {
+    // Load previous chat history
+    loadChatHistory();
+    loadPreviousSessions();
+  }
+
+  // Chat send button
+  chatSendBtn.addEventListener("click", sendChatMessage);
+  chatInput.addEventListener("keypress", e => {
+    if (e.key === "Enter") sendChatMessage();
+  });
+}
+
+function sendChatMessage() {
+  const chatInput = document.getElementById("chat-input");
+  const message = chatInput.value.trim();
+
+  if (!message || !currentSessionId) return;
+
+  // Display user message
+  displayChatMessage("user", message);
+  chatInput.value = "";
+
+  // Send to backend
+  apiCall("/mapi/v1/chat/message", "POST", {
+    session_id: currentSessionId,
+    message: message,
+    context: { platform: "firefox" }
+  }).then(data => {
+    if (data.response) {
+      displayChatMessage("orchestrator", data.response, data.decision_type);
+
+      // Show action icons if decision taken
+      if (data.action_id) {
+        showAlert(`✅ Action taken: ${data.decision_type} (ID: ${data.action_id.substring(0, 8)}...)`, "info");
+      }
+
+      // Log to genesis if needed
+      if (data.genesis_logged) {
+        showAlert("✓ Logged to Genesis Record", "success");
+      }
+    }
+  }).catch(err => {
+    displayChatMessage("orchestrator", `❌ Error: ${err.message}`, "error");
+  });
+}
+
+function displayChatMessage(sender, text, type = "") {
+  const container = document.getElementById("chat-messages");
+
+  // Clear initial message if first message
+  if (container.querySelector(".d-flex")) {
+    container.innerHTML = "";
+  }
+
+  const msgDiv = document.createElement("div");
+  msgDiv.style.cssText = `
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: ${sender === "user" ? "rgba(0, 120, 212, 0.1)" : "rgba(39, 174, 96, 0.1)"};
+    border-left: 3px solid ${sender === "user" ? "#0078D4" : "#27AE60"};
+  `;
+
+  let icon = sender === "user" ? "👤" : "🤖";
+  if (type === "HEAL") icon = "🔧";
+  if (type === "DELEGATE") icon = "📋";
+  if (type === "CONTINUE") icon = "🔄";
+  if (type === "error") icon = "❌";
+
+  msgDiv.innerHTML = `
+    <strong>${icon} ${sender === "user" ? "You" : "Orchestrator"}:</strong>
+    <div style="color: #1E3A5F; margin-top: 4px; font-size: 0.95em;">${escapeHtml(text)}</div>
+  `;
+
+  container.appendChild(msgDiv);
+  container.scrollTop = container.scrollHeight;
+}
+
+function loadChatHistory() {
+  if (!currentSessionId) return;
+
+  apiCall(`/mapi/v1/chat/history?session_id=${currentSessionId}&limit=50`, "GET").then(data => {
+    if (data.messages) {
+      // Render last 10 messages
+      const container = document.getElementById("chat-messages");
+      container.innerHTML = "";
+
+      data.messages.slice(-10).forEach(msg => {
+        displayChatMessage(msg.sender, msg.message, msg.response_type);
+      });
+    }
+  });
+}
+
+function loadPreviousSessions() {
+  const userId = getOrgId() || "anonymous";
+
+  apiCall(`/mapi/v1/session/previous?user_id=${userId}&limit=10`, "GET").then(data => {
+    if (data.sessions) {
+      const selector = document.getElementById("session-selector");
+      if (!selector) return;
+
+      selector.innerHTML = '<option value="">Select previous session to resume...</option>';
+
+      data.sessions.forEach(session => {
+        const option = document.createElement("option");
+        option.value = session.session_id;
+        option.textContent = `${session.status} - ${session.msg_count} msg, ${session.task_count} tasks (${new Date(session.last_seen_at).toLocaleString()})`;
+        selector.appendChild(option);
+      });
+    }
+  });
+}
+
+function resumeSession() {
+  const selector = document.getElementById("session-selector");
+  if (!selector.value) {
+    showAlert("⚠️ Select a session first", "warning");
+    return;
+  }
+
+  const sessionId = selector.value;
+  currentSessionId = sessionId;
+  localStorage.setItem("adrion_session_id", sessionId);
+
+  loadChatHistory();
+  showAlert(`✅ Session resumed: ${sessionId.substring(0, 8)}...`, "success");
+}
+
+// Resume button
 document.addEventListener("DOMContentLoaded", () => {
+  const resumeBtn = document.getElementById("resume-session-btn");
+  if (resumeBtn) {
+    resumeBtn.addEventListener("click", resumeSession);
+  }
+
   loadHealerDashboard();
+  initializeChat();
 }, { once: true });

@@ -9,19 +9,19 @@ Routes added:
 - POST /mapi/v1/task/simulate — DRM preview without execution
 - GET  /mapi/v1/status/v2 — Enhanced status with DB metrics
 """
+import hmac
 import os
 import sys
-import hmac
-from pathlib import Path
 from functools import wraps
-from typing import Dict, Any, Optional
+from pathlib import Path
+
 from flask import Flask, jsonify, request
 
 sys.path.insert(0, str(Path(__file__).parent))
 
 from integration import get_integration
+
 from db import get_db
-from websocket_server import TelemetryServer
 
 # PRIORITY 6 FIX: Use empty default — never ship a hardcoded key
 API_KEY = os.getenv("UAP_API_KEY", "")

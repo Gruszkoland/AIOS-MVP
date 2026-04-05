@@ -4,15 +4,14 @@ Git-based diff preview for destructive operations
 
 Implements KROK 2.5: Show what WOULD happen without executing
 """
-import sys
-import subprocess
-import json
-import hmac
 import hashlib
+import hmac
 import logging
 import os
-from typing import Dict, Any, Optional, List
+import subprocess
+import sys
 from pathlib import Path
+from typing import Any, Dict, List
 
 sys.path.insert(0, str(Path(__file__).parent))
 from db import get_db

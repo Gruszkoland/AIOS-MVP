@@ -10,26 +10,26 @@ CORE FEATURES:
 - Real-time EBDI telemetry
 - Trust Score heatmap
 """
+import hmac
+import logging
 import os
 import sys
-import hmac
-import json
-import logging
-import time
 import threading
+import time
+import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Any, Optional, List
-
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+from typing import Any, Dict, List, Optional
 
 # Load .env variables
 from dotenv import load_dotenv
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 # Import PostgreSQL integration
-from db import PostgresDB
+from db import PostgresDB  # noqa: E402
 
 # ────────────────────────────────────────────────────────────────────────────
 # CONFIG & LOGGING
@@ -405,7 +405,7 @@ def task_delegate():
             status="completed",
             action="execution_success",
             guards_passed=9,
-            notes=f"Found 5 results with 92% confidence"
+            notes="Found 5 results with 92% confidence"
         )
 
     if not dry_run:
@@ -510,21 +510,21 @@ def genesis_logs():
             logger.warning(f"DB error: {e}, falling back to in-memory")
             logs = GENESIS_LOGS.copy()
             cutoff = datetime.now() - timedelta(hours=since_hours)
-            logs = [l for l in logs if datetime.fromisoformat(l["timestamp"]) > cutoff]
+            logs = [entry for entry in logs if datetime.fromisoformat(entry["timestamp"]) > cutoff]
             if agent_filter:
-                logs = [l for l in logs if l["agent"] == agent_filter]
+                logs = [entry for entry in logs if entry["agent"] == agent_filter]
             if status_filter:
-                logs = [l for l in logs if l["status"] == status_filter]
-            logs = sorted(logs, key=lambda l: l["timestamp"], reverse=True)[:limit]
+                logs = [entry for entry in logs if entry["status"] == status_filter]
+            logs = sorted(logs, key=lambda entry: entry["timestamp"], reverse=True)[:limit]
     else:
         logs = GENESIS_LOGS.copy()
         cutoff = datetime.now() - timedelta(hours=since_hours)
-        logs = [l for l in logs if datetime.fromisoformat(l["timestamp"]) > cutoff]
+        logs = [entry for entry in logs if datetime.fromisoformat(entry["timestamp"]) > cutoff]
         if agent_filter:
-            logs = [l for l in logs if l["agent"] == agent_filter]
+            logs = [entry for entry in logs if entry["agent"] == agent_filter]
         if status_filter:
-            logs = [l for l in logs if l["status"] == status_filter]
-        logs = sorted(logs, key=lambda l: l["timestamp"], reverse=True)[:limit]
+            logs = [entry for entry in logs if entry["status"] == status_filter]
+        logs = sorted(logs, key=lambda entry: entry["timestamp"], reverse=True)[:limit]
 
     return jsonify({"logs": logs, "count": len(logs)})
 
@@ -655,7 +655,7 @@ def guardian_laws():
 
     return jsonify({
         "laws": GUARDIAN_LAWS_STATUS,
-        "compliance": sum(1 for l in GUARDIAN_LAWS_STATUS if l["status"] == "pass"),
+        "compliance": sum(1 for law in GUARDIAN_LAWS_STATUS if law["status"] == "pass"),
         "total": len(GUARDIAN_LAWS_STATUS),
         "timestamp": datetime.now().isoformat(),
     })
@@ -674,7 +674,7 @@ def checkpoint_create():
     body = request.get_json(silent=True) or {}
     label = body.get("label", "")
 
-    checkpoint_id = f"rbc-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}"
+    checkpoint_id = f"rbc-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}-{str(uuid.uuid4())[:8]}"
 
     # Snapshot current session state (tasks + logs) for restore capability
     try:
@@ -874,6 +874,251 @@ def conflict_resolve():
         "votes": votes,
         "timestamp": datetime.now().isoformat(),
     })
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# SESSION & CHAT ORCHESTRATOR ENDPOINTS
+# ────────────────────────────────────────────────────────────────────────────
+
+# Initialize session manager and chat orchestrator on first import
+_session_manager = None
+_chat_orchestrator = None
+_auto_startup = None
+
+
+def _ensure_chat_components():
+    """Lazy-initialize chat components."""
+    global _session_manager, _chat_orchestrator, _auto_startup
+    if _session_manager is None:
+        try:
+            from session_manager import SessionManager
+            from chat_orchestrator import ChatOrchestrator
+            from auto_startup import AutoStartupSequence
+
+            _session_manager = SessionManager(db)
+            _chat_orchestrator = ChatOrchestrator(
+                session_manager=_session_manager,
+                db_instance=db,
+                llm_backend=None,  # Optional: add LLM backend
+                master_orchestrator=None,  # Optional: add orchestrator
+            )
+            _auto_startup = AutoStartupSequence(
+                session_manager=_session_manager,
+                db_instance=db,
+                chat_orchestrator=_chat_orchestrator,
+            )
+            logger.info("✅ Chat orchestrator components initialized")
+        except ImportError as e:
+            logger.warning(f"⚠️ Chat components not available: {e}")
+
+
+@app.route("/mapi/v1/session/create", methods=["POST"])
+def create_session():
+    """Create new user session."""
+    _ensure_chat_components()
+    if not _session_manager:
+        return jsonify({"error": "Session manager not available"}), 503
+
+    try:
+        data = request.get_json() or {}
+        user_id = data.get("user_id", "anonymous")
+        metadata = data.get("metadata", {})
+
+        session_id = _session_manager.create_session(user_id, metadata)
+
+        return jsonify({
+            "session_id": session_id,
+            "user_id": user_id,
+            "created_at": datetime.now().isoformat(),
+            "status": "active",
+        }), 201
+
+    except Exception as e:
+        logger.error(f"❌ Session creation failed: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/session/<session_id>", methods=["GET"])
+def get_session(session_id: str):
+    """Get session by ID."""
+    _ensure_chat_components()
+    if not _session_manager:
+        return jsonify({"error": "Session manager not available"}), 503
+
+    try:
+        session = _session_manager.get_session(session_id)
+        if not session:
+            return jsonify({"error": "Session not found"}), 404
+
+        return jsonify(session), 200
+
+    except Exception as e:
+        logger.error(f"❌ Session retrieval failed: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/session/previous", methods=["GET"])
+def list_previous_sessions():
+    """List previous sessions for user (for recovery)."""
+    _ensure_chat_components()
+    if not _session_manager:
+        return jsonify({"error": "Session manager not available"}), 503
+
+    try:
+        user_id = request.args.get("user_id", "anonymous")
+        limit = int(request.args.get("limit", 10))
+
+        sessions = _session_manager.list_previous_sessions(user_id, limit)
+
+        return jsonify({
+            "user_id": user_id,
+            "count": len(sessions),
+            "sessions": sessions,
+        }), 200
+
+    except Exception as e:
+        logger.error(f"❌ Session list failed: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/chat/message", methods=["POST"])
+def chat_message():
+    """
+    Send message to AI orchestrator in a session.
+
+    Request:
+    {
+        "session_id": "uuid",
+        "message": "user message",
+        "context": {"platform": "vscode", ...}
+    }
+
+    Response:
+    {
+        "response": "orchestrator response",
+        "decision_type": "QUERY|DELEGATE|HEAL|CONTINUE",
+        "action_id": "optional task ID",
+        "confidence": 0.0-1.0,
+        "genesis_logged": bool,
+        "timestamp": "ISO"
+    }
+    """
+    _ensure_chat_components()
+    if not _chat_orchestrator:
+        return jsonify({"error": "Chat orchestrator not available"}), 503
+
+    try:
+        data = request.get_json() or {}
+        session_id = data.get("session_id")
+        message = data.get("message", "")
+        context = data.get("context", {})
+
+        if not session_id or not message:
+            return jsonify({"error": "session_id and message required"}), 400
+
+        # Ensure session exists
+        _ensure_chat_components()
+        session = _session_manager.get_session(session_id)
+        if not session:
+            return jsonify({"error": "Session not found"}), 404
+
+        # Process message through orchestrator
+        result = _chat_orchestrator.process_message(session_id, message, context)
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        logger.error(f"❌ Chat message processing failed: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/chat/history", methods=["GET"])
+def get_chat_history():
+    """Get chat history for session."""
+    _ensure_chat_components()
+    if not _session_manager:
+        return jsonify({"error": "Session manager not available"}), 503
+
+    try:
+        session_id = request.args.get("session_id")
+        limit = int(request.args.get("limit", 100))
+
+        if not session_id:
+            return jsonify({"error": "session_id required"}), 400
+
+        history = _session_manager.get_chat_history(session_id, limit)
+
+        return jsonify({
+            "session_id": session_id,
+            "count": len(history),
+            "messages": history,
+        }), 200
+
+    except Exception as e:
+        logger.error(f"❌ Chat history retrieval failed: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/startup/auto-run", methods=["POST"])
+def auto_startup_run():
+    """
+    Trigger autonomous startup sequence.
+
+    Request:
+    {
+        "user_id": "...",
+        "context": {"platform": "vscode", ...}
+    }
+
+    Response:
+    {
+        "status": "success|warning|error",
+        "timestamp": "ISO",
+        "steps": [...],
+        "session_id": "...",
+        "summary": "..."
+    }
+    """
+    _ensure_chat_components()
+    if not _auto_startup:
+        return jsonify({"error": "Auto-startup not available"}), 503
+
+    try:
+        data = request.get_json() or {}
+        user_id = data.get("user_id", "anonymous")
+        context = data.get("context", {})
+
+        result = _auto_startup.run_full_sequence(user_id, context)
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        logger.error(f"❌ Auto-startup sequence failed: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mapi/v1/startup/status", methods=["GET"])
+def auto_startup_status():
+    """Get auto-startup status."""
+    _ensure_chat_components()
+    if not _auto_startup:
+        return jsonify({"error": "Auto-startup not available"}), 503
+
+    try:
+        # Return current session + recovery options
+        user_id = request.args.get("user_id", "anonymous")
+
+        previous_sessions = _session_manager.list_previous_sessions(user_id, 5) if _session_manager else []
+
+        return jsonify({
+            "user_id": user_id,
+            "previous_sessions": previous_sessions,
+            "ready": True,
+        }), 200
+
+    except Exception as e:
+        logger.error(f"❌ Auto-startup status failed: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 # ────────────────────────────────────────────────────────────────────────────

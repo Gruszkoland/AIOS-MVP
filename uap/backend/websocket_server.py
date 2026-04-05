@@ -5,15 +5,14 @@ Real-time telemetry push (<500ms latency)
 Run: python websocket_server.py
 Port: 8004
 """
+import asyncio
+import json
 import os
 import sys
-import json
-import asyncio
-import threading
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Set
+from typing import Dict
 
 import websockets
 from websockets.server import WebSocketServerProtocol

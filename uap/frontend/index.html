@@ -457,6 +457,11 @@
                     <i class="fas fa-heart-pulse me-2"></i>Self-Healing
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat" type="button" role="tab">
+                    <i class="fas fa-comments me-2"></i>Chat Assistant
+                </button>
+            </li>
         </ul>
 
         <!-- TAB CONTENT -->
@@ -807,6 +812,68 @@
                             </div>
                             <div class="card-body">
                                 <div id="healer-history-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. CHAT ASSISTANT -->
+            <div class="tab-pane fade" id="chat" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card" style="height: 600px; display: flex; flex-direction: column;">
+                            <div class="card-header">
+                                <h5><i class="fas fa-comments me-2"></i>Chat with Master Orchestrator</h5>
+                                <small class="text-muted">Ask anything or request actions autonomously</small>
+                            </div>
+                            <div class="card-body" style="flex: 1; overflow-y: auto; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-bottom: 1px solid rgba(0, 120, 212, 0.1);">
+                                <div id="chat-messages" style="min-height: 100%;">
+                                    <div class="d-flex align-items-center justify-content-center h-100">
+                                        <p class="text-muted text-center">
+                                            <i class="fas fa-comments fa-3x mb-3 d-block"></i>
+                                            Start a conversation with the AI Orchestrator
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer" style="background: #f8f9fa;">
+                                <div class="input-group">
+                                    <input type="text" id="chat-input" class="form-control" placeholder="Ask the Master Orchestrator..."
+                                           style="background: #ffffff; border: 1px solid #d5d8dc;">
+                                    <button id="chat-send-btn" class="btn btn-primary" type="button" style="background: linear-gradient(135deg, #0078D4 0%, #0066CC 100%); border: none;">
+                                        <i class="fas fa-paper-plane me-2"></i>Send
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-history me-2"></i>Session Recovery</h5>
+                            </div>
+                            <div class="card-body">
+                                <select id="session-selector" class="form-select" style="background: #f8f9fa; border: 1px solid #d5d8dc;">
+                                    <option value="">Select previous session to resume...</option>
+                                </select>
+                                <button id="resume-session-btn" class="btn btn-sm btn-outline-primary mt-2 w-100" style="border-color: #0078D4; color: #0078D4;">
+                                    <i class="fas fa-redo me-2"></i>Resume Session
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-lightbulb me-2"></i>Suggested Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="suggested-actions"></div>
                             </div>
                         </div>
                     </div>

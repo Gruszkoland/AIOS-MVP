@@ -4,18 +4,20 @@ Combines Phase 2 modules: PostgreSQL, WebSocket, Ollama, MCTS, DRM
 
 High-level API that orchestrates all subsystems
 """
-import sys
 import os
-from typing import Dict, Any, Optional, Tuple
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from db import get_db
-from ollama_router import get_router
-from mcts_planner import get_planner
 from drm_executor import get_drm
+from mcts_planner import get_planner
+from ollama_router import get_router
+
+from db import get_db
+
 
 class UAP_IntegrationLayer:
     """Master orchestrator for Phase 2 UAP system."""
