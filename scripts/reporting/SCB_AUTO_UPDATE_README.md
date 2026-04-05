@@ -1,4 +1,5 @@
 # 🔄 SESSION CONTINUITY BRIDGE (SCB) — Auto-Update System
+
 **ADRION 369 v4.0** | Status: ✅ ACTIVE & OPERATIONAL
 
 ---
@@ -6,7 +7,9 @@
 ## 📋 QUICK START
 
 ### What is SCB?
+
 **Session Continuity Bridge** — automatic synchronization system that:
+
 - ✅ Runs at session start (loads profile)
 - ✅ Updates JSON trackers on demand (`python update_adr_status.py`)
 - ✅ Auto-syncs Master Synthesis Document every execution
@@ -32,9 +35,11 @@ $PROFILE
 ## 🔧 COMPONENTS
 
 ### 1. Python Automation Script
+
 **Location:** `scripts/reporting/update_adr_status.py` (280+ lines)
 
 **Functions:**
+
 - `load_json()` — UTF-8 encoded file I/O
 - `save_json()` — Formatted JSON output
 - `scan_adr_files()` — Parse ADR metadata
@@ -44,6 +49,7 @@ $PROFILE
 - `update_master_synthesis_doc()` — **NEW: Sync doc sections §3, §4, §9**
 
 **Usage:**
+
 ```bash
 # Manual execution (anytime)
 python scripts/reporting/update_adr_status.py
@@ -56,9 +62,11 @@ python scripts/reporting/update_adr_status.py
 ```
 
 ### 2. SCB Hook File
+
 **Location:** `.vscode/scb_hook.ps1` (60+ lines)
 
 **Features:**
+
 - Function: `Invoke-ADRONMonitoringSync`
 - Auto-activates Python venv
 - Calls `update_adr_status.py`
@@ -66,6 +74,7 @@ python scripts/reporting/update_adr_status.py
 - Error handling + fallback
 
 **Usage:**
+
 ```powershell
 # Manual execution within session
 Invoke-ADRONMonitoringSync
@@ -75,9 +84,11 @@ Invoke-ADRONMonitoringSync
 ```
 
 ### 3. PowerShell Profile
+
 **Location:** `C:\Users\adiha\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`
 
 **Responsibilities:**
+
 - Load SCB hook
 - Activate .venv
 - Set working directory to project root
@@ -146,6 +157,7 @@ Invoke-ADRONMonitoringSync
 ## 🎯 EXECUTION MODES
 
 ### Mode 1: Manual Trigger (Any Time)
+
 ```powershell
 # Within active session, run anytime
 Invoke-ADRONMonitoringSync
@@ -157,6 +169,7 @@ Invoke-ADRONMonitoringSync
 ```
 
 ### Mode 2: Automatic Session Exit (Default)
+
 ```powershell
 # User closes PowerShell window or presses exit
 # System automatically:
@@ -168,6 +181,7 @@ Invoke-ADRONMonitoringSync
 ```
 
 ### Mode 3: CI/CD Pipeline (GitHub Actions)
+
 ```yaml
 # Triggers on: push to docs/adr/
 # Runs: update_adr_status.py
@@ -182,6 +196,7 @@ Invoke-ADRONMonitoringSync
 ### On Each Sync (All 3 JSON + Master Doc):
 
 #### JSON Trackers (Auto-saved)
+
 1. **ADR-Adoption-Status.json**
    - ADR count (total, accepted, proposed, deprecated)
    - Coverage percentage
@@ -197,6 +212,7 @@ Invoke-ADRONMonitoringSync
    - Timestamp
 
 #### Master Synthesis Document Sections (Auto-updated)
+
 - **§3 — TRUST SCORE DASHBOARD:** Latest TSPA values from current session
 - **§4 — ADR STATUS BOARD:** Coverage %, ADR counts, progress bars
 - **§9 — METRICS DASHBOARD:** Current KPIs, velocity, trends
@@ -206,6 +222,7 @@ Invoke-ADRONMonitoringSync
 ## 🔍 MONITORING & VERIFICATION
 
 ### Check if SCB is Active
+
 ```powershell
 # Should see this banner on session start:
 # 🚀 [ADRION v4.0] Initializing PowerShell Environment...
@@ -218,6 +235,7 @@ Invoke-ADRONMonitoringSync
 ```
 
 ### Manual Sync Verification
+
 ```powershell
 # Run manually to verify
 Invoke-ADRONMonitoringSync
@@ -240,6 +258,7 @@ Invoke-ADRONMonitoringSync
 ```
 
 ### Check Last Sync Timestamp
+
 ```powershell
 # Open Master Synthesis Document
 cat progress\MASTER_SYNTHESIS_ADRION369_05-04-2026.md | tail -5
@@ -252,8 +271,10 @@ cat progress\MASTER_SYNTHESIS_ADRION369_05-04-2026.md | tail -5
 ## 🚨 TROUBLESHOOTING
 
 ### Issue: SCB Hook Not Loading
+
 **Symptom:** Profile doesn't show SCB banner  
-**Solution:**  
+**Solution:**
+
 ```powershell
 # Check execution policy
 Get-ExecutionPolicy
@@ -266,8 +287,10 @@ $PROFILE | Invoke-Item
 ```
 
 ### Issue: Python Script Fails
+
 **Symptom:** "update_adr_status.py not found" error  
-**Solution:**  
+**Solution:**
+
 ```powershell
 # Verify venv exists
 Test-Path ".venv\Scripts\Activate.ps1"
@@ -280,6 +303,7 @@ python scripts/reporting/update_adr_status.py
 ```
 
 ### Issue: TS Encoding Error
+
 **Symptom:** "charmap codec can't decode"  
 **Solution:** Already fixed (encoding='utf-8' in all file I/O) ✅  
 No action needed.
@@ -307,14 +331,14 @@ No action needed.
 
 ## 🎯 BENEFITS
 
-| Benefit | Impact | Measurement |
-|---------|--------|-------------|
-| **Auto-sync** | Zero manual doc updates | -30-45 min/week |
-| **Always current** | No desynchronization | 100% consistency |
-| **Single source** | Master Synthesis = truth | One document to read |
-| **Audit trail** | Timestamps on every update | Full traceability |
-| **Low overhead** | <2s execution time | Negligible cost |
-| **Error resilient** | Fallback logging | Safe to ignore errors |
+| Benefit             | Impact                     | Measurement           |
+| ------------------- | -------------------------- | --------------------- |
+| **Auto-sync**       | Zero manual doc updates    | -30-45 min/week       |
+| **Always current**  | No desynchronization       | 100% consistency      |
+| **Single source**   | Master Synthesis = truth   | One document to read  |
+| **Audit trail**     | Timestamps on every update | Full traceability     |
+| **Low overhead**    | <2s execution time         | Negligible cost       |
+| **Error resilient** | Fallback logging           | Safe to ignore errors |
 
 ---
 
