@@ -1,0 +1,187 @@
+version: '3.8'
+
+# ADRION 369 v1.0 — Development Docker Compose
+# Includes: PostgreSQL, UAP Backend, UAP Frontend, Ollama (optional)
+#
+# Usage:
+#   docker-compose up -d          # Start all services
+#   docker-compose ps              # Check status
+#   docker-compose logs -f backend # Follow backend logs
+#   docker-compose down            # Stop all services
+
+services:
+  # ════════════════════════════════════════════════════════════════
+  # PostgreSQL Database (Genesis Record)
+  # ════════════════════════════════════════════════════════════════
+  postgres:
+    image: postgres:15-alpine
+    container_name: adrion-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-adrion}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-adrion_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-genesis_record}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./adrion-swarm/postgres_data:/var/lib/postgresql/backup:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-adrion}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - adrion-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ════════════════════════════════════════════════════════════════
+  # UAP Backend (Port 8002)
+  # ════════════════════════════════════════════════════════════════
+  backend:
+    build:
+      context: ./uap
+      dockerfile: Dockerfile
+    container_name: adrion-uap-backend
+    environment:
+      # PRIORITY 6, 7: Security secrets from .env
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      MAPI_PORT: 8002
+      MAPI_HOST: 0.0.0.0
+      UAP_API_KEY: ${UAP_API_KEY:-local-dev-key-123}
+      JWT_SECRET: ${JWT_SECRET:-uap-secret-key-change-in-production}
+      DRM_HMAC_SECRET: ${DRM_HMAC_SECRET:-default-dev-secret-change-in-production}
+
+      # PRIORITY 1: PostgreSQL Integration
+      DB_ENGINE: postgresql
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: ${POSTGRES_USER:-adrion}
+      PG_PASSWORD: ${POSTGRES_PASSWORD:-adrion_pass}
+      PG_DB: ${POSTGRES_DB:-genesis_record}
+
+      # LLM (Optional - requires Ollama running on host)
+      OLLAMA_URL: http://host.docker.internal:11434
+      LLM_BACKEND: ollama
+
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      PYTHONIOENCODING: utf-8
+      PYTHONUNBUFFERED: 1
+
+    ports:
+      - "8002:8002"
+
+    volumes:
+      - ./uap:/app
+      - ./:/workspace:ro
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-H", "X-API-Key: ${UAP_API_KEY:-local-dev-key-123}", "http://localhost:8002/mapi/v1/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    restart: unless-stopped
+    networks:
+      - adrion-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # ════════════════════════════════════════════════════════════════
+  # UAP Frontend (Port 8003)
+  # ════════════════════════════════════════════════════════════════
+  frontend:
+    image: python:3.11-slim
+    container_name: adrion-uap-frontend
+    working_dir: /app/uap/frontend
+    command: python -m http.server 8003
+    environment:
+      PYTHONUNBUFFERED: 1
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./uap/frontend:/app/uap/frontend
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - adrion-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ════════════════════════════════════════════════════════════════
+  # Ollama (Optional - Local LLM)
+  # Uncomment to enable. Requires ~10GB disk space
+  # ════════════════════════════════════════════════════════════════
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: adrion-ollama
+  #   environment:
+  #     OLLAMA_HOST: 0.0.0.0:11434
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   restart: unless-stopped
+  #   networks:
+  #     - adrion-net
+
+  # ════════════════════════════════════════════════════════════════
+  # Optional: pgAdmin (PostgreSQL Management UI)
+  # Access at http://localhost:5050
+  # ════════════════════════════════════════════════════════════════
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: adrion-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - adrion-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+volumes:
+  postgres_data:
+    driver: local
+  # ollama_data:
+  #   driver: local
+
+networks:
+  adrion-net:
+    driver: bridge

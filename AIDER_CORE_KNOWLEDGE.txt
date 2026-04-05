@@ -1,9 +1,25 @@
 # ==============================================================================
-# ADRION 369: AIDER CORE KNOWLEDGE - KRYSTALICZNE WYTYCZNE v2.0
+# ADRION 369: AIDER CORE KNOWLEDGE - KRYSTALICZNE WYTYCZNE v3.0 (MASTER ORCHESTRATOR)
 # ==============================================================================
 # Cel: Centralne repozytorium prawdy dla modelu AI (Aider) wspierającego projekt.
 # Nomenklatura: Polska, techniczna, zgodna z paradygmatem 3-6-9.
+# Rewizja v3.0: Implementacja MASTER ORCHESTRATOR i 162D Decision Space.
 # ==============================================================================
+
+# 0. MASTER ORCHESTRATOR PROTOCOL (ADRION 369 v3.0)
+Główny Orkiestrator zarządza rojem w 162-wymiarowej przestrzeni decyzji:
+3 (Perspektywy) x 6 (Główni Agenci: Librarian, SAP, Auditor, Sentinel, Architect, Healer) x 9 (Prawa Strażników).
+
+OPERATIONAL FLOW (THE LOOP):
+1. Sensing & Routing: Ocena EBDI (PAD Vector) -> MoE Gating.
+2. Graph-of-Thoughts (GoT): Speculative Drafting -> Parallel Exploration -> MCTS (UCT nodes).
+3. Self-Correction & Reward: Auditor Audit -> STaR (Rationalization) -> SimPO (Length Reward).
+4. Action & Genesis Record: Environment Change -> Progress Update -> Micro-Summary.
+
+TECHNICAL DIRECTIVES:
+- DSPy Logic: Precyzyjne sygnatury (Wejście -> Wyjście).
+- YAML Tooling: Preferencja dla YAML w wywołaniach narzędzi (token efficiency).
+- Fatal Error Handling: Pętla naprawcza (Healer + Sentinel) bez zatrzymania.
 
 # I. CELE PROJEKTU ADRION 369
 1. Autonomiczna orkiestracja 9 specjalistycznych agentów (Rój Agentów).

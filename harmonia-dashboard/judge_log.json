@@ -403,5 +403,86 @@
     "drift_score": 0.0,
     "vera_score": 0.7075,
     "action_taken": "none"
+  },
+  {
+    "interaction_id": "ccbcaf7af79e4dc7",
+    "timestamp": "2026-04-04T13:26:58.306886+00:00",
+    "verdict": "pass",
+    "reason": "All metrics within acceptable ranges",
+    "drift_score": 0.0,
+    "vera_score": 0.7075,
+    "action_taken": "none"
+  },
+  {
+    "interaction_id": "cc3e50165b4c2b18",
+    "timestamp": "2026-04-04T13:32:16.476379+00:00",
+    "verdict": "pass",
+    "reason": "All metrics within acceptable ranges",
+    "drift_score": 0.0,
+    "vera_score": 0.7075,
+    "action_taken": "none"
+  },
+  {
+    "interaction_id": "e8cd11b12bcf4d07",
+    "timestamp": "2026-04-04T13:33:50.724103+00:00",
+    "verdict": "pass",
+    "reason": "All metrics within acceptable ranges",
+    "drift_score": 0.0,
+    "vera_score": 0.7075,
+    "action_taken": "none"
+  },
+  {
+    "interaction_id": "5540da0e3e5a40d1",
+    "timestamp": "2026-04-04T13:48:38.409729+00:00",
+    "verdict": "pass",
+    "reason": "All metrics within acceptable ranges",
+    "drift_score": 0.0,
+    "vera_score": 0.7075,
+    "action_taken": "none"
+  },
+  {
+    "interaction_id": "0ec9eff25cf248ac",
+    "timestamp": "2026-04-04T13:52:39.587016+00:00",
+    "verdict": "pass",
+    "reason": "All metrics within acceptable ranges",
+    "drift_score": 0.0,
+    "vera_score": 0.7075,
+    "action_taken": "none"
+  },
+  {
+    "interaction_id": "23afc01d1609e230",
+    "timestamp": "2026-04-04T13:53:40.719722+00:00",
+    "verdict": "pass",
+    "reason": "All metrics within acceptable ranges",
+    "drift_score": 0.0,
+    "vera_score": 0.7075,
+    "action_taken": "none"
+  },
+  {
+    "interaction_id": "3625a6f4de51b6fd",
+    "timestamp": "2026-04-04T13:54:21.781586+00:00",
+    "verdict": "pass",
+    "reason": "All metrics within acceptable ranges",
+    "drift_score": 0.0,
+    "vera_score": 0.7075,
+    "action_taken": "none"
+  },
+  {
+    "interaction_id": "e3d74cd2db447d0f",
+    "timestamp": "2026-04-04T13:55:07.186325+00:00",
+    "verdict": "pass",
+    "reason": "All metrics within acceptable ranges",
+    "drift_score": 0.0,
+    "vera_score": 0.7075,
+    "action_taken": "none"
+  },
+  {
+    "interaction_id": "822052c21c7a3e76",
+    "timestamp": "2026-04-04T13:55:42.563166+00:00",
+    "verdict": "pass",
+    "reason": "All metrics within acceptable ranges",
+    "drift_score": 0.0,
+    "vera_score": 0.7075,
+    "action_taken": "none"
   }
 ]

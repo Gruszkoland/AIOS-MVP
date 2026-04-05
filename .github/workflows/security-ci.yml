@@ -1,0 +1,83 @@
+name: ADRION 369 Security Scans
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    - cron: "0 4 * * 1"  # Every Monday at 04:00 UTC
+
+jobs:
+  python-sast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bandit
+        run: pip install bandit[toml]
+
+      - name: Bandit SAST scan
+        run: |
+          bandit -r arbitrage/ \
+            -f json -o bandit-report.json \
+            --skip B101,B311 \
+            --severity-level medium
+
+      - name: Upload bandit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+  python-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install safety
+        run: pip install safety
+
+      - name: Safety dependency check
+        run: |
+          pip install -r requirements-arbitrage.txt
+          safety check --json -o safety-report.json
+
+      - name: Upload safety report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: safety-report
+          path: safety-report.json
+
+  container-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy on Python base image
+        uses: aquasecurity/trivy-action@0.18.0
+        with:
+          image-ref: "python:3.11-slim"
+          format: "table"
+          severity: "HIGH,CRITICAL"
+          exit-code: "1"
+
+      - name: Run Trivy on Go base image
+        uses: aquasecurity/trivy-action@0.18.0
+        with:
+          image-ref: "golang:1.22-alpine"
+          format: "table"
+          severity: "HIGH,CRITICAL"
+          exit-code: "1"

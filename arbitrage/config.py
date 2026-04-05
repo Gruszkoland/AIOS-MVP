@@ -44,6 +44,50 @@ QUANTUM_SCAN_CHANNELS = [
 # Security policy: wallet address is entered manually at transfer time and is not persisted in code/env.
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# LLM Prompts & Templates (G5: Transparency)
+# ─────────────────────────────────────────────────────────────────────────────
+ANALYZER_SYSTEM = os.getenv('ANALYZER_SYSTEM', """You are a freelance content writing expert evaluating job opportunities.
+Analyze the job and return ONLY a JSON object with:
+{
+  "score": <1-10>,
+  "fit": "<why this job fits a content writer>",
+  "risks": "<main risks or concerns>",
+  "est_hours": <estimated hours to complete>,
+  "our_price": <our recommended bid in USD>,
+  "est_cost": <estimated LLM/tools cost in USD, usually 0-5>,
+  "est_profit": <our_price minus est_cost>
+}
+Score criteria: 10=perfect fit, high budget, clear scope; 1=off-topic, too complex, red flags.
+""")
+
+ANALYZER_USER = os.getenv('ANALYZER_USER', """Job Title: {title}
+Platform: {platform}
+Budget: ${budget_min} - ${budget_max}
+Description: {description}
+
+Evaluate this job opportunity.""")
+
+COVER_LETTER_SYSTEM = os.getenv('COVER_LETTER_SYSTEM', """You are a professional freelance content writer with 5+ years of experience.
+Write a concise, personalized cover letter for a freelance job proposal.
+Rules:
+- Max 200 words
+- Start with a specific hook about THEIR project (not generic opening)
+- Mention 1-2 relevant examples or skills
+- Include proposed timeline
+- End with a soft call to action
+- Tone: professional but approachable
+Return ONLY the cover letter text, no JSON, no headers.
+""")
+
+COVER_LETTER_USER = os.getenv('COVER_LETTER_USER', """Write a cover letter for this job:
+Title: {title}
+Platform: {platform}
+Description: {description}
+Our bid price: ${our_price}
+Estimated delivery: {est_days} days""")
+
+
 def get_active_llm_backend() -> str:
     """Auto-detect which LLM backend to use based on available API keys."""
     if LLM_BACKEND != "auto":
@@ -55,4 +99,17 @@ def get_active_llm_backend() -> str:
     if ANTHROPIC_KEY:
         return "anthropic"
     return "mock"
+
+
+def validate_db_url(url: str) -> bool:
+    """
+    Validate that a DATABASE_URL has the expected PostgreSQL DSN format.
+
+    Expected pattern: postgresql://user:pass@host:port/dbname
+
+    Returns True if valid or url is empty (SQLite mode), False otherwise.
+    """
+    if not url:
+        return True  # SQLite mode — no URL required
+    return url.startswith("postgresql://") or url.startswith("postgres://")
 

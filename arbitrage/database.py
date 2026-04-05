@@ -12,6 +12,75 @@ from .config import DB_ENGINE, DB_PATH, DB_URL
 
 logger = logging.getLogger("adrion.db")
 
+# ── Connection Pool (PostgreSQL only) ────────────────────────────────────────
+_pool = None  # psycopg2.pool.SimpleConnectionPool instance, None in SQLite mode
+
+
+def init_pool(db_url: str = "", min_conn: int = 2, max_conn: int = 10) -> bool:
+    """
+    Initialize a psycopg2 connection pool for PostgreSQL production use.
+    No-op (returns False) when using SQLite.
+
+    Args:
+        db_url: PostgreSQL DSN (defaults to config.DB_URL).
+        min_conn: Minimum connections kept open.
+        max_conn: Maximum connections allowed.
+
+    Returns:
+        True if pool was created, False if using SQLite or psycopg2 missing.
+    """
+    global _pool
+    url = db_url or DB_URL
+    if not url or DB_ENGINE != "postgres":
+        logger.debug("Pool init skipped — SQLite mode or no DB_URL")
+        return False
+    try:
+        import psycopg2.pool
+        _pool = psycopg2.pool.SimpleConnectionPool(min_conn, max_conn, dsn=url)
+        # Pre-warm: check out and immediately return min_conn connections
+        conns = [_pool.getconn() for _ in range(min_conn)]
+        for c in conns:
+            _pool.putconn(c)
+        logger.info("PostgreSQL connection pool ready (min=%d, max=%d)", min_conn, max_conn)
+        return True
+    except ImportError:
+        logger.error("psycopg2 not installed — pool not available")
+    except Exception as e:
+        logger.error("Failed to create connection pool: %s", e)
+    return False
+
+
+def get_pooled_conn():
+    """
+    Return a connection checked out from the pool (PostgreSQL) or a fresh
+    SQLite connection. Caller must call return_conn() when done.
+    """
+    if _pool is not None:
+        return _pool.getconn()
+    return get_conn()
+
+
+def return_conn(conn) -> None:
+    """Return a pooled connection back to the pool. No-op for SQLite connections."""
+    if _pool is not None:
+        try:
+            _pool.putconn(conn)
+        except Exception as e:
+            logger.warning("Failed to return connection to pool: %s", e)
+
+
+def graceful_drain() -> None:
+    """Close all idle pool connections on app shutdown. No-op for SQLite."""
+    global _pool
+    if _pool is not None:
+        try:
+            _pool.closeall()
+            logger.info("Connection pool drained.")
+        except Exception as e:
+            logger.warning("Error draining pool: %s", e)
+        finally:
+            _pool = None
+
 def get_conn():
     """Returns a connection based on the configured engine."""
     if DB_ENGINE == "postgres" and DB_URL:
@@ -194,16 +263,13 @@ def init_db():
 def upsert_job(job: dict) -> bool:
     """Insert job, skip if already exists. Returns True if new."""
     with get_conn() as conn:
-        existing = conn.execute("SELECT id FROM jobs WHERE id=?", (job["id"],)).fetchone()
-        if existing:
-            return False
-        conn.execute(
-            "INSERT INTO jobs "
+        cursor = conn.execute(
+            "INSERT OR IGNORE INTO jobs "
             "(id,platform,title,description,budget_min,budget_max,client,url,keywords,status) "
             "VALUES (:id,:platform,:title,:description,:budget_min,:budget_max,:client,:url,:keywords,:status)",
             {**job, "keywords": json.dumps(job.get("keywords", [])), "status": "new"},
         )
-        return True
+        return cursor.rowcount > 0
 
 
 def get_jobs(status: str = None, limit: int = 50) -> list[dict]:
@@ -433,26 +499,8 @@ def get_client_bid_count_today(client_name: str) -> int:
 def upsert_deal(deal: dict) -> bool:
     """Insert or update a wholesale deal. Returns True if new."""
     with get_conn() as conn:
-        existing = conn.execute(
-            "SELECT id FROM deals WHERE sku=? AND supplier=?",
-            (deal["sku"], deal.get("supplier", "")),
-        ).fetchone()
-        if existing:
-            conn.execute(
-                "UPDATE deals SET wholesale_price=?, retail_price_de=?, retail_price_pl=?, "
-                "margin_pct=?, vortex_resonance=?, vortex_pass=?, stock_qty=?, "
-                "source_url=?, status=? WHERE id=?",
-                (
-                    deal.get("wholesale_price"), deal.get("retail_price_de"),
-                    deal.get("retail_price_pl"), deal.get("margin_pct"),
-                    deal.get("vortex_resonance"), int(deal.get("vortex_pass", False)),
-                    deal.get("stock_qty", 0), deal.get("source_url"), "updated",
-                    existing["id"],
-                ),
-            )
-            return False
-        conn.execute(
-            "INSERT INTO deals "
+        cursor = conn.execute(
+            "INSERT OR IGNORE INTO deals "
             "(sku,product_name,channel_id,wholesale_price,retail_price_de,retail_price_pl,"
             "margin_pct,vortex_resonance,vortex_pass,source_url,supplier,stock_qty,status) "
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
@@ -466,7 +514,21 @@ def upsert_deal(deal: dict) -> bool:
                 deal.get("stock_qty", 0), "new",
             ),
         )
-        return True
+        if cursor.rowcount > 0:
+            return True
+        conn.execute(
+            "UPDATE deals SET wholesale_price=?, retail_price_de=?, retail_price_pl=?, "
+            "margin_pct=?, vortex_resonance=?, vortex_pass=?, stock_qty=?, "
+            "source_url=?, status=? WHERE sku=? AND supplier=?",
+            (
+                deal.get("wholesale_price"), deal.get("retail_price_de"),
+                deal.get("retail_price_pl"), deal.get("margin_pct"),
+                deal.get("vortex_resonance"), int(deal.get("vortex_pass", False)),
+                deal.get("stock_qty", 0), deal.get("source_url"), "updated",
+                deal["sku"], deal.get("supplier", ""),
+            ),
+        )
+        return False
 
 
 def get_deals(channel_id: str = None, status: str = None, min_margin: float = None,

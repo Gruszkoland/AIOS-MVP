@@ -3,7 +3,6 @@ Unit tests for arbitrage/oracle.py — Predykcyjna Wyrocznia AI (PROGRAMATOR #19
 """
 import sys
 import os
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 os.environ.setdefault("DB_PATH", ":memory:")
@@ -17,8 +16,6 @@ from arbitrage.oracle import (
     oracle_predict,
     oracle_scan_products,
     FIBONACCI_RATIOS,
-    SPIRAL_EYE_LOW,
-    SPIRAL_EYE_HIGH,
     FREQ_528_HZ,
     FREQ_396_HZ,
     FREQ_174_HZ,

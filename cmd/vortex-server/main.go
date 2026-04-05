@@ -11,8 +11,9 @@ import (
 )
 
 func main() {
+	fmt.Println("ADRION 369 Vortex Engine v1.0.0")
 	// Initialize Vortex Engine (3-6-9) and Oracle
-	vortex := &quantum.VortexNode{}
+	vortex := quantum.NewVortexNode()
 	oracle := &quantum.OracleNode{Vortex: vortex}
 
 	// Start 174Hz Oscillation Tracker

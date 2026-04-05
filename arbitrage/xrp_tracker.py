@@ -4,10 +4,10 @@ Fetches live XRP/USD price, calculates progress toward 1000 XRP target,
 persists snapshots in the DB.
 NOTE: XRP wallet is NEVER stored here — enter at transfer time only.
 """
-import json
 import logging
 from datetime import datetime
-from urllib.request import Request, urlopen
+
+import requests
 
 from .config import XRP_TARGET
 from .database import get_conn
@@ -28,25 +28,27 @@ _PRICE_ENDPOINTS = [
 # ─────────────────────────────────────────────────────────────────────────────
 def fetch_xrp_price() -> float:
     """Try multiple public APIs to get current XRP/USD price."""
+    headers = {"User-Agent": "ADRION369/1.0"}
+
     # CoinGecko
     try:
-        req = Request(_PRICE_ENDPOINTS[0], headers={"User-Agent": "ADRION369/1.0"})
-        with urlopen(req, timeout=5) as resp:
-            data = json.loads(resp.read())
-            price = float(data["ripple"]["usd"])
-            log.debug("XRP price from CoinGecko: $%.4f", price)
-            return price
+        resp = requests.get(_PRICE_ENDPOINTS[0], headers=headers, timeout=5)
+        resp.raise_for_status()
+        data = resp.json()
+        price = float(data["ripple"]["usd"])
+        log.debug("XRP price from CoinGecko: $%.4f", price)
+        return price
     except Exception as e:
         log.warning("CoinGecko failed: %s", e)
 
     # Binance
     try:
-        req = Request(_PRICE_ENDPOINTS[1], headers={"User-Agent": "ADRION369/1.0"})
-        with urlopen(req, timeout=5) as resp:
-            data = json.loads(resp.read())
-            price = float(data["price"])
-            log.debug("XRP price from Binance: $%.4f", price)
-            return price
+        resp = requests.get(_PRICE_ENDPOINTS[1], headers=headers, timeout=5)
+        resp.raise_for_status()
+        data = resp.json()
+        price = float(data["price"])
+        log.debug("XRP price from Binance: $%.4f", price)
+        return price
     except Exception as e:
         log.warning("Binance failed: %s", e)
 

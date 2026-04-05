@@ -25,7 +25,6 @@ Endpoints:
   GET  /api/arbitrage/mass-generate/manifest (Get current manifest)
 """
 
-import collections
 import json
 import logging
 import os
@@ -35,68 +34,11 @@ import time
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+from arbitrage.rate_limiter import cycle_limiter, mass_gen_limiter, oracle_limiter, quantum_limiter, scout_limiter
+
 logger = logging.getLogger(__name__)
 ARB_PORT = 8001
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Rate Limiter — G8/A-11 fix: sliding-window per-IP, thread-safe
-# ──────────────────────────────────────────────────────────────────────────────
-
-class _SlidingWindowRateLimiter:
-    """Thread-safe sliding-window rate limiter keyed by client IP."""
-
-    def __init__(self, max_requests: int, window_seconds: float) -> None:
-        self._max = max_requests
-        self._window = window_seconds
-        self._lock = threading.Lock()
-        self._buckets: dict[str, collections.deque] = {}
-
-    def is_allowed(self, key: str) -> bool:
-        now = time.monotonic()
-        cutoff = now - self._window
-        with self._lock:
-            dq = self._buckets.setdefault(key, collections.deque())
-            while dq and dq[0] < cutoff:
-                dq.popleft()
-            if len(dq) >= self._max:
-                return False
-            dq.append(now)
-            return True
-
-
-def _env_positive_int(name: str, default: int) -> int:
-    raw = os.getenv(name)
-    if raw is None:
-        return default
-    try:
-        value = int(raw)
-        if value <= 0:
-            raise ValueError()
-        return value
-    except ValueError:
-        logger.warning("Invalid %s=%r, using default %d", name, raw, default)
-        return default
-
-
-def _env_positive_float(name: str, default: float) -> float:
-    raw = os.getenv(name)
-    if raw is None:
-        return default
-    try:
-        value = float(raw)
-        if value <= 0:
-            raise ValueError()
-        return value
-    except ValueError:
-        logger.warning("Invalid %s=%r, using default %.3f", name, raw, default)
-        return default
-
-
-_quantum_limiter = _SlidingWindowRateLimiter(
-    max_requests=_env_positive_int("QUANTUM_RATE_LIMIT_MAX", 30),
-    window_seconds=_env_positive_float("QUANTUM_RATE_LIMIT_WINDOW_SECONDS", 60.0),
-)
+_CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "http://localhost:8003")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -179,14 +121,14 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
         body = json.dumps(data, default=str).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", _CORS_ORIGIN)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
 
     def do_OPTIONS(self):
         self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", _CORS_ORIGIN)
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
@@ -215,7 +157,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
                 self._send({"error": "Not found"}, 404)
         except Exception as exc:
             logger.exception("GET error: %s", exc)
-            self._send({"error": str(exc)}, 500)
+            self._send({"error": "Internal server error"}, 500)
 
     def do_POST(self):
         try:
@@ -254,7 +196,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
                 self._send({"error": "Not found"}, 404)
         except Exception as exc:
             logger.exception("POST error: %s", exc)
-            self._send({"error": str(exc)}, 500)
+            self._send({"error": "Internal server error"}, 500)
 
     # ── Handlers ──────────────────────────────────────────────────────────────
 
@@ -300,11 +242,19 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
         self._send({"ok": True, "bid_id": bid_id, "approved": approved})
 
     def _handle_scout(self):
+        client_ip = self.client_address[0]
+        if not scout_limiter.is_allowed(client_ip):
+            self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
+            return
         run_scout = _scout()
         result = run_scout()
         self._send(result)
 
     def _handle_analyze_batch(self):
+        client_ip = self.client_address[0]
+        if not mass_gen_limiter.is_allowed(client_ip):
+            self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
+            return
         get_jobs, _, _, _, _ = _db()
         analyze_job, filter_worthy, create_bid = _analyzer()
         DAILY_BID_LIMIT, MIN_ANALYZER_SCORE, _ = _config()
@@ -332,6 +282,10 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_cycle(self):
         """Run scout + analyze in background, return immediately."""
+        client_ip = self.client_address[0]
+        if not cycle_limiter.is_allowed(client_ip):
+            self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
+            return
         def _run():
             run_scout = _scout()
             get_jobs, _, _, _, _ = _db()
@@ -387,7 +341,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
     def _handle_quantum_decide(self):
         """POST /api/arbitrage/quantum/decide — Kwantowy Moduł Decyzyjny."""
         client_ip = self.client_address[0]
-        if not _quantum_limiter.is_allowed(client_ip):
+        if not quantum_limiter.is_allowed(client_ip):
             self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
             return
 
@@ -413,7 +367,7 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
     def _handle_quantum_scan(self):
         """POST /api/arbitrage/quantum/scan — Skan wszystkich kanałów."""
         client_ip = self.client_address[0]
-        if not _quantum_limiter.is_allowed(client_ip):
+        if not quantum_limiter.is_allowed(client_ip):
             self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
             return
 
@@ -426,6 +380,10 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_oracle_predict(self):
         """POST /api/arbitrage/oracle/predict — Vortex Oracle single prediction."""
+        client_ip = self.client_address[0]
+        if not oracle_limiter.is_allowed(client_ip):
+            self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
+            return
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}") if length else {}
         wholesale_price = float(body.get("wholesale_price", 0))
@@ -438,6 +396,10 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_oracle_scan(self):
         """POST /api/arbitrage/oracle/scan — Oracle batch product scan."""
+        client_ip = self.client_address[0]
+        if not oracle_limiter.is_allowed(client_ip):
+            self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
+            return
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}") if length else {}
         products = body.get("products", [])
@@ -463,6 +425,10 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_wholesale_cycle(self):
         """POST /api/arbitrage/wholesale/cycle — Full Singularity Run pipeline."""
+        client_ip = self.client_address[0]
+        if not cycle_limiter.is_allowed(client_ip):
+            self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
+            return
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}") if length else {}
         channel_filter = body.get("channel_filter")
@@ -492,6 +458,10 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
 
     def _handle_mass_generate(self):
         """POST /api/arbitrage/mass-generate — Run Mass Generator pipeline."""
+        client_ip = self.client_address[0]
+        if not mass_gen_limiter.is_allowed(client_ip):
+            self._send({"error": "Rate limit exceeded", "retry_after": 60}, 429)
+            return
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}") if length else {}
         channel_filter = body.get("channel_filter")
