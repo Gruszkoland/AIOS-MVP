@@ -11,6 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
 from api import app, API_KEY, TASKS_STORE, GENESIS_LOGS, AGENT_TRUST_SCORES
+import api as api_module
 
 @pytest.fixture
 def client():
@@ -21,13 +22,19 @@ def client():
 
 
 @pytest.fixture(autouse=True)
-def reset_stores():
-    """Reset in-memory stores before each test."""
+def reset_stores(monkeypatch):
+    """Reset in-memory stores before each test and force in-memory mode."""
+    # Force in-memory mode so tests don't depend on a running PostgreSQL
+    monkeypatch.setattr(api_module, "USE_DATABASE", False)
+    monkeypatch.setattr(api_module, "db", None)
+
     TASKS_STORE.clear()
     GENESIS_LOGS.clear()
+    api_module.CHECKPOINTS_STORE.clear()
     yield
     TASKS_STORE.clear()
     GENESIS_LOGS.clear()
+    api_module.CHECKPOINTS_STORE.clear()
 
 
 # ──────────────────────────────────────────────────────────────────────────

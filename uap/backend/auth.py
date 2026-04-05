@@ -252,15 +252,36 @@ class AuthManager:
 
     def filter_tasks_by_tenant(self, org_id: str,
                               filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
-        """Get tasks for specific tenant."""
-        # TODO: Query PostgreSQL using scope_query_to_tenant result
-        return []
+        """Get tasks for specific tenant — filters by org_id in-memory after DB query."""
+        filters = filters or {}
+        try:
+            all_tasks = self.db.list_tasks(
+                status=filters.get("status"),
+                agent=filters.get("agent"),
+                limit=filters.get("limit", 1000),
+            )
+        except Exception as e:
+            import logging as _l
+            _l.getLogger("adrion.uap.auth").error("Failed to query tasks for tenant filter: %s", e)
+            all_tasks = []
+        return [t for t in all_tasks if t.get("org_id") == org_id]
 
     def filter_genesis_logs_by_tenant(self, org_id: str,
                                       filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
-        """Get Genesis logs for specific tenant."""
-        # TODO: Query PostgreSQL using scope_query_to_tenant result
-        return []
+        """Get Genesis logs for specific tenant — filters by org_id in-memory after DB query."""
+        filters = filters or {}
+        try:
+            all_logs = self.db.query_genesis_logs(
+                agent=filters.get("agent"),
+                since_hours=filters.get("since_hours", 24),
+                status=filters.get("status"),
+                limit=filters.get("limit", 100),
+            )
+        except Exception as e:
+            import logging as _l
+            _l.getLogger("adrion.uap.auth").error("Failed to query genesis logs for tenant filter: %s", e)
+            all_logs = []
+        return [log for log in all_logs if log.get("org_id") == org_id]
 
     # ────────────────────────────────────────────────────────────────────
     # UTILITY

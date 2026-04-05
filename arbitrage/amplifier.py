@@ -65,6 +65,7 @@ class AdrionAmplifier:
 
     def _verify_authenticity(self, data):
         """Guardian G6: Check for inflated claims (Placeholder for NLP logic)."""
+        # TODO: replace with real NLP check
         # Simple heuristic: if metrics are provided, it's more authentic
         return len(data.get('metrics', {})) > 0
 
@@ -77,6 +78,7 @@ class AdrionAmplifier:
         logger.info("Publishing to LinkedIn...")
         # Placeholder for actual API call
         # Mocking success for simulation
+        logger.warning("LinkedIn API not configured — publish is simulated")
         return True
 
 if __name__ == '__main__':

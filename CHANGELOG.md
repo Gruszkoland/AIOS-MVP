@@ -6,6 +6,26 @@ versioning based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.0] - 2026-04-05
+
+### Added
+- **UAP tests CI step** — `pytest uap/tests/ -v` added as separate step in `python-ci.yml` with env vars `UAP_API_KEY`, `ENVIRONMENT`, `JWT_SECRET`
+- **GUARDIAN_LAWS_CANONICAL.json** (`docs/`) — single-source canonical definition of all 9 Guardian Laws (G1–G9)
+
+### Changed
+- **Coverage gate unified** — `--cov-fail-under` raised from 37 → 65 in `.github/workflows/release.yml` (aligned with `python-ci.yml` and `pyproject.toml`)
+- **Resource limits** added to all major services in `docker-compose.prod.yml` (`deploy.resources.limits`): adrion-api (512m/0.5cpu), adrion-uap (512m/0.5cpu), adrion-dashboard (256m/0.25cpu), loki (512m/0.5cpu), grafana (512m/0.5cpu), adrion-nginx (128m/0.25cpu)
+- **Pre-commit hook cross-platform** — `powershell.exe` call in `.githooks/pre-commit` wrapped in shell detection (powershell.exe → pwsh → warning fallback)
+
+### Security
+- **Bandit SAST** — `continue-on-error: false` made explicit in `security-ci.yml` to ensure hard block on findings
+- **Safety dependency check** — `continue-on-error: false` made explicit in `security-ci.yml`
+
+### Fixed
+- **`.gitignore`** — added `monitoring/*.jsonl`, `monitoring/*_history*.jsonl`, `monitoring/*_test*.json`, `.runtime/`, `*.pid` to prevent runtime data from being committed
+
+---
+
 ## [Unreleased]
 
 ### Security

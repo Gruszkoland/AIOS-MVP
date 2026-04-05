@@ -5,6 +5,8 @@ persists snapshots in the DB.
 NOTE: XRP wallet is NEVER stored here — enter at transfer time only.
 """
 import logging
+import threading
+import time
 from datetime import datetime
 
 import requests
@@ -132,6 +134,49 @@ def get_progress() -> dict:
         "pct_complete":     0.0,
         "snapshot_at":      None,
     }
+
+
+def start_tracking(interval_seconds: int = 300, log_every_n: int = 10) -> threading.Thread:
+    """
+    Start continuous XRP price tracking loop in a background daemon thread.
+
+    Calls update_xrp_snapshot() every `interval_seconds` and logs a summary
+    every `log_every_n` iterations (StartOscillation — 528Hz regeneration rhythm).
+
+    Args:
+        interval_seconds: Pause between snapshots (default 300 = 5 min).
+        log_every_n:      Log progress summary every N iterations (default 10).
+
+    Returns:
+        The started daemon Thread (can be ignored — it will stop with the process).
+    """
+    iteration = 0
+
+    def _worker() -> None:
+        nonlocal iteration
+        log.info(
+            "XRP tracker started — interval=%ds, log_every_n=%d",
+            interval_seconds, log_every_n,
+        )
+        while True:
+            try:
+                snap = update_xrp_snapshot()
+                iteration += 1
+                if iteration % log_every_n == 0:
+                    log.info(
+                        "XRP oscillation #%d — price=$%.4f earned=$%.2f progress=%.1f%%",
+                        iteration,
+                        snap["xrp_price_usd"],
+                        snap["total_earned_usd"],
+                        snap["pct_complete"],
+                    )
+            except Exception as exc:
+                log.warning("XRP snapshot failed at iteration %d: %s", iteration, exc)
+            time.sleep(interval_seconds)
+
+    t = threading.Thread(target=_worker, daemon=True, name="adrion-xrp-tracker")
+    t.start()
+    return t
 
 
 def get_kpi_summary() -> dict:

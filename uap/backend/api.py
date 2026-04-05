@@ -379,6 +379,11 @@ def task_delegate():
         time.sleep(1)  # Simulate work
         task["status"] = "executing"
         task["updated_at"] = datetime.now().isoformat()
+        if USE_DATABASE and db:
+            try:
+                db.update_task_status(task_id, "executing")
+            except Exception as exc:
+                logger.error("Failed to update task status to 'executing' in DB: %s", exc)
 
         time.sleep(2)  # More work
         task["status"] = "completed"
@@ -388,6 +393,11 @@ def task_delegate():
             "confidence": 0.92,
         }
         task["updated_at"] = datetime.now().isoformat()
+        if USE_DATABASE and db:
+            try:
+                db.update_task_status(task_id, "completed", task["result"])
+            except Exception as exc:
+                logger.error("Failed to update task status to 'completed' in DB: %s", exc)
 
         log_genesis_record(
             task_id=task_id,
@@ -664,7 +674,20 @@ def checkpoint_create():
     body = request.get_json(silent=True) or {}
     label = body.get("label", "")
 
-    checkpoint_id = f"rbc-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+    checkpoint_id = f"rbc-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}"
+
+    # Snapshot current session state (tasks + logs) for restore capability
+    try:
+        if USE_DATABASE and db:
+            tasks_snapshot = db.list_tasks(limit=10000)
+            logs_snapshot = db.export_genesis_logs()
+        else:
+            tasks_snapshot = list(TASKS_STORE.values())
+            logs_snapshot = GENESIS_LOGS.copy()
+    except Exception as snap_err:
+        logger.warning("Failed to snapshot full state for checkpoint: %s. Storing counts only.", snap_err)
+        tasks_snapshot = []
+        logs_snapshot = []
 
     checkpoint = {
         "checkpoint_id": checkpoint_id,
@@ -672,8 +695,10 @@ def checkpoint_create():
         "created_at": datetime.now().isoformat(),
         "git_commit": "local-checkpoint",  # TODO: actual git commit hash
         "session_state": {
-            "tasks_count": len(db.list_tasks(limit=10000)) if (USE_DATABASE and db) else len(TASKS_STORE),
-            "logs_count": len(db.export_genesis_logs()) if (USE_DATABASE and db) else len(GENESIS_LOGS),
+            "tasks_count": len(tasks_snapshot),
+            "logs_count": len(logs_snapshot),
+            "tasks": tasks_snapshot,
+            "logs": logs_snapshot,
         },
     }
 
@@ -713,10 +738,42 @@ def checkpoint_restore(checkpoint_id: str):
         return jsonify({"error": "Unauthorized"}), 401
 
     checkpoint = CHECKPOINTS_STORE.get(checkpoint_id)
+
+    # Try DB first if in-memory store doesn't have it
+    if not checkpoint and USE_DATABASE and db:
+        try:
+            checkpoint = db.get_checkpoint(checkpoint_id)
+        except Exception as e:
+            logger.warning("Failed to fetch checkpoint from DB: %s", e)
+
     if not checkpoint:
         return jsonify({"error": f"Checkpoint {checkpoint_id} not found"}), 404
 
-    # TODO: Actually restore git state, session state
+    # Load session_state and restore in-memory stores if data is present
+    session_state = checkpoint.get("session_state") or {}
+
+    tasks_restored = 0
+    logs_restored = 0
+
+    if "tasks" in session_state and isinstance(session_state["tasks"], list):
+        TASKS_STORE.clear()
+        for task in session_state["tasks"]:
+            if isinstance(task, dict) and "task_id" in task:
+                TASKS_STORE[task["task_id"]] = task
+        tasks_restored = len(TASKS_STORE)
+        logger.info(
+            "event=checkpoint_restore checkpoint_id=%s tasks_restored=%d",
+            checkpoint_id, tasks_restored,
+        )
+
+    if "logs" in session_state and isinstance(session_state["logs"], list):
+        GENESIS_LOGS.clear()
+        GENESIS_LOGS.extend(session_state["logs"])
+        logs_restored = len(GENESIS_LOGS)
+        logger.info(
+            "event=checkpoint_restore checkpoint_id=%s logs_restored=%d",
+            checkpoint_id, logs_restored,
+        )
 
     log_genesis_record(
         task_id="system",
@@ -724,13 +781,17 @@ def checkpoint_restore(checkpoint_id: str):
         status="restored",
         action="RBC_checkpoint_restored",
         guards_passed=9,
-        notes=f"Restored from {checkpoint_id}"
+        notes=f"Restored from {checkpoint_id}: label='{checkpoint.get('label', '')}'"
     )
 
     return jsonify({
         "status": "restored",
         "checkpoint_id": checkpoint_id,
+        "label": checkpoint.get("label", ""),
+        "restored_from": checkpoint.get("created_at", ""),
         "restored_at": datetime.now().isoformat(),
+        "tasks_restored": tasks_restored,
+        "logs_restored": logs_restored,
     })
 
 
@@ -841,6 +902,14 @@ try:
     logger.info("✅ Phase 2 endpoints registered (PRIORITY 1-10)")
 except Exception as e:
     logger.warning(f"⚠️ Phase 2 endpoints not registered: {e}")
+
+# Register Phase 3 auth endpoints (JWT + RBAC)
+try:
+    from auth_endpoints import register_auth_endpoints
+    register_auth_endpoints(app)
+    logger.info("✅ Phase 3 auth endpoints registered (JWT + RBAC)")
+except Exception as e:
+    logger.warning(f"⚠️ Phase 3 auth endpoints not registered: {e}")
 
 if __name__ == "__main__":
     print("=" * 45)

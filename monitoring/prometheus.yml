@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'adrion-api'
+    static_configs:
+      - targets: ['adrion-api:8001']
+    metrics_path: '/metrics'
+
+  - job_name: 'adrion-uap'
+    static_configs:
+      - targets: ['adrion-uap:8002']
+    metrics_path: '/mapi/v1/metrics'
+
+  - job_name: 'vortex-sentinel'
+    static_configs:
+      - targets: ['adrion-vortex:1740']
+    metrics_path: '/metrics'

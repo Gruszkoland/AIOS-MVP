@@ -51,3 +51,13 @@ jobs:
         with:
           name: python-coverage
           path: tests/results/
+
+      - name: Run UAP tests
+        env:
+          UAP_API_KEY: test-key-ci
+          ENVIRONMENT: testing
+          JWT_SECRET: test-jwt-secret-ci
+        run: |
+          cd uap
+          pip install -r requirements.txt 2>/dev/null || true
+          pytest tests/ -v --tb=short

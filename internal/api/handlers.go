@@ -207,7 +207,9 @@ func (h *Handler) SentinelScan(c echo.Context) error {
 	})
 }
 
-// GetThreats returns current threat monitoring status (A-01 to A-12)
+// GetThreats returns current threat monitoring status (A-01 to A-12).
+// NOTE: threat Details are static nominal baselines; dynamic anomaly detection
+// is not yet implemented. resonance and health reflect live Vortex state (P1-06).
 func (h *Handler) GetThreats(c echo.Context) error {
 	// Sentinel monitors 12 threat vectors
 	threats := []ThreatEntry{
@@ -222,7 +224,9 @@ func (h *Handler) GetThreats(c echo.Context) error {
 		"active_alerts":            0,
 		"threats":                  threats,
 		"guardian_status":          "G7-G9 enforced",
-		"timestamp":                time.Now().Format(time.RFC3339),
+		"resonance":                h.Vortex.GetResonance(),
+		"health":                   h.Vortex.GetHealth(),
+		"timestamp":                time.Now().UTC(),
 	})
 }
 

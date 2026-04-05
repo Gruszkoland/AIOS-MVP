@@ -46,3 +46,10 @@ config/nginx/certs/
 
 # ── adrion-swarm secrets ──────────────────────────────────────────────────
 adrion-swarm/.env
+
+# Runtime monitoring data
+monitoring/*.jsonl
+monitoring/*_history*.jsonl
+monitoring/*_test*.json
+.runtime/
+*.pid

@@ -11,6 +11,7 @@ Routes added:
 """
 import os
 import sys
+import hmac
 from pathlib import Path
 from functools import wraps
 from typing import Dict, Any, Optional
@@ -22,20 +23,19 @@ from integration import get_integration
 from db import get_db
 from websocket_server import TelemetryServer
 
-# PRIORITY 6 FIX: Move API key to environment variable
-_API_KEY_DEFAULT = "local-dev-key-123"
-API_KEY = os.getenv("UAP_API_KEY", _API_KEY_DEFAULT)
+# PRIORITY 6 FIX: Use empty default — never ship a hardcoded key
+API_KEY = os.getenv("UAP_API_KEY", "")
 
-if API_KEY == _API_KEY_DEFAULT:
+if not API_KEY:
     import logging as _logging
     _logging.getLogger("adrion.uap.api").warning(
-        "[SECURITY] UAP_API_KEY is not set — using insecure default 'local-dev-key-123'. "
+        "[SECURITY] UAP_API_KEY is not set — all authenticated requests will be rejected. "
         "Set UAP_API_KEY env var before exposing this service on a network."
     )
     if os.getenv("ENVIRONMENT") == "production":
         import logging as _logging2
         _logging2.getLogger("adrion.uap.api").critical(
-            "[SECURITY] UAP_API_KEY is default in PRODUCTION — refusing to start."
+            "[SECURITY] UAP_API_KEY is empty in PRODUCTION — refusing to start."
         )
         sys.exit(1)
 
@@ -51,8 +51,8 @@ def require_api_key(f):
                 # In dev mode, warn but allow (will likely reject since no key matches empty)
                 pass
 
-        key = request.headers.get("X-API-Key")
-        if key != API_KEY:
+        key = request.headers.get("X-API-Key") or ""
+        if not API_KEY or not hmac.compare_digest(key, API_KEY):
             return jsonify({"error": "Unauthorized"}), 401
         return f(*args, **kwargs)
     return decorated_function
@@ -371,4 +371,4 @@ def register_phase2_endpoints(app: Flask):
     print("  GET  /mapi/v1/agent/<agent>/metrics — Agent EBDI history")
     print("  GET  /mapi/v1/checkpoint/v2/list — PostgreSQL checkpoints")
     print("\n🔐 Security settings:")
-    print(f"  UAP_API_KEY: {'default (⚠️ change in production)' if API_KEY == _API_KEY_DEFAULT else 'custom (✓ set from env)'}")
+    print(f"  UAP_API_KEY: {'not set (⚠️ all authenticated requests rejected)' if not API_KEY else 'custom (✓ set from env)'}")

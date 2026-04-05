@@ -54,7 +54,14 @@ def in_memory_db():
 
 @pytest.fixture
 def clean_env(monkeypatch):
-    """Remove all ADRION-related env vars so defaults are used."""
+    """Remove all ADRION-related env vars so defaults are used.
+
+    Also patches load_dotenv to be a no-op so .env file doesn't override
+    the cleared environment during module reloads in tests.
+    """
+    import dotenv
+    monkeypatch.setattr(dotenv, "load_dotenv", lambda *a, **kw: None)
+
     keys = [
         "LLM_BACKEND", "OPENROUTER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
         "LLM_MODEL", "APIFY_API_TOKEN", "DATABASE_URL", "DB_ENGINE", "DB_PATH",

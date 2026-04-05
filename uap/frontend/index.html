@@ -12,12 +12,18 @@
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
+            --primary-blue: #0078D4;
+            --primary-gradient: linear-gradient(135deg, #0078D4 0%, #0066CC 100%);
+            --secondary-dark: #1E3A5F;
+            --tertiary-gray: #2C3E50;
+            --light-bg: #F5F5F5;
+            --white-bg: #FFFFFF;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+            --danger-color: #E74C3C;
+            --border-light: #D5D8DC;
+            --text-primary: #1E3A5F;
+            --text-secondary: #566573;
         }
 
         * {
@@ -27,16 +33,16 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 100%);
-            color: #e2e8f0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             min-height: 100vh;
         }
 
         .navbar {
-            background: rgba(15, 23, 42, 0.95);
-            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-            backdrop-filter: blur(10px);
+            background: var(--white-bg);
+            border-bottom: 2px solid var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .navbar-brand {
@@ -54,16 +60,23 @@
         }
 
         .card {
-            background: var(--card-bg);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: var(--white-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 16px rgba(0, 120, 212, 0.1);
+            border-color: var(--primary-blue);
         }
 
         .card-header {
-            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
-            background: rgba(102, 126, 234, 0.1);
+            border-bottom: 2px solid var(--primary-blue);
+            background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
         .status-badge {
@@ -74,9 +87,9 @@
             font-weight: 600;
         }
 
-        .status-online { background: var(--success-color); color: white; }
-        .status-offline { background: var(--danger-color); color: white; }
-        .status-pending { background: var(--warning-color); color: white; }
+        .status-online { background: #D4EDDA; color: var(--success-color); border: 1px solid var(--success-color); }
+        .status-offline { background: #F8D7DA; color: var(--danger-color); border: 1px solid var(--danger-color); }
+        .status-pending { background: #FFF3CD; color: #856404; border: 1px solid var(--warning-color); }
 
         .score-display {
             font-size: 2rem;
@@ -93,6 +106,8 @@
             margin: 5px;
             font-weight: 600;
             min-width: 100px;
+            background: var(--white-bg);
+            border: 1px solid var(--border-light);
         }
 
         .agent-list-item {

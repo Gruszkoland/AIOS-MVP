@@ -12,7 +12,7 @@ import os
 import json
 import logging
 import psycopg2
-from psycopg2 import sql
+from psycopg2 import sql, pool
 from contextlib import contextmanager
 from datetime import datetime
 from typing import List, Dict, Any, Optional
@@ -41,12 +41,22 @@ class PostgresDB:
 
     def __init__(self):
         self.conn_string = f"postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
+        self._pool = pool.ThreadedConnectionPool(2, 10, self.conn_string)
         self._init_schema()
 
     @contextmanager
+    def get_conn(self):
+        """Get a raw connection from the pool; caller is responsible for commit/rollback."""
+        conn = self._pool.getconn()
+        try:
+            yield conn
+        finally:
+            self._pool.putconn(conn)
+
+    @contextmanager
     def get_connection(self):
-        """Context manager for database connections."""
-        conn = psycopg2.connect(self.conn_string)
+        """Context manager for database connections with automatic commit/rollback."""
+        conn = self._pool.getconn()
         try:
             yield conn
             conn.commit()
@@ -54,7 +64,7 @@ class PostgresDB:
             conn.rollback()
             raise
         finally:
-            conn.close()
+            self._pool.putconn(conn)
 
     def _init_schema(self):
         """Create tables if they don't exist."""
@@ -381,8 +391,9 @@ class PostgresDB:
                 }
 
     def cleanup(self):
-        """Close all connections."""
-        pass  # psycopg2 handles this
+        """Close all connections in the pool."""
+        if hasattr(self, "_pool") and self._pool:
+            self._pool.closeall()
 
 
 # Singleton instance
