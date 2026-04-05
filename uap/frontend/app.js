@@ -34,6 +34,43 @@ function getUserRole() {
   return localStorage.getItem("role") || "operator";
 }
 
+// ──────────────────────────────────────────────────────────────────────────
+// CONNECTION STATUS MONITOR
+// ──────────────────────────────────────────────────────────────────────────
+
+function checkConnectionStatus() {
+  fetch(`${API_BASE_URL}/status`, {
+    method: "GET",
+    headers: {"X-API-Key": "local-dev-key-123"}
+  })
+  .then(response => {
+    if (response.ok) {
+      updateConnectionStatus(true);
+    } else {
+      updateConnectionStatus(false);
+    }
+  })
+  .catch(err => {
+    console.error("Connection check failed:", err);
+    updateConnectionStatus(false);
+  });
+}
+
+function updateConnectionStatus(isConnected) {
+  const statusEl = document.getElementById("connection-status");
+  if (!statusEl) return;
+
+  if (isConnected) {
+    statusEl.classList.remove("status-offline");
+    statusEl.classList.add("status-online");
+    statusEl.innerHTML = '<i class="fas fa-circle me-2" style="color: #27AE60;"></i>Connected ✓';
+  } else {
+    statusEl.classList.remove("status-online");
+    statusEl.classList.add("status-offline");
+    statusEl.innerHTML = '<i class="fas fa-circle me-2"></i>Offline';
+  }
+}
+
 function checkAuth() {
   const token = getAuthToken();
   if (!token) {
@@ -1363,6 +1400,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (resumeBtn) {
     resumeBtn.addEventListener("click", resumeSession);
   }
+
+  // Check backend connection status
+  checkConnectionStatus();
+  setInterval(checkConnectionStatus, 5000);  // Check every 5 seconds
 
   loadHealerDashboard();
   initializeChat();
