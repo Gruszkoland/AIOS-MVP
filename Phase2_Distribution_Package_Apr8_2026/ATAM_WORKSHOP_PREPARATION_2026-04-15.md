@@ -334,6 +334,40 @@ For each HIGH/MEDIUM risk:
 
 ---
 
+## CONTINGENCY PLANS
+
+### 🚨 Scenario 1: Video Conference Fails
+
+**Action:**
+- [ ] Switch to voice-only + shared Google Doc
+- [ ] Dial-in number: [BACKUP NUMBER TO BE FILLED]
+- [ ] Continue discussions synchronously in Doc
+- [ ] Record key decisions real-time in shared template
+
+**Backup Tool:** Google Doc + Zoom dial-in phone
+
+### 🚨 Scenario 2: Architect Unavailable
+
+**Action:**
+- [ ] Sentinel takes facilitation role
+- [ ] SAP assists with time-keeping
+- [ ] Proceed with full 3h 45m agenda (don't cancel)
+- [ ] Architect reviews recording + notes by Apr 16
+
+**Backup Facilitator:** Sentinel (empowered to make process decisions)
+
+### 🚨 Scenario 3: Workshop Time Overrun
+
+**Action (Priority Order):**
+1. Cut trade-offs discussion (reduce 45 min → 25 min)
+2. Focus on Quality Attributes + Scenarios (must-have)
+3. Defer detailed risk mitigation to async follow-up doc
+4. Schedule 30-min follow-up call for Apr 16 (resolve open items)
+
+**Outcome:** Core workshop completed, low-priority items deferred
+
+---
+
 ## EXPECTED WORKSHOP OUTPUTS
 
 ### Deliverables (Immediate)

@@ -1,7 +1,7 @@
 # 📅 PHASE 2 MASTER TIMELINE & ROADMAP
 
 **Status:** 🔲 PLANNED (Ready to execute post-ATAM workshop)  
-**Phase 2 Duration:** 8-10 weeks (Q2 2026: May 1 — July 15)  
+**Phase 2 Duration:** 16 weeks (Q2-Q3 2026: Apr 8 — Jul 31, 2026)  
 **Generated:** 2026-04-05  
 **Current Date:** 2026-04-05 (10 days to ATAM kick-off)
 
@@ -11,6 +11,8 @@
 
 **Phase 2 Mission:**
 Implement ADR-002 through ADR-010 (9 remaining ADRs) with rigorous quality gates, moving ADRION 369 from 10% to ~65% ADR coverage.
+
+**Timeline Scope:** Apr 8 (distribution) → Jul 31, 2026 (Phase 2 complete)
 
 **Key Metrics:**
 
