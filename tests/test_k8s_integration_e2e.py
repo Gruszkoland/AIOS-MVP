@@ -34,9 +34,9 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
     def create_mock_app(self):
         """Create mock Flask app for testing"""
         from flask import Flask, jsonify
-        
+
         app = Flask(__name__)
-        
+
         @app.route('/mapi/v1/kubernetes/cluster-info', methods=['GET'])
         def kubernetes_cluster_info():
             return jsonify({
@@ -48,7 +48,7 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
                     "api_health": "ok"
                 }
             })
-        
+
         @app.route('/mapi/v1/kubernetes/pods', methods=['GET'])
         def kubernetes_pods_status():
             return jsonify({
@@ -60,7 +60,7 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
                     "total": 14
                 }
             })
-        
+
         @app.route('/mapi/v1/kubernetes/services', methods=['GET'])
         def kubernetes_services():
             return jsonify({
@@ -70,7 +70,7 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
                     "services": []
                 }
             })
-        
+
         @app.route('/mapi/v1/kubernetes/deployments', methods=['GET'])
         def kubernetes_deployments():
             return jsonify({
@@ -80,7 +80,7 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
                     "deployments": []
                 }
             })
-        
+
         @app.route('/mapi/v1/kubernetes/pod/<pod_name>/logs', methods=['GET'])
         def kubernetes_pod_logs(pod_name):
             return jsonify({
@@ -88,42 +88,42 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
                 "pod": pod_name,
                 "logs": "Sample logs..."
             })
-        
+
         @app.route('/mapi/v1/kubernetes/pod/<pod_name>/restart', methods=['POST'])
         def kubernetes_pod_restart(pod_name):
             return jsonify({
                 "status": "success",
                 "message": f"Pod {pod_name} restart initiated"
             })
-        
+
         @app.route('/mapi/v1/kubernetes/metrics', methods=['GET'])
         def kubernetes_metrics():
             return jsonify({
                 "status": "success",
                 "metrics": {}
             })
-        
+
         @app.route('/mapi/v1/kubernetes/events', methods=['GET'])
         def kubernetes_events():
             return jsonify({
                 "status": "success",
                 "events": []
             })
-        
+
         @app.route('/mapi/v1/kubernetes/watch/start', methods=['POST'])
         def kubernetes_watch_start():
             return jsonify({
                 "status": "success",
                 "message": "Kubernetes watcher started"
             })
-        
+
         @app.route('/mapi/v1/kubernetes/watch/stop', methods=['POST'])
         def kubernetes_watch_stop():
             return jsonify({
                 "status": "success",
                 "message": "Kubernetes watcher stopped"
             })
-        
+
         @app.route('/mapi/v1/kubernetes/watch/events', methods=['GET'])
         def kubernetes_watch_events():
             return jsonify({
@@ -131,7 +131,7 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
                 "events": [],
                 "count": 0
             })
-        
+
         @app.route('/mapi/v1/kubernetes/stream', methods=['GET'])
         def kubernetes_stream_sse():
             def generate():
@@ -141,7 +141,7 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
                 status=200,
                 mimetype='text/event-stream'
             )
-        
+
         return app
 
     def test_rest_endpoints_defined(self):
@@ -156,7 +156,7 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
             '/mapi/v1/kubernetes/metrics',
             '/mapi/v1/kubernetes/events',
         ]
-        
+
         # All endpoints should be listed
         self.assertEqual(len(endpoints), 8)
 
@@ -168,7 +168,7 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
             '/mapi/v1/kubernetes/watch/events',
             '/mapi/v1/kubernetes/stream',
         ]
-        
+
         # All endpoints should be listed
         self.assertEqual(len(endpoints), 4)
 
@@ -176,10 +176,10 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
         """Test REST endpoint response format"""
         app = self.create_mock_app()
         client = app.test_client()
-        
+
         response = client.get('/mapi/v1/kubernetes/cluster-info')
         self.assertEqual(response.status_code, 200)
-        
+
         data = json.loads(response.data)
         self.assertIn('status', data)
         self.assertEqual(data['status'], 'success')
@@ -188,10 +188,10 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
         """Test pod-specific endpoint parameters"""
         app = self.create_mock_app()
         client = app.test_client()
-        
+
         response = client.get('/mapi/v1/kubernetes/pod/api-0/logs')
         self.assertEqual(response.status_code, 200)
-        
+
         data = json.loads(response.data)
         self.assertEqual(data['pod'], 'api-0')
 
@@ -199,7 +199,7 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
         """Test restart endpoint uses POST"""
         app = self.create_mock_app()
         client = app.test_client()
-        
+
         response = client.post('/mapi/v1/kubernetes/pod/api-0/restart')
         self.assertEqual(response.status_code, 200)
 
@@ -207,10 +207,10 @@ class TestKubernetesRestEndpoints(unittest.TestCase):
         """Test WebSocket endpoints return correct structure"""
         app = self.create_mock_app()
         client = app.test_client()
-        
+
         response = client.post('/mapi/v1/kubernetes/watch/start')
         self.assertEqual(response.status_code, 200)
-        
+
         data = json.loads(response.data)
         self.assertIn('status', data)
         self.assertIn('message', data)
@@ -272,7 +272,7 @@ class TestErrorHandling(unittest.TestCase):
         # Endpoint should handle gracefully
         app = self.create_mock_app()
         client = app.test_client()
-        
+
         response = client.get('/mapi/v1/kubernetes/pod/nonexistent/logs')
         # Should not crash
         self.assertTrue(response.status_code in [200, 400, 404, 503])
@@ -309,7 +309,7 @@ class TestGenesisRecordLogging(unittest.TestCase):
             "guards_passed": 9,
             "notes": "Cluster info retrieved successfully"
         }
-        
+
         required_keys = ['task_id', 'agent', 'status', 'action', 'guards_passed']
         for key in required_keys:
             self.assertIn(key, log_entry)
@@ -330,7 +330,7 @@ class TestGenesisRecordLogging(unittest.TestCase):
             "kubernetes_events_polled",
             "kubernetes_sse_stream_opened",
         ]
-        
+
         # All actions should be defined
         self.assertEqual(len(actions), 12)
 
@@ -351,7 +351,7 @@ class TestStreamingBehavior(unittest.TestCase):
             "status": "Running",
             "timestamp": "2026-04-06T17:50:00Z"
         }
-        
+
         # Should be JSON serializable
         json_str = json.dumps(event)
         self.assertTrue(len(json_str) > 0)
@@ -369,11 +369,11 @@ class TestEndToEndFlow(unittest.TestCase):
         """Test sequential API calls"""
         app = self.create_mock_app()
         client = app.test_client()
-        
+
         # First call: get cluster info
         r1 = client.get('/mapi/v1/kubernetes/cluster-info')
         self.assertEqual(r1.status_code, 200)
-        
+
         # Second call: get pods
         r2 = client.get('/mapi/v1/kubernetes/pods')
         self.assertEqual(r2.status_code, 200)
@@ -382,11 +382,11 @@ class TestEndToEndFlow(unittest.TestCase):
         """Test watch start then stream"""
         app = self.create_mock_app()
         client = app.test_client()
-        
+
         # Start watcher
         r1 = client.post('/mapi/v1/kubernetes/watch/start')
         self.assertEqual(r1.status_code, 200)
-        
+
         # Get stream
         r2 = client.get('/mapi/v1/kubernetes/stream')
         self.assertEqual(r2.status_code, 200)
@@ -394,24 +394,24 @@ class TestEndToEndFlow(unittest.TestCase):
     def create_mock_app(self):
         """Create mock Flask app"""
         from flask import Flask
-        
+
         app = Flask(__name__)
-        
+
         @app.route('/mapi/v1/kubernetes/cluster-info')
         def cluster_info():
             from flask import jsonify
             return jsonify({"status": "success"})
-        
+
         @app.route('/mapi/v1/kubernetes/pods')
         def pods():
             from flask import jsonify
             return jsonify({"status": "success"})
-        
+
         @app.route('/mapi/v1/kubernetes/watch/start', methods=['POST'])
         def watch_start():
             from flask import jsonify
             return jsonify({"status": "success"})
-        
+
         @app.route('/mapi/v1/kubernetes/stream')
         def stream():
             return app.response_class(
@@ -419,7 +419,7 @@ class TestEndToEndFlow(unittest.TestCase):
                 status=200,
                 mimetype='text/event-stream'
             )
-        
+
         return app
 
 
@@ -427,7 +427,7 @@ def run_integration_tests():
     """Run all integration tests"""
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
-    
+
     suite.addTests(loader.loadTestsFromTestCase(TestKubernetesRestEndpoints))
     suite.addTests(loader.loadTestsFromTestCase(TestEndpointResponseValidation))
     suite.addTests(loader.loadTestsFromTestCase(TestApiKeyValidation))
@@ -435,10 +435,10 @@ def run_integration_tests():
     suite.addTests(loader.loadTestsFromTestCase(TestGenesisRecordLogging))
     suite.addTests(loader.loadTestsFromTestCase(TestStreamingBehavior))
     suite.addTests(loader.loadTestsFromTestCase(TestEndToEndFlow))
-    
+
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
-    
+
     return result.wasSuccessful()
 
 

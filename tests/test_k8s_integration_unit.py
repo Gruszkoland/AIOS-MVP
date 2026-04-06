@@ -65,7 +65,7 @@ class TestKubernetesIntegration(unittest.TestCase):
                 "metadata": {"name": "docker-desktop"}
             })
         )
-        
+
         # Should not crash when calling
         self.assertTrue(hasattr(self.k8s, "get_cluster_info"))
 
@@ -93,7 +93,7 @@ class TestK8sWatcher(unittest.TestCase):
         """Test event subscription mechanism"""
         callback = Mock()
         self.watcher.subscribe("pod_status_change", callback)
-        
+
         self.assertIn("pod_status_change", self.watcher.subscribers)
         self.assertIn(callback, self.watcher.subscribers["pod_status_change"])
 
@@ -101,10 +101,10 @@ class TestK8sWatcher(unittest.TestCase):
         """Test multiple subscribers for same event"""
         callback1 = Mock()
         callback2 = Mock()
-        
+
         self.watcher.subscribe("pod_status_change", callback1)
         self.watcher.subscribe("pod_status_change", callback2)
-        
+
         self.assertEqual(len(self.watcher.subscribers["pod_status_change"]), 2)
 
     def test_event_queue_initialization(self):
@@ -123,7 +123,7 @@ class TestK8sWatcher(unittest.TestCase):
         # Add mock events to queue
         for i in range(5):
             self.watcher.event_queue.put({"id": i, "type": "test"})
-        
+
         # Get only 3
         events = self.watcher.get_queued_events(max_count=3)
         self.assertEqual(len(events), 3)
@@ -147,7 +147,7 @@ class TestK8sWatcher(unittest.TestCase):
         """Test get_k8s_watcher singleton factory"""
         w1 = get_k8s_watcher()
         w2 = get_k8s_watcher()
-        
+
         self.assertIsInstance(w1, K8sWatcher)
         self.assertIs(w1, w2)  # Same instance
 
@@ -173,10 +173,10 @@ class TestK8sWatcherEvents(unittest.TestCase):
         """Test notifying actual subscribers"""
         callback = Mock()
         self.watcher.subscribe("pod_status_change", callback)
-        
+
         event = {"pod": "test", "status": "Running"}
         self.watcher._notify_subscribers("pod_status_change", event)
-        
+
         # Small delay for callback
         time.sleep(0.1)
         # callback.assert_called()  # May not be called in sync context
@@ -185,7 +185,7 @@ class TestK8sWatcherEvents(unittest.TestCase):
         """Test adding events to queue"""
         event = {"type": "pod_status_change", "pod": "api-0"}
         self.watcher.event_queue.put(event)
-        
+
         retrieved = self.watcher.event_queue.get_nowait()
         self.assertEqual(retrieved, event)
 
@@ -209,7 +209,7 @@ class TestKubernetesIntegrationMethods(unittest.TestCase):
             "get_metrics",
             "get_namespace_events",
         ]
-        
+
         for method_name in required_methods:
             self.assertTrue(
                 hasattr(self.k8s, method_name),
@@ -223,12 +223,12 @@ class TestKubernetesIntegrationMethods(unittest.TestCase):
     def test_method_signatures(self):
         """Test method signatures accept correct parameters"""
         import inspect
-        
+
         # get_pod_logs should accept pod_name, optional namespace and lines
         sig = inspect.signature(self.k8s.get_pod_logs)
         params = list(sig.parameters.keys())
         self.assertIn("pod_name", params)
-        
+
         # restart_pod should accept pod_name and optional namespace
         sig = inspect.signature(self.k8s.restart_pod)
         params = list(sig.parameters.keys())
@@ -291,7 +291,7 @@ class TestErrorHandling(unittest.TestCase):
                 self.watcher.event_queue.put({"id": i}, block=False)
             except queue.Full:
                 break
-        
+
         # Should not crash, just fill up
         self.assertGreater(self.watcher.event_queue.qsize(), 0)
 
@@ -300,7 +300,7 @@ def run_tests():
     """Run all unit tests"""
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
-    
+
     # Add test classes
     suite.addTests(loader.loadTestsFromTestCase(TestKubernetesIntegration))
     suite.addTests(loader.loadTestsFromTestCase(TestK8sWatcher))
@@ -309,10 +309,10 @@ def run_tests():
     suite.addTests(loader.loadTestsFromTestCase(TestK8sWatcherThreading))
     suite.addTests(loader.loadTestsFromTestCase(TestApiKeyBehavior))
     suite.addTests(loader.loadTestsFromTestCase(TestErrorHandling))
-    
+
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
-    
+
     return result.wasSuccessful()
 
 
