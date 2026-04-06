@@ -129,7 +129,7 @@
       }
 
       .panel-left {
-        flex: 2;
+        flex: 1;
         background: var(--white);
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -138,7 +138,7 @@
 
       .panel-right {
         flex: 1;
-        display: flex;
+        display: none;
         flex-direction: column;
         gap: 1rem;
       }
@@ -905,6 +905,172 @@
           grid-template-columns: 1fr;
         }
       }
+
+      /* SUB-TABS HISTORY */
+      .sub-tabs-container {
+        display: flex;
+        gap: 1rem;
+        border-bottom: 2px solid #ddd;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+      }
+
+      .sub-tab-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-weight: 500;
+        color: #666;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .sub-tab-btn.active {
+        color: var(--primary-blue);
+        border-bottom-color: var(--primary-blue);
+      }
+
+      .sub-tab-btn:hover {
+        color: var(--primary-blue);
+      }
+
+      .sub-tab-content {
+        display: none;
+      }
+
+      .sub-tab-content.active {
+        display: block;
+      }
+
+      /* HISTORIA STYLE */
+      .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .history-item {
+        background: #f9f9f9;
+        padding: 0.75rem;
+        border-left: 4px solid var(--primary-blue);
+        border-radius: 4px;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+      }
+
+      .history-item:hover {
+        background: #f0f0f0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      .history-time {
+        color: #999;
+        font-size: 0.75rem;
+        display: block;
+      }
+
+      .history-title {
+        font-weight: 600;
+        color: var(--dark);
+        margin-top: 0.25rem;
+      }
+
+      .history-status {
+        display: inline-block;
+        padding: 0.1rem 0.4rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-top: 0.3rem;
+      }
+
+      .history-status.completed {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .history-status.pending {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .history-status.error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      /* TREE VIEW K8S */
+      .k8s-tree {
+        font-family: monospace;
+        font-size: 0.85rem;
+        line-height: 1.8;
+      }
+
+      .tree-node {
+        padding-left: 1rem;
+        margin: 0.3rem 0;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .tree-node-toggle {
+        display: inline-block;
+        width: 1.2rem;
+        text-align: center;
+        color: var(--primary-blue);
+        font-weight: bold;
+      }
+
+      .tree-node-toggle.expanded {
+        transform: rotate(90deg);
+        display: inline-block;
+      }
+
+      .tree-children {
+        display: none;
+        margin-left: 0.5rem;
+        border-left: 1px solid #ddd;
+        padding-left: 0.5rem;
+      }
+
+      .tree-children.visible {
+        display: block;
+      }
+
+      /* HEALING TABLE */
+      .heal-history-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+
+      .heal-history-table th {
+        background: #f0f0f0;
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid #ddd;
+      }
+
+      .heal-history-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      .heal-history-table tbody tr:hover {
+        background: #f9f9f9;
+      }
+
+      /* HIDDEN UNTIL IMPLEMENTED */
+      .not-yet-implemented {
+        padding: 2rem;
+        text-align: center;
+        color: #999;
+        font-style: italic;
+      }
     </style>
   </head>
   <body>
@@ -1034,13 +1200,42 @@
             <span
               ><i class="fas fa-comments"></i> Master Orchestrator Chat</span
             >
+            <div style="display: flex; gap: 0.5rem; font-size: 0.85rem">
+              <span
+                id="phase-indicator"
+                style="
+                  background: #ddd;
+                  padding: 0.25rem 0.75rem;
+                  border-radius: 12px;
+                  color: #666;
+                "
+                >FAZA 0: Inicjacja</span
+              >
+            </div>
           </div>
+
+          <!-- SUB-TABS FOR CHAT -->
+          <div class="sub-tabs-container">
+            <button class="sub-tab-btn active" onclick="switchSubTab('chat', 'current')">
+              <i class="fas fa-comments"></i> Bieżący Chat
+            </button>
+            <button class="sub-tab-btn" onclick="switchSubTab('chat', 'history')">
+              <i class="fas fa-history"></i> Historia Orkiestratora
+            </button>
+            <button class="sub-tab-btn" onclick="switchSubTab('chat', 'console')">
+              <i class="fas fa-terminal"></i> Console Wdrażania
+            </button>
+          </div>
+
+          <!-- Chat History -->
           <div
+            id="chat-history"
             style="
               min-height: 300px;
               padding: 1rem;
               background: #f9f9f9;
               border-radius: 6px;
+              overflow-y: auto;
               display: flex;
               align-items: center;
               justify-content: center;
@@ -1051,38 +1246,1069 @@
               <p>Start a conversation with the AI Orchestrator</p>
             </div>
           </div>
-          <div class="chat-input-area">
+
+          <!-- Questions Panel (Faza 0) -->
+          <div
+            id="questions-panel"
+            style="
+              display: none;
+              margin-top: 1rem;
+              padding: 1rem;
+              background: #fffbf0;
+              border: 1px solid #e8d4b8;
+              border-radius: 6px;
+            "
+          >
+            <h6 style="margin-bottom: 1rem">Co chcesz zrobić?</h6>
+            <div
+              id="questions-container"
+              style="display: flex; flex-direction: column; gap: 0.75rem"
+            ></div>
             <input
               type="text"
-              placeholder="Ask the Master Orchestrator... e.g., 'Deploy backend' or 'Check system'"
+              id="custom-input"
+              placeholder="Lub wpisz własną odpowiedź..."
+              style="
+                margin-top: 1rem;
+                padding: 0.75rem;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                width: 100%;
+              "
             />
-            <button type="button">
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem">
+              <button
+                class="btn btn-primary"
+                onclick="submitQuestionnaire()"
+                style="flex: 1"
+              >
+                Dalej
+              </button>
+              <button
+                class="btn btn-outline"
+                onclick="cancelOrchestration()"
+                style="flex: 1"
+              >
+                Anuluj
+              </button>
+            </div>
+          </div>
+
+          <!-- Plan Panel (Faza 1) -->
+          <div
+            id="plan-panel"
+            style="
+              display: none;
+              margin-top: 1rem;
+              padding: 1rem;
+              background: #f0f8ff;
+              border: 1px solid #b3d9ff;
+              border-radius: 6px;
+            "
+          >
+            <h6 style="margin-bottom: 1rem">📋 Plan Wdrażania</h6>
+            <div
+              id="plan-content"
+              style="font-size: 0.9rem; line-height: 1.6"
+            ></div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+              <button
+                class="btn btn-success"
+                onclick="approvePlan()"
+                style="flex: 1"
+              >
+                ✓ Zatwierdź i Wdróż
+              </button>
+              <button
+                class="btn btn-outline"
+                onclick="rejectPlan()"
+                style="flex: 1"
+              >
+                ✗ Zmień Plan
+              </button>
+            </div>
+          </div>
+
+          <!-- Deployment Status (Faza 2) -->
+          <div
+            id="deployment-panel"
+            style="
+              display: none;
+              margin-top: 1rem;
+              padding: 1rem;
+              background: #f0fff4;
+              border: 1px solid #b3f5b3;
+              border-radius: 6px;
+            "
+          >
+            <h6 style="margin-bottom: 1rem">🚀 Wdrażanie w Toku</h6>
+            <div id="deployment-tasks" style="font-size: 0.9rem"></div>
+          </div>
+
+          <!-- Chat Input -->
+          <div class="chat-input-area">
+            <input
+              id="chat-input"
+              type="text"
+              placeholder="Ask the Master Orchestrator... e.g., 'Deploy backend' or 'Check system'"
+              onkeypress="if (event.key === 'Enter') sendChatMessage();"
+            />
+            <button type="button" onclick="sendChatMessage()">
               <i class="fas fa-paper-plane"></i> Send
             </button>
+          </div>
+
+          <!-- SUB-TAB CONTENT: Current Chat (Default) -->
+          <div class="sub-tab-content active" data-sub-tab="current" style="display: block">
+            <!-- Content is shown by default -->
+          </div>
+
+          <!-- SUB-TAB CONTENT: History -->
+          <div class="sub-tab-content" data-sub-tab="history">
+            <div style="background: #f9f9f9; padding: 1rem; border-radius: 6px; margin-top: 1rem">
+              <h6 style="margin-bottom: 1rem"><i class="fas fa-history"></i> Historia Konwersacji z Orkiestratorem</h6>
+              <div class="history-list" id="chat-history"></div>
+            </div>
+          </div>
+
+          <!-- SUB-TAB CONTENT: Console -->
+          <div class="sub-tab-content" data-sub-tab="console">
+            <div style="background: #1e1e1e; color: #00ff00; padding: 1rem; border-radius: 6px; margin-top: 1rem; font-family: 'Courier New', monospace; font-size: 0.85rem; max-height: 400px; overflow-y: auto">
+              <div style="margin-bottom: 0.5rem">$ orchestrator --status</div>
+              <div style="color: #00ff00">System Status: OPERATIONAL</div>
+              <div style="color: #00ff00">Services Running: 7/7 ✓</div>
+              <div style="color: #ffff00">K8s Namespace: adrion-369</div>
+              <div style="color: #ffff00">Last Sync: 2 minutes ago</div>
+              <div style="color: #00ff00; margin-top: 1rem">[✓] All systems green</div>
+              <div style="color: #00ff00">[✓] Database: Connected</div>
+              <div style="color: #00ff00">[✓] APIs: Registered (12)</div>
+              <div style="color: #ffff00">[⚠] Ollama: Fallback mode</div>
+              <div style="color: #27ae60; margin-top: 1rem">[INFO] Ready for deployment</div>
+              <div style="color: #999; margin-top: 1rem; font-size: 0.8rem">Last command: 2026-04-06 14:32:15 UTC</div>
+            </div>
+            <div style="background: #f9f9f9; padding: 1rem; border-radius: 6px; margin-top: 1rem; font-size: 0.85rem">
+              <div style="font-weight: bold; margin-bottom: 0.5rem">📊 Logi Wdrażania (Real-time)</div>
+              <div style="font-family: monospace; color: #333; line-height: 1.6; max-height: 200px; overflow-y: auto">
+                <div>[14:45:22] Starting deployment: backend-service</div>
+                <div style="color: #4caf50">[14:45:23] ✓ Pull image: adrion/api:v2.1</div>
+                <div style="color: #4caf50">[14:45:28] ✓ Create pod: api-deployment-0</div>
+                <div style="color: #ffff00">[14:45:32] ⚠  Waiting for service endpoint...</div>
+                <div style="color: #4caf50">[14:45:35] ✓ Service: backend-lb ready (IP: 10.0.1.5)</div>
+                <div style="color: #4caf50">[14:45:36] ✓ Health check passed</div>
+                <div style="color: #4caf50">[14:45:37] ✓ Deployment complete: 100%</div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="tab-pane" id="agent">
           <div class="section-header">
-            <span><i class="fas fa-robot"></i> Agent Delegator</span>
+            <span><i class="fas fa-robot"></i> Agent Delegator & Builder</span>
           </div>
-          <p>Delegate tasks to specific agents in the swarm...</p>
+
+          <!-- SUB-TABS FOR AGENT -->
+          <div class="sub-tabs-container">
+            <button class="sub-tab-btn active" onclick="switchSubTab('agent', 'current')">
+              <i class="fas fa-tasks"></i> Bieżące Zadania
+            </button>
+            <button class="sub-tab-btn" onclick="switchSubTab('agent', 'history')">
+              <i class="fas fa-history"></i> Historia Zmian
+            </button>
+          </div>
+
+          <!-- Agent Builder Sub-tabs -->
+          <div
+            style="
+              display: flex;
+              gap: 0.5rem;
+              margin-bottom: 1rem;
+              border-bottom: 2px solid #e0e0e0;
+              padding-bottom: 0.5rem;
+            "
+          >
+            <button
+              class="agent-subtab active"
+              onclick="switchAgentView('templates')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.5rem 1rem;
+                cursor: pointer;
+                font-weight: bold;
+                color: #0288d1;
+                border-bottom: 3px solid #0288d1;
+                margin-bottom: -0.5rem;
+              "
+            >
+              <i class="fas fa-cube"></i> Szablony
+            </button>
+            <button
+              class="agent-subtab"
+              onclick="switchAgentView('tasks')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.4rem 0.8rem;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #999;
+                white-space: nowrap;
+              "
+            >
+              <i class="fas fa-tasks"></i> Zadania
+            </button>
+            <button
+              class="agent-subtab"
+              onclick="switchAgentView('task-detail')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.4rem 0.8rem;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #999;
+                white-space: nowrap;
+              "
+            >
+              <i class="fas fa-chart-line"></i> Przebieg
+            </button>
+            <button
+              class="agent-subtab"
+              onclick="switchAgentView('databases')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.4rem 0.8rem;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #999;
+                white-space: nowrap;
+              "
+            >
+              <i class="fas fa-database"></i> Bazy Danych
+            </button>
+            <button
+              class="agent-subtab"
+              onclick="switchAgentView('prompts')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.4rem 0.8rem;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #999;
+                white-space: nowrap;
+              "
+            >
+              <i class="fas fa-pen-fancy"></i> Prompty
+            </button>
+            <button
+              class="agent-subtab"
+              onclick="switchAgentView('statistics')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.4rem 0.8rem;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #999;
+                white-space: nowrap;
+              "
+            >
+              <i class="fas fa-chart-bar"></i> Statystyki
+            </button>
+          </div>
+
+          <!-- Templates View -->
+          <div id="agent-templates" class="agent-view" style="display: block">
+            <h4 style="margin-bottom: 1rem">📋 Dostępne Szablony Agentów</h4>
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem"
+            >
+              <div
+                style="
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  padding: 1.5rem;
+                  border-radius: 8px;
+                  color: white;
+                  cursor: pointer;
+                  transition: transform 0.2s;
+                "
+                onmouseover="this.style.transform = 'scale(1.02)'"
+                onmouseout="this.style.transform = 'scale(1)'"
+              >
+                <div style="font-weight: bold; font-size: 1.1rem">
+                  🏗️ Kubernetes Specialist
+                </div>
+                <div
+                  style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.9"
+                >
+                  Zarządzanie K8s, deployments, pods, namespaces
+                </div>
+                <button
+                  onclick="selectTemplate('k8s')"
+                  style="
+                    margin-top: 0.75rem;
+                    background: white;
+                    color: #667eea;
+                    border: none;
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    cursor: pointer;
+                  "
+                >
+                  Wyберz
+                </button>
+              </div>
+              <div
+                style="
+                  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                  padding: 1.5rem;
+                  border-radius: 8px;
+                  color: white;
+                  cursor: pointer;
+                  transition: transform 0.2s;
+                "
+                onmouseover="this.style.transform = 'scale(1.02)'"
+                onmouseout="this.style.transform = 'scale(1)'"
+              >
+                <div style="font-weight: bold; font-size: 1.1rem">
+                  💾 Data Pipeline Engineer
+                </div>
+                <div
+                  style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.9"
+                >
+                  ETL, transformacje danych, SQL, schemat DB
+                </div>
+                <button
+                  onclick="selectTemplate('data')"
+                  style="
+                    margin-top: 0.75rem;
+                    background: white;
+                    color: #f5576c;
+                    border: none;
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    cursor: pointer;
+                  "
+                >
+                  Wyберz
+                </button>
+              </div>
+              <div
+                style="
+                  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                  padding: 1.5rem;
+                  border-radius: 8px;
+                  color: white;
+                  cursor: pointer;
+                  transition: transform 0.2s;
+                "
+                onmouseover="this.style.transform = 'scale(1.02)'"
+                onmouseout="this.style.transform = 'scale(1)'"
+              >
+                <div style="font-weight: bold; font-size: 1.1rem">
+                  📊 Analytics & Monitoring
+                </div>
+                <div
+                  style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.9"
+                >
+                  Metryki, logi, alerting, Performance tracking
+                </div>
+                <button
+                  onclick="selectTemplate('monitor')"
+                  style="
+                    margin-top: 0.75rem;
+                    background: white;
+                    color: #00f2fe;
+                    border: none;
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    cursor: pointer;
+                  "
+                >
+                  Wyберz
+                </button>
+              </div>
+              <div
+                style="
+                  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+                  padding: 1.5rem;
+                  border-radius: 8px;
+                  color: white;
+                  cursor: pointer;
+                  transition: transform 0.2s;
+                "
+                onmouseover="this.style.transform = 'scale(1.02)'"
+                onmouseout="this.style.transform = 'scale(1)'"
+              >
+                <div style="font-weight: bold; font-size: 1.1rem">
+                  🔐 Security & Compliance
+                </div>
+                <div
+                  style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.9"
+                >
+                  Audyt, RBAC, enkrypcja, policy enforcement
+                </div>
+                <button
+                  onclick="selectTemplate('security')"
+                  style="
+                    margin-top: 0.75rem;
+                    background: white;
+                    color: #fee140;
+                    border: none;
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    cursor: pointer;
+                  "
+                >
+                  Wyберz
+                </button>
+              </div>
+            </div>
+            <div
+              id="template-info"
+              style="
+                margin-top: 1.5rem;
+                padding: 1rem;
+                background: #f0f0f0;
+                border-radius: 6px;
+                display: none;
+              "
+            >
+              <div style="font-weight: bold; margin-bottom: 0.5rem">
+                📦 Wybrano szablon:
+                <span id="selected-template" style="color: #0288d1"></span>
+              </div>
+              <button
+                onclick="proceedToBuilder()"
+                style="
+                  background: #0288d1;
+                  color: white;
+                  border: none;
+                  padding: 0.6rem 1.2rem;
+                  border-radius: 4px;
+                  cursor: pointer;
+                  margin-top: 0.5rem;
+                "
+              >
+                Przejdź do Konstruktora →
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Tasks View -->
+          <div id="agent-tasks" class="agent-view" style="display: none">
+            <h4 style="margin-bottom: 1rem">📋 Aktywne Zadania</h4>
+            <div style="display: grid; gap: 0.5rem">
+              <div
+                onclick="selectTask('task-001', 'K8s-Optimizer')"
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #667eea;
+                  cursor: pointer;
+                "
+              >
+                <div style="display: flex; justify-content: space-between">
+                  <div style="font-weight: bold">K8s-Optimizer</div>
+                  <span
+                    style="
+                      background: #667eea;
+                      color: white;
+                      padding: 0.2rem 0.6rem;
+                      border-radius: 12px;
+                      font-size: 0.8rem;
+                    "
+                    >⏳ W trakcie</span
+                  >
+                </div>
+                <div style="font-size: 0.9rem; color: #666; margin-top: 0.3rem">
+                  Optimizacja zasobów klastera • 65% complete
+                </div>
+              </div>
+              <div
+                onclick="selectTask('task-002', 'DataPipe-ETL')"
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #f5576c;
+                  cursor: pointer;
+                "
+              >
+                <div style="display: flex; justify-content: space-between">
+                  <div style="font-weight: bold">DataPipe-ETL</div>
+                  <span
+                    style="
+                      background: #4caf50;
+                      color: white;
+                      padding: 0.2rem 0.6rem;
+                      border-radius: 12px;
+                      font-size: 0.8rem;
+                    "
+                    >✓ Ukończone</span
+                  >
+                </div>
+                <div style="font-size: 0.9rem; color: #666; margin-top: 0.3rem">
+                  Transformacja tabel sprzedażowych • 100% complete
+                </div>
+              </div>
+              <div
+                onclick="selectTask('task-003', 'Monitor-Alert')"
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #4facfe;
+                  cursor: pointer;
+                "
+              >
+                <div style="display: flex; justify-content: space-between">
+                  <div style="font-weight: bold">Monitor-Alert</div>
+                  <span
+                    style="
+                      background: #ff9800;
+                      color: white;
+                      padding: 0.2rem 0.6rem;
+                      border-radius: 12px;
+                      font-size: 0.8rem;
+                    "
+                    >⚠️ Czeka</span
+                  >
+                </div>
+                <div style="font-size: 0.9rem; color: #666; margin-top: 0.3rem">
+                  Konfiguracja alertów dla API gateway • W kolejce
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Task Execution Detail -->
+          <div id="agent-task-detail" class="agent-view" style="display: none">
+            <h4 id="task-detail-title" style="margin-bottom: 1rem">
+              📊 Szczegóły Zadania
+            </h4>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1rem;
+                margin-bottom: 1rem;
+              "
+            >
+              <div
+                style="background: #f9f9f9; padding: 1rem; border-radius: 6px"
+              >
+                <div style="font-weight: bold; color: #333">
+                  Status Wykonania
+                </div>
+                <div
+                  id="task-progress-bar"
+                  style="
+                    background: #ddd;
+                    height: 8px;
+                    border-radius: 4px;
+                    overflow: hidden;
+                    margin: 0.5rem 0;
+                  "
+                >
+                  <div
+                    style="
+                      background: linear-gradient(90deg, #667eea, #764ba2);
+                      height: 100%;
+                      width: 65%;
+                    "
+                  ></div>
+                </div>
+                <div style="font-size: 0.9rem; color: #666">
+                  65% ukończone • Etap 3/5
+                </div>
+              </div>
+              <div
+                style="
+                  background: #e8f5e9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #4caf50;
+                "
+              >
+                <div style="font-weight: bold; color: #2e7d32">
+                  ⏱️ Statystyka
+                </div>
+                <div style="margin-top: 0.3rem; font-size: 0.8rem; color: #555">
+                  <div>Czas: 25 min / 40 min</div>
+                  <div>Pozostało: ~15 min</div>
+                </div>
+              </div>
+            </div>
+            <div
+              style="
+                background: #fafafa;
+                padding: 1rem;
+                border-radius: 6px;
+                border: 1px solid #ddd;
+                max-height: 300px;
+                overflow-y: auto;
+              "
+            >
+              <div style="font-weight: bold; margin-bottom: 0.5rem">
+                📋 Etapy Wykonania
+              </div>
+              <div
+                style="
+                  font-size: 0.85rem;
+                  font-family: monospace;
+                  line-height: 1.6;
+                "
+              >
+                <div style="color: #4caf50">
+                  ✓ [10:15:00] Phase 1: Inicjalizacja zasobów
+                </div>
+                <div style="color: #4caf50">
+                  ✓ [10:18:30] Phase 2: Analiza metryki klastera
+                </div>
+                <div style="color: #667eea">
+                  ● [10:40:15] Phase 3: Optymalizacja CPU
+                </div>
+                <div style="color: #ccc">
+                  ○ [--:--:--] Phase 4: Ustawienie limitów
+                </div>
+                <div style="color: #ccc">
+                  ○ [--:--:--] Phase 5: Weryfikacja i raport
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 1rem">
+              <button
+                onclick="switchAgentView('tasks')"
+                style="
+                  background: #999;
+                  color: white;
+                  border: none;
+                  padding: 0.6rem 1rem;
+                  border-radius: 4px;
+                  cursor: pointer;
+                "
+              >
+                ← Powrót
+              </button>
+            </div>
+          </div>
+
+          <!-- Databases Configuration -->
+          <div id="agent-databases" class="agent-view" style="display: none">
+            <h4 style="margin-bottom: 1rem">💾 Zarządzanie Bazami Danych</h4>
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem"
+            >
+              <div
+                style="
+                  background: #e3f2fd;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #2196f3;
+                "
+              >
+                <div style="font-weight: bold; color: #2196f3">
+                  Połączone Bazy
+                </div>
+                <div
+                  style="
+                    font-size: 0.9rem;
+                    line-height: 1.6;
+                    margin-top: 0.5rem;
+                  "
+                >
+                  <div
+                    style="
+                      background: white;
+                      padding: 0.5rem;
+                      border-radius: 4px;
+                      margin: 0.3rem 0;
+                    "
+                  >
+                    <strong>adrion_prod</strong>
+                    <span style="color: #4caf50">● Active</span>
+                  </div>
+                  <div
+                    style="
+                      background: white;
+                      padding: 0.5rem;
+                      border-radius: 4px;
+                      margin: 0.3rem 0;
+                    "
+                  >
+                    <strong>analytics_db</strong>
+                    <span style="color: #4caf50">● Active</span>
+                  </div>
+                  <div
+                    style="
+                      background: white;
+                      padding: 0.5rem;
+                      border-radius: 4px;
+                    "
+                  >
+                    <strong>staging_db</strong>
+                    <span style="color: #ff9800">○ Inactive</span>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="
+                  background: #f3e5f5;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #9c27b0;
+                "
+              >
+                <div style="font-weight: bold; color: #9c27b0">
+                  ✚ Dodaj Nową Bazę
+                </div>
+                <input
+                  type="text"
+                  placeholder="Nazwa"
+                  style="
+                    width: 100%;
+                    padding: 0.5rem;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    margin: 0.5rem 0;
+                    font-size: 0.85rem;
+                  "
+                />
+                <input
+                  type="text"
+                  placeholder="Host"
+                  style="
+                    width: 100%;
+                    padding: 0.5rem;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    margin: 0.5rem 0;
+                    font-size: 0.85rem;
+                  "
+                />
+                <input
+                  type="text"
+                  placeholder="Port"
+                  style="
+                    width: 100%;
+                    padding: 0.5rem;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    margin: 0.5rem 0;
+                    font-size: 0.85rem;
+                  "
+                />
+                <button
+                  style="
+                    background: #9c27b0;
+                    color: white;
+                    border: none;
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    width: 100%;
+                  "
+                >
+                  Testuj
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prompts Configuration -->
+          <div id="agent-prompts" class="agent-view" style="display: none">
+            <h4 style="margin-bottom: 1rem">📝 Edycja Promptów</h4>
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem"
+            >
+              <div
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #ff9800;
+                "
+              >
+                <div style="font-weight: bold">System Prompt</div>
+                <textarea
+                  style="
+                    width: 100%;
+                    padding: 0.5rem;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    min-height: 150px;
+                    margin: 0.5rem 0;
+                    font-family: monospace;
+                    font-size: 0.85rem;
+                  "
+                ></textarea>
+                <button
+                  style="
+                    background: #ff9800;
+                    color: white;
+                    border: none;
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 4px;
+                    width: 100%;
+                  "
+                >
+                  💾 Zapisz
+                </button>
+              </div>
+              <div
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #2196f3;
+                "
+              >
+                <div style="font-weight: bold">Context/Instrukcje</div>
+                <textarea
+                  style="
+                    width: 100%;
+                    padding: 0.5rem;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    min-height: 150px;
+                    margin: 0.5rem 0;
+                    font-family: monospace;
+                    font-size: 0.85rem;
+                  "
+                ></textarea>
+                <button
+                  style="
+                    background: #2196f3;
+                    color: white;
+                    border: none;
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 4px;
+                    width: 100%;
+                  "
+                >
+                  💾 Zapisz
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statistics & Analytics -->
+          <div id="agent-statistics" class="agent-view" style="display: none">
+            <h4 style="margin-bottom: 1rem">📊 Statystyki</h4>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1rem;
+                margin-bottom: 1rem;
+              "
+            >
+              <div
+                style="
+                  background: linear-gradient(135deg, #667eea, #764ba2);
+                  padding: 1.5rem;
+                  border-radius: 6px;
+                  color: white;
+                  text-align: center;
+                "
+              >
+                <div style="font-size: 2rem; font-weight: bold">47</div>
+                <div style="font-size: 0.9rem">Ukończonych Zadań</div>
+              </div>
+              <div
+                style="
+                  background: linear-gradient(135deg, #4facfe, #00f2fe);
+                  padding: 1.5rem;
+                  border-radius: 6px;
+                  color: white;
+                  text-align: center;
+                "
+              >
+                <div style="font-size: 2rem; font-weight: bold">2h 34m</div>
+                <div style="font-size: 0.9rem">Średni Czas</div>
+              </div>
+              <div
+                style="
+                  background: linear-gradient(135deg, #4caf50, #45a049);
+                  padding: 1.5rem;
+                  border-radius: 6px;
+                  color: white;
+                  text-align: center;
+                "
+              >
+                <div style="font-size: 2rem; font-weight: bold">98.5%</div>
+                <div style="font-size: 0.9rem">Sukces</div>
+              </div>
+            </div>
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem"
+            >
+              <div
+                style="background: #f9f9f9; padding: 1rem; border-radius: 6px"
+              >
+                <div style="font-weight: bold">Top Agenci (Te Miesiąc)</div>
+                <div
+                  style="
+                    font-size: 0.9rem;
+                    line-height: 1.8;
+                    margin-top: 0.5rem;
+                  "
+                >
+                  <div>🥇 K8s-Optimizer — 18 zadań</div>
+                  <div>🥈 DataPipe-ETL — 12 zadań</div>
+                  <div>🥉 Monitor-Alert — 10 zadań</div>
+                </div>
+              </div>
+              <div
+                style="background: #f9f9f9; padding: 1rem; border-radius: 6px"
+              >
+                <div style="font-weight: bold">Problemy (Ostatnie 7 Dni)</div>
+                <div
+                  style="
+                    font-size: 0.9rem;
+                    line-height: 1.8;
+                    margin-top: 0.5rem;
+                  "
+                >
+                  <div style="color: #4caf50">✓ Brak błędów krytycznych</div>
+                  <div>⚠️ 1 timeout</div>
+                  <div>📈 Uptime: 99.2%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h4 style="margin-bottom: 1rem">🛠️ Konstruktor Agenta</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
+            <div
+              style="
+                background: #f9f9f9;
+                padding: 1rem;
+                border-radius: 6px;
+                border-left: 4px solid #0288d1;
+              "
+            >
+              <label
+                style="font-weight: bold; display: block; margin-bottom: 0.5rem"
+                >Agent Name:</label
+              >
+              <input
+                type="text"
+                id="agent-name"
+                placeholder="np. K8s-Optimizer"
+                style="
+                  width: 100%;
+                  padding: 0.5rem;
+                  border: 1px solid #ddd;
+                  border-radius: 4px;
+                "
+              />
+            </div>
+            <div
+              style="
+                background: #f9f9f9;
+                padding: 1rem;
+                border-radius: 6px;
+                border-left: 4px solid #4caf50;
+              "
+            >
+              <label
+                style="font-weight: bold; display: block; margin-bottom: 0.5rem"
+                >Role/Personality:</label
+              >
+              <input
+                type="text"
+                id="agent-role"
+                placeholder="np. Cloud Infrastructure Expert"
+                style="
+                  width: 100%;
+                  padding: 0.5rem;
+                  border: 1px solid #ddd;
+                  border-radius: 4px;
+                "
+              />
+            </div>
+          </div>
+          <div
+            style="
+              margin-top: 1rem;
+              padding: 1rem;
+              background: #f9f9f9;
+              border-radius: 6px;
+              border-left: 4px solid #ff9800;
+            "
+          >
+            <label
+              style="font-weight: bold; display: block; margin-bottom: 0.5rem"
+              >Agent Description:</label
+            >
+            <textarea
+              id="agent-description"
+              placeholder="Opisz zadania i możliwości agenta..."
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                min-height: 80px;
+                font-family: monospace;
+                font-size: 0.9rem;
+              "
+            ></textarea>
+          </div>
           <div style="margin-top: 1rem">
             <button
-              class="btn btn-outline-primary btn-sm"
-              style="margin-right: 0.5rem"
+              onclick="saveAgentConfig()"
+              style="
+                background: #4caf50;
+                color: white;
+                border: none;
+                padding: 0.6rem 1.2rem;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-right: 0.5rem;
+              "
             >
-              <i class="fas fa-cube"></i> K8s Agent
+              💾 Zapisz Konfigurację
             </button>
             <button
-              class="btn btn-outline-primary btn-sm"
-              style="margin-right: 0.5rem"
+              onclick="switchAgentView('tools')"
+              style="
+                background: #0288d1;
+                color: white;
+                border: none;
+                padding: 0.6rem 1.2rem;
+                border-radius: 4px;
+                cursor: pointer;
+              "
             >
-              <i class="fas fa-database"></i> Data Agent
+              → Skonfiguruj Narzędzia
             </button>
-            <button class="btn btn-outline-primary btn-sm">
-              <i class="fas fa-wrench"></i> Maintenance
-            </button>
+          </div>
+
+          <!-- SUB-TAB CONTENT: Current Tasks (Default) -->
+          <div class="sub-tab-content active" data-sub-tab="current" style="display: block">
+            <!-- Default current tasks shown -->
+          </div>
+
+          <!-- SUB-TAB CONTENT: History -->
+          <div class="sub-tab-content" data-sub-tab="history">
+            <div style="background: #f9f9f9; padding: 1rem; border-radius: 6px; margin-top: 1rem">
+              <h6 style="margin-bottom: 1rem"><i class="fas fa-history"></i> Historia Deploymentów i Zmian</h6>
+              <div class="history-list" id="agent-history"></div>
+            </div>
           </div>
         </div>
 
@@ -1093,7 +2319,19 @@
               >Kliknij na rząd aby rozwinąć</span
             >
           </div>
-          <table class="resource-table">
+
+          <!-- SUB-TABS FOR MANAGER -->
+          <div class="sub-tabs-container">
+            <button class="sub-tab-btn active" onclick="switchSubTab('manager', 'current')">
+              <i class="fas fa-list"></i> Agenci & Zadania
+            </button>
+            <button class="sub-tab-btn" onclick="switchSubTab('manager', 'history')">
+              <i class="fas fa-history"></i> Historia Zadań
+            </button>
+          </div>
+
+          <!-- SUB-TAB CONTENT: Current (Default) -->
+          <div class="sub-tab-content active" data-sub-tab="current" style="display: block">
             <thead>
               <tr>
                 <th></th>
@@ -1356,60 +2594,67 @@
               </tr>
             </tbody>
           </table>
+          </div>
+
+          <!-- SUB-TAB CONTENT: History -->
+          <div class="sub-tab-content" data-sub-tab="history">
+            <div style="background: #f9f9f9; padding: 1rem; border-radius: 6px; margin-top: 1rem">
+              <h6 style="margin-bottom: 1rem"><i class="fas fa-history"></i> Historia Przypisań i Zadań</h6>
+              <div class="history-list" id="manager-history"></div>
+            </div>
+          </div>
         </div>
 
         <div class="tab-pane" id="k8s">
           <div class="section-header">
             <span><i class="fas fa-cube"></i> Kubernetes Dashboard</span>
           </div>
-          <div class="k8s-grid">
-            <div class="k8s-card">
-              <div class="k8s-card-icon">
-                <i class="fas fa-project-diagram"></i>
+
+          <!-- K8s Tree-View Structure -->
+          <div style="background: #f9f9f9; border-radius: 6px; padding: 1rem">
+
+            <!-- PODS Section -->
+            <div style="margin-bottom: 1rem; border-left: 4px solid #667eea; padding-left: 1rem">
+              <div onclick="toggleK8sSection('pods')" style="cursor: pointer; font-weight: bold; color: #667eea; display: flex; align-items: center; gap: 0.5rem">
+                <i class="fas fa-chevron-right k8s-chevron" id="pods-chevron" style="transition: transform 0.2s"></i>
+                <i class="fas fa-project-diagram"></i> Pods (12)
               </div>
-              <div class="k8s-card-value" id="k8s-pods">--</div>
-              <div class="k8s-card-label">PODS</div>
-            </div>
-            <div class="k8s-card">
-              <div class="k8s-card-icon">
-                <i class="fas fa-network-wired"></i>
+              <div id="pods-list" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: white; border-radius: 4px; max-height: 200px; overflow-y: auto">
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><span style="color: #4caf50">●</span> api-deployment-0 <span style="float: right; font-size: 0.8rem; color: #999">Running</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><span style="color: #4caf50">●</span> api-deployment-1 <span style="float: right; font-size: 0.8rem; color: #999">Running</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><span style="color: #4caf50">●</span> backend-service-0 <span style="float: right; font-size: 0.8rem; color: #999">Running</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><span style="color: #4caf50">●</span> redis-cache-0 <span style="float: right; font-size: 0.8rem; color: #999">Running</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><span style="color: #4caf50">●</span> k8s-optimiz-0 <span style="float: right; font-size: 0.8rem; color: #999">Running</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem"><span style="color: #4caf50">●</span> monitor-0 <span style="float: right; font-size: 0.8rem; color: #999">Running</span></div>
               </div>
-              <div class="k8s-card-value" id="k8s-services">--</div>
-              <div class="k8s-card-label">SERVICES</div>
             </div>
-            <div class="k8s-card">
-              <div class="k8s-card-icon"><i class="fas fa-rocket"></i></div>
-              <div class="k8s-card-value" id="k8s-deployments">--</div>
-              <div class="k8s-card-label">DEPLOYMENTS</div>
+
+            <!-- SERVICES Section -->
+            <div style="margin-bottom: 1rem; border-left: 4px solid #f5576c; padding-left: 1rem">
+              <div onclick="toggleK8sSection('services')" style="cursor: pointer; font-weight: bold; color: #f5576c; display: flex; align-items: center; gap: 0.5rem">
+                <i class="fas fa-chevron-right k8s-chevron" id="services-chevron" style="transition: transform 0.2s"></i>
+                <i class="fas fa-network-wired"></i> Services (7)
+              </div>
+              <div id="services-list" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: white; border-radius: 4px; max-height: 130px; overflow-y: auto">
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><strong>api-service</strong> <span style="float: right; font-size: 0.8rem; color: #666">ClusterIP</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><strong>backend-lb</strong> <span style="float: right; font-size: 0.8rem; color: #666">LoadBalancer</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><strong>cache-service</strong> <span style="float: right; font-size: 0.8rem; color: #666">ClusterIP</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem"><strong>monitor-svc</strong> <span style="float: right; font-size: 0.8rem; color: #666">NodePort</span></div>
+              </div>
             </div>
-          </div>
-          <div style="margin-top: 2rem">
-            <h6 style="font-weight: 700; color: var(--dark)">Recent Events</h6>
-            <table class="resource-table">
-              <thead>
-                <tr>
-                  <th>Event</th>
-                  <th>Pod/Resource</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Pod Created</td>
-                  <td>api-deployment-0</td>
-                  <td>
-                    <span class="badge-status badge-running">Running</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Service Updated</td>
-                  <td>backend-service</td>
-                  <td>
-                    <span class="badge-status badge-running">Updated</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+
+            <!-- DEPLOYMENTS Section -->
+            <div style="border-left: 4px solid #4facfe; padding-left: 1rem">
+              <div onclick="toggleK8sSection('deployments')" style="cursor: pointer; font-weight: bold; color: #4facfe; display: flex; align-items: center; gap: 0.5rem">
+                <i class="fas fa-chevron-right k8s-chevron" id="deployments-chevron" style="transition: transform 0.2s"></i>
+                <i class="fas fa-rocket"></i> Deployments (4)
+              </div>
+              <div id="deployments-list" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: white; border-radius: 4px; max-height: 130px; overflow-y: auto">
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><strong>api-deployment</strong> <span style="float: right; font-size: 0.8rem; color: #4caf50">✓ 3/3 Ready</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #eee"><strong>backend-service</strong> <span style="float: right; font-size: 0.8rem; color: #4caf50">✓ 2/2 Ready</span></div>
+                <div style="padding: 0.5rem; font-size: 0.9rem"><strong>monitor-deployment</strong> <span style="float: right; font-size: 0.8rem; color: #4caf50">✓ 1/1 Ready</span></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1417,28 +2662,531 @@
           <div class="section-header">
             <span><i class="fas fa-database"></i> Genesis Viewer</span>
           </div>
-          <p>System logs from Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/</p>
+
+          <!-- Genesis Sub-tabs (REORDERED: Docs|BD|Stats|Logs|Vault) -->
           <div
             style="
-              margin-top: 1rem;
-              background: #f9f9f9;
-              padding: 1rem;
-              border-radius: 6px;
-              font-family: monospace;
-              font-size: 0.85rem;
-              max-height: 400px;
-              overflow-y: auto;
+              display: flex;
+              gap: 0.5rem;
+              margin-bottom: 1rem;
+              border-bottom: 2px solid #e0e0e0;
+              padding-bottom: 0.5rem;
             "
           >
-            <div style="color: #27ae60">
-              [✓] Application started successfully
+            <button
+              class="genesis-subtab active"
+              onclick="switchGenesisView('documents')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.5rem 1rem;
+                cursor: pointer;
+                font-weight: bold;
+                color: #0288d1;
+                border-bottom: 3px solid #0288d1;
+                margin-bottom: -0.5rem;
+              "
+            >
+              <i class="fas fa-file-alt"></i> Dokumenty
+            </button>
+            <button
+              class="genesis-subtab"
+              onclick="switchGenesisView('database')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.5rem 1rem;
+                cursor: pointer;
+                font-weight: 600;
+                color: #999;
+              "
+            >
+              <i class="fas fa-server"></i> Baza Danych
+            </button>
+            <button
+              class="genesis-subtab"
+              onclick="switchGenesisView('statistics')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.5rem 1rem;
+                cursor: pointer;
+                font-weight: 600;
+                color: #999;
+              "
+            >
+              <i class="fas fa-chart-bar"></i> Statystyki
+            </button>
+            <button
+              class="genesis-subtab"
+              onclick="switchGenesisView('logs')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.5rem 1rem;
+                cursor: pointer;
+                font-weight: 600;
+                color: #999;
+              "
+            >
+              <i class="fas fa-scroll"></i> Logi
+            </button>
+            <button
+              class="genesis-subtab"
+              onclick="switchGenesisView('vault')"
+              style="
+                background: none;
+                border: none;
+                padding: 0.5rem 1rem;
+                cursor: pointer;
+                font-weight: 600;
+                color: #999;
+              "
+            >
+              <i class="fas fa-lock"></i> Sejf Kodu
+            </button>
+          </div>
+
+          <!-- Dokumenty View (Now First/Active) -->
+          <div id="genesis-documents" class="genesis-view" style="display: block">
+            <p style="color: #666; margin-bottom: 1rem">
+              📋 Dokumentacja i Raporty z Genesis Record
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
+              <div style="background: #e3f2fd; padding: 1rem; border-radius: 6px; border-left: 4px solid #2196f3">
+                <div style="font-weight: bold; color: #2196f3">📄 Raporty Sesji</div>
+                <div style="margin-top: 0.5rem; font-size: 0.9rem; line-height: 1.6">
+                  <div>Backend_API_Integration_2026-04-06</div>
+                  <div>PERSONA_PREP_Workshop_2026-04-15</div>
+                  <div>Workshop_ARCHITECT_2026-04-06</div>
+                </div>
+              </div>
+              <div style="background: #e8f5e9; padding: 1rem; border-radius: 6px; border-left: 4px solid #4caf50">
+                <div style="font-weight: bold; color: #4caf50">📊 Deliverables</div>
+                <div style="margin-top: 0.5rem; font-size: 0.9rem; line-height: 1.6">
+                  <div>WORKSHOP_SAP_DELIVERABLES (17KB)</div>
+                  <div>WORKSHOP_SENTINEL_DELIVERABLES (15KB)</div>
+                  <div>WORKSHOP_HEALER_DELIVERABLES (22KB)</div>
+                </div>
+              </div>
             </div>
-            <div style="color: #27ae60">[✓] Database initialized</div>
-            <div style="color: #27ae60">[✓] K8s integration loaded</div>
-            <div style="color: #f39c12">
-              [⚠] K8s cluster connection (expected)
+          </div>
+
+          <!-- Logi View -->
+          <div id="genesis-logs" class="genesis-view" style="display: none">
+            <p style="color: #666; margin-bottom: 1rem">
+              System logs from Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/
+            </p>
+            <div
+              style="
+                background: #f9f9f9;
+                padding: 1rem;
+                border-radius: 6px;
+                font-family: monospace;
+                font-size: 0.85rem;
+                max-height: 350px;
+                overflow-y: auto;
+                border-left: 4px solid #0288d1;
+              "
+            >
+              <div style="color: #27ae60">
+                [✓] Application started successfully
+              </div>
+              <div style="color: #27ae60">[✓] Database initialized</div>
+              <div style="color: #27ae60">[✓] K8s integration loaded</div>
+              <div style="color: #f39c12">
+                [⚠] K8s cluster connection (expected)
+              </div>
+              <div style="color: #27ae60">[✓] All services operational</div>
+              <div style="color: #27ae60; margin-top: 0.5rem">
+                [✓] Phase 2 API endpoints registered
+              </div>
+              <div style="color: #27ae60">
+                [✓] Phase 3 auth endpoints registered
+              </div>
+              <div style="color: #f39c12; margin-top: 0.5rem">
+                [⚠] Ollama unavailable
+              </div>
+              <div style="color: #27ae60">[✓] Fallback to keyword routing</div>
             </div>
-            <div style="color: #27ae60">[✓] All services operational</div>
+          </div>
+
+          <!-- Statistics View (New) -->
+          <div id="genesis-statistics" class="genesis-view" style="display: none">
+            <p style="color: #666; margin-bottom: 1rem">
+              📈 Statystyka Systemu i Performance
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem">
+              <div style="background: #667eea; color: white; padding: 1.5rem; border-radius: 6px; text-align: center">
+                <div style="font-size: 1.8rem; font-weight: bold">156</div>
+                <div style="font-size: 0.9rem">Zadań</div>
+              </div>
+              <div style="background: #4caf50; color: white; padding: 1.5rem; border-radius: 6px; text-align: center">
+                <div style="font-size: 1.8rem; font-weight: bold">98.5%</div>
+                <div style="font-size: 0.9rem">Uptime</div>
+              </div>
+              <div style="background: #ff9800; color: white; padding: 1.5rem; border-radius: 6px; text-align: center">
+                <div style="font-size: 1.8rem; font-weight: bold">2.1s</div>
+                <div style="font-size: 0.9rem">Avg Response</div>
+              </div>
+            </div>
+            <div style="background: #f9f9f9; padding: 1rem; border-radius: 6px; border: 1px solid #ddd">
+              <div style="font-weight: bold; margin-bottom: 0.5rem">🔄 KPIs Ostatnie 24h</div>
+              <div style="font-size: 0.9rem; line-height: 1.8">
+                <div>• Ukończone: 12 (85% SLA)</div>
+                <div>• W trakcie: 3 (on-track)</div>
+                <div>• Czeka: 1 (prioritized)</div>
+                <div>• Błędy: 0 (clean)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Database View -->
+          <div id="genesis-database" class="genesis-view" style="display: none">
+            <p style="color: #666; margin-bottom: 1rem">
+              📊 Baza Danych — Stan i Statystyka
+            </p>
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem"
+            >
+              <div
+                style="
+                  background: #e3f2fd;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #0288d1;
+                "
+              >
+                <div style="font-weight: bold; color: #0288d1">Typ Bazy</div>
+                <div
+                  style="
+                    margin-top: 0.5rem;
+                    font-family: monospace;
+                    color: #555;
+                  "
+                >
+                  SQLite (Development)
+                </div>
+              </div>
+              <div
+                style="
+                  background: #f3e5f5;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #7b1fa2;
+                "
+              >
+                <div style="font-weight: bold; color: #7b1fa2">Ścieżka</div>
+                <div
+                  style="
+                    margin-top: 0.5rem;
+                    font-family: monospace;
+                    font-size: 0.8rem;
+                    color: #555;
+                  "
+                >
+                  ./db/adrion_local.db
+                </div>
+              </div>
+              <div
+                style="
+                  background: #e8f5e9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #388e3c;
+                "
+              >
+                <div style="font-weight: bold; color: #388e3c">Tabele</div>
+                <div
+                  style="
+                    margin-top: 0.5rem;
+                    font-family: monospace;
+                    font-size: 0.9rem;
+                    color: #555;
+                  "
+                >
+                  • tasks<br />
+                  • genesis_logs<br />
+                  • checkpoints<br />
+                  • agent_metrics
+                </div>
+              </div>
+              <div
+                style="
+                  background: #fff3e0;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #f57c00;
+                "
+              >
+                <div style="font-weight: bold; color: #f57c00">Status</div>
+                <div style="margin-top: 0.5rem; color: #27ae60">
+                  ✓ Connected
+                </div>
+                <div
+                  style="margin-top: 0.3rem; font-size: 0.85rem; color: #666"
+                >
+                  1.847 MB
+                </div>
+              </div>
+            </div>
+            <div
+              style="
+                margin-top: 1.5rem;
+                padding: 1rem;
+                background: #f5f5f5;
+                border-radius: 6px;
+                border: 1px solid #ddd;
+              "
+            >
+              <div style="font-weight: bold; margin-bottom: 0.5rem">
+                📈 Statystyka Tabel
+              </div>
+              <div style="font-size: 0.9rem; color: #666; line-height: 1.6">
+                <div>tasks: 156 records</div>
+                <div>genesis_logs: 4,832 records</div>
+                <div>checkpoints: 23 records</div>
+                <div>agent_metrics: 12,456 records</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Documents View -->
+          <div
+            id="genesis-documents"
+            class="genesis-view"
+            style="display: none"
+          >
+            <p style="color: #666; margin-bottom: 1rem">📄 Dokumenty Systemu</p>
+            <div style="display: grid; gap: 0.75rem">
+              <div
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #2196f3;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                "
+                onmouseover="this.style.background = '#f0f0f0'"
+                onmouseout="this.style.background = '#f9f9f9'"
+              >
+                <div style="font-weight: bold; color: #2196f3">
+                  📋 DEPLOYMENT_SUMMARY.md
+                </div>
+                <div
+                  style="font-size: 0.85rem; color: #999; margin-top: 0.3rem"
+                >
+                  Podsumowanie deploymentu — ostatnia aktualizacja: 5 minut temu
+                </div>
+              </div>
+              <div
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #4caf50;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                "
+                onmouseover="this.style.background = '#f0f0f0'"
+                onmouseout="this.style.background = '#f9f9f9'"
+              >
+                <div style="font-weight: bold; color: #4caf50">
+                  📚 README.md
+                </div>
+                <div
+                  style="font-size: 0.85rem; color: #999; margin-top: 0.3rem"
+                >
+                  Główna dokumentacja projektu — 1,847 linek
+                </div>
+              </div>
+              <div
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #ff9800;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                "
+                onmouseover="this.style.background = '#f0f0f0'"
+                onmouseout="this.style.background = '#f9f9f9'"
+              >
+                <div style="font-weight: bold; color: #ff9800">
+                  ⚙️ INSTALLATION.md
+                </div>
+                <div
+                  style="font-size: 0.85rem; color: #999; margin-top: 0.3rem"
+                >
+                  Instrukcje instalacji systemu — aktualna wersja
+                </div>
+              </div>
+              <div
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #f44336;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                "
+                onmouseover="this.style.background = '#f0f0f0'"
+                onmouseout="this.style.background = '#f9f9f9'"
+              >
+                <div style="font-weight: bold; color: #f44336">
+                  🔐 SYSTEM_PROMPTS_LEAD_ARBITRAGE.md
+                </div>
+                <div
+                  style="font-size: 0.85rem; color: #999; margin-top: 0.3rem"
+                >
+                  Prompty systemowe dla modelu LLM — confidential
+                </div>
+              </div>
+              <div
+                style="
+                  background: #f9f9f9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #9c27b0;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                "
+                onmouseover="this.style.background = '#f0f0f0'"
+                onmouseout="this.style.background = '#f9f9f9'"
+              >
+                <div style="font-weight: bold; color: #9c27b0">
+                  🏗️ PRODUCTION_DEPLOYMENT.md
+                </div>
+                <div
+                  style="font-size: 0.85rem; color: #999; margin-top: 0.3rem"
+                >
+                  Wdrażanie w środowisku produkcji — zaawansowane
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Code Vault View -->
+          <div id="genesis-vault" class="genesis-view" style="display: none">
+            <p style="color: #666; margin-bottom: 1rem">
+              🔐 Sejf Kodu — Przechowywanie i Ochrona
+            </p>
+            <div
+              style="
+                background: #fff9e6;
+                padding: 1rem;
+                border-radius: 6px;
+                border-left: 4px solid #d4a017;
+                margin-bottom: 1rem;
+              "
+            >
+              <div style="font-weight: bold; color: #d4a017">
+                ⚠️ Uwaga Bezpieczeństwa
+              </div>
+              <div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem">
+                Wszystkie hasła i klucze API są szyfrowane AES-256. Dostęp
+                wymaga JWT token.
+              </div>
+            </div>
+            <div style="display: grid; gap: 0.75rem">
+              <div
+                style="
+                  background: #f0f4ff;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #0288d1;
+                "
+              >
+                <div style="font-weight: bold; color: #0288d1">🔑 API Keys</div>
+                <div
+                  style="
+                    margin-top: 0.7rem;
+                    font-family: monospace;
+                    font-size: 0.85rem;
+                    color: #555;
+                  "
+                >
+                  <div>UAP_API_KEY: [ENCRYPTED]</div>
+                  <div style="margin-top: 0.3rem">JWT_SECRET: [ENCRYPTED]</div>
+                  <div style="margin-top: 0.3rem">
+                    STATUS: ✓ 3 klucze przechowywane
+                  </div>
+                </div>
+              </div>
+              <div
+                style="
+                  background: #ffe0f0;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #c2185b;
+                "
+              >
+                <div style="font-weight: bold; color: #c2185b">
+                  🛡️ Credentials
+                </div>
+                <div
+                  style="
+                    margin-top: 0.7rem;
+                    font-family: monospace;
+                    font-size: 0.85rem;
+                    color: #555;
+                  "
+                >
+                  <div>PG_USER: [ENCRYPTED]</div>
+                  <div style="margin-top: 0.3rem">PG_PASSWORD: [ENCRYPTED]</div>
+                  <div style="margin-top: 0.3rem">
+                    STATUS: ✓ 2 kredencjały przechowywane
+                  </div>
+                </div>
+              </div>
+              <div
+                style="
+                  background: #e8f5e9;
+                  padding: 1rem;
+                  border-radius: 6px;
+                  border-left: 4px solid #388e3c;
+                "
+              >
+                <div style="font-weight: bold; color: #388e3c">
+                  🔓 Master Key
+                </div>
+                <div
+                  style="
+                    margin-top: 0.7rem;
+                    font-family: monospace;
+                    font-size: 0.85rem;
+                    color: #555;
+                  "
+                >
+                  <div>Status: [PROTECTED]</div>
+                  <div style="margin-top: 0.3rem">Rotation: Q2 2026</div>
+                  <div style="margin-top: 0.3rem">
+                    Strength: 256-bit HMAC-SHA256
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              style="
+                margin-top: 1.5rem;
+                padding: 1rem;
+                background: #f5f5f5;
+                border-radius: 6px;
+                border: 1px dashed #999;
+              "
+            >
+              <div style="font-weight: bold; margin-bottom: 0.5rem">
+                📦 Backup Status
+              </div>
+              <div style="font-size: 0.9rem; color: #666">
+                <div>✓ Last backup: 2 godziny temu</div>
+                <div style="margin-top: 0.3rem">✓ Size: 4.2 MB (encrypted)</div>
+                <div style="margin-top: 0.3rem">
+                  ✓ Location: /backups/vault/
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1473,9 +3221,11 @@
           </div>
           <div style="padding: 1rem">
             <p style="margin-bottom: 1.5rem">
-              System health monitoring and auto-recovery status
+              System health monitoring, auto-recovery status i historia healów dla każdego agenta
             </p>
-            <div class="stat-grid">
+
+            <!-- Health Stats -->
+            <div class="stat-grid" style="margin-bottom: 2rem">
               <div class="stat-box">
                 <div class="stat-value" style="color: var(--success)">98%</div>
                 <div class="stat-label">System Health</div>
@@ -1486,15 +3236,82 @@
               </div>
               <div class="stat-box">
                 <div class="stat-value" style="color: var(--primary-blue)">
-                  12
+                  34
                 </div>
                 <div class="stat-label">Auto-Fixed</div>
               </div>
               <div class="stat-box">
                 <div class="stat-value" style="color: var(--success)">
-                  2h 34m
+                  15d 8h
                 </div>
                 <div class="stat-label">Uptime</div>
+              </div>
+            </div>
+
+            <!-- Healing History Table -->
+            <div style="background: #f9f9f9; padding: 1rem; border-radius: 6px; border: 1px solid #ddd">
+              <h6 style="margin-bottom: 1rem; font-weight: bold">📋 Historia Aplikowanych Healów</h6>
+              <div style="overflow-x: auto">
+                <table style="width: 100%; font-size: 0.85rem; border-collapse: collapse">
+                  <thead>
+                    <tr style="background: #e0e0e0; border-bottom: 2px solid #999">
+                      <th style="padding: 0.5rem; text-align: left">Czas</th>
+                      <th style="padding: 0.5rem; text-align: left">Agent</th>
+                      <th style="padding: 0.5rem; text-align: left">Problem</th>
+                      <th style="padding: 0.5rem; text-align: left">Akcja Heal</th>
+                      <th style="padding: 0.5rem; text-align: left">RTO</th>
+                      <th style="padding: 0.5rem; text-align: left">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="border-bottom: 1px solid #ddd">
+                      <td style="padding: 0.5rem">2026-04-06 14:32</td>
+                      <td style="padding: 0.5rem"><strong>Sentinel</strong></td>
+                      <td style="padding: 0.5rem">Memory leak detected</td>
+                      <td style="padding: 0.5rem">GC restart + cache clear</td>
+                      <td style="padding: 0.5rem">0.3s</td>
+                      <td style="padding: 0.5rem"><span style="color: #4caf50">✓ Fixed</span></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #ddd">
+                      <td style="padding: 0.5rem">2026-04-06 13:15</td>
+                      <td style="padding: 0.5rem"><strong>Healer</strong></td>
+                      <td style="padding: 0.5rem">Orphaned checkpoint</td>
+                      <td style="padding: 0.5rem">Auto-cleanup + retry</td>
+                      <td style="padding: 0.5rem">0.1s</td>
+                      <td style="padding: 0.5rem"><span style="color: #4caf50">✓ Fixed</span></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #ddd">
+                      <td style="padding: 0.5rem">2026-04-06 12:08</td>
+                      <td style="padding: 0.5rem"><strong>SAP</strong></td>
+                      <td style="padding: 0.5rem">Cascade recovery needed</td>
+                      <td style="padding: 0.5rem">Trust Score reset + resume</td>
+                      <td style="padding: 0.5rem">2.1s</td>
+                      <td style="padding: 0.5rem"><span style="color: #4caf50">✓ Fixed</span></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #ddd">
+                      <td style="padding: 0.5rem">2026-04-06 10:45</td>
+                      <td style="padding: 0.5rem"><strong>Auditor</strong></td>
+                      <td style="padding: 0.5rem">Context overflow</td>
+                      <td style="padding: 0.5rem">Summarization + compression</td>
+                      <td style="padding: 0.5rem">1.2s</td>
+                      <td style="padding: 0.5rem"><span style="color: #4caf50">✓ Fixed</span></td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 0.5rem">2026-04-05 22:30</td>
+                      <td style="padding: 0.5rem"><strong>Librarian</strong></td>
+                      <td style="padding: 0.5rem">Database connection timeout</td>
+                      <td style="padding: 0.5rem">Reconnect + pool reset</td>
+                      <td style="padding: 0.5rem">0.8s</td>
+                      <td style="padding: 0.5rem"><span style="color: #4caf50">✓ Fixed</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div style="margin-top: 1rem; font-size: 0.85rem; color: #666">
+                <div><strong>Podsumowanie:</strong></div>
+                <div>• Łącznie healów wykonanych: 34 w ciągu ostatnich 24h</div>
+                <div>• Średni RTO: 0.7s (cel: <2s) ✓</div>
+                <div>• Sukces: 34/34 (100%) — wszystkie heale powiodły się</div>
               </div>
             </div>
           </div>
@@ -1692,57 +3509,7 @@
         </div>
       </div>
 
-      <div class="panel-right">
-        <div class="card-tasks">
-          <h5><i class="fas fa-list-check"></i> Bieżące Zadania</h5>
-          <div id="tasks-container">
-            <div class="task-item">
-              <span class="task-status running"></span> K8s pod monitoring
-            </div>
-            <div class="task-item">
-              <span class="task-status running"></span> API health check
-            </div>
-            <div class="task-item">
-              <span class="task-status pending"></span> Deployment queue
-            </div>
-          </div>
-          <p style="margin-top: 1rem; font-size: 0.85rem; color: #999">
-            Brak aktywnych zadań
-          </p>
-        </div>
 
-        <div class="card-stats">
-          <h5><i class="fas fa-chart-pie"></i> Statystyka</h5>
-          <div class="stat-grid">
-            <div class="stat-box">
-              <div class="stat-value" style="font-size: 1.5rem">0</div>
-              <div class="stat-label">UKOŃCZONE</div>
-            </div>
-            <div class="stat-box">
-              <div
-                class="stat-value"
-                style="font-size: 1.5rem; color: var(--warning)"
-              >
-                0
-              </div>
-              <div class="stat-label">W TOKU</div>
-            </div>
-            <div class="stat-box">
-              <div
-                class="stat-value"
-                style="font-size: 1.5rem; color: var(--danger)"
-              >
-                0
-              </div>
-              <div class="stat-label">BŁĘDY</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-value" style="font-size: 1.5rem">7/7</div>
-              <div class="stat-label">SERVICES</div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Toast Notification Container -->
@@ -1980,13 +3747,163 @@
         event.target.closest(".nav-link-master").classList.add("active");
       }
 
+      // Agent Delegator View Switching
+      function switchAgentView(viewType) {
+        document.querySelectorAll(".agent-view").forEach((el) => {
+          el.style.display = "none";
+        });
+
+        const selectedView = document.getElementById(`agent-${viewType}`);
+        if (selectedView) selectedView.style.display = "block";
+
+        document.querySelectorAll(".agent-subtab").forEach((btn) => {
+          btn.style.color = "#999";
+          btn.style.borderBottom = "none";
+          btn.style.marginBottom = "0";
+        });
+
+        if (event && event.target) {
+          const btn = event.target.closest(".agent-subtab");
+          if (btn) {
+            btn.style.color = "#0288d1";
+            btn.style.borderBottom = "3px solid #0288d1";
+            btn.style.marginBottom = "-0.5rem";
+          }
+        }
+      }
+
+      // Agent Template Selection
+      function selectTemplate(templateId) {
+        OrchestratorState.agentConfig.selectedTemplate = templateId;
+        document.getElementById("selected-template").textContent =
+          templateId.toUpperCase();
+        document.getElementById("template-info").style.display = "block";
+      }
+
+      // Create Agent from Template
+      function createAgentFromTemplate() {
+        const agentName =
+          document.getElementById("agent-custom-name").value ||
+          document.getElementById("selected-template").textContent;
+        alert(`✅ Agent "${agentName}" został utworzony z szablonu!`);
+        document.getElementById("template-info").style.display = "none";
+        localStorage.setItem(
+          `agent_${agentName}`,
+          JSON.stringify(OrchestratorState.agentConfig),
+        );
+      }
+
+      // Select Active Task
+      function selectTask(taskId, taskName) {
+        document.getElementById("task-detail-title").textContent =
+          `📊 Szczegóły: ${taskName}`;
+        switchAgentView("task-detail");
+      }
+
+      // Save User Preferences
+      function savePreferences() {
+        alert("✅ Preferencje użytkownika zapisane!");
+        localStorage.setItem(
+          "user_preferences",
+          JSON.stringify(OrchestratorState.userPatterns),
+        );
+      }
+
+      // Load Active Tasks from API
+      async function loadActiveTasks() {
+        try {
+          const response = await fetch("http://localhost:8002/mapi/v1/tasks", {
+            headers: { "X-API-Key": "dev-key" },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const tasks = data.tasks || [];
+
+            // Update tasks container
+            const tasksContainer = document.querySelector(
+              "#agent-tasks > div:last-child",
+            );
+            if (tasksContainer && tasks.length > 0) {
+              tasksContainer.innerHTML = tasks
+                .map(
+                  (task) => `
+                <div onclick="selectTask('${task.id}', '${task.name}')" style="background: #f9f9f9; padding: 1rem; border-radius: 6px; border-left: 4px solid #667eea; cursor: pointer;">
+                  <div style="display: flex; justify-content: space-between;">
+                    <div style="font-weight: bold">${task.name}</div>
+                    <span style="background: ${task.status === "running" ? "#667eea" : task.status === "pending" ? "#ff9800" : "#4caf50"}; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem;">
+                      ${task.status === "running" ? "⏳ W trakcie" : task.status === "pending" ? "⚠️ Czeka" : "✓ Ukończone"}
+                    </span>
+                  </div>
+                  <div style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;">${task.agent} • ${task.progress || 0}% complete</div>
+                </div>
+              `,
+                )
+                .join("");
+            }
+
+            // Update stats
+            const statsResponse = await fetch(
+              "http://localhost:8002/mapi/v1/tasks/stats",
+              {
+                headers: { "X-API-Key": "dev-key" },
+              },
+            );
+
+            if (statsResponse.ok) {
+              const statsData = await statsResponse.json();
+              // Update stats display if needed
+              console.log("Task stats:", statsData);
+            }
+          }
+        } catch (error) {
+          console.error("Error loading active tasks:", error);
+          // Fallback: keep default data
+        }
+      }
+
+      // Load Database Connections from API
+      async function loadDatabaseConnections() {
+        try {
+          // TODO: Create /mapi/v1/databases endpoint
+          // For now, use hardcoded data
+          console.log("Database connections endpoint not yet implemented");
+        } catch (error) {
+          console.error("Error loading database connections:", error);
+        }
+      }
+
+      // Genesis Viewer Sub-tab Switching
+      function switchGenesisView(viewType) {
+        // Hide all genesis views
+        document
+          .querySelectorAll(".genesis-view")
+          .forEach((view) => (view.style.display = "none"));
+
+        // Show selected view
+        document.getElementById("genesis-" + viewType).style.display = "block";
+
+        // Update button styles
+        document.querySelectorAll(".genesis-subtab").forEach((btn) => {
+          btn.style.color = "#999";
+          btn.style.borderBottom = "none";
+          btn.style.marginBottom = "0";
+        });
+
+        // Highlight active button
+        event.target.closest(".genesis-subtab").style.color = "#0288d1";
+        event.target.closest(".genesis-subtab").style.borderBottom =
+          "3px solid #0288d1";
+        event.target.closest(".genesis-subtab").style.marginBottom = "-0.5rem";
+      }
+
       // Check API Status
       async function checkAPIStatus() {
         try {
           const response = await fetch(
             "http://localhost:8002/mapi/v1/kubernetes/cluster-info",
             {
-              headers: { "X-API-Key": "test-key" },
+              headers: { "X-API-Key": "dev-key" },
             },
           );
           if (response.ok) {
@@ -2018,6 +3935,8 @@
       document.addEventListener("DOMContentLoaded", function () {
         loadK8sData();
         checkAPIStatus();
+        loadActiveTasks();
+        loadDatabaseConnections();
         loadSavedApis();
         updateTestButtonStates();
         showToast("Master Orchestrator loaded successfully", "success");
@@ -2457,12 +4376,713 @@
         event.target.value = ""; // Reset input
       }
 
+      // K8s Dashboard Tree-View Toggle Function
+      function toggleK8sSection(section) {
+        const listId = `${section}-list`;
+        const chevronId = `${section}-chevron`;
+        const list = document.getElementById(listId);
+        const chevron = document.getElementById(chevronId);
+
+        if (list) {
+          const isVisible = list.style.display !== 'none';
+          list.style.display = isVisible ? 'none' : 'block';
+
+          if (chevron) {
+            chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(90deg)';
+          }
+        }
+      }
+
       // Periodic updates
       setInterval(loadK8sData, 30000);
       setInterval(() => {
         checkAPIStatus();
         updateTestButtonStates();
       }, 10000);
-    </script>
+
+      // ============ ORCHESTRATOR CHAT LOGIC ============
+
+      const OrchestratorState = {
+        phase: "INIT", // INIT, QUESTIONNAIRE, PLANNING, DEPLOYMENT, DONE
+        userGoal: "",
+        selectedAnswers: [],
+        plan: null,
+        chatHistory: [],
+      };
+
+      const questionSets = {
+        deploy: [
+          { label: "Backend", value: "backend" },
+          { label: "Frontend", value: "frontend" },
+          { label: "Database", value: "database" },
+          { label: "Wszystko", value: "all" },
+        ],
+        fix: [
+          { label: "Błęd aplikacji", value: "app-error" },
+          { label: "Wydajność", value: "performance" },
+          { label: "Bezpieczeństwo", value: "security" },
+          { label: "Infrastruktura", value: "infra" },
+        ],
+        monitor: [
+          { label: "Logi", value: "logs" },
+          { label: "Metryki", value: "metrics" },
+          { label: "Alerty", value: "alerts" },
+          { label: "Raporty", value: "reports" },
+        ],
+      };
+
+      function sendChatMessage() {
+        const input = document.getElementById("chat-input");
+        const message = input.value.trim();
+        if (!message) return;
+
+        // Add user message to history
+        OrchestratorState.chatHistory.push({ role: "user", text: message });
+        OrchestratorState.userGoal = message;
+
+        // Display message
+        displayChatMessage(message, "user");
+        input.value = "";
+
+        // Analyze user goal and show appropriate questions
+        setTimeout(() => {
+          analyzeGoalAndShowQuestions(message);
+        }, 300);
+      }
+
+      function displayChatMessage(text, role) {
+        const history = document.getElementById("chat-history");
+
+        // Remove empty state if exists
+        const emptyState = history.querySelector(".empty-state");
+        if (emptyState) emptyState.remove();
+
+        // Ensure history is scrollable
+        if (!history.getAttribute("data-initialized")) {
+          history.innerHTML = "";
+          history.style.display = "flex";
+          history.style.flexDirection = "column";
+          history.style.alignItems = "flex-start";
+          history.style.gap = "1rem";
+          history.style.justifyContent = "flex-start";
+          history.style.minHeight = "auto";
+          history.setAttribute("data-initialized", "true");
+        }
+
+        const msgEl = document.createElement("div");
+        msgEl.style.cssText = `
+          padding: 0.75rem 1rem;
+          border-radius: 6px;
+          max-width: 80%;
+          word-wrap: break-word;
+          align-self: ${role === "user" ? "flex-end" : "flex-start"};
+          background: ${role === "user" ? "#0078d4" : "#f0f0f0"};
+          color: ${role === "user" ? "white" : "#333"};
+          font-size: 0.95rem;
+        `;
+        msgEl.textContent = text;
+        history.appendChild(msgEl);
+        history.scrollTop = history.scrollHeight;
+      }
+
+      function analyzeGoalAndShowQuestions(goal) {
+        let goalType = "other";
+        let explanation = "";
+
+        if (
+          goal.toLowerCase().includes("deploy") ||
+          goal.toLowerCase().includes("wdróż")
+        ) {
+          goalType = "deploy";
+          explanation =
+            "📦 Proces wdrażania to stopniowe uruchomienie kodu w produkcji. Potrzebnie wiedzieć, co dokładnie chcesz wdrożyć, aby zaproponować optymalną strategię i zasoby.";
+        } else if (
+          goal.toLowerCase().includes("fix") ||
+          goal.toLowerCase().includes("napraw")
+        ) {
+          goalType = "fix";
+          explanation =
+            "🔧 Diagnoza problemu to pierwszy krok. Na podstawie typu błędu sprawdzę system, przeanalizuję logi i zasugeruję rozwiązanie.";
+        } else if (
+          goal.toLowerCase().includes("monitor") ||
+          goal.toLowerCase().includes("monitoruj")
+        ) {
+          goalType = "monitor";
+          explanation =
+            "📊 Monitoring to ciągłe obserwowanie systemu. Pokazuję metryki, alerty i trendy - pomagam wykryć problemy zanim stanu się poważne.";
+        } else {
+          explanation =
+            "💡 Rozumiem Twoje zapytanie. Mogę Ci pomóc w trzech obszarach: wdrażaniu kodu, naprawach błędów i monitoringu systemu. Którym zainteresowany?";
+        }
+
+        // Show conversational response
+        displayChatMessage(
+          `${explanation}\n\nPo co konkretnie chcesz się zabrać?`,
+          "assistant",
+        );
+
+        // Show questions panel
+        const questions = questionSets[goalType] || questionSets["deploy"];
+        showQuestionsPanel(questions, goalType, goal);
+      }
+
+      function showQuestionsPanel(questions, goalType, goal) {
+        OrchestratorState.phase = "QUESTIONNAIRE";
+        updatePhaseIndicator();
+
+        const panel = document.getElementById("questions-panel");
+        const container = document.getElementById("questions-container");
+
+        const optionDescriptions = {
+          backend: "Serwer, API, logika biznesowa",
+          frontend: "Interfejs użytkownika, aplikacja webowa",
+          database: "Baza danych, migracje, schematy",
+          all: "Cały system (uwaga: długo trwa)",
+          "app-error": "Crash, exception, błędy w logach",
+          performance: "Wolne response, high CPU/memory",
+          security: "Vulnerability, unauthorized access",
+          infra: "Sieć, serwery, storage",
+          logs: "História zdarzeń, debug info",
+          metrics: "Performance, uptime, resources",
+          alerts: "Aktywne alarmy, progi",
+          reports: "Zestawienia, SLA, trendy",
+        };
+
+        container.innerHTML = questions
+          .map(
+            (q) => `
+          <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: white; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; transition: all 0.2s">
+            <input type="radio" name="goal-question" value="${q.value}" data-type="${goalType}" style="cursor: pointer; width: 18px; height: 18px">
+            <div style="flex: 1">
+              <strong>${q.label}</strong>
+              <div style="font-size: 0.8rem; color: #666; margin-top: 0.25rem">${optionDescriptions[q.value] || ""}</div>
+            </div>
+          </label>
+        `,
+          )
+          .join("");
+
+        // Add info box about the process
+        const infoBox = document.createElement("div");
+        infoBox.style.cssText = `
+          padding: 0.75rem;
+          background: #f0f8ff;
+          border-left: 3px solid #0078d4;
+          border-radius: 4px;
+          font-size: 0.85rem;
+          color: #333;
+          margin-bottom: 1rem;
+        `;
+        infoBox.innerHTML = `
+          <strong>📋 Jak to działa:</strong><br>
+          1️⃣ Wybierz opcję lub wpisz szczegóły<br>
+          2️⃣ Wygeneruję szczegółowy plan<br>
+          3️⃣ Zatwierdzisz - zaczynam wdrażać<br>
+          4️⃣ System będzie się aktualizować w real-time
+        `;
+        container.insertAdjacentElement("beforebegin", infoBox);
+
+        panel.style.display = "block";
+        document.getElementById("plan-panel").style.display = "none";
+        document.getElementById("deployment-panel").style.display = "none";
+      }
+
+      function submitQuestionnaire() {
+        const selected = document.querySelector(
+          'input[name="goal-question"]:checked',
+        );
+        const custom = document.getElementById("custom-input").value.trim();
+
+        if (!selected && !custom) {
+          showToast("Wybierz opcję lub wpisz własną odpowiedź", "warning");
+          return;
+        }
+
+        const answer = custom || selected.value;
+        const answerType = selected?.getAttribute("data-type") || "other";
+
+        OrchestratorState.selectedAnswers = [answer];
+
+        // Hide questions, show plan generation
+        document.getElementById("questions-panel").style.display = "none";
+        displayChatMessage(`Wybrałeś: ${answer}`, "user");
+        displayChatMessage(`Generuję plan wdrażania...`, "assistant");
+
+        setTimeout(() => {
+          generateAndShowPlan(OrchestratorState.userGoal, answer, answerType);
+        }, 500);
+      }
+
+      function generateAndShowPlan(goal, answer, type) {
+        OrchestratorState.phase = "PLANNING";
+        updatePhaseIndicator();
+
+        // Generate contextual plan based on goal type
+        let planDetails = "";
+        if (type === "deploy") {
+          planDetails =
+            "Bezpieczne wdrażanie kodu z monitoringiem i rollback-iem";
+        } else if (type === "fix") {
+          planDetails = "Diagnoza, analiza root cause i wdrażanie poprawki";
+        } else if (type === "monitor") {
+          planDetails =
+            "Zbieranie metryk, analiza trendów i ustawienie alertów";
+        }
+
+        // Generate mock plan based on inputs
+        const plan = {
+          title: `Plan: ${goal.substring(0, 30)}...`,
+          description: planDetails,
+          riskLevel: "Niskie",
+          phases: [
+            {
+              name: "Przygotowanie",
+              description: "Weryfikacja warunków i przygotowanie zasobów",
+              tasks: [
+                "✓ Sprawdzenie stanu systemu",
+                "✓ Zweryfikowanie uprawnień",
+                "✓ Przygotowanie backupu",
+                "✓ Notyfikacja teamów",
+              ],
+            },
+            {
+              name: "Wdrażanie",
+              description: `Realizacja głównej operacji: ${answer}`,
+              tasks: [
+                `✓ Wdrożenie dla: ${answer}`,
+                "✓ Konfiguracja parametrów",
+                "✓ Testowanie zmian",
+                "✓ Health checks",
+              ],
+            },
+            {
+              name: "Weryfikacja",
+              description: "Potwierdzenie sukcesu i dokumentacja",
+              tasks: [
+                "✓ Kontrola logów i metryk",
+                "✓ Potwierdzenie stanu",
+                "✓ Feedback od użytkowników",
+                "✓ Raport końcowy",
+              ],
+            },
+          ],
+          estimatedTime: "15-30 minut",
+          requiredAgents: ["K8s Agent", "Data Agent", "Monitor Agent"],
+          rollbackAvailable: true,
+        };
+
+        OrchestratorState.plan = plan;
+
+        // Show conversational message
+        displayChatMessage(
+          `✅ Plan gotów! Będę wdrażać w 3 etapach:\n\n${plan.phases.map((p, i) => `${i + 1}. ${p.name} - ${p.description}`).join("\n")}\n\n⏱️ Szacowy czas: ${plan.estimatedTime}\n🔙 Możliwy rollback w razie problemu`,
+          "assistant",
+        );
+
+        // Display plan UI
+        const planContent = document.getElementById("plan-content");
+        let html = `
+          <div style="line-height: 1.8">
+            <p><strong>📋 ${plan.title}</strong></p>
+            <p style="font-size: 0.85rem; color: #666">${plan.description}</p>
+            <div style="display: flex; gap: 1rem; margin: 0.75rem 0">
+              <span style="background: #e3f2fd; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem">⏱️ ${plan.estimatedTime}</span>
+              <span style="background: #e8f5e9; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem">🎯 Ryzyko: ${plan.riskLevel}</span>
+              <span style="background: #fff3e0; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem">🔙 ${plan.rollbackAvailable ? "Rollback dostępny" : "Brak rollback-u"}</span>
+            </div>
+            <hr style="margin: 0.75rem 0">
+        `;
+
+        plan.phases.forEach((phase, idx) => {
+          html += `
+            <div style="margin-bottom: 1.5rem; padding: 0.75rem; background: #f9f9f9; border-left: 3px solid #0078d4; border-radius: 4px">
+              <p style="margin: 0.5rem 0; font-weight: 600; color: #0078d4">
+                <strong>Faza ${idx + 1}: ${phase.name}</strong>
+              </p>
+              <p style="font-size: 0.85rem; color: #666; margin: 0.5rem 0">${phase.description}</p>
+              <ul style="margin: 0.5rem 0; padding-left: 1.5rem; font-size: 0.9rem">
+                ${phase.tasks.map((task) => `<li style="margin: 0.25rem 0">${task}</li>`).join("")}
+              </ul>
+            </div>
+          `;
+        });
+
+        html += `
+          <hr style="margin: 0.75rem 0">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; font-size: 0.85rem">
+            <i class="fas fa-users"></i>
+            <span><strong>Zespół:</strong> ${plan.requiredAgents.join(", ")}</span>
+          </div>
+          <div style="margin-top: 0.75rem; font-size: 0.8rem; color: #999">
+            💡 Plan można zmienić - jeśli coś Ci się nie podoba, powiedz jakie poprawki chcesz intro. Jest to wersja optymalna na bazie Twoich danych.
+          </div>
+          </div>
+        `;
+
+        planContent.innerHTML = html;
+        document.getElementById("plan-panel").style.display = "block";
+      }
+
+      function approvePlan() {
+        OrchestratorState.phase = "DEPLOYMENT";
+        updatePhaseIndicator();
+
+        document.getElementById("plan-panel").style.display = "none";
+        document.getElementById("deployment-panel").style.display = "block";
+
+        displayChatMessage(
+          "✅ Plan zatwierdzony i zaakceptowany!\n\nRozpoczynamą wdrażanie w 3 fazach. Każdy agent otrzymał swoje zadania. Obsługuję w real-time i aktualizuję status...",
+          "assistant",
+        );
+
+        // Simulate deployment
+        setTimeout(() => {
+          deployTasksToAgents();
+        }, 800);
+      }
+
+      function rejectPlan() {
+        displayChatMessage(
+          `Plan nie spełnia Twoich oczekiwań 🤔\n\nMogę zmienić:\n• Zakres pracy (co wdrażamy)\n• Strategię (etapy i zasoby)\n• Timing (kiedy i w jakiej kolejności)\n\nPowiedz co Ci się nie podoba lub czego chcesz zmienić`,
+          "assistant",
+        );
+
+        // Show options to modify
+        const modifyOptions = `
+          <div style="padding: 1rem; background: #fff3e0; border: 1px solid #ffb74d; border-radius: 6px; margin-top: 1rem">
+            <h6 style="margin-top: 0">Co chcesz zmienić?</h6>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem">
+              <button onclick="modifyPlanScope()" style="padding: 0.5rem; border: none; background: #fff; border: 1px solid #ffb74d; border-radius: 4px; cursor: pointer">📦 Zmień zakres</button>
+              <button onclick="modifyPlanStrategy()" style="padding: 0.5rem; border: none; background: #fff; border: 1px solid #ffb74d; border-radius: 4px; cursor: pointer">🎯 Zmień strategię</button>
+              <button onclick="modifyPlanTiming()" style="padding: 0.5rem; border: none; background: #fff; border: 1px solid #ffb74d; border-radius: 4px; cursor: pointer">⏰ Zmień timing</button>
+              <button onclick="startOver()" style="padding: 0.5rem; border: none; background: #fff; border: 1px solid #ffb74d; border-radius: 4px; cursor: pointer">↻ Od nowa</button>
+            </div>
+          </div>
+        `;
+
+        const planPanel = document.getElementById("plan-panel");
+        const modifyEl = planPanel.querySelector('[style*="999"]');
+        if (modifyEl) {
+          modifyEl.insertAdjacentHTML("afterend", modifyOptions);
+        }
+      }
+
+      function modifyPlanScope() {
+        displayChatMessage(
+          "Zmieniam zakres pracy... jaki dokładnie element chcesz dodać/usunąć?",
+          "assistant",
+        );
+        OrchestratorState.phase = "QUESTIONNAIRE";
+        updatePhaseIndicator();
+      }
+
+      function modifyPlanStrategy() {
+        displayChatMessage(
+          "Jaką strategię preferujesz?\n• Ostrożna (długo, mało ryzyka)\n• Stabilna (szybko, średnie ryzyko)\n• Agresywna (szybko, więcej ryzyka)",
+          "assistant",
+        );
+        OrchestratorState.phase = "QUESTIONNAIRE";
+        updatePhaseIndicator();
+      }
+
+      function modifyPlanTiming() {
+        displayChatMessage(
+          "Kiedy chcesz to zrobić?\n• Teraz (ASAP)\n• W godzinach szczytu (optimization)\n• O nocy (maintenance window)",
+          "assistant",
+        );
+        OrchestratorState.phase = "QUESTIONNAIRE";
+        updatePhaseIndicator();
+      }
+
+      function startOver() {
+        cancelOrchestration();
+        displayChatMessage(
+          "OK, zaczynam od nowa 🔄 Powiedz co chcesz zrobić",
+          "assistant",
+        );
+      }
+
+      function deployTasksToAgents() {
+        if (!OrchestratorState.plan) return;
+
+        const tasksDiv = document.getElementById("deployment-tasks");
+        let html = "";
+
+        OrchestratorState.plan.phases.forEach((phase, phaseIdx) => {
+          html += `
+            <div style="margin-bottom: 1.5rem">
+              <p style="margin: 0.5rem 0; font-weight: 600; color: #27ae60">
+                Faza ${phaseIdx + 1}: ${phase.name}
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem">
+          `;
+
+          phase.tasks.forEach((task, taskIdx) => {
+            const agents = [
+              OrchestratorState.plan.requiredAgents[
+                phaseIdx % OrchestratorState.plan.requiredAgents.length
+              ],
+            ];
+            const taskId = `task-${phaseIdx}-${taskIdx}`;
+
+            html += `
+              <div id="${taskId}" style="padding: 0.75rem; background: white; border-left: 3px solid #27ae60; border-radius: 4px; font-size: 0.9rem">
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                  <span>${task}</span>
+                  <span class="task-progress" style="font-size: 0.8rem; color: #999">⏳ W toku</span>
+                </div>
+                <div style="font-size: 0.8rem; color: #666; margin-top: 0.5rem">
+                  Agent: <strong>${agents[0]}</strong>
+                </div>
+              </div>
+            `;
+          });
+
+          html += "</div></div>";
+        });
+
+        tasksDiv.innerHTML = html;
+
+        // Simulate task completion
+        simulateTaskCompletion();
+      }
+
+      function simulateTaskCompletion() {
+        let taskIdx = 0;
+        const allTasks = document.querySelectorAll('[id^="task-"]');
+        const taskMessages = [
+          "🔧 Inicjalizuję pierwszy Agent do pracy...",
+          "📊 Zbieranie danych i konfiguracja...",
+          "🚀 Wdrażanie zmian...",
+          "✓ Pierwszy Agent zakończył swoją część",
+          "📈 Drugi Agent przejmuje pracę...",
+          "🔍 Weryfikuję wszystkie komponenty...",
+          "✓ Drugi Agent raportuje sukces",
+          "📋 Monitor Agent rozpoczyna nadzór...",
+          "✅ Wszystko działa poprawnie!",
+        ];
+        let messageIdx = 0;
+
+        const completeNext = () => {
+          if (taskIdx >= allTasks.length) {
+            displayChatMessage(
+              "🎉 Wszystkie zadania ukończone!\n\n✅ System działa prawidłowo\n✅ Metryki w normie\n✅ Alerty wyłączone (bez problemów)\n\nCo chcesz zrobić teraz? Mogę:\n• Pokazać szczegółowy raport\n• Monitorować system\n• Wdrożyć kolejne zmiany",
+              "assistant",
+            );
+            OrchestratorState.phase = "DONE";
+            updatePhaseIndicator();
+
+            // Show next steps
+            const nextSteps = document.createElement("div");
+            nextSteps.style.cssText = `
+              padding: 1rem;
+              background: #f0f8ff;
+              border: 1px solid #b3d9ff;
+              border-radius: 6px;
+              margin-top: 1rem;
+            `;
+            nextSteps.innerHTML = `
+              <h6 style="margin-top: 0">Co dalej?</h6>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9rem">
+                <button onclick="showReport()" style="padding: 0.5rem; background: #0078d4; color: white; border: none; border-radius: 4px; cursor: pointer">📄 Pokaż raport szczegółowy</button>
+                <button onclick="scheduleMonitoring()" style="padding: 0.5rem; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer">📊 Monitoruj system przez 1h</button>
+                <button onclick="startNewTask()" style="padding: 0.5rem; background: #f39c12; color: white; border: none; border-radius: 4px; cursor: pointer">➕ Nowe zadanie</button>
+              </div>
+            `;
+            document.getElementById("deployment-panel").appendChild(nextSteps);
+            return;
+          }
+
+          const task = allTasks[taskIdx];
+          const progress = task.querySelector(".task-progress");
+          const taskName = task.querySelector(
+            "div:first-child div:first-child",
+          )?.textContent;
+
+          // Show progress message
+          if (messageIdx < taskMessages.length && taskIdx % 3 === 0) {
+            displayChatMessage(taskMessages[messageIdx], "assistant");
+            messageIdx++;
+          }
+
+          setTimeout(
+            () => {
+              progress.textContent = "✓ Ukończone";
+              progress.style.color = "#27ae60";
+              task.style.borderLeftColor = "#27ae60";
+              taskIdx++;
+              completeNext();
+            },
+            800 + Math.random() * 1200,
+          );
+        };
+
+        completeNext();
+      }
+
+      function showReport() {
+        displayChatMessage(
+          "📋 RAPORT WDRAŻANIA\n\n✅ Status: SUKCES\n⏱️ Czas trwania: 8m 42s\n👥 Agenci: K8s (3 tasks), Data (3 tasks), Monitor (3 tasks)\n🎯 Wykonano: 9/9 zadań\n\nMetryki:\n• CPU Usage: 45% → 42% (↓)\n• Memory: 62GB → 58GB (↓)\n• Response time: 145ms → 128ms (↓)\n• Errors: 0 (brak)\n\nWniosek: Plan wdrożony poprawnie i w pełni efektywnie! 🚀",
+          "assistant",
+        );
+      }
+
+      function scheduleMonitoring() {
+        displayChatMessage(
+          "📊 Zaplanowałem monitoring na następną godzinę.\n\nBędę obserwować:\n• Performance metryki\n• Error logs\n• Alertów i anomalii\n\nJeśli coś pójdzie nie tak, natychmiast Cię powiadomię i proponuję rollback.",
+          "assistant",
+        );
+      }
+
+      function startNewTask() {
+        cancelOrchestration();
+        displayChatMessage(
+          "✨ OK! Czego chcesz dokonać teraz? Mogę:\n• Wdrożyć nową funkcję\n• Naprawić błąd\n• Zmienić konfigurację",
+          "assistant",
+        );
+      }
+
+      function cancelOrchestration() {
+        OrchestratorState.phase = "INIT";
+        OrchestratorState.chatHistory = [];
+        OrchestratorState.plan = null;
+        updatePhaseIndicator();
+
+        document.getElementById("questions-panel").style.display = "none";
+        document.getElementById("plan-panel").style.display = "none";
+        document.getElementById("deployment-panel").style.display = "none";
+        document.getElementById("chat-input").value = "";
+
+        const history = document.getElementById("chat-history");
+        history.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-comment-dots"></i>
+            <p>Start a conversation with the AI Orchestrator</p>
+          </div>
+        `;
+        history.removeAttribute("data-initialized");
+      }
+
+      function updatePhaseIndicator() {
+        const indicator = document.getElementById("phase-indicator");
+        const phaseNames = {
+          INIT: "🟢 FAZA 0: Inicjacja",
+          QUESTIONNAIRE: "🟡 FAZA 1: Dopytywanie",
+          PLANNING: "🔵 FAZA 2: Planowanie",
+          DEPLOYMENT: "🟣 FAZA 3: Wdrażanie",
+          DONE: "✅ Ukończone",
+        };
+
+        indicator.textContent =
+          phaseNames[OrchestratorState.phase] || OrchestratorState.phase;
+        indicator.style.background =
+          {
+            INIT: "#e8f5e9",
+            QUESTIONNAIRE: "#fff3e0",
+            PLANNING: "#e3f2fd",
+            DEPLOYMENT: "#f3e5f5",
+            DONE: "#c8e6c9",
+          }[OrchestratorState.phase] || "#ddd";
+      }
+
+      // ====== SUB-TABS HISTORY SYSTEM ======
+
+      // Storage for historical data (in production, would be backend)
+      const historyData = {
+        chat: [
+          { id: 1, time: '10:30', title: 'Backend API Integration', status: 'completed' },
+          { id: 2, time: '10:15', title: 'Workshop Preparation', status: 'completed' },
+          { id: 3, time: '09:45', title: 'K8s Cluster Setup', status: 'completed' },
+        ],
+        agent: [
+          { id: 1, time: '2026-04-06 10:25', title: 'Deployment: API v2.1', status: 'completed', details: 'Successfully deployed API to production' },
+          { id: 2, time: '2026-04-06 09:50', title: 'Rollback: Database migration', status: 'error', details: 'Migration failed, reverted to previous state' },
+          { id: 3, time: '2026-04-05 16:30', title: 'Config update: SSL certs', status: 'completed', details: 'Updated SSL certificates for all endpoints' },
+        ],
+        manager: [
+          { id: 1, time: '10:45', title: 'K8s-Optimizer assigned 5 tasks', status: 'pending', agent: 'K8s-Optimizer' },
+          { id: 2, time: '10:30', title: 'DataPipe-ETL completed task #47', status: 'completed', agent: 'DataPipe-ETL' },
+          { id: 3, time: '10:15', title: 'Monitor-Agent started monitoring', status: 'pending', agent: 'Monitor-Agent' },
+        ],
+        healing: [
+          { date: '2026-04-06 10:20', agent: 'Healer', target: 'TSPA-Confidence', reason: 'High arousal detected', status: 'completed', rto: '2s' },
+          { date: '2026-04-06 09:15', agent: 'Healer', target: 'RBC-Checkpoint', reason: 'Stale rollback state', status: 'completed', rto: '5s' },
+          { date: '2026-04-05 15:45', agent: 'Healer', target: 'SAV-Verification', reason: 'Failed step validation', status: 'error', rto: '15s' },
+        ],
+      };
+
+      // Switch between sub-tabs
+      function switchSubTab(tabName, subTabId) {
+        // Hide all sub-tab-contents in this tab
+        const container = document.querySelector(`[data-tab="${tabName}"] .sub-tabs-container`).parentElement;
+        if (!container) return;
+
+        container.querySelectorAll(':scope > .sub-tab-content').forEach(tab => {
+          tab.classList.remove('active');
+        });
+
+        // Remove active from all buttons
+        container.querySelectorAll(':scope .sub-tab-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+
+        // Show selected sub-tab
+        const selected = container.querySelector(`[data-sub-tab="${subTabId}"]`);
+        if (selected) selected.classList.add('active');
+
+        // Activate button
+        event.target?.classList.add('active');
+      }
+
+      // Render history for a tab
+      function renderHistory(tabName, historyType) {
+        const container = document.getElementById(`${tabName}-history`);
+        if (!container) return;
+
+        const items = historyData[historyType] || [];
+        if (items.length === 0) {
+          container.innerHTML = '<div style="text-align:center; color: #999">No history available</div>';
+          return;
+        }
+
+        const html = items.map(item => {
+          const statusClass = item.status === 'completed' ? 'completed' : item.status === 'error' ? 'error' : 'pending';
+          return `
+            <div class="history-item">
+              <span class="history-time">${item.time}</span>
+              <div class="history-title">${item.title}</div>
+              <span class="history-status ${statusClass}">${item.status.toUpperCase()}</span>
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = html;
+      }
+
+      // Tree-view toggle for K8s
+      function toggleTreeNode(element) {
+        const children = element.nextElementSibling;
+        if (!children) return;
+
+        const toggle = element.querySelector('.tree-node-toggle');
+        children.classList.toggle('visible');
+        if (toggle) toggle.classList.toggle('expanded');
+      }
+
+      // Initialize histories on page load
+      function initializeHistories() {
+        setTimeout(() => {
+          ['chat', 'agent', 'manager', 'healing'].forEach(tab => {
+            renderHistory(tab, tab);
+          });
+        }, 100);
+      }
+
+      // Load histories when switching tabs
+      const origSwitchTab = switchTab;
+      window.switchTab = function(tabId) {
+        origSwitchTab(tabId);
+        initializeHistories();
+      };
   </body>
 </html>
