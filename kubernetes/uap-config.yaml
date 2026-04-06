@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  K8S_ENABLED: 'true'
+  K8S_NAMESPACE: adrion-369
+  K8S_WATCHER_ENABLED: 'true'
+  PROMETHEUS_URL: http://prometheus:9090
+kind: ConfigMap
+metadata:
+  name: uap-kubernetes-config
+  namespace: adrion-369

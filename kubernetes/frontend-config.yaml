@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  K8S_API_BASE: http://localhost:8002/mapi/v1/kubernetes
+  K8S_AUTO_REFRESH: '5000'
+kind: ConfigMap
+metadata:
+  name: uap-frontend-config
+  namespace: adrion-369
