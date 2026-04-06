@@ -12,7 +12,9 @@
 
 You lead the discovery of quality attributes and scenarios. You bridge business requirements and technical implementation. You're responsible for ensuring ADR-002-010 fit together architecturally.
 
-### Pre-Reading (by 2026-04-14)
+### Pre-Reading (by Apr 14, 2026)
+
+**📅 CRITICAL DEADLINE: Apr 14 EOD (1 day before workshop)**
 
 - [ ] Read all 10 ADR templates (ADR-001-010)
   - Focus on: Context, Decision, Consequences, 162D Mapping
@@ -27,6 +29,8 @@ You lead the discovery of quality attributes and scenarios. You bridge business 
 
 - [ ] Understand 6 personas' responsibilities
   - How does each persona interact with your architecture?
+
+**🗓️ WORKSHOP: Apr 15, 2026 @ 09:00 UTC (Duration: 3h 45m)**
 
 ### Your Contributions (during workshop)
 
