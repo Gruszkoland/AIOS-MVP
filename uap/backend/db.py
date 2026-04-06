@@ -37,7 +37,7 @@ logger.info(f"[DB] Using engine: {DB_ENGINE}")
 # ============================================================================
 class SQLiteDB:
     """SQLite connection & operations (for development)."""
-    
+
     def __init__(self, db_path: str = DB_PATH):
         self.db_path = db_path
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
@@ -45,7 +45,7 @@ class SQLiteDB:
         self.conn.row_factory = sqlite3.Row
         self._init_schema()
         logger.info(f"[SQLite] Connected to {db_path}")
-    
+
     @contextmanager
     def get_connection(self):
         """Context manager for database connections with automatic commit/rollback."""
@@ -56,11 +56,29 @@ class SQLiteDB:
             logger.error(f"[SQLite] Error: {e}")
             self.conn.rollback()
             raise
-    
+
     def _init_schema(self):
         """Initialize SQLite schema if needed."""
         cursor = self.conn.cursor()
-        
+
+        # Agents table (for agent registry)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS agents (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                role TEXT,
+                personality TEXT,
+                description TEXT,
+                trust_score REAL DEFAULT 0.5,
+                capability_level TEXT DEFAULT 'beginner',
+                skills TEXT DEFAULT '[]',
+                active INTEGER DEFAULT 1,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                success_rate REAL DEFAULT 0.0,
+                tasks_completed INTEGER DEFAULT 0
+            )
+        """)
+
         # Tasks table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS tasks (
@@ -77,7 +95,7 @@ class SQLiteDB:
                 updated_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        
+
         # Genesis logs table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS genesis_logs (
@@ -92,7 +110,7 @@ class SQLiteDB:
                 FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE
             )
         """)
-        
+
         # Checkpoints table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS checkpoints (
@@ -103,7 +121,7 @@ class SQLiteDB:
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        
+
         # Agent metrics table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS agent_metrics (
@@ -116,13 +134,27 @@ class SQLiteDB:
                 timestamp TEXT DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        
+
+        # Seed default agents if table is empty
+        cursor.execute("SELECT COUNT(*) FROM agents")
+        if cursor.fetchone()[0] == 0:
+            agents_data = [
+                ("agent-librarian", "Librarian", "Knowledge Management", "Organized, thorough", "Manages knowledge base", 0.95, "expert", '["documentation"]', 1, 0.98, 342),
+                ("agent-architect", "Architect", "System Design", "Strategic thinker", "Designs systems", 0.88, "expert", '["design"]', 1, 0.92, 215),
+                ("agent-auditor", "Auditor", "Security & Compliance", "Detail-oriented", "Performs audits", 0.92, "expert", '["audit"]', 1, 0.95, 178),
+                ("agent-sentinel", "Sentinel", "Monitoring & Alerts", "Vigilant watcher", "Monitors system", 0.90, "expert", '["monitoring"]', 1, 0.97, 412),
+            ]
+            cursor.executemany("""
+                INSERT INTO agents (id, name, role, personality, description, trust_score, capability_level, skills, active, success_rate, tasks_completed)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, agents_data)
+
         self.conn.commit()
-    
+
     # ────────────────────────────────────────────────────────────────────
     # TASKS
     # ────────────────────────────────────────────────────────────────────
-    
+
     def insert_task(self, task_id: str, description: str, agent: str, dry_run: bool,
                     budget_max: float, trust_score: float) -> bool:
         """Insert new task."""
@@ -134,7 +166,7 @@ class SQLiteDB:
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (task_id, description, agent, int(dry_run), budget_max, trust_score))
         return True
-    
+
     def get_task(self, task_id: str) -> Optional[Dict[str, Any]]:
         """Get task by ID."""
         with self.get_connection() as conn:
@@ -160,7 +192,7 @@ class SQLiteDB:
                 "created_at": row[9],
                 "updated_at": row[10],
             }
-    
+
     def list_tasks(self, status: Optional[str] = None, agent: Optional[str] = None,
                    limit: int = 50) -> List[Dict[str, Any]]:
         """List tasks with optional filters."""
@@ -168,17 +200,17 @@ class SQLiteDB:
             cursor = conn.cursor()
             query = "SELECT task_id, task_description, assigned_agent, status, trust_score, created_at FROM tasks WHERE 1=1"
             params = []
-            
+
             if status:
                 query += " AND status = ?"
                 params.append(status)
             if agent:
                 query += " AND assigned_agent = ?"
                 params.append(agent)
-            
+
             query += " ORDER BY created_at DESC LIMIT ?"
             params.append(limit)
-            
+
             cursor.execute(query, params)
             rows = cursor.fetchall()
             return [
@@ -192,7 +224,7 @@ class SQLiteDB:
                 }
                 for row in rows
             ]
-    
+
     def update_task_status(self, task_id: str, status: str, result: Optional[Dict] = None):
         """Update task status and/or result."""
         with self.get_connection() as conn:
@@ -207,11 +239,11 @@ class SQLiteDB:
                     UPDATE tasks SET status = ?, updated_at = CURRENT_TIMESTAMP
                     WHERE task_id = ?
                 """, (status, task_id))
-    
+
     # ────────────────────────────────────────────────────────────────────
     # GENESIS LOGS
     # ────────────────────────────────────────────────────────────────────
-    
+
     def insert_genesis_log(self, task_id: str, agent: str, status: str, action: str,
                           guards_passed: int = 9, notes: str = "") -> bool:
         """Insert Genesis Record log entry."""
@@ -223,7 +255,7 @@ class SQLiteDB:
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (task_id, agent, status, action, guards_passed, notes))
         return True
-    
+
     def query_genesis_logs(self, agent: Optional[str] = None, since_hours: int = 1,
                           status: Optional[str] = None, limit: int = 100) -> List[Dict[str, Any]]:
         """Query Genesis logs with filters."""
@@ -235,17 +267,17 @@ class SQLiteDB:
                 WHERE datetime(timestamp) > datetime('now', '-' || ? || ' hours')
             """
             params = [since_hours]
-            
+
             if agent:
                 query += " AND agent = ?"
                 params.append(agent)
             if status:
                 query += " AND status = ?"
                 params.append(status)
-            
+
             query += " ORDER BY timestamp DESC LIMIT ?"
             params.append(limit)
-            
+
             cursor.execute(query, params)
             rows = cursor.fetchall()
             return [
@@ -260,7 +292,7 @@ class SQLiteDB:
                 }
                 for row in rows
             ]
-    
+
     def export_genesis_logs(self) -> List[Dict[str, Any]]:
         """Export all Genesis logs."""
         with self.get_connection() as conn:
@@ -282,11 +314,11 @@ class SQLiteDB:
                 }
                 for row in rows
             ]
-    
+
     # ────────────────────────────────────────────────────────────────────
     # CHECKPOINTS
     # ────────────────────────────────────────────────────────────────────
-    
+
     def insert_checkpoint(self, checkpoint_id: str, label: str, git_commit: str,
                          session_state: Dict) -> bool:
         """Insert checkpoint."""
@@ -298,7 +330,7 @@ class SQLiteDB:
                 VALUES (?, ?, ?, ?)
             """, (checkpoint_id, label, git_commit, json.dumps(session_state)))
         return True
-    
+
     def list_checkpoints(self, limit: int = 50) -> List[Dict[str, Any]]:
         """List all checkpoints."""
         with self.get_connection() as conn:
@@ -317,7 +349,7 @@ class SQLiteDB:
                 }
                 for row in rows
             ]
-    
+
     def get_checkpoint(self, checkpoint_id: str) -> Optional[Dict[str, Any]]:
         """Get checkpoint by ID."""
         with self.get_connection() as conn:
@@ -336,11 +368,11 @@ class SQLiteDB:
                 "session_state": json.loads(row[3]) if row[3] else {},
                 "created_at": row[4],
             }
-    
+
     # ────────────────────────────────────────────────────────────────────
     # AGENT METRICS
     # ────────────────────────────────────────────────────────────────────
-    
+
     def insert_agent_metric(self, agent: str, trust_score: float, pleasure: float,
                            arousal: float, dominance: float) -> bool:
         """Insert agent EBDI metric."""
@@ -352,7 +384,7 @@ class SQLiteDB:
                 VALUES (?, ?, ?, ?, ?)
             """, (agent, trust_score, pleasure, arousal, dominance))
         return True
-    
+
     def get_agent_metrics(self, agent: str, limit: int = 100) -> List[Dict[str, Any]]:
         """Get metrics for an agent."""
         with self.get_connection() as conn:
@@ -374,7 +406,7 @@ class SQLiteDB:
                 }
                 for row in rows
             ]
-    
+
     def export_agent_metrics(self) -> List[Dict[str, Any]]:
         """Export all agent metrics."""
         with self.get_connection() as conn:
@@ -396,16 +428,36 @@ class SQLiteDB:
                 for row in rows
             ]
 
+    # ────────────────────────────────────────────────────────────────────
+    # Generic Query/Execute Methods
+    # ────────────────────────────────────────────────────────────────────
+
+    def query(self, sql: str, params: List = None) -> List[Dict[str, Any]]:
+        """Execute SELECT query and return results as dicts."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, params or [])
+            cols = [d[0] for d in cursor.description] if cursor.description else []
+            rows = cursor.fetchall()
+            # Convert sqlite3.Row objects to dicts
+            return [{cols[i]: row[i] for i in range(len(cols))} for row in rows] if cols else []
+
+    def execute(self, sql: str, params: List = None) -> None:
+        """Execute INSERT/UPDATE/DELETE query."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, params or [])
+
 
 # ============================================================================
 # PostgreSQL Implementation (with graceful fallback)
 # ============================================================================
 try:
     from psycopg2 import pool
-    
+
     class PostgresDB:
         """PostgreSQL connection pool & operations."""
-        
+
         def __init__(self):
             self.conn_string = f"postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
             try:
@@ -415,7 +467,7 @@ try:
             except Exception as e:
                 logger.error(f"[PostgreSQL] Connection failed: {e}")
                 raise
-        
+
         @contextmanager
         def get_connection(self):
             """Context manager for database connections with automatic commit/rollback."""
@@ -429,7 +481,7 @@ try:
                 raise
             finally:
                 self._pool.putconn(conn)
-        
+
         def _init_schema(self):
             """Create tables if they don't exist."""
             with self.get_connection() as conn:
@@ -453,7 +505,7 @@ try:
                         CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
                         CREATE INDEX IF NOT EXISTS idx_tasks_created ON tasks(created_at);
                     """)
-                    
+
                     # Genesis logs table
                     cur.execute("""
                         CREATE TABLE IF NOT EXISTS genesis_logs (
@@ -471,7 +523,7 @@ try:
                         CREATE INDEX IF NOT EXISTS idx_genesis_timestamp ON genesis_logs(timestamp);
                         CREATE INDEX IF NOT EXISTS idx_genesis_action ON genesis_logs(action);
                     """)
-                    
+
                     # Checkpoints table
                     cur.execute("""
                         CREATE TABLE IF NOT EXISTS checkpoints (
@@ -483,7 +535,7 @@ try:
                         );
                         CREATE INDEX IF NOT EXISTS idx_checkpoints_created ON checkpoints(created_at);
                     """)
-                    
+
                     # Agent metrics table
                     cur.execute("""
                         CREATE TABLE IF NOT EXISTS agent_metrics (
@@ -498,7 +550,7 @@ try:
                         CREATE INDEX IF NOT EXISTS idx_metrics_agent ON agent_metrics(agent);
                         CREATE INDEX IF NOT EXISTS idx_metrics_timestamp ON agent_metrics(timestamp);
                     """)
-        
+
         def insert_task(self, task_id: str, description: str, agent: str, dry_run: bool,
                         budget_max: float, trust_score: float) -> bool:
             """Insert new task."""
@@ -510,7 +562,7 @@ try:
                         VALUES (%s, %s, %s, %s, %s, %s)
                     """, (task_id, description, agent, dry_run, budget_max, trust_score))
             return True
-        
+
         def get_task(self, task_id: str) -> Optional[Dict[str, Any]]:
             """Get task by ID."""
             with self.get_connection() as conn:
@@ -536,7 +588,7 @@ try:
                         "created_at": row[9].isoformat() if row[9] else None,
                         "updated_at": row[10].isoformat() if row[10] else None,
                     }
-        
+
         def list_tasks(self, status: Optional[str] = None, agent: Optional[str] = None,
                        limit: int = 50) -> List[Dict[str, Any]]:
             """List tasks with optional filters."""
@@ -544,17 +596,17 @@ try:
                 with conn.cursor() as cur:
                     query = "SELECT task_id, task_description, assigned_agent, status, trust_score, created_at FROM tasks WHERE 1=1"
                     params = []
-                    
+
                     if status:
                         query += " AND status = %s"
                         params.append(status)
                     if agent:
                         query += " AND assigned_agent = %s"
                         params.append(agent)
-                    
+
                     query += " ORDER BY created_at DESC LIMIT %s"
                     params.append(limit)
-                    
+
                     cur.execute(query, params)
                     rows = cur.fetchall()
                     return [
@@ -568,7 +620,7 @@ try:
                         }
                         for row in rows
                     ]
-        
+
         def update_task_status(self, task_id: str, status: str, result: Optional[Dict] = None):
             """Update task status and/or result."""
             with self.get_connection() as conn:
@@ -583,7 +635,7 @@ try:
                             UPDATE tasks SET status = %s, updated_at = CURRENT_TIMESTAMP
                             WHERE task_id = %s
                         """, (status, task_id))
-        
+
         def insert_genesis_log(self, task_id: str, agent: str, status: str, action: str,
                               guards_passed: int = 9, notes: str = "") -> bool:
             """Insert Genesis Record log entry."""
@@ -595,7 +647,7 @@ try:
                         VALUES (%s, %s, %s, %s, %s, %s)
                     """, (task_id, agent, status, action, guards_passed, notes))
             return True
-        
+
         def query_genesis_logs(self, agent: Optional[str] = None, since_hours: int = 1,
                               status: Optional[str] = None, limit: int = 100) -> List[Dict[str, Any]]:
             """Query Genesis logs with filters."""
@@ -607,17 +659,17 @@ try:
                         WHERE timestamp > CURRENT_TIMESTAMP - (%s * INTERVAL '1 hour')
                     """
                     params = [since_hours]
-                    
+
                     if agent:
                         query += " AND agent = %s"
                         params.append(agent)
                     if status:
                         query += " AND status = %s"
                         params.append(status)
-                    
+
                     query += " ORDER BY timestamp DESC LIMIT %s"
                     params.append(limit)
-                    
+
                     cur.execute(query, params)
                     rows = cur.fetchall()
                     return [
@@ -632,7 +684,7 @@ try:
                         }
                         for row in rows
                     ]
-        
+
         def export_genesis_logs(self) -> List[Dict[str, Any]]:
             """Export all Genesis logs."""
             with self.get_connection() as conn:
@@ -654,7 +706,7 @@ try:
                         }
                         for row in rows
                     ]
-        
+
         def insert_checkpoint(self, checkpoint_id: str, label: str, git_commit: str,
                              session_state: Dict) -> bool:
             """Insert checkpoint."""
@@ -666,7 +718,7 @@ try:
                         VALUES (%s, %s, %s, %s)
                     """, (checkpoint_id, label, git_commit, json.dumps(session_state)))
             return True
-        
+
         def list_checkpoints(self, limit: int = 50) -> List[Dict[str, Any]]:
             """List all checkpoints."""
             with self.get_connection() as conn:
@@ -685,7 +737,7 @@ try:
                         }
                         for row in rows
                     ]
-        
+
         def get_checkpoint(self, checkpoint_id: str) -> Optional[Dict[str, Any]]:
             """Get checkpoint by ID."""
             with self.get_connection() as conn:
@@ -704,7 +756,7 @@ try:
                         "session_state": row[3],
                         "created_at": row[4].isoformat() if row[4] else None,
                     }
-        
+
         def insert_agent_metric(self, agent: str, trust_score: float, pleasure: float,
                                arousal: float, dominance: float) -> bool:
             """Insert agent EBDI metric."""
@@ -716,7 +768,7 @@ try:
                         VALUES (%s, %s, %s, %s, %s)
                     """, (agent, trust_score, pleasure, arousal, dominance))
             return True
-        
+
         def get_agent_metrics(self, agent: str, limit: int = 100) -> List[Dict[str, Any]]:
             """Get metrics for an agent."""
             with self.get_connection() as conn:
@@ -738,7 +790,7 @@ try:
                         }
                         for row in rows
                     ]
-        
+
         def export_agent_metrics(self) -> List[Dict[str, Any]]:
             """Export all agent metrics."""
             with self.get_connection() as conn:
@@ -759,6 +811,23 @@ try:
                         }
                         for row in rows
                     ]
+
+        def query(self, sql: str, params: List = None) -> List[Dict[str, Any]]:
+            """Execute SELECT query and return results as dicts."""
+            with self.get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(sql, params or [])
+                    cols = [d[0] for d in cur.description] if cur.description else []
+                    rows = cur.fetchall()
+                    # Convert tuples to dicts
+                    return [{cols[i]: row[i] for i in range(len(cols))} for row in rows] if cols else []
+
+        def execute(self, sql: str, params: List = None) -> None:
+            """Execute INSERT/UPDATE/DELETE query."""
+            with self.get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(sql, params or [])
+                    conn.commit()
 
 except ImportError:
     logger.warning("[DB] psycopg2 not available, defaulting to SQLite")
@@ -783,3 +852,11 @@ def get_database_engine():
 
 # Initialize on import
 DatabaseEngine = get_database_engine()
+
+
+# ============================================================================
+# Compatibility Function: get_db() for legacy imports
+# ============================================================================
+def get_db():
+    """Compatibility wrapper for modules that import get_db()."""
+    return DatabaseEngine

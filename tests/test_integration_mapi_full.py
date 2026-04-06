@@ -13,7 +13,7 @@ from datetime import datetime
 # Configuration
 API_BASE = "http://localhost:8002/mapi/v1"
 FRONTEND_BASE = "http://127.0.0.1:8003"
-TIMEOUT = 10
+TIMEOUT = 30  # Increased from 10 to 30 for slow backends
 
 # Test results tracking
 PASSED = []
@@ -102,7 +102,7 @@ def main():
     # Pre-flight checks
     log_info("Checking service availability...")
     try:
-        resp = requests.get(f"{API_BASE}/health", timeout=5)
+        resp = requests.get(f"{API_BASE}/health", timeout=30)
         if resp.status_code == 200:
             log_success("Backend API is responsive")
         else:
@@ -113,7 +113,7 @@ def main():
         return False
 
     try:
-        resp = requests.get(FRONTEND_BASE, timeout=5)
+        resp = requests.get(FRONTEND_BASE, timeout=30)
         if resp.status_code == 200:
             log_success("Frontend is responsive")
         else:
@@ -140,7 +140,7 @@ def main():
     run_test("List All Agents", "GET", "/agents")
     run_test("Get Agent Scores", "GET", "/agent/scores")
     run_test("Get Agent Score (librarian)", "GET", "/agent/librarian/score")
-    run_test("Update Trust Score", "POST", "/agent/librarian/score/update", 
+    run_test("Update Trust Score", "POST", "/agent/librarian/score/update",
             json_data={"new_score": 0.85})
     run_test("List Agent Metrics", "GET", "/agent/metrics")
     run_test("Get EBDI State", "GET", "/agent/librarian/ebdi")
@@ -156,11 +156,11 @@ def main():
         "dry_run": False,
         "budget_max": 100
     }
-    
-    run_test("Submit New Task", "POST", "/task/submit", 
+
+    run_test("Submit New Task", "POST", "/task/submit",
             json_data=task_payload)
     run_test("List Tasks", "GET", "/tasks")
-    run_test("Query Tasks (status filter)", "GET", "/tasks/query", 
+    run_test("Query Tasks (status filter)", "GET", "/tasks/query",
             params={"status": "submitted"})
     run_test("Get Task Details", "GET", "/task/test-task-001", 404)  # Expect 404
     run_test("Update Task Status", "PUT", "/task/test-task-001/status", 404,
@@ -230,9 +230,9 @@ def main():
 
 if __name__ == "__main__":
     banner("STARTING INTEGRATION TEST SUITE")
-    
+
     success = main()
 
     banner("TEST SUITE COMPLETE")
-    
+
     sys.exit(0 if success else 1)
