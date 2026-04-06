@@ -23,7 +23,8 @@ $Node = $null
 try {
     $Node = node --version 2>$null
     Log-Success "Node.js $Node"
-} catch {
+}
+catch {
     Log-Error "Node.js not installed. Install Node.js 18 LTS first."
     exit 1
 }
@@ -32,7 +33,8 @@ $Npm = $null
 try {
     $Npm = npm --version 2>$null
     Log-Success "npm $Npm"
-} catch {
+}
+catch {
     Log-Error "npm not installed."
     exit 1
 }
@@ -75,7 +77,8 @@ Log-Info "Initializing npm project..."
 if (-not (Test-Path "package.json")) {
     npm init -y 2>$null | Out-Null
     Log-Success "package.json created"
-} else {
+}
+else {
     Log-Warn "package.json already exists"
 }
 

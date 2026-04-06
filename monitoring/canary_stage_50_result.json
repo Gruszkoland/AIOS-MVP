@@ -1,0 +1,8 @@
+{
+  "stage": "50%",
+  "status": "PASS",
+  "duration": 167,
+  "checks_total": 2,
+  "checks_passed": 0,
+  "recommendation": "PROCEED_TO_CANARY_100"
+}
