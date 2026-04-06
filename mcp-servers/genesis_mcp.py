@@ -40,7 +40,7 @@ class SessionState:
     state_data: Dict[str, Any] = field(default_factory=dict)
     retention_ttl_seconds: int = 86400  # 24h default
     scope: str = "local"  # "local" or "global"
-    
+
     def to_dict(self) -> dict:
         return asdict(self)
 
@@ -58,7 +58,7 @@ class LogEntry:
 
 class GenesisMCP(MCPBaseServer):
     """State Management & Memory (Local-First)"""
-    
+
     def __init__(self):
         super().__init__(
             server_name="GENESIS-MCP",
@@ -69,7 +69,7 @@ class GenesisMCP(MCPBaseServer):
         self.logs: List[LogEntry] = []
         self.rag_documents: List[Dict[str, Any]] = []
         self.record_path = "Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU"
-    
+
     def handle_save_session(self, session_id: str, state: Dict[str, Any]) -> dict:
         """POST /session/save — Save session state"""
         def operation_fn():
@@ -79,9 +79,9 @@ class GenesisMCP(MCPBaseServer):
                 scope="local"
             )
             self.sessions[session_id] = session
-            
+
             filepath = f"{self.record_path}/{session_id}.json"
-            
+
             return {
                 "saved": True,
                 "session_id": session_id,
@@ -89,7 +89,7 @@ class GenesisMCP(MCPBaseServer):
                 "timestamp": session.timestamp,
                 "state_size_bytes": len(json.dumps(state))
             }
-        
+
         result = self.execute_step(
             step_name=f"save_session_{session_id}",
             operation=operation_fn,
@@ -100,7 +100,7 @@ class GenesisMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_recall_memory(self, query: str, scope: str = "local") -> dict:
         """POST /memory/recall — Retrieve session memory"""
         def operation_fn():
@@ -115,14 +115,14 @@ class GenesisMCP(MCPBaseServer):
                             "timestamp": session.timestamp,
                             "data_preview": str(session.state_data)[:100]
                         })
-            
+
             return {
                 "results": sorted(results, key=lambda x: x["relevance_score"], reverse=True)[:5],
                 "timestamp": datetime.utcnow().isoformat(),
                 "query": query,
                 "scope": scope
             }
-        
+
         result = self.execute_step(
             step_name=f"recall_{query[:20]}",
             operation=operation_fn,
@@ -133,7 +133,7 @@ class GenesisMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_rag_search(self, embedding: List[float], top_k: int = 5) -> dict:
         """POST /rag/search — Semantic search on Genesis Record"""
         def operation_fn():
@@ -147,14 +147,14 @@ class GenesisMCP(MCPBaseServer):
                 }
                 for i in range(top_k)
             ]
-            
+
             return {
                 "docs": docs,
                 "count": len(docs),
                 "embedding_dim": len(embedding),
                 "search_time_ms": 42
             }
-        
+
         result = self.execute_step(
             step_name=f"rag_search_k{top_k}",
             operation=operation_fn,
@@ -165,7 +165,7 @@ class GenesisMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_log_event(self, event: str, level: str = "info") -> dict:
         """POST /log/append — Append to Genesis Record (append-only)"""
         def operation_fn():
@@ -178,12 +178,12 @@ class GenesisMCP(MCPBaseServer):
                 message=event,
                 context={}
             )
-            
+
             self.logs.append(log_entry)
-            
+
             # Append to Genesis Record file
             log_path = f"{self.record_path}/genesis_audit.jsonl"
-            
+
             return {
                 "logged_at": log_entry.timestamp,
                 "entry_id": entry_id,
@@ -191,7 +191,7 @@ class GenesisMCP(MCPBaseServer):
                 "file_path": log_path,
                 "total_entries": len(self.logs)
             }
-        
+
         result = self.execute_step(
             step_name=f"log_{level}_{event[:20]}",
             operation=operation_fn,
@@ -202,13 +202,13 @@ class GenesisMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_checkpoint_create(self, checkpoint_id: str, data: Dict[str, Any]) -> dict:
         """Create rollback checkpoint"""
         def operation_fn():
             # Store checkpoint
             checkpoint_path = f"{self.record_path}/checkpoints/{checkpoint_id}.json"
-            
+
             return {
                 "checkpoint_id": checkpoint_id,
                 "path": checkpoint_path,
@@ -216,7 +216,7 @@ class GenesisMCP(MCPBaseServer):
                 "data_size_bytes": len(json.dumps(data)),
                 "recoverable": True
             }
-        
+
         result = self.execute_step(
             step_name=f"checkpoint_{checkpoint_id}",
             operation=operation_fn,
@@ -227,7 +227,7 @@ class GenesisMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def get_memory_stats(self) -> dict:
         """Memory usage statistics"""
         total_bytes = sum(len(json.dumps(s.state_data)) for s in self.sessions.values())

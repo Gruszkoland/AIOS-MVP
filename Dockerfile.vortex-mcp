@@ -1,0 +1,19 @@
+# VORTEX-MCP Dockerfile
+# Harmonic Orchestration @ 174Hz (Port 9001)
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements-mcp.txt .
+RUN pip install --no-cache-dir -r requirements-mcp.txt
+
+COPY mcp-servers/ ./mcp-servers/
+COPY mcp_vortex_app.py .
+
+EXPOSE 9001
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:9001/health || exit 1
+
+CMD ["python", "mcp_vortex_app.py"]

@@ -1,12 +1,13 @@
 # STEP 8: ATAM WORKSHOP EXECUTION — LOCKED MILESTONE
+
 ## Apr 15, 2026 @ 09:00-13:00 UTC (IMMOVABLE, 3h 45m)
 
-**Status:** READY FOR EXECUTION  
-**Date:** April 15, 2026 (LOCKED — NO RESCHEDULING)  
-**Time:** 09:00-13:00 UTC (3 hours 45 minutes)  
-**Location:** Online (Zoom/Google Meet, TBD)  
-**Attendees:** 6 personas (Architect as facilitator)  
-**Deliverables:** 7 ADR-related outputs  
+**Status:** READY FOR EXECUTION
+**Date:** April 15, 2026 (LOCKED — NO RESCHEDULING)
+**Time:** 09:00-13:00 UTC (3 hours 45 minutes)
+**Location:** Online (Zoom/Google Meet, TBD)
+**Attendees:** 6 personas (Architect as facilitator)
+**Deliverables:** 7 ADR-related outputs
 
 ---
 
@@ -29,6 +30,7 @@
 ## 📅 4-BLOCK AGENDA (TBD—block times flexible within 09:00-13:00 window)
 
 ### **BLOCK 1: Opening + Attribute Scenarios (40 minutes)**
+
 **Owner:** Architect (Facilitator)
 
 - **Opening (5 min):**
@@ -47,6 +49,7 @@
 ---
 
 ### **BLOCK 2: Trade-offs & Decision (40 minutes)**
+
 **Owner:** SAP (Facilitator for trade-off logic)
 
 - **Options Presentation (15 min):**
@@ -69,6 +72,7 @@
 ---
 
 ### **BLOCK 3: ADR Scope + Risks (40 minutes)**
+
 **Owner:** Sentinel (Implementer perspective) + Auditor (Guardian Laws)
 
 - **ADR Sequence (20 min):**
@@ -96,6 +100,7 @@
 ---
 
 ### **BLOCK 4: Metrics + Governance (45 minutes)**
+
 **Owner:** Auditor (Compliance) + Librarian (Documentation)
 
 - **Success Metrics (15 min):**
@@ -120,7 +125,7 @@
   - Publish decision log immediately post-workshop
   - Schedule next milestone confirmation: Apr 16 @ 09:00 UTC (24h post-workshop)
 
-🔴 **If Auditor unavailable:** Architect leads (backup)  
+🔴 **If Auditor unavailable:** Architect leads (backup)
 🔴 **If Librarian unavailable:** SAP documents + publishes (backup)
 
 ---
@@ -179,6 +184,7 @@
 **Scenario:** Sentinel doesn't join by 09:05 UTC
 
 **Protocol:**
+
 1. Wait 5 minutes for late join (tech issues)
 2. If still missing at 09:05:
    - Architect: "Can we proceed with 5/6?"
@@ -193,6 +199,7 @@
 **Scenario:** Zoom disconnects during Block 2 (09:45 UTC)
 
 **Protocol:**
+
 1. Immediate switch to backup: Google Meet link shared in Slack
 2. Librarian: Copy/paste all notes to Google Docs (save progress)
 3. Architect: "Resuming in Google Meet, same link in Slack"
@@ -207,6 +214,7 @@
 **Scenario:** Vote is split 3-3 between Option A vs Option B
 
 **Protocol:**
+
 1. Auditor: "Let's re-examine the deciding factor: resource allocation"
 2. Sentinel: "Show the impact on Apr 15-22 timeline for each option"
 3. SAP: "Vote by resource feasibility: Can we sustain 260h over 12 weeks?"
@@ -220,6 +228,7 @@
 **Scenario:** Risk register grows to 15+ items (exceeds planned 10)
 
 **Protocol:**
+
 1. Sentinel: "Prioritize top 10 by likely impact + Guardian Laws risk"
 2. Auditor: "Which risks violate critical Guardian Laws? (G7, G8, G4)"
 3. Healer: "What's our remediation SLA for top 5?"
@@ -233,6 +242,7 @@
 **Scenario:** By 12:45 UTC, only 5/7 outputs complete
 
 **Protocol:**
+
 1. Architect: **HARD STOP at 12:55 UTC** (5 min grace max)
 2. Lock complete outputs immediately
 3. For incomplete outputs:
@@ -249,6 +259,7 @@
 ### **Real-Time Capture (During Workshop)**
 
 **Librarian's role (documentation lead):**
+
 1. Shared Google Doc (live collaborative editing during workshop)
 2. Section per block:
    - Block 1: [10 Prioritized Attributes]
@@ -261,6 +272,7 @@
 ### **Async Completion (If Needed)**
 
 **If outputs 3-7 incomplete by 13:00 UTC:**
+
 - Librarian + responsible persona meet Apr 16 @ 10:00 UTC (24h post-workshop)
 - Complete decision log + risk register + metrics
 - Publish by Apr 16 @ 17:00 UTC
@@ -286,16 +298,16 @@
 
 ## ✅ SUCCESS CRITERIA
 
-| Deliverable | Target | Status |
-|-------------|--------|--------|
-| 7 outputs complete | 7/7 ✅ | — |
-| 6 personas attended | 6/6 (or 5/6 + approved backup) ✅ | — |
-| Decisions locked | YES ✅ | — |
-| Risk register published | YES ✅ | — |
-| Guardian Laws verified | 9/9 ✅ | — |
-| Decision log signed | 6/6 signatures ✅ | — |
-| Workshop on time | 09:00-13:00 UTC ✅ | — |
-| Recording saved | 1 archive ✅ | — |
+| Deliverable             | Target                            | Status |
+| ----------------------- | --------------------------------- | ------ |
+| 7 outputs complete      | 7/7 ✅                            | —      |
+| 6 personas attended     | 6/6 (or 5/6 + approved backup) ✅ | —      |
+| Decisions locked        | YES ✅                            | —      |
+| Risk register published | YES ✅                            | —      |
+| Guardian Laws verified  | 9/9 ✅                            | —      |
+| Decision log signed     | 6/6 signatures ✅                 | —      |
+| Workshop on time        | 09:00-13:00 UTC ✅                | —      |
+| Recording saved         | 1 archive ✅                      | —      |
 
 ---
 
@@ -307,6 +319,7 @@
 # STEP 8 WORKSHOP EXECUTION LOG — Apr 15, 2026
 
 ## Workshop Summary
+
 - Date: Apr 15, 2026
 - Time: 09:00-13:00 UTC
 - Duration: 3h 45m (on schedule)
@@ -315,6 +328,7 @@
 - Recording: [Archive link]
 
 ## 7 Deliverables Status
+
 - Attribute Scenarios: COMPLETE ✅
 - Trade-off Analysis: COMPLETE ✅
 - Decision Log: COMPLETE ✅
@@ -324,14 +338,17 @@
 - Guardian Laws Mapping: COMPLETE ✅
 
 ## Key Decisions
+
 - Option chosen: [Option A/B/C]
 - ADR merge sequence locked: [detailed timeline]
 - 10 priority risks + owners assigned
 
 ## Contingencies Triggered
+
 [Document any issues + resolutions]
 
 ## Next Milestone
+
 - Apr 22 @ 08:00 UTC: Phase 2 Day 1 Kickoff
 - All decisions locked & confirmed
 - Ready for implementation sprint
@@ -344,8 +361,8 @@
 
 ---
 
-**Status:** ✅ **STEP 8 READY FOR EXECUTION (Apr 15)**  
-**LOCKED MILESTONE — NO RESCHEDULING**  
-**Contingencies:** Fully staged  
+**Status:** ✅ **STEP 8 READY FOR EXECUTION (Apr 15)**
+**LOCKED MILESTONE — NO RESCHEDULING**
+**Contingencies:** Fully staged
 
 🎯 **ATAM WORKSHOP IS IMMOVABLE. THIS DRIVES ALL OF PHASE 2.**

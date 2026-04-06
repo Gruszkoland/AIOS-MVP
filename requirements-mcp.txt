@@ -1,0 +1,36 @@
+# MCP Servers Requirements
+# Model Context Protocol Implementation for ADRION 369 v4.0
+
+# Core
+Flask==2.3.3
+Flask-CORS==4.0.0
+requests==2.31.0
+python-dotenv==1.0.0
+
+# Data & State Management
+sqlalchemy==2.0.21
+psycopg2-binary==2.9.9
+pydantic==2.4.2
+marshmallow==3.20.1
+
+# Logging & Monitoring
+structlog==23.1.0
+prometheus-client==0.17.1
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+
+# Code Quality
+black==23.11.0
+flake8==6.1.0
+mypy==1.6.1
+
+# Optional: LLM Integration (for ORACLE)
+# openai==0.28.1
+# anthropic==0.7.6
+
+# Optional: Vector Search (for GENESIS RAG)
+# faiss-cpu==1.7.4
+# sentence-transformers==2.2.2

@@ -47,7 +47,7 @@ class AuditEntry:
 
 class GuardianMCP(MCPBaseServer):
     """9 Guardian Laws Enforcement"""
-    
+
     def __init__(self):
         super().__init__(
             server_name="GUARDIAN-MCP",
@@ -66,30 +66,30 @@ class GuardianMCP(MCPBaseServer):
             "G8_Nonmaleficence": {"no_data_loss": True, "require_backup": True},
             "G9_Sustainability": {"prefer_efficient": True, "cap_resources": True}
         }
-    
+
     def handle_validate_policy(self, operation: str, context: Dict[str, Any]) -> dict:
         """POST /validate — Policy compliance check"""
         def operation_fn():
             violations = []
             recommendations = []
-            
+
             # Rule: G7 Privacy — local_first
             if operation == "export_data" and context.get("scope") == "global":
                 violations.append(GuardianLaw.G7_PRIVACY.value)
                 recommendations.append("Restrict to local scope only")
-            
+
             # Rule: G8 Nonmaleficence — require backup
             if operation == "delete" and not context.get("backup_exists"):
                 violations.append(GuardianLaw.G8_NONMALEFICENCE.value)
                 recommendations.append("Create backup before delete")
-            
+
             # Rule: G5 Transparency — audit trail
             if not context.get("logged_audit"):
                 violations.append(GuardianLaw.G5_TRANSPARENCY.value)
                 recommendations.append("Audit log required")
-            
+
             compliance = "PASS" if len(violations) == 0 else "FAIL"
-            
+
             return {
                 "compliance_status": compliance,
                 "violated_laws": violations,
@@ -103,7 +103,7 @@ class GuardianMCP(MCPBaseServer):
                     "severity": "critical" if len(violations) > 0 else "info"
                 }
             }
-        
+
         result = self.execute_step(
             step_name=f"validate_{operation}",
             operation=operation_fn,
@@ -113,7 +113,7 @@ class GuardianMCP(MCPBaseServer):
                 "audit_entry_created"
             ]
         )
-        
+
         if result["success"] and result["result"]["compliance_status"] == "PASS":
             # Log successful validation
             entry = result["result"]["audit_entry"]
@@ -129,9 +129,9 @@ class GuardianMCP(MCPBaseServer):
             self.trust_score.increment_success()
         else:
             self.trust_score.increment_failure()
-        
+
         return result
-    
+
     def handle_audit_event(self, event: str, actor: str, timestamp: str) -> dict:
         """POST /audit/log — Log compliance event"""
         def operation_fn():
@@ -145,14 +145,14 @@ class GuardianMCP(MCPBaseServer):
                 severity="info"
             )
             self.audit_log.append(audit_entry)
-            
+
             return {
                 "logged": True,
                 "event_id": f"AUD-{len(self.audit_log)}",
                 "timestamp": audit_entry.timestamp,
                 "actor": audit_entry.actor
             }
-        
+
         result = self.execute_step(
             step_name=f"audit_{actor}_{event}",
             operation=operation_fn,
@@ -163,26 +163,26 @@ class GuardianMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_law_enforcement(self, operation: str, scope: str) -> dict:
         """POST /laws/check — Enforce 9 Guardian Laws"""
         def operation_fn():
             violated = []
-            
+
             # G1: Unity
             if scope == "fragmented":
                 violated.append("G1_UNITY")
-            
+
             # G7: Privacy (always for exports)
             if operation == "export" and scope != "local":
                 violated.append("G7_PRIVACY")
-            
+
             # G8: Nonmaleficence (critical ops without verification)
             if operation in ["delete", "destroy"] and not scope.startswith("verified_"):
                 violated.append("G8_NONMALEFICENCE")
-            
+
             allowed = len(violated) == 0
-            
+
             return {
                 "allowed": allowed,
                 "violated_laws": violated,
@@ -190,7 +190,7 @@ class GuardianMCP(MCPBaseServer):
                 "scope": scope,
                 "enforcement_level": "strict" if violated else "permissive"
             }
-        
+
         result = self.execute_step(
             step_name=f"laws_{operation}_{scope}",
             operation=operation_fn,
@@ -201,14 +201,14 @@ class GuardianMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_privacy_scan(self, data: str, sensitivity: str) -> dict:
         """POST /privacy/scan — Check data privacy compliance"""
         def operation_fn():
             # Simplified privacy check
             requires_masking = sensitivity in ["confidential", "internal"]
             masked_data = "*" * len(data) if requires_masking else data
-            
+
             return {
                 "clearance": "granted" if sensitivity == "public" else "restricted",
                 "data_masked": requires_masking,
@@ -216,7 +216,7 @@ class GuardianMCP(MCPBaseServer):
                 "privacy_compliant": True,
                 "notes": f"Data classified as {sensitivity}"
             }
-        
+
         result = self.execute_step(
             step_name=f"privacy_scan_{sensitivity}",
             operation=operation_fn,
@@ -227,7 +227,7 @@ class GuardianMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def get_audit_log_summary(self) -> dict:
         """Return audit log statistics"""
         return {

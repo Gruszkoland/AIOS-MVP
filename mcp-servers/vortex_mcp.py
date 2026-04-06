@@ -43,7 +43,7 @@ class DeploymentStep:
 
 class VortexMCP(MCPBaseServer):
     """Harmonic Orchestration at 174Hz"""
-    
+
     def __init__(self):
         super().__init__(
             server_name="VORTEX-MCP",
@@ -52,7 +52,7 @@ class VortexMCP(MCPBaseServer):
         )
         self.harmonic_frequency = 174.0  # Hz
         self.canary_states = {}  # backend -> {% active, last_update}
-    
+
     def handle_health_check(self) -> dict:
         """GET /health — Container health status"""
         def operation():
@@ -66,7 +66,7 @@ class VortexMCP(MCPBaseServer):
                 "harmonic_frequency": self.harmonic_frequency,
                 "canary_states": self.canary_states
             }
-        
+
         result = self.execute_step(
             step_name="health_check",
             operation=operation,
@@ -77,23 +77,23 @@ class VortexMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_canary_deploy(self, backend: str, percent: float, constraints: List[str]) -> dict:
         """POST /canary/deploy — Safe canary rollout"""
-        
+
         # Validate constraints (Guardian Laws)
         is_compliant, violations = self.validate_guardian_laws(
             "canary_deploy",
             {"backend": backend, "percent": percent}
         )
-        
+
         if not is_compliant:
             return {
                 "success": False,
                 "error": f"Guardian Laws violated: {violations}",
                 "deployed": False
             }
-        
+
         def operation():
             # Create deployment plan
             plan = [
@@ -103,12 +103,12 @@ class VortexMCP(MCPBaseServer):
                 DeploymentStep(4, "verify", backend, {"check_metrics": True}),
                 DeploymentStep(5, "rollout", backend, {"gradual": True})
             ]
-            
+
             self.canary_states[backend] = {
                 "percent_active": percent,
                 "last_update": "2026-04-06T14:30:00Z"
             }
-            
+
             return {
                 "deployment_plan": [
                     {
@@ -127,7 +127,7 @@ class VortexMCP(MCPBaseServer):
                 ],
                 "safe_to_deploy": True
             }
-        
+
         result = self.execute_step(
             step_name=f"canary_deploy_{backend}_{percent}",
             operation=operation,
@@ -137,12 +137,12 @@ class VortexMCP(MCPBaseServer):
                 "monitoring_active"
             ]
         )
-        
+
         if result["success"]:
             self.ebdi_state.arousal = min(1.0, self.ebdi_state.arousal + 0.1)
-        
+
         return result
-    
+
     def handle_container_logs(self, service: str, lines: int = 50) -> dict:
         """GET /logs/{service} — Retrieve container logs"""
         def operation():
@@ -156,7 +156,7 @@ class VortexMCP(MCPBaseServer):
                 "tail_lines": lines,
                 "timestamp": "2026-04-06T14:30:00Z"
             }
-        
+
         result = self.execute_step(
             step_name=f"logs_{service}",
             operation=operation,
@@ -167,14 +167,14 @@ class VortexMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_monitor_harmonic(self) -> dict:
         """GET /monitor/harmonic — 174Hz harmonic state"""
         def operation():
             import math
             current_phase = (self.ebdi_state.arousal * 360) % 360
             amplitude = 1.0 if not self.ebdi_state.is_crisis_mode else 0.5
-            
+
             return {
                 "frequency_hz": self.harmonic_frequency,
                 "frequency_tolerance": "±2%",
@@ -182,7 +182,7 @@ class VortexMCP(MCPBaseServer):
                 "amplitude": amplitude,
                 "in_harmonic_alignment": True
             }
-        
+
         result = self.execute_step(
             step_name="monitor_174hz",
             operation=operation,

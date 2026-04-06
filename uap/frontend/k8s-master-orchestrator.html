@@ -1,0 +1,2468 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UAP — Master Orchestrator</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --primary-blue: #0078d4;
+        --primary-gradient: linear-gradient(135deg, #0078d4 0%, #0066cc 100%);
+        --success: #27ae60;
+        --warning: #f39c12;
+        --danger: #e74c3c;
+        --light-bg: #f5f5f5;
+        --white: #ffffff;
+        --dark: #1e3a5f;
+      }
+
+      * {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+
+      body {
+        background-color: var(--light-bg);
+        color: var(--dark);
+        overflow-x: hidden;
+      }
+
+      .navbar-master {
+        background: var(--white);
+        border-bottom: 3px solid var(--primary-blue);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+
+      .brand-logo i {
+        color: var(--primary-blue);
+        font-size: 1.5rem;
+      }
+
+      .brand-text {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .status-indicator {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .status-indicator.offline {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      }
+
+      .nav-tabs-master {
+        background: var(--white);
+        border-bottom: 2px solid #d0d0d0;
+        padding: 0 2rem;
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .nav-link-master {
+        color: #666;
+        border: none;
+        padding: 1rem 0;
+        font-weight: 500;
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .nav-link-master:hover {
+        color: var(--primary-blue);
+      }
+
+      .nav-link-master.active {
+        color: var(--primary-blue);
+      }
+
+      .nav-link-master.active::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary-gradient);
+      }
+
+      .container-main {
+        display: flex;
+        gap: 1.5rem;
+        padding: 1.5rem 2rem;
+        min-height: calc(100vh - 120px);
+      }
+
+      .panel-left {
+        flex: 2;
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+      }
+
+      .panel-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .tab-pane {
+        display: none;
+      }
+
+      .tab-pane.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .section-header {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 0.5rem;
+      }
+
+      .section-header i {
+        color: var(--primary-blue);
+        margin-right: 0.5rem;
+      }
+
+      .card-tasks,
+      .card-stats {
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+      }
+
+      .card-tasks h5,
+      .card-stats h5 {
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .task-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #eee;
+        font-size: 0.9rem;
+      }
+
+      .task-item:last-child {
+        border-bottom: none;
+      }
+
+      .task-status {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+      }
+
+      .task-status.running {
+        background: var(--success);
+      }
+
+      .task-status.pending {
+        background: var(--warning);
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .stat-box {
+        text-align: center;
+        padding: 1rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .stat-box:hover {
+        border-color: var(--primary-blue);
+        box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin: 0.5rem 0;
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .k8s-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .k8s-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .k8s-card:hover {
+        border-color: var(--primary-blue);
+        box-shadow: 0 8px 16px rgba(0, 120, 212, 0.15);
+        transform: translateY(-4px);
+      }
+
+      .k8s-card-icon {
+        font-size: 2.5rem;
+        color: var(--primary-blue);
+        margin-bottom: 0.5rem;
+      }
+
+      .k8s-card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin: 0.5rem 0;
+      }
+
+      .k8s-card-label {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .resource-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+
+      .resource-table thead {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-bottom: 2px solid var(--primary-blue);
+      }
+
+      .resource-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 700;
+        color: var(--dark);
+      }
+
+      .resource-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      .resource-table tbody tr:hover {
+        background: rgba(0, 120, 212, 0.03);
+      }
+
+      .badge-status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .badge-running {
+        background: #d4edda;
+        color: var(--success);
+      }
+
+      .badge-pending {
+        background: #fff3cd;
+        color: var(--warning);
+      }
+
+      .badge-error {
+        background: #f8d7da;
+        color: var(--danger);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #999;
+      }
+
+      .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      .chat-input-area {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+      }
+
+      .chat-input-area input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
+
+      .chat-input-area button {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .chat-input-area button:hover {
+        opacity: 0.9;
+      }
+
+      /* Toast Notifications - Prawy dolny róg */
+      .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .toast-notification {
+        background: var(--white);
+        border-left: 4px solid var(--primary-blue);
+        border-radius: 4px;
+        padding: 1rem;
+        min-width: 300px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .toast-notification.success {
+        border-left-color: var(--success);
+      }
+
+      .toast-notification.warning {
+        border-left-color: var(--warning);
+      }
+
+      .toast-notification.error {
+        border-left-color: var(--danger);
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .toast-close {
+        float: right;
+        cursor: pointer;
+        color: #999;
+        font-weight: bold;
+      }
+
+      .toast-close:hover {
+        color: #333;
+      }
+
+      /* Namespace Menu Dropdown */
+      .namespace-menu {
+        position: relative;
+      }
+
+      .namespace-btn {
+        background: linear-gradient(135deg, #0066cc 0%, #0078d4 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .namespace-btn:hover {
+        opacity: 0.9;
+      }
+
+      .namespace-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: var(--white);
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        min-width: 250px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        margin-top: 0.5rem;
+      }
+
+      .namespace-dropdown.active {
+        display: block;
+      }
+
+      .dropdown-header {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #eee;
+        font-weight: 600;
+        color: var(--dark);
+      }
+
+      .dropdown-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f5f5f5;
+      }
+
+      .dropdown-item:hover {
+        background: #f9f9f9;
+      }
+
+      .dropdown-item.selected {
+        background: rgba(0, 120, 212, 0.1);
+        color: var(--primary-blue);
+        font-weight: 600;
+      }
+
+      /* Expandable Agent Rows */
+      .agent-row {
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .agent-row:hover {
+        background: rgba(0, 120, 212, 0.05);
+      }
+
+      .agent-row.expanded {
+        background: rgba(0, 120, 212, 0.08);
+      }
+
+      .agent-expand-icon {
+        transition: transform 0.3s ease;
+      }
+
+      .agent-expand-icon.rotated {
+        transform: rotate(90deg);
+      }
+
+      .agent-details {
+        display: none;
+        padding: 1rem;
+        background: #f9f9f9;
+      }
+
+      .agent-details.show {
+        display: block;
+      }
+
+      .agent-detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        font-size: 0.9rem;
+      }
+
+      .agent-detail-label {
+        font-weight: 600;
+        color: var(--dark);
+      }
+
+      .agent-detail-value {
+        color: #666;
+      }
+
+      /* API Status Indicator */
+      .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .status-online {
+        background: #d4edda;
+        color: var(--success);
+      }
+
+      .status-offline {
+        background: #f8d7da;
+        color: var(--danger);
+      }
+
+      /* API Docs Styling */
+      .api-endpoint {
+        background: var(--white);
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .api-endpoint:hover {
+        box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+      }
+
+      .api-method {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin-right: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .api-method.get {
+        background: #d1e7ff;
+        color: #0c63e4;
+      }
+
+      .api-method.post {
+        background: #d1e7f1;
+        color: #0d5cb8;
+      }
+
+      .api-method.websocket {
+        background: #e8d5c4;
+        color: #7d562c;
+      }
+
+      .api-path {
+        font-family: monospace;
+        background: #f5f5f5;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        margin: 0.5rem 0;
+        font-size: 0.9rem;
+        word-break: break-all;
+      }
+
+      .api-section-title {
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+      }
+
+      .auth-notice {
+        background: #fff3cd;
+        border-left: 4px solid var(--warning);
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+      }
+
+      /* API Management */
+      .api-action-icons {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .api-action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .api-action-btn:hover {
+        background: rgba(0, 120, 212, 0.1);
+        color: var(--primary-blue);
+      }
+      .api-action-btn.copy {
+        color: #7d562c;
+      }
+      .api-action-btn.test {
+        color: var(--success);
+      }
+      .api-action-btn.edit {
+        color: var(--primary-blue);
+      }
+      .api-action-btn.delete {
+        color: var(--danger);
+      }
+
+      .btn-add-api {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: auto;
+      }
+      .btn-add-api:hover {
+        background: #0066b3;
+      }
+
+      .api-endpoint-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #ddd;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+      }
+      .api-endpoint-row:hover {
+        background: #f9f9f9;
+        border-color: var(--primary-blue);
+      }
+      .api-endpoint-info {
+        flex: 1;
+      }
+
+      .saved-api-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #e0e0e0;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        border-radius: 4px;
+        background: #fafafa;
+      }
+      .saved-api-item:hover {
+        background: #f5f5f5;
+        border-color: var(--primary-blue);
+      }
+
+      /* Badge styles */
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .bg-primary {
+        background: var(--primary-blue);
+        color: white;
+      }
+      .bg-info {
+        background: #17a2b8;
+        color: white;
+      }
+      .bg-success {
+        background: var(--success);
+        color: white;
+      }
+      .bg-danger {
+        background: var(--danger);
+        color: white;
+      }
+      .bg-warning {
+        background: #ffc107;
+        color: #333;
+      }
+
+      /* Modal */
+      .modal-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        pointer-events: none;
+      }
+      .modal-backdrop[style*="display: block"],
+      .modal-backdrop[style*="display:block"] {
+        pointer-events: auto;
+      }
+      .modal-backdrop.active {
+        display: block;
+      }
+      .modal-dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        pointer-events: auto;
+      }
+      .modal-dialog.active {
+        display: block;
+      }
+      .modal-header {
+        padding: 1.5rem;
+        border-bottom: 2px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #999;
+      }
+      .modal-close:hover {
+        color: #333;
+      }
+      .modal-body {
+        padding: 1.5rem;
+      }
+      .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+      }
+
+      .btn-primary {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .btn-primary:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+      }
+      .btn-secondary {
+        background: #f0f0f0;
+        color: var(--dark);
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .btn-secondary:hover {
+        background: #e0e0e0;
+      }
+
+      .saved-apis-list {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .saved-api-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .saved-api-item:hover {
+        background: #f9f9f9;
+      }
+      .saved-api-item:last-child {
+        border-bottom: none;
+      }
+
+      @media (max-width: 768px) {
+        .container-main {
+          flex-direction: column;
+        }
+        .k8s-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar-master">
+      <div class="brand-logo">
+        <i class="fas fa-cog"></i>
+        <span class="brand-text">UAP — Master Orchestrator</span>
+      </div>
+      <div style="display: flex; gap: 1rem; align-items: center">
+        <div
+          id="api-status"
+          class="status-indicator"
+          style="background: #d4edda; color: var(--success)"
+        >
+          <i
+            class="fas fa-circle"
+            style="font-size: 0.7rem; margin-right: 0.5rem; animation: none"
+          ></i>
+          <span id="api-status-text">✓ Online</span>
+        </div>
+        <div class="namespace-menu">
+          <button class="namespace-btn" onclick="toggleNamespaceMenu()">
+            <i class="fas fa-cog"></i>
+            <span id="namespace-display">adrion-369</span>
+            <i class="fas fa-chevron-down" style="font-size: 0.8rem"></i>
+          </button>
+          <div class="namespace-dropdown" id="namespace-dropdown">
+            <div class="dropdown-header">
+              <i class="fas fa-bell"></i> Namespace & Settings
+            </div>
+            <div
+              class="dropdown-item selected"
+              onclick="selectNamespace('adrion-369')"
+            >
+              <i
+                class="fas fa-check"
+                style="margin-right: 0.5rem; color: var(--primary-blue)"
+              ></i>
+              adrion-369 (Current)
+            </div>
+            <div class="dropdown-item" onclick="selectNamespace('default')">
+              default
+            </div>
+            <div class="dropdown-item" onclick="selectNamespace('kube-system')">
+              kube-system
+            </div>
+            <div style="border-top: 1px solid #ddd; padding: 0.75rem 1rem">
+              <div
+                style="
+                  font-weight: 600;
+                  margin-bottom: 0.5rem;
+                  color: var(--dark);
+                "
+              >
+                Powiadomienia
+              </div>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  margin: 0.5rem 0;
+                  cursor: pointer;
+                "
+              >
+                <input type="checkbox" checked style="margin-right: 0.5rem" />
+                <span style="font-size: 0.85rem">Pod alerts</span>
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  margin: 0.5rem 0;
+                  cursor: pointer;
+                "
+              >
+                <input type="checkbox" checked style="margin-right: 0.5rem" />
+                <span style="font-size: 0.85rem">Deployment updates</span>
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  margin: 0.5rem 0;
+                  cursor: pointer;
+                "
+              >
+                <input type="checkbox" checked style="margin-right: 0.5rem" />
+                <span style="font-size: 0.85rem">Error notifications</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-tabs-master">
+      <button class="nav-link-master active" onclick="switchTab('chat')">
+        <i class="fas fa-comments"></i> Chat (Home)
+      </button>
+      <button class="nav-link-master" onclick="switchTab('agent')">
+        <i class="fas fa-robot"></i> Agent Delegator
+      </button>
+      <button class="nav-link-master" onclick="switchTab('manager')">
+        <i class="fas fa-users-cog"></i> Agent Manager
+      </button>
+      <button class="nav-link-master" onclick="switchTab('k8s')">
+        <i class="fas fa-cube"></i> Kubernetes Dashboard
+      </button>
+      <button class="nav-link-master" onclick="switchTab('genesis')">
+        <i class="fas fa-database"></i> Genesis Viewer
+      </button>
+      <button class="nav-link-master" onclick="switchTab('console')">
+        <i class="fas fa-terminal"></i> Orchestrator Console
+      </button>
+      <button class="nav-link-master" onclick="switchTab('healing')">
+        <i class="fas fa-heart"></i> Self-Healing
+      </button>
+      <button class="nav-link-master" onclick="switchTab('api-docs')">
+        <i class="fas fa-book"></i> API Docs
+      </button>
+    </div>
+
+    <div class="container-main">
+      <div class="panel-left">
+        <div class="tab-pane active" id="chat">
+          <div class="section-header">
+            <span
+              ><i class="fas fa-comments"></i> Master Orchestrator Chat</span
+            >
+          </div>
+          <div
+            style="
+              min-height: 300px;
+              padding: 1rem;
+              background: #f9f9f9;
+              border-radius: 6px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <div class="empty-state">
+              <i class="fas fa-comment-dots"></i>
+              <p>Start a conversation with the AI Orchestrator</p>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input
+              type="text"
+              placeholder="Ask the Master Orchestrator... e.g., 'Deploy backend' or 'Check system'"
+            />
+            <button type="button">
+              <i class="fas fa-paper-plane"></i> Send
+            </button>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="agent">
+          <div class="section-header">
+            <span><i class="fas fa-robot"></i> Agent Delegator</span>
+          </div>
+          <p>Delegate tasks to specific agents in the swarm...</p>
+          <div style="margin-top: 1rem">
+            <button
+              class="btn btn-outline-primary btn-sm"
+              style="margin-right: 0.5rem"
+            >
+              <i class="fas fa-cube"></i> K8s Agent
+            </button>
+            <button
+              class="btn btn-outline-primary btn-sm"
+              style="margin-right: 0.5rem"
+            >
+              <i class="fas fa-database"></i> Data Agent
+            </button>
+            <button class="btn btn-outline-primary btn-sm">
+              <i class="fas fa-wrench"></i> Maintenance
+            </button>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="manager">
+          <div class="section-header">
+            <span><i class="fas fa-users-cog"></i> Agent Manager</span>
+            <span style="font-size: 0.8rem; color: #999; font-weight: 400"
+              >Kliknij na rząd aby rozwinąć</span
+            >
+          </div>
+          <table class="resource-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Agent Name</th>
+                <th>Status</th>
+                <th>Tasks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                class="agent-row"
+                onclick="toggleAgentDetails(this, 'k8s-agent')"
+              >
+                <td style="padding: 1rem; text-align: center">
+                  <i class="fas fa-chevron-right agent-expand-icon"></i>
+                </td>
+                <td>Kubernetes Agent</td>
+                <td><span class="badge-status badge-running">Running</span></td>
+                <td>12</td>
+              </tr>
+              <tr class="agent-details" id="k8s-agent-details">
+                <td colspan="4">
+                  <div class="agent-details">
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-server"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Hostname:</span
+                      >
+                      <span class="agent-detail-value">k8s-agent-pod-1</span>
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-hourglass-start"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Uptime:</span
+                      >
+                      <span class="agent-detail-value">2d 14h 22m</span>
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-memory"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Memory Usage:</span
+                      >
+                      <span class="agent-detail-value"
+                        >245 MB / 512 MB (47%)</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-microchip"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >CPU Usage:</span
+                      >
+                      <span class="agent-detail-value"
+                        >0.45 cores / 1.0 core (45%)</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-tasks"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Active Tasks:</span
+                      >
+                      <span class="agent-detail-value"
+                        >12 (11 completed, 1 running)</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-network-wired"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Last Sync:</span
+                      >
+                      <span class="agent-detail-value">32 seconds ago</span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="agent-row"
+                onclick="toggleAgentDetails(this, 'data-agent')"
+              >
+                <td style="padding: 1rem; text-align: center">
+                  <i class="fas fa-chevron-right agent-expand-icon"></i>
+                </td>
+                <td>Data Agent</td>
+                <td><span class="badge-status badge-running">Running</span></td>
+                <td>5</td>
+              </tr>
+              <tr class="agent-details" id="data-agent-details">
+                <td colspan="4">
+                  <div class="agent-details">
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-server"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Hostname:</span
+                      >
+                      <span class="agent-detail-value">data-agent-pod-2</span>
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-hourglass-start"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Uptime:</span
+                      >
+                      <span class="agent-detail-value">1d 8h 15m</span>
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-memory"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Memory Usage:</span
+                      >
+                      <span class="agent-detail-value"
+                        >156 MB / 512 MB (30%)</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-microchip"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >CPU Usage:</span
+                      >
+                      <span class="agent-detail-value"
+                        >0.22 cores / 1.0 core (22%)</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-tasks"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Active Tasks:</span
+                      >
+                      <span class="agent-detail-value"
+                        >5 (4 completed, 1 queued)</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-network-wired"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Last Sync:</span
+                      >
+                      <span class="agent-detail-value">48 seconds ago</span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="agent-row"
+                onclick="toggleAgentDetails(this, 'monitor-agent')"
+              >
+                <td style="padding: 1rem; text-align: center">
+                  <i class="fas fa-chevron-right agent-expand-icon"></i>
+                </td>
+                <td>Monitor Agent</td>
+                <td><span class="badge-status badge-running">Running</span></td>
+                <td>8</td>
+              </tr>
+              <tr class="agent-details" id="monitor-agent-details">
+                <td colspan="4">
+                  <div class="agent-details">
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-server"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Hostname:</span
+                      >
+                      <span class="agent-detail-value"
+                        >monitor-agent-pod-3</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-hourglass-start"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Uptime:</span
+                      >
+                      <span class="agent-detail-value">5d 12h 47m</span>
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-memory"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Memory Usage:</span
+                      >
+                      <span class="agent-detail-value"
+                        >189 MB / 512 MB (36%)</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-microchip"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >CPU Usage:</span
+                      >
+                      <span class="agent-detail-value"
+                        >0.38 cores / 1.0 core (38%)</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-tasks"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Active Tasks:</span
+                      >
+                      <span class="agent-detail-value"
+                        >8 (7 completed, 1 running)</span
+                      >
+                    </div>
+                    <div class="agent-detail-item">
+                      <span class="agent-detail-label"
+                        ><i
+                          class="fas fa-network-wired"
+                          style="margin-right: 0.5rem"
+                        ></i
+                        >Last Sync:</span
+                      >
+                      <span class="agent-detail-value">22 seconds ago</span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane" id="k8s">
+          <div class="section-header">
+            <span><i class="fas fa-cube"></i> Kubernetes Dashboard</span>
+          </div>
+          <div class="k8s-grid">
+            <div class="k8s-card">
+              <div class="k8s-card-icon">
+                <i class="fas fa-project-diagram"></i>
+              </div>
+              <div class="k8s-card-value" id="k8s-pods">--</div>
+              <div class="k8s-card-label">PODS</div>
+            </div>
+            <div class="k8s-card">
+              <div class="k8s-card-icon">
+                <i class="fas fa-network-wired"></i>
+              </div>
+              <div class="k8s-card-value" id="k8s-services">--</div>
+              <div class="k8s-card-label">SERVICES</div>
+            </div>
+            <div class="k8s-card">
+              <div class="k8s-card-icon"><i class="fas fa-rocket"></i></div>
+              <div class="k8s-card-value" id="k8s-deployments">--</div>
+              <div class="k8s-card-label">DEPLOYMENTS</div>
+            </div>
+          </div>
+          <div style="margin-top: 2rem">
+            <h6 style="font-weight: 700; color: var(--dark)">Recent Events</h6>
+            <table class="resource-table">
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Pod/Resource</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Pod Created</td>
+                  <td>api-deployment-0</td>
+                  <td>
+                    <span class="badge-status badge-running">Running</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Service Updated</td>
+                  <td>backend-service</td>
+                  <td>
+                    <span class="badge-status badge-running">Updated</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="genesis">
+          <div class="section-header">
+            <span><i class="fas fa-database"></i> Genesis Viewer</span>
+          </div>
+          <p>System logs from Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/</p>
+          <div
+            style="
+              margin-top: 1rem;
+              background: #f9f9f9;
+              padding: 1rem;
+              border-radius: 6px;
+              font-family: monospace;
+              font-size: 0.85rem;
+              max-height: 400px;
+              overflow-y: auto;
+            "
+          >
+            <div style="color: #27ae60">
+              [✓] Application started successfully
+            </div>
+            <div style="color: #27ae60">[✓] Database initialized</div>
+            <div style="color: #27ae60">[✓] K8s integration loaded</div>
+            <div style="color: #f39c12">
+              [⚠] K8s cluster connection (expected)
+            </div>
+            <div style="color: #27ae60">[✓] All services operational</div>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="console">
+          <div class="section-header">
+            <span><i class="fas fa-terminal"></i> Orchestrator Console</span>
+          </div>
+          <div
+            style="
+              background: #1e1e1e;
+              color: #00ff00;
+              padding: 1rem;
+              border-radius: 6px;
+              font-family: &quot;Courier New&quot;, monospace;
+              font-size: 0.85rem;
+              max-height: 400px;
+              overflow-y: auto;
+            "
+          >
+            <div>$ orchestrator --status</div>
+            <div style="color: #00ff00">System Status: OPERATIONAL</div>
+            <div style="color: #00ff00">Services Running: 7/7</div>
+            <div style="color: #ffff00">K8s Namespace: adrion-369</div>
+            <div style="color: #ffff00">Last Sync: 2 minutes ago</div>
+            <div style="color: #00ff00">All systems green ✓</div>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="healing">
+          <div class="section-header">
+            <span><i class="fas fa-heart"></i> Self-Healing</span>
+          </div>
+          <div style="padding: 1rem">
+            <p style="margin-bottom: 1.5rem">
+              System health monitoring and auto-recovery status
+            </p>
+            <div class="stat-grid">
+              <div class="stat-box">
+                <div class="stat-value" style="color: var(--success)">98%</div>
+                <div class="stat-label">System Health</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" style="color: var(--success)">0</div>
+                <div class="stat-label">Active Issues</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" style="color: var(--primary-blue)">
+                  12
+                </div>
+                <div class="stat-label">Auto-Fixed</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" style="color: var(--success)">
+                  2h 34m
+                </div>
+                <div class="stat-label">Uptime</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="api-docs">
+          <div class="section-header">
+            <span><i class="fas fa-book"></i> API Dokumentacja</span>
+            <button class="btn-add-api" onclick="openApiModal()">
+              <i class="fas fa-plus"></i> Dodaj API
+            </button>
+          </div>
+          <div style="padding: 1rem">
+            <div class="api-endpoints-container">
+              <!-- Domyślne endpointy -->
+              <div class="api-endpoint-row">
+                <div class="api-info">
+                  <span class="badge bg-primary">GET</span>
+                  <span class="api-name">/mapi/v1/kubernetes/cluster-info</span>
+                </div>
+                <div class="api-action-icons">
+                  <button
+                    class="api-action-btn copy"
+                    onclick="
+                      copyApiEndpoint('/mapi/v1/kubernetes/cluster-info')
+                    "
+                    title="Kopiuj"
+                  >
+                    <i class="fas fa-copy"></i>
+                  </button>
+                  <button
+                    class="api-action-btn test"
+                    onclick="
+                      testApiEndpoint('GET', '/mapi/v1/kubernetes/cluster-info')
+                    "
+                    title="Testuj"
+                  >
+                    <i class="fas fa-flask"></i>
+                  </button>
+                  <button
+                    class="api-action-btn edit"
+                    onclick="editApiEndpoint('default-cluster-info')"
+                    title="Edytuj"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="api-endpoint-row">
+                <div class="api-info">
+                  <span class="badge bg-primary">GET</span>
+                  <span class="api-name">/mapi/v1/kubernetes/pods</span>
+                </div>
+                <div class="api-action-icons">
+                  <button
+                    class="api-action-btn copy"
+                    onclick="copyApiEndpoint('/mapi/v1/kubernetes/pods')"
+                    title="Kopiuj"
+                  >
+                    <i class="fas fa-copy"></i>
+                  </button>
+                  <button
+                    class="api-action-btn test"
+                    onclick="testApiEndpoint('GET', '/mapi/v1/kubernetes/pods')"
+                    title="Testuj"
+                  >
+                    <i class="fas fa-flask"></i>
+                  </button>
+                  <button
+                    class="api-action-btn edit"
+                    onclick="editApiEndpoint('default-pods')"
+                    title="Edytuj"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="api-endpoint-row">
+                <div class="api-info">
+                  <span class="badge bg-primary">GET</span>
+                  <span class="api-name">/mapi/v1/kubernetes/services</span>
+                </div>
+                <div class="api-action-icons">
+                  <button
+                    class="api-action-btn copy"
+                    onclick="copyApiEndpoint('/mapi/v1/kubernetes/services')"
+                    title="Kopiuj"
+                  >
+                    <i class="fas fa-copy"></i>
+                  </button>
+                  <button
+                    class="api-action-btn test"
+                    onclick="
+                      testApiEndpoint('GET', '/mapi/v1/kubernetes/services')
+                    "
+                    title="Testuj"
+                  >
+                    <i class="fas fa-flask"></i>
+                  </button>
+                  <button
+                    class="api-action-btn edit"
+                    onclick="editApiEndpoint('default-services')"
+                    title="Edytuj"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="api-endpoint-row">
+                <div class="api-info">
+                  <span class="badge bg-primary">GET</span>
+                  <span class="api-name">/mapi/v1/kubernetes/deployments</span>
+                </div>
+                <div class="api-action-icons">
+                  <button
+                    class="api-action-btn copy"
+                    onclick="copyApiEndpoint('/mapi/v1/kubernetes/deployments')"
+                    title="Kopiuj"
+                  >
+                    <i class="fas fa-copy"></i>
+                  </button>
+                  <button
+                    class="api-action-btn test"
+                    onclick="
+                      testApiEndpoint('GET', '/mapi/v1/kubernetes/deployments')
+                    "
+                    title="Testuj"
+                  >
+                    <i class="fas fa-flask"></i>
+                  </button>
+                  <button
+                    class="api-action-btn edit"
+                    onclick="editApiEndpoint('default-deployments')"
+                    title="Edytuj"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                margin-top: 2rem;
+                border-top: 1px solid #ddd;
+                padding-top: 1rem;
+              "
+            >
+              <h6>Zapisane API</h6>
+              <div class="saved-apis-list" id="saved-apis-list">
+                <p style="color: #999; text-align: center">
+                  Brak zapisanych API
+                </p>
+              </div>
+
+              <div
+                style="
+                  margin-top: 2rem;
+                  border-top: 1px solid #ddd;
+                  padding-top: 1rem;
+                "
+              >
+                <h6>Export / Import</h6>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+                  <button
+                    class="btn btn-secondary"
+                    onclick="exportApis()"
+                    style="flex: 1"
+                  >
+                    <i class="fas fa-download"></i> Export JSON
+                  </button>
+                  <button
+                    class="btn btn-secondary"
+                    onclick="
+                      document.getElementById('import-file-input').click()
+                    "
+                    style="flex: 1"
+                  >
+                    <i class="fas fa-upload"></i> Import JSON
+                  </button>
+                </div>
+                <input
+                  type="file"
+                  id="import-file-input"
+                  accept=".json"
+                  style="display: none"
+                  onchange="importApis(event)"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-right">
+        <div class="card-tasks">
+          <h5><i class="fas fa-list-check"></i> Bieżące Zadania</h5>
+          <div id="tasks-container">
+            <div class="task-item">
+              <span class="task-status running"></span> K8s pod monitoring
+            </div>
+            <div class="task-item">
+              <span class="task-status running"></span> API health check
+            </div>
+            <div class="task-item">
+              <span class="task-status pending"></span> Deployment queue
+            </div>
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.85rem; color: #999">
+            Brak aktywnych zadań
+          </p>
+        </div>
+
+        <div class="card-stats">
+          <h5><i class="fas fa-chart-pie"></i> Statystyka</h5>
+          <div class="stat-grid">
+            <div class="stat-box">
+              <div class="stat-value" style="font-size: 1.5rem">0</div>
+              <div class="stat-label">UKOŃCZONE</div>
+            </div>
+            <div class="stat-box">
+              <div
+                class="stat-value"
+                style="font-size: 1.5rem; color: var(--warning)"
+              >
+                0
+              </div>
+              <div class="stat-label">W TOKU</div>
+            </div>
+            <div class="stat-box">
+              <div
+                class="stat-value"
+                style="font-size: 1.5rem; color: var(--danger)"
+              >
+                0
+              </div>
+              <div class="stat-label">BŁĘDY</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" style="font-size: 1.5rem">7/7</div>
+              <div class="stat-label">SERVICES</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- API Management Modal -->
+    <div
+      class="modal-backdrop"
+      id="api-modal-backdrop"
+      onclick="closeApiModal()"
+    ></div>
+    <div class="modal-dialog" id="api-modal" style="display: none">
+      <div class="modal-header">
+        <h5 style="margin: 0">Dodaj/Edytuj API</h5>
+        <button
+          style="
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+          "
+          onclick="closeApiModal()"
+        >
+          ✕
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="api-form">
+          <div class="form-group">
+            <label for="api-name">Nazwa API:</label>
+            <input
+              type="text"
+              id="api-name"
+              placeholder="np. Get Cluster Info"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="api-method">Metoda HTTP:</label>
+            <select id="api-method" required>
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+              <option value="PATCH">PATCH</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="api-url">URL Endpoint:</label>
+            <input
+              type="text"
+              id="api-url"
+              placeholder="http://localhost:8002/api/..."
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="api-headers">Nagłówki (JSON):</label>
+            <textarea
+              id="api-headers"
+              placeholder='{"X-API-Key": "your-key"}'
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="api-body">Ciało żądania (JSON):</label>
+            <textarea
+              id="api-body"
+              placeholder='{"key": "value"}'
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="api-description">Opis:</label>
+            <input
+              type="text"
+              id="api-description"
+              placeholder="Opis tego API"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="api-category">Kategoria:</label>
+            <select id="api-category" required>
+              <option value="">-- Wybierz kategorię --</option>
+              <option value="REST">REST API</option>
+              <option value="WebSocket">WebSocket</option>
+              <option value="GraphQL">GraphQL</option>
+              <option value="gRPC">gRPC</option>
+              <option value="Other">Inne</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeApiModal()">
+          Anuluj
+        </button>
+        <button class="btn btn-primary" onclick="saveApiEndpoint()">
+          Zapisz API
+        </button>
+      </div>
+    </div>
+
+    <!-- API Test Result Modal -->
+    <div
+      class="modal-backdrop"
+      id="test-modal-backdrop"
+      onclick="closeTestModal()"
+      style="display: none"
+    ></div>
+    <div
+      class="modal-dialog"
+      id="test-modal"
+      style="display: none; max-width: 600px"
+    >
+      <div class="modal-header">
+        <h5 style="margin: 0">Wynik Testu API</h5>
+        <button
+          style="
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+          "
+          onclick="closeTestModal()"
+        >
+          ✕
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="max-height: 400px; overflow-y: auto">
+          <div
+            id="test-result-content"
+            style="
+              background: #f5f5f5;
+              padding: 1rem;
+              border-radius: 4px;
+              font-family: monospace;
+              white-space: pre-wrap;
+              word-break: break-all;
+            "
+          ></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeTestModal()">
+          Zamknij
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Toast Notifications Manager
+      function showToast(message, type = "info") {
+        const container = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+        toast.className = `toast-notification ${type}`;
+        toast.innerHTML = `
+          <span class="toast-close" onclick="this.parentElement.remove()">✕</span>
+          <strong>${type === "success" ? "✓" : type === "error" ? "✕" : "ℹ"}</strong> ${message}
+        `;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          if (toast.parentElement) toast.remove();
+        }, 5000);
+      }
+
+      // Namespace Menu Toggle
+      function toggleNamespaceMenu() {
+        const dropdown = document.getElementById("namespace-dropdown");
+        dropdown.classList.toggle("active");
+      }
+
+      function selectNamespace(namespace) {
+        document.getElementById("namespace-display").textContent = namespace;
+        document
+          .querySelectorAll(".namespace-dropdown .dropdown-item")
+          .forEach((item) => {
+            item.classList.remove("selected");
+          });
+        event.target.closest(".dropdown-item").classList.add("selected");
+        showToast(`Namespace changed to: ${namespace}`, "success");
+      }
+
+      // Click outside to close namespace menu
+      document.addEventListener("click", function (event) {
+        const dropdown = document.getElementById("namespace-dropdown");
+        const namespace = document.querySelector(".namespace-menu");
+        if (namespace && !namespace.contains(event.target)) {
+          dropdown.classList.remove("active");
+        }
+      });
+
+      // Agent Details Toggle
+      function toggleAgentDetails(rowElement, agentId) {
+        const detailsRow = document.getElementById(agentId + "-details");
+        const icon = rowElement.querySelector(".agent-expand-icon");
+
+        // Close other expanded rows
+        document.querySelectorAll(".agent-row").forEach((row) => {
+          if (row !== rowElement) {
+            row.classList.remove("expanded");
+            row.querySelector(".agent-expand-icon").classList.remove("rotated");
+          }
+        });
+        document.querySelectorAll(".agent-details").forEach((detail) => {
+          if (detail !== detailsRow) {
+            detail.classList.remove("show");
+          }
+        });
+
+        // Toggle current row
+        rowElement.classList.toggle("expanded");
+        icon.classList.toggle("rotated");
+        detailsRow.querySelector(".agent-details").classList.toggle("show");
+      }
+
+      // Tab Switching
+      function switchTab(tabId) {
+        document
+          .querySelectorAll(".tab-pane")
+          .forEach((pane) => pane.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+
+        document
+          .querySelectorAll(".nav-link-master")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.closest(".nav-link-master").classList.add("active");
+      }
+
+      // Check API Status
+      async function checkAPIStatus() {
+        try {
+          const response = await fetch(
+            "http://localhost:8002/mapi/v1/kubernetes/cluster-info",
+            {
+              headers: { "X-API-Key": "test-key" },
+            },
+          );
+          if (response.ok) {
+            document.getElementById("api-status").style.background = "#d4edda";
+            document.getElementById("api-status").style.color =
+              "var(--success)";
+            document.getElementById("api-status-text").textContent = "✓ Online";
+          }
+        } catch (error) {
+          document.getElementById("api-status").style.background = "#f8d7da";
+          document.getElementById("api-status").style.color = "var(--danger)";
+          document.getElementById("api-status-text").textContent = "✕ Offline";
+        }
+      }
+
+      // Load K8s Data
+      async function loadK8sData() {
+        try {
+          const headers = { "X-API-Key": "test-key" };
+          document.getElementById("k8s-pods").textContent = "12";
+          document.getElementById("k8s-services").textContent = "5";
+          document.getElementById("k8s-deployments").textContent = "3";
+        } catch (error) {
+          console.log("K8s data:", error.message);
+        }
+      }
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        loadK8sData();
+        checkAPIStatus();
+        loadSavedApis();
+        updateTestButtonStates();
+        showToast("Master Orchestrator loaded successfully", "success");
+      });
+
+      // ========== API MANAGEMENT FUNCTIONS ==========
+
+      let currentEditingApiId = null;
+
+      function openApiModal(apiId = null) {
+        const modal = document.getElementById("api-modal");
+        const backdrop = document.getElementById("api-modal-backdrop");
+        const form = document.getElementById("api-form");
+
+        // Clear form for new API
+        if (!apiId) {
+          form.reset();
+          currentEditingApiId = null;
+        } else {
+          // Load saved API for editing
+          const savedApis = JSON.parse(
+            localStorage.getItem("saved_apis") || "[]",
+          );
+          const api = savedApis.find((a) => a.id === apiId);
+          if (api) {
+            document.getElementById("api-name").value = api.name || "";
+            document.getElementById("api-method").value = api.method || "GET";
+            document.getElementById("api-url").value = api.url || "";
+            document.getElementById("api-headers").value =
+              JSON.stringify(api.headers || {}, null, 2) || "";
+            document.getElementById("api-body").value =
+              JSON.stringify(api.body || {}, null, 2) || "";
+            document.getElementById("api-description").value =
+              api.description || "";
+            document.getElementById("api-category").value = api.category || "";
+            currentEditingApiId = apiId;
+          }
+        }
+
+        modal.style.display = "block";
+        backdrop.style.display = "block";
+      }
+
+      function closeApiModal() {
+        const modal = document.getElementById("api-modal");
+        const backdrop = document.getElementById("api-modal-backdrop");
+        modal.style.display = "none";
+        backdrop.style.display = "none";
+        currentEditingApiId = null;
+      }
+
+      function saveApiEndpoint() {
+        const name = document.getElementById("api-name").value.trim();
+        const method = document.getElementById("api-method").value;
+        const url = document.getElementById("api-url").value.trim();
+        const description = document
+          .getElementById("api-description")
+          .value.trim();
+        const category = document.getElementById("api-category").value;
+
+        if (!name || !url || !category) {
+          showToast("Nazwa, URL i kategoria są wymagane", "error");
+          return;
+        }
+
+        let headers = {};
+        let body = {};
+
+        try {
+          const headersText = document
+            .getElementById("api-headers")
+            .value.trim();
+          if (headersText) headers = JSON.parse(headersText);
+        } catch (e) {
+          showToast("Błąd w nagłówkach JSON: " + e.message, "error");
+          return;
+        }
+
+        try {
+          const bodyText = document.getElementById("api-body").value.trim();
+          if (bodyText) body = JSON.parse(bodyText);
+        } catch (e) {
+          showToast("Błąd w ciele JSON: " + e.message, "error");
+          return;
+        }
+
+        let savedApis = JSON.parse(localStorage.getItem("saved_apis") || "[]");
+
+        if (currentEditingApiId) {
+          // Update existing
+          const index = savedApis.findIndex(
+            (a) => a.id === currentEditingApiId,
+          );
+          if (index !== -1) {
+            savedApis[index] = {
+              id: currentEditingApiId,
+              name,
+              method,
+              url,
+              headers,
+              body,
+              description,
+              category,
+              createdAt: savedApis[index].createdAt,
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          showToast("API zaktualizowane", "success");
+        } else {
+          // Create new
+          const newApi = {
+            id: `api-${Date.now()}`,
+            name,
+            method,
+            url,
+            headers,
+            body,
+            description,
+            category,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+          savedApis.push(newApi);
+          showToast("API dodane pomyślnie", "success");
+        }
+
+        localStorage.setItem("saved_apis", JSON.stringify(savedApis));
+        closeApiModal();
+        loadSavedApis();
+      }
+
+      function editApiEndpoint(apiId) {
+        openApiModal(apiId);
+      }
+
+      function deleteApiEndpoint(apiId) {
+        if (
+          confirm(
+            "Czy na pewno chcesz usunąć to API? Ta akcja nie może być cofnięta.",
+          )
+        ) {
+          let savedApis = JSON.parse(
+            localStorage.getItem("saved_apis") || "[]",
+          );
+          savedApis = savedApis.filter((a) => a.id !== apiId);
+          localStorage.setItem("saved_apis", JSON.stringify(savedApis));
+          showToast("API usunięte", "success");
+          loadSavedApis();
+        }
+      }
+
+      function copyApiEndpoint(text) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            showToast("Skopiowano do schowka", "success");
+          })
+          .catch(() => {
+            showToast("Nie udało się skopiować", "error");
+          });
+      }
+
+      async function testApiEndpoint(method, url, apiId = null) {
+        try {
+          let headers = {
+            "X-API-Key": "dev-key",
+            "Content-Type": "application/json",
+          };
+          let body = null;
+          let requestDetails = "";
+
+          if (apiId && apiId.startsWith("api-")) {
+            const savedApis = JSON.parse(
+              localStorage.getItem("saved_apis") || "[]",
+            );
+            const api = savedApis.find((a) => a.id === apiId);
+            if (api) {
+              headers = { ...headers, ...api.headers };
+              body = api.body ? JSON.stringify(api.body) : null;
+              method = api.method;
+              url = api.url;
+            }
+          }
+
+          requestDetails = `📤 REQUEST DETAILS\n`;
+          requestDetails += `Method: ${method}\n`;
+          requestDetails += `URL: ${url}\n`;
+          requestDetails += `Headers: ${JSON.stringify(headers, null, 2)}\n`;
+          if (body) requestDetails += `Body: ${body}\n`;
+          requestDetails += `\n${"=".repeat(60)}\n\n`;
+
+          const options = {
+            method: method,
+            headers: headers,
+          };
+
+          if (body && method !== "GET") {
+            options.body = body;
+          }
+
+          const startTime = performance.now();
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+          options.signal = controller.signal;
+
+          const response = await fetch(url, options);
+          clearTimeout(timeout);
+          const endTime = performance.now();
+          const duration = (endTime - startTime).toFixed(2);
+
+          let data;
+          const contentType = response.headers.get("content-type");
+
+          if (contentType && contentType.includes("application/json")) {
+            data = await response.json();
+          } else {
+            data = await response.text();
+          }
+
+          let resultText = requestDetails;
+          resultText += `📥 RESPONSE\n`;
+          resultText += `Status: ${response.status} ${response.statusText}\n`;
+          resultText += `Duration: ${duration}ms\n`;
+          resultText += `Size: ${JSON.stringify(data).length} bytes\n`;
+          resultText += `${"=".repeat(60)}\n\n`;
+          resultText += `BODY:\n`;
+          resultText +=
+            typeof data === "string" ? data : JSON.stringify(data, null, 2);
+
+          showTestResult(resultText);
+          showToast(`✓ Test passed (${duration}ms)`, "success");
+        } catch (error) {
+          if (error.name === "AbortError") {
+            showTestResult(
+              `❌ TIMEOUT ERROR\nPrzypuszczalnie API nie odpowiada (timeout 10s)`,
+            );
+            showToast("Timeout - API nie odpowiadał", "error");
+          } else {
+            showTestResult(
+              `❌ ERROR\n${error.message}\n\nSprawdzenie:\n- Czy backend działa?\n- Czy URL jest poprawny?\n- Czy API Key jest wymagana?`,
+            );
+            showToast("Błąd połączenia: " + error.message, "error");
+          }
+        }
+      }
+
+      function showTestResult(content) {
+        document.getElementById("test-result-content").textContent = content;
+        document.getElementById("test-modal").style.display = "block";
+        document.getElementById("test-modal-backdrop").style.display = "block";
+      }
+
+      function closeTestModal() {
+        document.getElementById("test-modal").style.display = "none";
+        document.getElementById("test-modal-backdrop").style.display = "none";
+      }
+
+      function loadSavedApis() {
+        const savedApis = JSON.parse(
+          localStorage.getItem("saved_apis") || "[]",
+        );
+        const container = document.getElementById("saved-apis-list");
+
+        if (savedApis.length === 0) {
+          container.innerHTML =
+            '<p style="color: #999; text-align: center">Brak zapisanych API</p>';
+          return;
+        }
+
+        // Group APIs by category
+        const grouped = {};
+        savedApis.forEach((api) => {
+          const cat = api.category || "Other";
+          if (!grouped[cat]) grouped[cat] = [];
+          grouped[cat].push(api);
+        });
+
+        // Get category colors
+        const categoryColors = {
+          REST: "bg-primary",
+          WebSocket: "bg-warning",
+          GraphQL: "bg-danger",
+          gRPC: "bg-success",
+          Other: "bg-secondary",
+        };
+
+        let html = "";
+
+        // Categories in order
+        const categories = ["REST", "WebSocket", "GraphQL", "gRPC", "Other"];
+
+        categories.forEach((category) => {
+          if (!grouped[category]) return;
+
+          const apis = grouped[category];
+          const badgeClass = categoryColors[category] || "bg-secondary";
+
+          html += `
+            <div style="margin-bottom: 2rem">
+              <h7 style="display: flex; align-items: center; gap: 0.5rem; color: var(--dark); margin-bottom: 1rem; font-weight: 700">
+                <span class="badge ${badgeClass}" style="padding: 0.5rem 1rem; font-size: 0.85rem">${category}</span>
+                <span style="color: #999; font-size: 0.9rem">${apis.length} API</span>
+              </h7>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem">
+          `;
+
+          apis.forEach((api) => {
+            const methodBadgeClass =
+              api.method === "GET"
+                ? "bg-info"
+                : api.method === "POST"
+                  ? "bg-success"
+                  : api.method === "PUT"
+                    ? "bg-warning"
+                    : api.method === "DELETE"
+                      ? "bg-danger"
+                      : "bg-secondary";
+
+            html += `
+              <div class="saved-api-item" style="border-left: 3px solid #0078d4">
+                <div class="api-info" style="flex: 1">
+                  <span class="badge ${methodBadgeClass}">${api.method}</span>
+                  <span class="api-name">${api.name}</span>
+                  <div style="font-size: 0.85rem; color: #666; margin-top: 0.25rem; word-break: break-all">${
+                    api.description || api.url
+                  }</div>
+                </div>
+                <div class="api-action-icons">
+                  <button class="api-action-btn copy" onclick="copyApiEndpoint('${api.url}')" title="Kopiuj URL">
+                    <i class="fas fa-copy"></i>
+                  </button>
+                  <button class="api-action-btn test" data-api-id="${api.id}" onclick="testApiEndpoint('${api.method}', '${api.url}', '${api.id}')" title="Testuj">
+                    <i class="fas fa-flask"></i>
+                  </button>
+                  <button class="api-action-btn edit" onclick="editApiEndpoint('${api.id}')" title="Edytuj">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="api-action-btn delete" onclick="deleteApiEndpoint('${api.id}')" title="Usuń">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+        updateTestButtonStates();
+      }
+
+      function updateTestButtonStates() {
+        // Check if API is online
+        const statusText =
+          document.querySelector(".status-indicator")?.nextElementSibling
+            ?.textContent || "";
+        const isOnline = statusText.includes("Online");
+
+        document.querySelectorAll(".api-action-btn.test").forEach((btn) => {
+          btn.disabled = !isOnline;
+          btn.style.opacity = isOnline ? "1" : "0.5";
+          btn.style.cursor = isOnline ? "pointer" : "not-allowed";
+          btn.title = isOnline ? "Testuj" : "API Offline - nie można testować";
+        });
+      }
+
+      function exportApis() {
+        const savedApis = JSON.parse(
+          localStorage.getItem("saved_apis") || "[]",
+        );
+
+        if (savedApis.length === 0) {
+          showToast("Brak API do wyeksportowania", "warning");
+          return;
+        }
+
+        const dataStr = JSON.stringify(savedApis, null, 2);
+        const dataBlob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `api-export-${new Date().toISOString().split("T")[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast(
+          `${savedApis.length} API wyeksportowanych pomyślnie`,
+          "success",
+        );
+      }
+
+      function importApis(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const importedApis = JSON.parse(e.target.result);
+
+            if (!Array.isArray(importedApis)) {
+              showToast("Błędny format JSON - powinien być array", "error");
+              return;
+            }
+
+            const savedApis = JSON.parse(
+              localStorage.getItem("saved_apis") || "[]",
+            );
+            const beforeCount = savedApis.length;
+
+            // Merge imported APIs (avoid duplicates by URL)
+            importedApis.forEach((api) => {
+              if (!savedApis.find((a) => a.url === api.url)) {
+                api.id = api.id || `api-${Date.now()}-${Math.random()}`;
+                savedApis.push(api);
+              }
+            });
+
+            localStorage.setItem("saved_apis", JSON.stringify(savedApis));
+            loadSavedApis();
+
+            const addedCount = savedApis.length - beforeCount;
+            showToast(`Załadowano ${addedCount} nowych API`, "success");
+          } catch (error) {
+            showToast("Błąd parsowania pliku: " + error.message, "error");
+          }
+        };
+
+        reader.readAsText(file);
+        event.target.value = ""; // Reset input
+      }
+
+      // Periodic updates
+      setInterval(loadK8sData, 30000);
+      setInterval(() => {
+        checkAPIStatus();
+        updateTestButtonStates();
+      }, 10000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+# MCP Router Dockerfile
+# Central orchestration layer (Port 9000)
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements-mcp.txt .
+RUN pip install --no-cache-dir -r requirements-mcp.txt
+
+# Copy application
+COPY mcp-servers/ ./mcp-servers/
+COPY mcp_router_app.py .
+
+# Health check endpoint
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:9000/health || exit 1
+
+EXPOSE 9000
+
+CMD ["python", "mcp_router_app.py"]

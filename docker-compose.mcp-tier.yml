@@ -1,0 +1,228 @@
+version: "3.9"
+
+# TIER 06: MCP SERVERS (Model Context Protocol)
+# Central orchestration layer for ADRION 369 v4.0
+#
+# Services:
+#   - mcp-router        (9000) — Central decision arbitration
+#   - vortex-mcp        (9001) — Orchestration & 174Hz monitoring
+#   - guardian-mcp      (9002) — Security & compliance (9 Laws)
+#   - oracle-mcp        (9003) — 162D routing & pattern matching
+#   - genesis-mcp       (9004) — State management & RAG
+#   - healer-mcp        (9005) — Recovery & monitoring
+
+services:
+  # ════════════════════════════════════════════════════════════════════════════
+  # MCP ROUTER — Port 9000 (Main Orchestrator)
+  # ════════════════════════════════════════════════════════════════════════════
+  mcp-router:
+    container_name: adrion-mcp-router
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp-router
+      args:
+        PYTHON_VERSION: "3.11"
+    image: adrion-mcp-router:v1.0
+    ports:
+      - "9000:9000"
+    environment:
+      - MCP_ENVIRONMENT=production
+      - MCP_DEBUG=false
+      - LOG_LEVEL=INFO
+      - VORTEX_URL=http://vortex-mcp:9001
+      - GUARDIAN_URL=http://guardian-mcp:9002
+      - ORACLE_URL=http://oracle-mcp:9003
+      - GENESIS_URL=http://genesis-mcp:9004
+      - HEALER_URL=http://healer-mcp:9005
+    volumes:
+      - ./mcp-servers:/app/mcp-servers:ro
+      - ./Genesis Record:/app/genesis-data
+    networks:
+      - adrion-mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      - vortex-mcp
+      - guardian-mcp
+      - oracle-mcp
+      - genesis-mcp
+      - healer-mcp
+    restart: unless-stopped
+    labels:
+      tier: "06-mcp-servers"
+      component: "router"
+      version: "1.0"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # VORTEX-MCP — Port 9001 (Harmonic Orchestration @ 174Hz)
+  # ════════════════════════════════════════════════════════════════════════════
+  vortex-mcp:
+    container_name: adrion-vortex-mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.vortex-mcp
+    image: adrion-vortex-mcp:v1.0
+    ports:
+      - "9001:9001"
+    environment:
+      - HARMONIC_FREQUENCY=174.0
+      - CANARY_THRESHOLD=5
+      - MAX_CONCURRENT_OPS=20
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./mcp-servers:/app/mcp-servers:ro
+      - ./monitoring/vortex-logs:/app/logs
+    networks:
+      - adrion-mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      tier: "06-mcp-servers"
+      component: "vortex"
+      domain: "orchestration"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # GUARDIAN-MCP — Port 9002 (Security & Compliance)
+  # ════════════════════════════════════════════════════════════════════════════
+  guardian-mcp:
+    container_name: adrion-guardian-mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.guardian-mcp
+    image: adrion-guardian-mcp:v1.0
+    ports:
+      - "9002:9002"
+    environment:
+      - ENFORCEMENT_LEVEL=strict
+      - AUDIT_LOG_PATH=/app/genesis-data/audit.jsonl
+      - POLICY_ENGINE=default
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./mcp-servers:/app/mcp-servers:ro
+      - ./Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU:/app/genesis-data
+    networks:
+      - adrion-mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      tier: "06-mcp-servers"
+      component: "guardian"
+      domain: "security"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # ORACLE-MCP — Port 9003 (Decision Routing & 162D Space)
+  # ════════════════════════════════════════════════════════════════════════════
+  oracle-mcp:
+    container_name: adrion-oracle-mcp
+    image: adrion-oracle-mcp:v1.0
+    build:
+      context: .
+      dockerfile: Dockerfile.oracle-mcp
+    ports:
+      - "9003:9003"
+    environment:
+      - ROUTING_CONFIDENCE_THRESHOLD=0.75
+      - PATTERN_MATCH_K=5
+      - INTENT_CLASSIFIER=default
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./mcp-servers:/app/mcp-servers:ro
+    networks:
+      - adrion-mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      tier: "06-mcp-servers"
+      component: "oracle"
+      domain: "routing"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # GENESIS-MCP — Port 9004 (State Management & RAG)
+  # ════════════════════════════════════════════════════════════════════════════
+  genesis-mcp:
+    container_name: adrion-genesis-mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.genesis-mcp
+    image: adrion-genesis-mcp:v1.0
+    ports:
+      - "9004:9004"
+    environment:
+      - GENESIS_RECORD_PATH=/app/genesis-data
+      - SESSION_TTL_SECONDS=86400
+      - RAG_TOP_K=5
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./Genesis Record:/app/genesis-data
+      - ./memories:/app/memories
+    networks:
+      - adrion-mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9004/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      tier: "06-mcp-servers"
+      component: "genesis"
+      domain: "state-management"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # HEALER-MCP — Port 9005 (Recovery & Monitoring)
+  # ════════════════════════════════════════════════════════════════════════════
+  healer-mcp:
+    container_name: adrion-healer-mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.healer-mcp
+    image: adrion-healer-mcp:v1.0
+    ports:
+      - "9005:9005"
+    environment:
+      - HEALTH_CHECK_INTERVAL=30
+      - ALERT_THRESHOLD_CPU=90
+      - ALERT_THRESHOLD_MEMORY=85
+      - AUTO_HEAL_ENABLED=true
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./mcp-servers:/app/mcp-servers:ro
+      - ./monitoring:/app/monitoring
+    networks:
+      - adrion-mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9005/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      tier: "06-mcp-servers"
+      component: "healer"
+      domain: "recovery-monitoring"
+
+networks:
+  adrion-mcp-network:
+    driver: bridge
+    name: adrion-mcp-network
+
+volumes:
+  mcp-router-data:
+  vortex-logs:
+  genesis-record:
