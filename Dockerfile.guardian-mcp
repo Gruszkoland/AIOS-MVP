@@ -1,0 +1,19 @@
+# GUARDIAN-MCP Dockerfile
+# Security & Compliance Engine (Port 9002)
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements-mcp.txt .
+RUN pip install --no-cache-dir -r requirements-mcp.txt
+
+COPY mcp-servers/ ./mcp-servers/
+COPY mcp_guardian_app.py .
+
+EXPOSE 9002
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:9002/health || exit 1
+
+CMD ["python", "mcp_guardian_app.py"]

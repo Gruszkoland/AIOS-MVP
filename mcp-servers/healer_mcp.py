@@ -63,7 +63,7 @@ class Alert:
 
 class HealerMCP(MCPBaseServer):
     """Automated Recovery & Health Monitoring"""
-    
+
     def __init__(self):
         super().__init__(
             server_name="HEALER-MCP",
@@ -73,7 +73,7 @@ class HealerMCP(MCPBaseServer):
         self.health_history: List[HealthReport] = []
         self.alerts: List[Alert] = []
         self.checkpoints_available: Dict[str, str] = {}
-    
+
     def handle_health_report(self) -> dict:
         """GET /health/report — Full system health"""
         def operation_fn():
@@ -85,13 +85,13 @@ class HealerMCP(MCPBaseServer):
                 "GENESIS-MCP": "healthy",
                 "HEALER-MCP": "healthy"
             }
-            
+
             alert_level = "healthy"
             if self.ebdi_state.is_crisis_mode:
                 alert_level = "critical"
             elif self.ebdi_state.arousal > 0.5:
                 alert_level = "warning"
-            
+
             report = HealthReport(
                 agents_status=agents_status,
                 alert_level=alert_level,
@@ -99,9 +99,9 @@ class HealerMCP(MCPBaseServer):
                 errors=[]
             )
             self.health_history.append(report)
-            
+
             return asdict(report)
-        
+
         result = self.execute_step(
             step_name="health_report",
             operation=operation_fn,
@@ -112,7 +112,7 @@ class HealerMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_trigger_rollback(self, checkpoint_id: str, scope: str = "local") -> dict:
         """POST /rollback — Restore from checkpoint"""
         def operation_fn():
@@ -122,10 +122,10 @@ class HealerMCP(MCPBaseServer):
                     "error": f"Checkpoint {checkpoint_id} not found",
                     "state_restored": False
                 }
-            
+
             # Execute rollback
             checkpoint_path = self.checkpoints_available[checkpoint_id]
-            
+
             return {
                 "rollback_ok": True,
                 "checkpoint_id": checkpoint_id,
@@ -134,7 +134,7 @@ class HealerMCP(MCPBaseServer):
                 "checkpoint_path": checkpoint_path,
                 "restored_at": datetime.utcnow().isoformat()
             }
-        
+
         result = self.execute_step(
             step_name=f"rollback_{checkpoint_id}",
             operation=operation_fn,
@@ -145,12 +145,12 @@ class HealerMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_self_heal(self, anomaly_type: str) -> dict:
         """POST /heal/auto — Automatic recovery"""
         def operation_fn():
             healing_actions = []
-            
+
             if anomaly_type == "high_arousal":
                 healing_actions = [
                     "Reduce processing load",
@@ -158,7 +158,7 @@ class HealerMCP(MCPBaseServer):
                     "Increase throttle timeout"
                 ]
                 self.ebdi_state.arousal = max(0.0, self.ebdi_state.arousal - 0.2)
-            
+
             elif anomaly_type == "memory_leak":
                 healing_actions = [
                     "Clear cache",
@@ -166,14 +166,14 @@ class HealerMCP(MCPBaseServer):
                     "Reset connections"
                 ]
                 self.ebdi_state.pleasure = min(1.0, self.ebdi_state.pleasure + 0.1)
-            
+
             elif anomaly_type == "dead_agent":
                 healing_actions = [
                     "Restart affected agent",
                     "Reset state",
                     "Verify connectivity"
                 ]
-            
+
             return {
                 "healed": len(healing_actions) > 0,
                 "anomaly_type": anomaly_type,
@@ -181,7 +181,7 @@ class HealerMCP(MCPBaseServer):
                 "recovery_log": f"Auto-healed {anomaly_type} with {len(healing_actions)} steps",
                 "confidence": 0.92
             }
-        
+
         result = self.execute_step(
             step_name=f"heal_{anomaly_type}",
             operation=operation_fn,
@@ -192,7 +192,7 @@ class HealerMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def handle_telemetry_alert(self, metric: str, value: float) -> dict:
         """POST /telemetry/alert — Alert on metric threshold"""
         def operation_fn():
@@ -203,10 +203,10 @@ class HealerMCP(MCPBaseServer):
                 "error_rate": 5,
                 "latency_ms": 500
             }
-            
+
             threshold = thresholds.get(metric, 100)
             over_threshold = value > threshold
-            
+
             alert = Alert(
                 alert_id=f"ALR-{len(self.alerts)}",
                 severity="critical" if over_threshold else "info",
@@ -214,10 +214,10 @@ class HealerMCP(MCPBaseServer):
                 recipients=["Sentinel", "Auditor"] if over_threshold else ["GENESIS-MCP"]
             )
             self.alerts.append(alert)
-            
+
             if over_threshold:
                 self.ebdi_state.arousal = min(1.0, self.ebdi_state.arousal + 0.1)
-            
+
             return {
                 "alert_id": alert.alert_id,
                 "alert_sent": True,
@@ -227,7 +227,7 @@ class HealerMCP(MCPBaseServer):
                 "severity": alert.severity,
                 "recipients": alert.recipients
             }
-        
+
         result = self.execute_step(
             step_name=f"telemetry_{metric}",
             operation=operation_fn,
@@ -238,22 +238,22 @@ class HealerMCP(MCPBaseServer):
             ]
         )
         return result
-    
+
     def detect_anomalies(self) -> List[str]:
         """Detect system anomalies"""
         anomalies = []
-        
+
         if self.ebdi_state.arousal > 0.7:
             anomalies.append("high_arousal")
-        
+
         if self.ebdi_state.pleasure < 0.3:
             anomalies.append("low_pleasure")
-        
+
         if len(self.alerts) > 10:
             anomalies.append("alert_spam")
-        
+
         return anomalies
-    
+
     def get_recovery_stats(self) -> dict:
         """Recovery statistics"""
         return {
