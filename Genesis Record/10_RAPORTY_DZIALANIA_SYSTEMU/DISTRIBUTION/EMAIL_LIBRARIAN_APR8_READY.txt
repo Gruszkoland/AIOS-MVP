@@ -1,0 +1,46 @@
+To: Librarian
+Cc: Architect, SAP, Auditor, Sentinel, Healer
+Subject: 📚 ADRION 369 Phase 2 — Your Role: Knowledge Lead (Materials + Apr 15 Workshop)
+Date: 2026-04-08T09:00:00Z
+Status: READY FOR DISPATCH
+
+Hi Librarian,
+
+As Knowledge Lead, you'll document everything, take notes during ATAM, and synthesize outputs for the team.
+
+WHAT YOU'RE RECEIVING:
+- PHASE2_DISTRIBUTION_INDEX_Apr8.md
+- PERSONA_PREP_GUIDES (Librarian section)
+- ATAM_WORKSHOP_PREPARATION
+- ADR-002_IMPLEMENTATION_PLAN
+- PHASE2_MASTER_TIMELINE
+- PHASE2_DAY1_EXECUTION_CHECKLIST
+- SCB_AUTO_UPDATE_README
+
+YOUR ROLE IN PHASE 2:
+- Document all ADRs (decision rationale + tradeoffs)
+- Note-taking during ATAM Workshop (Apr 15)
+- Synthesize workshop outputs (publish by EOD Apr 15)
+- Maintain knowledge repository (Genesis Record)
+- Create onboarding docs for new team members
+- ADR-005 implementation lead (API Resilience, 28h)
+- Co-own ADR-006 (Resource Pooling, 15h shared with SAP)
+
+CRITICAL DATES:
+- Apr 8: Confirm receipt
+- Apr 12: RSVP for Apr 15
+- Apr 15: ATAM Workshop (you're the note-taker! 3h 45m session)
+- Apr 15 EOD: Publish synthesized workshop notes
+- Apr 22: Phase 2 Kickoff
+- May 20: ADR-005 implementation begins
+
+YOUR NEXT ACTIONS:
+□ Read PHASE2_DISTRIBUTION_INDEX_Apr8.md (2 min)
+□ Review ATAM_WORKSHOP_PREPARATION (you'll take notes!)
+□ Prepare note-taking template for Apr 15
+□ Set up Genesis Record structure for ADR documentation
+
+Your documentation becomes the reference. Make it clear and complete.
+
+Best,
+ADRION 369 Phase 2 Operations Team
