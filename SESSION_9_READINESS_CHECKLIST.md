@@ -1,20 +1,22 @@
 # ✅ SESJA 9 READINESS CHECKLIST
 
-**Status**: Ready for Manual QA Testing  
-**Current Date**: 6 kwietnia 2026  
-**Expected QA Date**: Next available session  
+**Status**: Ready for Manual QA Testing
+**Current Date**: 6 kwietnia 2026
+**Expected QA Date**: Next available session
 
 ---
 
 ## 📋 PRE-SESSION 9 CHECKLIST (What Must Be Ready)
 
 ### ✅ Infrastructure Checks
+
 - [x] **Health Check Script**: `scripts/deployment_health_check.py` created & tested ✅
 - [x] **Artifact Verification**: All files present (ZIP, EXE, PS1) ✅
 - [x] **Port Availability**: 8002 & 8003 free on test machine ✅
 - [x] **Python Environment**: 3.11.9 configured ✅
 
 ### ✅ Documentation Ready
+
 - [x] **QA Guide**: `DEPLOYMENT_TODO_SYSTRAY_LOCAL.md` (14 sections) ✅
 - [x] **Quick Start**: `SYSTRAY_QUICKSTART_5MIN.md` (5-minute guide) ✅
 - [x] **Checklist**: `DEPLOYMENT_CHECKLIST_SYSTRAY.csv` (90 rows) ✅
@@ -22,12 +24,14 @@
 - [x] **Success Template**: Section 13 QA sign-off ✅
 
 ### ✅ Test Materials
+
 - [x] **8-Point Checklist**: Defined & documented ✅
 - [x] **TIER 0/1/2 Criteria**: Success metrics defined ✅
 - [x] **Go/No-Go Framework**: Decision matrix ready ✅
 - [x] **Expected Timings**: 70-100 minutes estimated ✅
 
 ### ✅ Support Materials
+
 - [x] **Troubleshooting**: Top 5 issues + fixes documented ✅
 - [x] **Health Indicators**: Normal baseline established ✅
 - [x] **Escalation Path**: Clear documentation ✅
@@ -38,6 +42,7 @@
 ## 🚀 SESSION 9 EXECUTION PLAN
 
 ### PHASE 1: SETUP (15 minutes)
+
 ```
 Tasks:
 ☐ Prepare Windows 10/11 VM or test machine
@@ -52,6 +57,7 @@ Tasks:
 ---
 
 ### PHASE 2: DEPLOYMENT (10 minutes)
+
 ```
 Tasks:
 ☐ Check ports: netstat -ano | findstr :800[23]
@@ -65,6 +71,7 @@ Tasks:
 **Success Indicator**: Green icon visible in tray, no errors
 
 **Expected Behavior**:
+
 - t=0s: Click EXE
 - t=2s: Backend starts (Flask on :8002)
 - t=3s: Frontend starts (dashboard on :8003)
@@ -76,6 +83,7 @@ Tasks:
 ### PHASE 3: FUNCTIONAL TESTING (30 minutes)
 
 #### TEST 1: Menu Interaction
+
 ```
 Actions:
 ☐ Right-click on tray icon
@@ -86,6 +94,7 @@ Actions:
 **Expected**: Menu pops up with 3 options
 
 #### TEST 2: Dashboard Access
+
 ```
 Actions:
 ☐ Click "Open UAP" from menu
@@ -98,6 +107,7 @@ Actions:
 **Expected**: Dashboard loads with ADRION 369 UI
 
 #### TEST 3: API Validation
+
 ```
 Actions:
 ☐ Open new browser tab
@@ -109,6 +119,7 @@ Actions:
 **Expected**: JSON with "status":"healthy"
 
 #### TEST 4: Agents List
+
 ```
 Actions:
 ☐ In dashboard, click "Agents" menu
@@ -120,6 +131,7 @@ Actions:
 **Expected**: 4 agents with details visible
 
 #### TEST 5: Status Check
+
 ```
 Actions:
 ☐ Right-click tray icon
@@ -131,6 +143,7 @@ Actions:
 **Expected**: Notification appears, icon green
 
 #### TEST 6: Graceful Shutdown
+
 ```
 Actions:
 ☐ Right-click tray icon
@@ -144,6 +157,7 @@ Actions:
 **Expected**: Clean shutdown, no orphaned processes
 
 #### TEST 7: Performance Check
+
 ```
 Measurements:
 ☐ Startup time: < 5 seconds ✅
@@ -156,6 +170,7 @@ Measurements:
 **Expected**: All metrics within baseline
 
 #### TEST 8: Restart Test
+
 ```
 Actions:
 ☐ Double-click uap_systray.exe again
@@ -172,6 +187,7 @@ Actions:
 ### PHASE 4: DOCUMENTATION (15 minutes)
 
 #### Create QA Report
+
 ```
 Steps:
 ☐ Copy QA Sign-Off Template (see DEPLOYMENT_TODO Section 13)
@@ -192,6 +208,7 @@ Steps:
 ### PHASE 5: DECISION (5 minutes)
 
 #### GO Decision (ALL TIER 0 + TIER 1 PASS)
+
 ```
 ✅ All 14 critical tests passed
 ✅ No blocker issues found
@@ -201,6 +218,7 @@ Steps:
 ```
 
 **Next Steps**:
+
 1. Document: "QA PASS: v1.0.0-systray Ready"
 2. Git: `git add uap/desktop/ && git commit -m "Faza 1: QA PASS"`
 3. Tag: `git tag -a v1.0.0-systray -m "First production release"`
@@ -209,6 +227,7 @@ Steps:
 6. **Start Faza 2**: Electron refactor (Sessions 10-12)
 
 #### NO-GO Decision (TIER 0 FAILS)
+
 ```
 ❌ Critical functionality broken
 ❌ Deployment fails
@@ -217,6 +236,7 @@ Steps:
 ```
 
 **Next Steps**:
+
 1. Document: Issue details & stack trace
 2. Identify: Root cause
 3. Fix: In code
@@ -224,6 +244,7 @@ Steps:
 5. Retry: Manual testing again (abbreviated)
 
 #### CONDITIONAL Decision (TIER 0 PASS, TIER 1 PARTIAL)
+
 ```
 ✅ Core functionality works
 ⚠️  Some non-critical issues
@@ -232,6 +253,7 @@ Steps:
 ```
 
 **Next Steps**:
+
 1. Document: Issues + workarounds in README
 2. Add: Known Issues section to deployment guide
 3. Git: Commit with "known issues" note
@@ -243,6 +265,7 @@ Steps:
 ## 📊 TIER BREAKDOWN
 
 ### TIER 0 - CRITICAL (9 tests) ✅ MUST ALL PASS
+
 1. [ ] ZIP extraction works (file integrity)
 2. [ ] EXE launches without errors
 3. [ ] Icon appears in system tray (bottom-right)
@@ -254,6 +277,7 @@ Steps:
 9. [ ] Restart works identically to first launch
 
 ### TIER 1 - IMPORTANT (5 tests) ⚠️ RECOMMENDED ALL PASS
+
 1. [ ] Startup time < 5 seconds
 2. [ ] Dashboard load < 2 seconds
 3. [ ] Status notification shows "Healthy"
@@ -261,6 +285,7 @@ Steps:
 5. [ ] All Tier 0 tests repeat successfully after restart
 
 ### TIER 2 - NICE-TO-HAVE (3 tests) 💡 OPTIONAL
+
 1. [ ] Dark mode toggle (if UI has it)
 2. [ ] Keyboard shortcuts working
 3. [ ] Icon animations smooth (no flicker)
@@ -286,6 +311,7 @@ ENDIF
 ## 📱 EXPECTED BEHAVIORS (Baseline)
 
 ### Normal Startup Sequence
+
 ```
 t=0.0s: User double-clicks uap_systray.exe
 t=0.5s: Python subprocess launched (Flask backend)
@@ -299,6 +325,7 @@ t=4.5s: Ready for user interaction
 **Total Time**: 4-5 seconds ✅
 
 ### Normal Shutdown Sequence
+
 ```
 t=0.0s: User right-clicks tray icon, clicks "Quit"
 t=0.5s: Graceful shutdown signal sent to backend
@@ -311,6 +338,7 @@ t=2.5s: Tray icon disappears
 **Total Time**: <3 seconds ✅
 
 ### Health Check Sequence
+
 ```
 t=0.0s: User right-clicks → "Status"
 t=0.2s: HTTP GET /mapi/v1/health sent
@@ -325,6 +353,7 @@ t=0.7s: Notification appears
 ## 🔧 TROUBLESHOOTING (Quick Fixes)
 
 ### Issue 1: Icon Doesn't Appear
+
 ```
 Check:
 ☐ Is EXE running? (Task Manager: python.exe)
@@ -334,6 +363,7 @@ Check:
 ```
 
 ### Issue 2: Dashboard Doesn't Load
+
 ```
 Check:
 ☐ Is port 8003 free? (netstat -ano | findstr :8003)
@@ -343,6 +373,7 @@ Check:
 ```
 
 ### Issue 3: Random Crashes
+
 ```
 Check:
 ☐ Free disk space? (min 100MB)
@@ -352,6 +383,7 @@ Check:
 ```
 
 ### Issue 4: Port Already In Use
+
 ```
 Solution:
 ☐ netstat -ano | findstr :8002  # Find process ID
@@ -360,6 +392,7 @@ Solution:
 ```
 
 ### Issue 5: UI Looks Wrong
+
 ```
 Check:
 ☐ Browser zoom 100%? (Ctrl+0)
@@ -373,6 +406,7 @@ Check:
 ## 📝 NOTES FOR TESTER
 
 **General Tips**:
+
 1. Use Chrome/Windows 11 for best experience
 2. Have admin console ready (for netstat, taskkill)
 3. Take screenshots if issues occur
@@ -380,12 +414,14 @@ Check:
 5. Test twice (first launch + restart)
 
 **Important**:
+
 - Don't modify any code (just test)
 - Use fresh VM if possible (clean environment)
 - Report even small UI glitches
 - If stuck >15 min, escalate
 
 **Keep**:
+
 - All logs/screenshots for bug reports
 - Timing measurements
 - Notes on workarounds used
@@ -397,6 +433,7 @@ Check:
 Before declaring GO:
 
 **Functionality** ✅
+
 - [ ] Systray integration works
 - [ ] Dashboard loads
 - [ ] Agents data visible
@@ -404,24 +441,28 @@ Before declaring GO:
 - [ ] Shutdown clean
 
 **Performance** ✅
+
 - [ ] Startup <5 seconds
 - [ ] Dashboard load <2 seconds
 - [ ] No memory leaks
 - [ ] CPU reasonable (<5% idle)
 
 **Stability** ✅
+
 - [ ] No crashes observed
 - [ ] Restart works
 - [ ] No orphaned processes
 - [ ] Clean error handling
 
 **UX** ✅
+
 - [ ] UI intuitive
 - [ ] Icons clearly visible
 - [ ] Notifications informative
 - [ ] Flows logical
 
 **Compliance** ✅
+
 - [ ] No external network calls
 - [ ] All local (127.0.0.1)
 - [ ] Guardian Laws enforced
@@ -437,9 +478,9 @@ Before declaring GO:
 
 ---
 
-**Generated**: 6 kwietnia 2026  
-**For**: Session 9 Manual QA Testing  
-**Status**: ✅ READY TO EXECUTE  
+**Generated**: 6 kwietnia 2026
+**For**: Session 9 Manual QA Testing
+**Status**: ✅ READY TO EXECUTE
 
 ---
 
