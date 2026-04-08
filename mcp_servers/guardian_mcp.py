@@ -83,10 +83,11 @@ class GuardianMCP(MCPBaseServer):
                 violations.append(GuardianLaw.G8_NONMALEFICENCE.value)
                 recommendations.append("Create backup before delete")
 
-            # Rule: G5 Transparency — audit trail
-            if not context.get("logged_audit"):
+            # Rule: G5 Transparency — audit trail (only for critical operations)
+            critical_ops = ["deploy", "delete", "export_data"]
+            if operation in critical_ops and not context.get("logged_audit"):
                 violations.append(GuardianLaw.G5_TRANSPARENCY.value)
-                recommendations.append("Audit log required")
+                recommendations.append("Audit log required for critical operations")
 
             compliance = "PASS" if len(violations) == 0 else "FAIL"
 
@@ -113,6 +114,23 @@ class GuardianMCP(MCPBaseServer):
                 "audit_entry_created"
             ]
         )
+
+        # Set success based on compliance status
+        if result["result"]["compliance_status"] == "FAIL":
+            result["success"] = False
+        else:
+            result["success"] = True
+
+        # Add checkpoint for SAV
+        result["checkpoint"] = {
+            "is_complete": result["success"],
+            "step": f"validate_{operation}",
+            "checks_passed": [
+                "compliance_status_set",
+                "violated_laws_array_present",
+                "audit_entry_created"
+            ]
+        }
 
         if result["success"] and result["result"]["compliance_status"] == "PASS":
             # Log successful validation

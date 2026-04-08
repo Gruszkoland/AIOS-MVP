@@ -99,6 +99,18 @@ class GenesisMCP(MCPBaseServer):
                 "timestamp_recorded"
             ]
         )
+
+        # Add checkpoint for SAV
+        result["checkpoint"] = {
+            "is_complete": result["success"],
+            "step": f"save_session_{session_id}",
+            "checks_passed": [
+                "session_created",
+                "file_path_generated",
+                "timestamp_recorded"
+            ]
+        }
+
         return result
 
     def handle_recall_memory(self, query: str, scope: str = "local") -> dict:

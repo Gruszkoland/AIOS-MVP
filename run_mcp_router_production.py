@@ -4,7 +4,7 @@ from mcp_router_app import app
 from waitress import serve
 
 if __name__ == "__main__":
-    print("🚀 MCP Router (PRODUCTION MODE) — Port 9000")
-    print("   Server: Waitress (multi-threaded)")
-    print("   Workers: 4 threads")
-    serve(app, host="0.0.0.0", port=9000, threads=4)
+    print("[ROUTER] MCP Router (PRODUCTION MODE) - Port 9001")
+    print("[ROUTER] Server: Waitress (multi-threaded)")
+    print("[ROUTER] Workers: 4 threads")
+    serve(app, host="0.0.0.0", port=9001, threads=4)

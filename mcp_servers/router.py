@@ -137,7 +137,9 @@ class MCPRouter:
             "feature": (["add", "new", "implement", "support"], 0.82),
             "refactor": (["redesign", "optimize", "clean"], 0.78),
             "analyze": (["analyze", "diagnose", "check"], 0.75),
-            "deploy": (["deploy", "rollout", "release"], 0.80)
+            "deploy": (["deploy", "rollout", "release"], 0.80),
+            "export": (["export", "extract", "download", "backup"], 0.78),
+            "delete": (["delete", "remove", "destroy"], 0.80)
         }
 
         best_intent = "unknown"
