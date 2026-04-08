@@ -76,6 +76,18 @@ class VortexMCP(MCPBaseServer):
                 "frequency_within_tolerance"
             ]
         )
+
+        # Add checkpoint for SAV
+        result["checkpoint"] = {
+            "is_complete": result["success"],
+            "step": "health_check",
+            "checks_passed": [
+                "status_field_present",
+                "containers_match_expected",
+                "frequency_within_tolerance"
+            ]
+        }
+
         return result
 
     def handle_canary_deploy(self, backend: str, percent: float, constraints: List[str]) -> dict:
