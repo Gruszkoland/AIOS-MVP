@@ -88,9 +88,11 @@ jobs:
             See [DEPLOYMENT_RUNBOOK.md](docs/DEPLOYMENT_RUNBOOK.md) for step-by-step instructions.
 
   build-containers:
-    name: Build & tag Docker images
+    name: Build & push Docker images to GHCR
     needs: validate
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -100,22 +102,29 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Vortex image (test only — no push)
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Vortex image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile.vortex
-          push: false
-          tags: adrion-vortex:${{ env.VERSION }},adrion-vortex:latest
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/adrion-vortex:${{ github.ref_name }},ghcr.io/${{ github.repository_owner }}/adrion-vortex:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build Healer image (test only — no push)
+      - name: Build and push Healer image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile.healer
-          push: false
-          tags: adrion-healer:${{ env.VERSION }},adrion-healer:latest
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/adrion-healer:${{ github.ref_name }},ghcr.io/${{ github.repository_owner }}/adrion-healer:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

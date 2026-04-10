@@ -55,5 +55,9 @@ def status():
 
 
 if __name__ == "__main__":
-    logger.info("Starting VORTEX-MCP on 0.0.0.0:9001")
-    app.run(host="0.0.0.0", port=9001, debug=False)
+    host = os.getenv("MCP_VORTEX_HOST", "0.0.0.0")
+    port = int(os.getenv("MCP_VORTEX_PORT", 9006))
+    debug = os.getenv("MCP_DEBUG", "false").lower() == "true"
+
+    logger.info(f"Starting VORTEX-MCP on {host}:{port}")
+    app.run(host=host, port=port, debug=debug)

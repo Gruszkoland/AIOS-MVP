@@ -1,33 +1,33 @@
 {
-  "passed": 5,
-  "failed": 0,
+  "passed": 0,
+  "failed": 5,
   "total": 5,
-  "status": "PASS",
+  "status": "PARTIAL",
   "results": [
     {
       "test": "Routing Query",
-      "status": "PASS",
-      "code": 400
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=9000): Max retries exceeded with url: /route (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=9000): Failed to establish a new connection: [WinError 10061] Nie mo\u017cna nawi\u0105za\u0107 po\u0142\u0105czenia, poniewa\u017c komputer docelowy aktywnie go odmawia\"))"
     },
     {
       "test": "Guardian Compliance",
-      "status": "PASS",
-      "code": 200
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=9002): Max retries exceeded with url: /validate (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=9002): Failed to establish a new connection: [WinError 10061] Nie mo\u017cna nawi\u0105za\u0107 po\u0142\u0105czenia, poniewa\u017c komputer docelowy aktywnie go odmawia\"))"
     },
     {
       "test": "Oracle Classification",
-      "status": "PASS",
-      "code": 200
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=9003): Max retries exceeded with url: /classify (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=9003): Failed to establish a new connection: [WinError 10061] Nie mo\u017cna nawi\u0105za\u0107 po\u0142\u0105czenia, poniewa\u017c komputer docelowy aktywnie go odmawia\"))"
     },
     {
       "test": "Genesis Session Save",
-      "status": "PASS",
-      "code": 200
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=9004): Max retries exceeded with url: /session/save (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=9004): Failed to establish a new connection: [WinError 10061] Nie mo\u017cna nawi\u0105za\u0107 po\u0142\u0105czenia, poniewa\u017c komputer docelowy aktywnie go odmawia\"))"
     },
     {
       "test": "Healer Health Report",
-      "status": "PASS",
-      "code": 200
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=9005): Max retries exceeded with url: /health/report (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=9005): Failed to establish a new connection: [WinError 10061] Nie mo\u017cna nawi\u0105za\u0107 po\u0142\u0105czenia, poniewa\u017c komputer docelowy aktywnie go odmawia\"))"
     }
   ]
 }

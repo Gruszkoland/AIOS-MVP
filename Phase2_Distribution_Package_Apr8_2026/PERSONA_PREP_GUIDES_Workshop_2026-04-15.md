@@ -1,7 +1,7 @@
 # 👥 PERSONA-SPECIFIC PRE-WORKSHOP PREP GUIDES
 
-**Workshop Date:** 2026-04-15 (10 days away)  
-**Meeting Time:** 09:00 UTC (3-4 hours)  
+**Workshop Date:** 2026-04-15 (10 days away)
+**Meeting Time:** 09:00 UTC (3-4 hours)
 **Role:** [See your section below]
 
 ---

@@ -1,7 +1,0 @@
-At line:2 char:138
-+ ... xe' -c import arbitrage.api as a; a.ARB_PORT=8011; a.run_api_server()
-+                                                                         ~
-An expression was expected after '('.
-    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
-    + FullyQualifiedErrorId : ExpectedExpression
- 

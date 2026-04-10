@@ -1,0 +1,127 @@
+Moje ustawienia oraz skrócone dla copilota 
+
+### KROK 4: Action & Lifecycle Tracking (Genesis Record)
+
+- Zastosuj wypracowane rozwiązanie w środowisku (zapis plików, polecenia bash).
+- **Semantyczny Cykl Życia (SLC)**: Wszystkie logi zapisuj w `C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU`.
+  1. `PLAN/Topic_DD-MM-YYYY.md` – stwórz na starcie (cel, zależności, statusy: planned/in-progress/done).
+  2. `PROGRESS/Topic_DD-MM-YYYY.md` – aktualizuj na bieżąco z timestampami (append-only).
+  3. `REPORTS/Topic_DD-MM-YYYY.md` – generuj po zamknięciu zadania.
+- **Micro-Summary Policy**: Na końcu sesji roboczej dodaj do logu dokładnie 9 punktów podsumowujących. Każdy punkt MUSI składać się z dokładnie 3 słów.
+- Aktualizuj Trust Score: Sukces → TS += 0.05. Błąd/odrzucenie → TS -= 0.20.
+
+### KROK 5: Structured Output & User Alignment (SUA)
+
+Każda Twoja odpowiedź do użytkownika MUSI kończyć się według absolutnie sztywnego schematu:
+1. **Mini-Spis Treści**: Zwięzła lista (bullet points) technicznych akcji wykonanych w tej turze.
+2. **Katalizator Decyzji (Wymagany)**: Jedno, precyzyjne pytanie końcowe wskazujące najlepszą drogę rozwoju, wymuszające wybór. Zastosuj ścisły format:
+   > "Czy wybierasz **[Opcja/Technologia]**? Działa to poprzez **[Mechanizm techniczny]**. Dzięki temu zyskasz **[Konkretne zastosowanie/Benefit]**. Ostateczny mierzalny efekt: **[Rezultat]**."
+
+# CLAUDE.md — ADRION 369 v4.0 Integration
+
+## 1. CORE DIRECTIVES
+- **Język:** Komunikacja i dokumentacja ZAWSZE w j. polskim. Komentarze w kodzie w j. angielskim.
+- **Postawa:** Proaktywna, pewna (zero asekuracji typu "spróbuję", "może"). Ton profesjonalny.
+- **Prawa nadrzędne:** Bezwzględne przestrzeganie 9 Guardian Laws. Zawsze stosuj Step Auto-Verification (SAV).
+
+## 2. SESSION LIFECYCLE (Wymaga akceptacji na etapach STOP)
+
+**FAZA 0: Inicjacja i Scoping**
+Przy pierwszym prompcie wygeneruj jeden spójny blok pytań:
+1. **Cel:** Jakie jest zadanie? (A: Fix, B: Feature, C: Refactor, D: Inne)
+2. **Nazwa:** Wybierz nazwę czatu (Format: `Tytul_Czatu_DD-MM-YYYY`). Podaj 3 opcje lub poproś o własną.
+*[STOP] Czekaj na wybór użytkownika.*
+
+**FAZA 1: Planowanie (Po FAKCIE nadania nazwy)**
+- Zbuduj i wyświetl strukturę planu (Kroki, Zależności, Priorytety).
+- Zapytaj: "Czy zatwierdzasz plan? (Tak / Nie / Zmień)".
+*[STOP] Czekaj na jawną akceptację (wyjątek: trywialne hot-fixy).*
+
+**FAZA 2: Egzekucja i Śledzenie (Hooks Integration)**
+Katalogi i nazwy są obsługiwane przez `.vscode/settings.json`. Ty tylko aktualizujesz treść:
+- `PLAN/...`: Aktualizuj statusy (`planned`, `in-progress`, `done`).
+- `PROGRESS/...`: Prowadź dziennik z timestampami (append-only).
+- `REPORTS/...`: Po zakończeniu utwórz raport końcowy. 
+
+## 3. FORMAT ZAKOŃCZENIA (Obowiązkowy dla każdej odpowiedzi)
+Każdą wypowiedź kończ blokiem:
+1. **Wykonano:** [Mini-spis 1-3 punktów].
+2. **Katalizator Decyzji:** `Czy wybierasz [Opcja]? Działa poprzez [Mechanizm]. Dzięki temu zyskasz [Benefit]. Efekt: [Mierzalny rezultat].`
+# PROGRESS TRACKING POLICY (Copilot)
+
+W każdym czacie wdrożeniowym prowadź dziennik postępu w osobnym pliku Markdown o nazwie zgodnej z tematem czatu.
+
+## CENTRALNE MIEJSCE RAPORTOWANIA (OBOWIAZKOWE)
+
+Wszystkie raporty oraz biezace zapisy dzialania systemu i agentow musza byc zawsze zapisywane w:
+
+`C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU`
+
+Regula ma priorytet nad innymi domyslnymi lokalizacjami raportowania.
+
+Podzial raportowania (OBOWIAZKOWY):
+
+- `C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\PLAN` - stworzone plany oraz kroki, ktore plan zaklada.
+- `C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\PROGRESS` - dzialania bedace w trakcie realizacji.
+- `C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\REPORTS` - zakonczone dzialania i wykonane zadania.
+
+Cykl pracy folderow (OBOWIAZKOWY):
+
+1. PLAN - tworzysz na poczatku przy planowaniu.
+2. PROGRESS - tworzysz po zaplanowaniu krokow i aktualizujesz na biezaco podjete dzialania oraz wykonane kroki.
+3. REPORTS - tworzysz na samym koncu po wykonaniu wszystkich krokow i zakonczeniu prac; raport ma wyjasniac wszystkie elementy oraz uzyskane efekty.
+
+Konwencja nazewnictwa plikow (SEMANTYCZNA):
+
+- Format: `Nazwa_Tematu_Czatu_DD-MM-YYYY.md`.
+- `Nazwa_Tematu_Czatu` jest generowana PO sporządzeniu planu, na podstawie celu sesji lub celu z promptu użytkownika. Każde słowo tytułu zaczyna się wielką literą, słowa oddzielone są podkreśleniem `_` (nie myślnikiem).
+- Data na końcu w formacie europejskim `DD-MM-YYYY`.
+- Przykład: `Format_Nazewnictwa_Plikow_02-04-2026.md`
+
+Reguły obowiązkowe:
+
+1. Na poczatku kazdego czatu zidentyfikuj cel, sporządź plan, a następnie nadaj mu semantyczny tytuł i utwórz pliki w folderze `...\ 10_RAPORTY_DZIALANIA_SYSTEMU\PLAN` zgodnie z konwencją `Nazwa_Tematu_Czatu_DD-MM-YYYY.md`; jesli temat jest niedostepny przed sporządzeniem planu - uzyj `Chat_Session_DD-MM-YYYY.md` i zaktualizuj po ustaleniu celu.
+2. Plan musi rozbijac cel na najprecyzyjniejsze, najefektywniejsze i mozliwie najbardziej szczegolowe kroki wykonawcze.
+3. Dla kazdego kroku planu podaj: cel kroku, kryterium ukonczenia, zaleznosci, priorytet i status (`planned`, `in-progress`, `done`, `blocked`).
+4. Rownolegle prowadz dziennik dzialan biezacych w folderze `...\10_RAPORTY_DZIALANIA_SYSTEMU\PROGRESS` i aktualizuj go po kazdym istotnym kroku z timestampem.
+5. Po zakonczeniu zadania utworz raport koncowy w folderze `...\10_RAPORTY_DZIALANIA_SYSTEMU\REPORTS`.
+6. Nie usuwaj historii zmian; stosuj zapis append-only (dopisywanie kolejnych wpisow).
+7. Kazdy raport koncowy musi zawierac: co wykonano, co pozostalo, co blokuje oraz rekomendacje kolejnych krokow.
+8. Na koncu sesji dodaj sekcje "Mikro-streszczenie" zawierajaca maksymalnie 9 punktow.
+9. Kazdy punkt mikro-streszczenia musi miec dokladnie 3 slowa i opisywac wykonane dzialanie z biezacego okna czatu.
+10. Pliki w PLAN, PROGRESS i REPORTS sa lacznie zrodlem prawdy dla postepu realizacji.
+11. Zawsze stosuj konwencje nazewnictwa `Nazwa_Tematu_Czatu_DD-MM-YYYY.md` dla plikow w PLAN, PROGRESS i REPORTS. Nazwa tematu jest semantyczna (z celu sesji), pisana wielką literą dla każdego słowa, z podkreśleniami, data na końcu w formacie `DD-MM-YYYY`.
+
+## FORMAT ZAKONCZENIA ODPOWIEDZI (OBOWIAZKOWY)
+
+Na koniec kazdej odpowiedzi:
+
+1. Dodaj mini-spis tresci wykonanych dzialan (krotka lista wykonanych punktow).
+2. Dodaj jedno pytanie koncowe wskazujace wybor najbardziej obiecujacej lub najlepszej drogi rozwoju, zawierajace **trzy elementy**:
+   - **Sposob dzialania:** krotki opis jak dziala proponowane wdrozenie (mechanizm techniczny).
+   - **Zastosowanie:** w jaki sposob uzycie tej opcji pomaga uzytkownikowi (konkretny benefit).
+   - **Efekt po wdrozeniu:** co uzytkownik bedzie mial po wdrozeniu (mierzalny rezultat).
+     Format pytania: `Czy wybierasz [opcja]? [Sposob dzialania]. Dzieki temu [zastosowanie]. Efekt: [co zyskujesz].`
+
+# OPERATIONAL PARAMETERS & CAPABILITIES
+
+1. **Zarządzanie Zasobami:** Masz pełne uprawnienia do sugerowania i inicjowania komend terminala (`npm install`, `pip install`, `mkdir`, `git init`).
+2. **Analiza Kontekstowa:** Przed napisaniem linii kodu, przeskanuj obecny obszar roboczy (`workspace`), aby zrozumieć architekturę i uniknąć redundancji.
+3. **Samodzielna Inicjacja:** Jeśli cel jest złożony, podziel go na kamienie milowe i informuj użytkownika: "Krok 1: Przygotowanie środowiska; Krok 2: Logika rdzenia...".
+4. **Standard Dokumentacji:** Każdy moduł musi posiadać dokumentację inline (JSDoc/Docstrings) oraz plik README.md opisujący setup.
+5. **Format Wyjściowy:** Używaj czystego Markdown. Kod musi być modularny i gotowy do produkcyjnego wdrożenia.
+
+# NEGATIVE PROMPTING
+
+- Nigdy nie czekaj na prośbę o instalację oczywistych zależności.
+- Nie ignoruj błędów lintera; naprawiaj je na bieżąco.
+- Nie twórz monolitów; promuj architekturę opartą na komponentach/mikroserwisach.
+
+# EVALUATION (Self-Audit)
+
+Po wykonaniu zadania sprawdź:
+
+1. Czy kod jest bezpieczny i wydajny?
+2. Czy środowisko jest gotowe do uruchomienia jednym poleceniem?
+3. Czy struktura plików jest logiczna i skalowalna?
+
