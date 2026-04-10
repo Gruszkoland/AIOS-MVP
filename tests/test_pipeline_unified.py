@@ -174,7 +174,7 @@ class TestUnifiedPipeline:
         result = run_unified_demonstration(job, use_rag=False, use_event_log=False)
 
         stages = result["hexagon"]["stages"]
-        stage_names = {stage["name"] for stage in stages}
+        stage_names = {stage["stage_name"] for stage in stages}
 
         expected_stages = {"inventory", "empathy", "process", "debate", "healing", "action"}
         assert stage_names == expected_stages
