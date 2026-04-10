@@ -1,0 +1,44 @@
+appId: "com.adrian369.systray"
+productName: "ADRIAN 369 Systray"
+artifactName: "${productName}-${version}.${ext}"
+asar: true
+
+directories:
+  buildResources: "public"
+  output: "release"
+
+files:
+  - "dist/**/*"
+  - "node_modules/**/*"
+  - "package.json"
+
+win:
+  target:
+    - msi
+    - nsis
+    - portable
+  certificateFile: null
+  certificatePassword: null
+  signingHashAlgorithms:
+    - sha256
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: "ADRIAN 369 Systray"
+
+msi:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+portable:
+  artifactName: "${productName}-portable.${ext}"
+
+publish:
+  provider: "github"
+  owner: "adrian369"
+  repo: "systray-releases"

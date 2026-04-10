@@ -1,4 +1,13 @@
 """
+DEPRECATED: This module is retained for backward compatibility only.
+New development should use the Flask-based entry point in arbitrage/app.py
+which registers routes via Flask Blueprints in arbitrage/blueprints/.
+
+To migrate: replace `from arbitrage.api import run_api_server` with
+            `from arbitrage.app import run_flask_server`
+
+─────────────────────────────────────────────────────────────────────
+
 ADRION 369 - Arbitrage HTTP API Server (port 8001)
 Serves the dashboard arbitrage endpoints via stdlib only (no Flask/FastAPI).
 
@@ -23,6 +32,11 @@ Endpoints:
   GET  /api/arbitrage/wholesale/deals (Query deals)
   POST /api/arbitrage/mass-generate      (Mass Generator — bulk manifest)
   GET  /api/arbitrage/mass-generate/manifest (Get current manifest)
+  POST /api/rag/retrieve          (Retrieve context from Guardian Laws)
+  POST /api/rag/reason            (Reason over retrieved context)
+  POST /api/rag/ingest-laws       (Ingest Guardian Laws into RAGFlow)
+  POST /api/crews/process         (CrewAI full pipeline)
+  POST /api/demo/full-pipeline    (CrewAI demonstration)
 """
 
 import json
@@ -64,6 +78,10 @@ _REQUEST_COUNTS: dict[str, int] = {
     "jobs": 0,
     "bids_pending": 0,
     "bid_approve": 0,
+    "rag_retrieve": 0,
+    "rag_reason": 0,
+    "rag_ingest_laws": 0,
+    "crews_process": 0,
 }
 _COUNTERS_LOCK = threading.Lock()
 
@@ -102,6 +120,11 @@ def _analyzer():
 def _config():
     from arbitrage.config import DAILY_BID_LIMIT, MIN_ANALYZER_SCORE, get_active_llm_backend
     return DAILY_BID_LIMIT, MIN_ANALYZER_SCORE, get_active_llm_backend
+
+
+def _rag():
+    from arbitrage.rag_integration import get_rag_integration
+    return get_rag_integration
 
 
 def _payments():
@@ -227,6 +250,18 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
                 return self._handle_wholesale_cycle()
             elif path == "/api/arbitrage/mass-generate":
                 return self._handle_mass_generate()
+            # RAG Endpoints
+            elif path == "/api/rag/retrieve":
+                return self._handle_rag_retrieve()
+            elif path == "/api/rag/reason":
+                return self._handle_rag_reason()
+            elif path == "/api/rag/ingest-laws":
+                return self._handle_rag_ingest_laws()
+            # CrewAI Endpoints
+            elif path == "/api/crews/process":
+                return self._handle_crews_process()
+            elif path == "/api/demo/full-pipeline":
+                return self._handle_demo_pipeline()
             else:
                 self._send({"error": "Not found"}, 404)
         except Exception as exc:
@@ -572,6 +607,123 @@ class ArbitrageHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    # ── RAG Integration Handlers ───────────────────────────────────────────────
+
+    def _handle_rag_retrieve(self):
+        """POST /api/rag/retrieve — Retrieve context from Guardian Laws knowledge base."""
+        _increment("rag_retrieve")
+        length = int(self.headers.get("Content-Length", 0))
+        body = json.loads(self.rfile.read(length) or b"{}") if length else {}
+
+        try:
+            get_rag_integration = _rag()
+            rag = get_rag_integration()
+
+            query = body.get("query", "")
+            top_k = body.get("top_k", 5)
+
+            if not query:
+                self._send({"error": "query parameter required"}, 400)
+                return
+
+            docs = rag.retrieve_context(query, top_k=top_k)
+
+            self._send({
+                "query": query,
+                "top_k": top_k,
+                "documents": docs,
+                "count": len(docs),
+                "timestamp": datetime.now().isoformat(),
+            })
+
+        except Exception as exc:
+            logger.exception("RAG retrieve error: %s", exc)
+            self._send({"error": str(exc)}, 500)
+
+    def _handle_rag_reason(self):
+        """POST /api/rag/reason — Reason over retrieved context using Ollama."""
+        _increment("rag_reason")
+        length = int(self.headers.get("Content-Length", 0))
+        body = json.loads(self.rfile.read(length) or b"{}") if length else {}
+
+        try:
+            get_rag_integration = _rag()
+            rag = get_rag_integration()
+
+            query = body.get("query", "")
+            context_docs = body.get("context_docs", [])
+
+            if not query:
+                self._send({"error": "query parameter required"}, 400)
+                return
+
+            reasoning = rag.reason_with_context(query, context_docs)
+
+            self._send({
+                "query": query,
+                "reasoning": reasoning.get("reasoning", ""),
+                "context_docs": reasoning.get("context_docs", 0),
+                "context_size": reasoning.get("context_size", 0),
+                "timestamp": datetime.now().isoformat(),
+            })
+
+        except Exception as exc:
+            logger.exception("RAG reason error: %s", exc)
+            self._send({"error": str(exc)}, 500)
+
+    def _handle_rag_ingest_laws(self):
+        """POST /api/rag/ingest-laws — Ingest Guardian Laws into RAGFlow knowledge base."""
+        _increment("rag_ingest_laws")
+        length = int(self.headers.get("Content-Length", 0))
+        body = json.loads(self.rfile.read(length) or b"{}") if length else {}
+
+        try:
+            get_rag_integration = _rag()
+            rag = get_rag_integration()
+
+            collection = body.get("collection", "guardian_laws")
+
+            success = rag.ingest_guardian_laws(collection=collection)
+
+            self._send({
+                "collection": collection,
+                "status": "success" if success else "failed",
+                "rag_available": rag.ragflow_available and rag.ollama_available,
+                "timestamp": datetime.now().isoformat(),
+            })
+
+        except Exception as exc:
+            logger.exception("RAG ingest error: %s", exc)
+            self._send({"error": str(exc)}, 500)
+
+    # ── CrewAI Handlers ────────────────────────────────────────────────────────
+        """POST /api/crews/process — Run full CrewAI pipeline."""
+        _increment("crews_process")
+        length = int(self.headers.get("Content-Length", 0))
+        body = json.loads(self.rfile.read(length) or b"{}") if length else {}
+
+        try:
+            from arbitrage.crews.orchestra import run_full_demonstration
+
+            job_data = {
+                "id": body.get("id", f"job-{int(time.time())}"),
+                "title": body.get("title", ""),
+                "description": body.get("description", ""),
+                "analysis": body.get("analysis", {"score": 7, "fit": "Good", "risks": "None", "est_profit": 50}),
+                "resources": body.get("resources"),
+            }
+
+            result = run_full_demonstration(job_data)
+            self._send(result)
+
+        except Exception as exc:
+            logger.exception("CrewAI pipeline error: %s", exc)
+            self._send({"error": str(exc)}, 500)
+
+    def _handle_demo_pipeline(self):
+        """POST /api/demo/full-pipeline — Alias for /api/crews/process (full demonstration)."""
+        return self._handle_crews_process()
 
     def log_message(self, fmt, *args):
         logger.debug(fmt, *args)

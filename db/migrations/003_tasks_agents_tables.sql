@@ -1,26 +1,18 @@
--- Database Migration 003: Tasks & Agents Tables (PostgreSQL)
+-- Database Migration 003: Tasks & Agents Tables (SQLite + PostgreSQL compatible)
 -- File: db/migrations/003_tasks_agents_tables.sql
 -- Date: 2026-04-05
 -- Status: PHASE B Implementation
--- Platform: PostgreSQL 12+
+-- SQLite: compatible
 
 -- ──────────────────────────────────────────────────────────────────────────
 -- TABLES FOR TASKS & AGENTS (Phase B)
 -- ──────────────────────────────────────────────────────────────────────────
 
--- Drop existing tables (safe for dev/testing)
-DROP TABLE IF EXISTS agent_feedback CASCADE;
-DROP TABLE IF EXISTS agent_performance CASCADE;
-DROP TABLE IF EXISTS agent_activity CASCADE;
-DROP TABLE IF EXISTS agent_assignments CASCADE;
-DROP TABLE IF EXISTS agents CASCADE;
-DROP TABLE IF EXISTS tasks CASCADE;
-
 -- ──────────────────────────────────────────────────────────────────────────
 -- TASKS TABLE — Tracks all task executions
 -- ──────────────────────────────────────────────────────────────────────────
 
-CREATE TABLE tasks (
+CREATE TABLE IF NOT EXISTS tasks (
     id VARCHAR(255) PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL DEFAULT 'default',
     name TEXT NOT NULL,
@@ -30,22 +22,18 @@ CREATE TABLE tasks (
     eta_seconds INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    duration_seconds INT,
-
-    CONSTRAINT check_progress CHECK (progress >= 0 AND progress <= 100),
-    CONSTRAINT check_status CHECK (status IN ('pending', 'running', 'completed', 'failed', 'cancelled'))
+    duration_seconds INT
 );
 
--- Create indexes for tasks table
-CREATE INDEX idx_tasks_session ON tasks(session_id);
-CREATE INDEX idx_tasks_status ON tasks(status);
-CREATE INDEX idx_tasks_updated ON tasks(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_tasks_session ON tasks(session_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_updated ON tasks(updated_at);
 
 -- ──────────────────────────────────────────────────────────────────────────
 -- AGENTS TABLE — Configurable AI agents
 -- ──────────────────────────────────────────────────────────────────────────
 
-CREATE TABLE agents (
+CREATE TABLE IF NOT EXISTS agents (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     role VARCHAR(255),
@@ -53,27 +41,23 @@ CREATE TABLE agents (
     description TEXT,
     trust_score FLOAT DEFAULT 0.8,
     capability_level VARCHAR(50),
-    skills JSONB,
-    active BOOLEAN DEFAULT TRUE,
+    skills TEXT,
+    active BOOLEAN DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     success_rate FLOAT DEFAULT 0,
-    tasks_completed INT DEFAULT 0,
-
-    CONSTRAINT check_trust_score CHECK (trust_score >= 0 AND trust_score <= 1),
-    CONSTRAINT check_capability CHECK (capability_level IN ('basic', 'intermediate', 'expert'))
+    tasks_completed INT DEFAULT 0
 );
 
--- Create indexes for agents table
-CREATE INDEX idx_agents_active ON agents(active);
-CREATE INDEX idx_agents_trust_score ON agents(trust_score DESC);
-CREATE INDEX idx_agents_name ON agents(name);
+CREATE INDEX IF NOT EXISTS idx_agents_active ON agents(active);
+CREATE INDEX IF NOT EXISTS idx_agents_trust_score ON agents(trust_score);
+CREATE INDEX IF NOT EXISTS idx_agents_name ON agents(name);
 
 -- ──────────────────────────────────────────────────────────────────────────
 -- DEFAULT AGENTS — Pre-loaded for immediate use
 -- ──────────────────────────────────────────────────────────────────────────
 
-INSERT INTO agents (id, name, role, personality, description, trust_score, capability_level, skills, active, success_rate, tasks_completed)
+INSERT OR IGNORE INTO agents (id, name, role, personality, description, trust_score, capability_level, skills, active, success_rate, tasks_completed)
 VALUES
 (
     'agent-1',
@@ -83,8 +67,8 @@ VALUES
     'Manages knowledge base, documentation systems, and search capabilities. Ensures all information is organized, searchable, and up-to-date. Excellent at pattern recognition and historical analysis.',
     0.95,
     'expert',
-    '["documentation", "search", "organization", "knowledge-management", "indexing"]'::jsonb,
-    TRUE,
+    '["documentation", "search", "organization", "knowledge-management", "indexing"]',
+    1,
     0.98,
     342
 ),
@@ -96,8 +80,8 @@ VALUES
     'Designs system architecture, scalability patterns, and infrastructure. Plans long-term technical strategies. Expert in distributed systems, microservices, and cloud architecture.',
     0.88,
     'expert',
-    '["design", "architecture", "planning", "scalability", "devops"]'::jsonb,
-    TRUE,
+    '["design", "architecture", "planning", "scalability", "devops"]',
+    1,
     0.92,
     187
 ),
@@ -109,8 +93,8 @@ VALUES
     'Conducts comprehensive audits, identifies security and compliance risks, and ensures adherence to standards. Thorough in analysis and conservative in recommendations.',
     0.87,
     'expert',
-    '["audit", "risk-assessment", "compliance", "security-review", "vulnerability-detection"]'::jsonb,
-    TRUE,
+    '["audit", "risk-assessment", "compliance", "security-review", "vulnerability-detection"]',
+    1,
     0.91,
     156
 ),
@@ -122,8 +106,8 @@ VALUES
     'Monitors system health, detects security threats, sends alerts, and ensures 24/7 uptime. Expert in intrusion detection, threat analysis, and proactive defense.',
     0.92,
     'expert',
-    '["monitoring", "security", "alerting", "threat-detection", "incident-response"]'::jsonb,
-    TRUE,
+    '["monitoring", "security", "alerting", "threat-detection", "incident-response"]',
+    1,
     0.95,
     421
 );
@@ -132,7 +116,7 @@ VALUES
 -- DEFAULT TASKS — For testing Phase B
 -- ──────────────────────────────────────────────────────────────────────────
 
-INSERT INTO tasks (id, session_id, name, agent, status, progress, eta_seconds, created_at)
+INSERT OR IGNORE INTO tasks (id, session_id, name, agent, status, progress, eta_seconds, created_at)
 VALUES
 (
     'task-001',
@@ -172,7 +156,7 @@ VALUES
     'completed',
     100,
     180,
-    CURRENT_TIMESTAMP - INTERVAL '2 hours'
+    datetime('now', '-2 hours')
 );
 
 -- ──────────────────────────────────────────────────────────────────────────
@@ -182,7 +166,7 @@ VALUES
 -- Run these to verify migration success:
 
 -- 1. Check tables exist
--- SHOW TABLES;
+-- SELECT name FROM sqlite_master WHERE type='table';
 
 -- 2. Check agents loaded
 -- SELECT id, name, role, trust_score FROM agents ORDER BY trust_score DESC;

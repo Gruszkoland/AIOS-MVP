@@ -25,5 +25,15 @@ monitoring/
 *.sqlite
 b2b_extract/
 temp_extract/
+temp_deploy/
+_temp_extract/
 Genesis Record/
 arbitrage-core/
+*.log
+Phase2_Distribution_Package_Apr8_2026/
+tests/
+docs/
+kubernetes/
+repositories/
+.claude/
+.roo/

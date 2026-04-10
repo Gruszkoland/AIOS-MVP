@@ -5,6 +5,7 @@ All queries use parameterized statements to prevent SQL injection.
 """
 import json
 import logging
+import os
 import sqlite3
 from datetime import datetime
 
@@ -101,161 +102,33 @@ def get_conn():
     return conn
 
 
-def init_db():
-    """Create all tables if they don't exist."""
-    with get_conn() as conn:
-        conn.executescript("""
-        CREATE TABLE IF NOT EXISTS jobs (
-            id          TEXT PRIMARY KEY,
-            platform    TEXT NOT NULL,
-            title       TEXT NOT NULL,
-            description TEXT,
-            budget_min  REAL DEFAULT 0,
-            budget_max  REAL DEFAULT 0,
-            client      TEXT,
-            url         TEXT,
-            keywords    TEXT,
-            scouted_at  TEXT DEFAULT (datetime('now')),
-            status      TEXT DEFAULT 'new'
-        );
-
-        CREATE TABLE IF NOT EXISTS bids (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            job_id          TEXT REFERENCES jobs(id),
-            cover_letter    TEXT,
-            our_price       REAL,
-            est_profit_usd  REAL,
-            analyzer_score  INTEGER,
-            llm_backend     TEXT,
-            approved        INTEGER DEFAULT 0,
-            sent_at         TEXT,
-            created_at      TEXT DEFAULT (datetime('now'))
-        );
-
-        CREATE TABLE IF NOT EXISTS kpis (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            recorded_at   TEXT DEFAULT (datetime('now')),
-            jobs_scouted  INTEGER DEFAULT 0,
-            bids_sent     INTEGER DEFAULT 0,
-            bids_won      INTEGER DEFAULT 0,
-            revenue_usd   REAL DEFAULT 0,
-            profit_usd    REAL DEFAULT 0,
-            xrp_earned    REAL DEFAULT 0
-        );
-
-        CREATE TABLE IF NOT EXISTS settings (
-            key   TEXT PRIMARY KEY,
-            value TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS earnings (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            project_id      TEXT,
-            amount_usd      REAL NOT NULL,
-            source_note     TEXT,
-            earned_at       TEXT DEFAULT (datetime('now'))
-        );
-
-        CREATE TABLE IF NOT EXISTS xrp_snapshots (
-            id               INTEGER PRIMARY KEY AUTOINCREMENT,
-            xrp_price_usd    REAL NOT NULL,
-            total_earned_usd REAL NOT NULL,
-            xrp_equivalent   REAL NOT NULL,
-            xrp_target       REAL NOT NULL DEFAULT 1000,
-            pct_complete     REAL NOT NULL,
-            snapshot_at      TEXT DEFAULT (datetime('now'))
-        );
-
-        CREATE TABLE IF NOT EXISTS autopilot_runs (
-            id                 INTEGER PRIMARY KEY AUTOINCREMENT,
-            started_at         TEXT NOT NULL,
-            finished_at        TEXT,
-            success            INTEGER NOT NULL DEFAULT 0,
-            dry_run            INTEGER NOT NULL DEFAULT 0,
-            jobs_scouted       INTEGER DEFAULT 0,
-            new_jobs           INTEGER DEFAULT 0,
-            analyzed           INTEGER DEFAULT 0,
-            bids_created       INTEGER DEFAULT 0,
-            bids_today         INTEGER DEFAULT 0,
-            total_earned_usd   REAL DEFAULT 0,
-            error_message      TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS kpi_events (
-            id                 INTEGER PRIMARY KEY AUTOINCREMENT,
-            stream             TEXT NOT NULL,
-            event_type         TEXT NOT NULL,
-            amount_usd         REAL DEFAULT 0,
-            est_cost_usd       REAL DEFAULT 0,
-            meta_json          TEXT,
-            created_at         TEXT DEFAULT (datetime('now'))
-        );
-        """)
-
-        # Wholesale arbitrage tables (PROGRAMATOR #11)
-        conn.executescript("""
-        CREATE TABLE IF NOT EXISTS deals (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            sku             TEXT NOT NULL,
-            product_name    TEXT NOT NULL,
-            channel_id      TEXT NOT NULL DEFAULT 'AUDIO_PREMIUM',
-            wholesale_price REAL NOT NULL,
-            retail_price_de REAL,
-            retail_price_pl REAL,
-            margin_pct      REAL,
-            vortex_resonance INTEGER,
-            vortex_pass     INTEGER DEFAULT 0,
-            source_url      TEXT,
-            supplier        TEXT,
-            stock_qty       INTEGER DEFAULT 0,
-            status          TEXT DEFAULT 'new',
-            scouted_at      TEXT DEFAULT (datetime('now')),
-            executed_at     TEXT,
-            UNIQUE(sku, supplier)
-        );
-
-        CREATE TABLE IF NOT EXISTS subscriptions (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_email      TEXT NOT NULL UNIQUE,
-            tier            TEXT NOT NULL DEFAULT 'pilot' CHECK(tier IN ('pilot','agresor','dominator')),
-            stripe_customer_id TEXT,
-            stripe_sub_id   TEXT,
-            active          INTEGER DEFAULT 1,
-            channels_json   TEXT DEFAULT '["AUDIO_PREMIUM"]',
-            max_alerts_day  INTEGER DEFAULT 3,
-            created_at      TEXT DEFAULT (datetime('now')),
-            expires_at      TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS alerts (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            deal_id         INTEGER REFERENCES deals(id),
-            subscription_id INTEGER REFERENCES subscriptions(id),
-            channel_id      TEXT NOT NULL,
-            alert_type      TEXT DEFAULT 'price_drop',
-            margin_pct      REAL,
-            sent            INTEGER DEFAULT 0,
-            sent_at         TEXT,
-            created_at      TEXT DEFAULT (datetime('now'))
-        );
-
-        CREATE TABLE IF NOT EXISTS payment_events (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            stripe_event_id TEXT UNIQUE NOT NULL,
-            event_type      TEXT NOT NULL,
-            amount_cents    INTEGER NOT NULL DEFAULT 0,
-            currency        TEXT DEFAULT 'pln',
-            customer_email  TEXT,
-            subscription_id INTEGER REFERENCES subscriptions(id),
-            meta_json       TEXT,
-            created_at      TEXT DEFAULT (datetime('now'))
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_deals_channel ON deals(channel_id);
-        CREATE INDEX IF NOT EXISTS idx_deals_status ON deals(status);
-        CREATE INDEX IF NOT EXISTS idx_deals_margin ON deals(margin_pct);
-        CREATE INDEX IF NOT EXISTS idx_alerts_deal ON alerts(deal_id);
-        """)
+def init_db(db_path=None):
+    """Initialize database using migration files."""
+    path = db_path or DB_PATH
+    conn = sqlite3.connect(str(path))
+    conn.execute("PRAGMA journal_mode=WAL")
+    # Check if tables already exist
+    tables = [r[0] for r in conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table'"
+    ).fetchall()]
+    if "jobs" in tables:
+        conn.close()
+        return  # Already initialized
+    # Apply migrations from files
+    import glob
+    migration_dir = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "db", "migrations"
+    )
+    for sql_file in sorted(glob.glob(os.path.join(migration_dir, "*.sql"))):
+        with open(sql_file) as f:
+            sql = f.read()
+        try:
+            conn.executescript(sql)
+            logger.info("Applied migration: %s", os.path.basename(sql_file))
+        except Exception as e:
+            logger.warning("Migration %s skipped: %s", os.path.basename(sql_file), e)
+    conn.commit()
+    conn.close()
 
 
 # ── Jobs ──────────────────────────────────────────────────────────────────────

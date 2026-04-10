@@ -1,0 +1,409 @@
+{
+  "scan_metadata": {
+    "scan_date": "2026-04-08",
+    "workspace_root": "c:\\Users\\adiha\\162 demencje w schemacie 369",
+    "scan_depth": 4,
+    "scan_status": "COMPLETE"
+  },
+  "file_statistics": {
+    "total_files_by_type": {
+      "python_py": {
+        "count": 1036,
+        "description": "Python source files",
+        "estimated_kb": 45000
+      },
+      "markdown_md": {
+        "count": 2080,
+        "description": "Documentation and markdown files",
+        "estimated_kb": 12000
+      },
+      "yaml_yml": {
+        "count": 104,
+        "description": "YAML configuration files (docker-compose, workflows)",
+        "estimated_kb": 2500
+      },
+      "yaml_alt": {
+        "count": 120,
+        "description": "YAML configuration files (.yaml extension)",
+        "estimated_kb": 3000
+      },
+      "shell_ps1": {
+        "count": 254,
+        "description": "PowerShell scripts for automation",
+        "estimated_kb": 2200
+      },
+      "dockerfile": {
+        "count": 60,
+        "description": "Docker container definitions",
+        "estimated_kb": 800
+      },
+      "go_files": {
+        "count": 45,
+        "description": "Go language source files",
+        "estimated_kb": 1500
+      },
+      "json": {
+        "count": "~150",
+        "description": "JSON configs, reports, test outputs",
+        "estimated_kb": 5000
+      },
+      "sql": {
+        "count": "~50",
+        "description": "SQL migrations and schemas",
+        "estimated_kb": 800
+      },
+      "other_configs": {
+        "count": "~100",
+        "description": "Various config files (.toml, .ini, .conf)",
+        "estimated_kb": 500
+      }
+    },
+    "summary": {
+      "total_distinct_file_types": 10,
+      "estimated_total_codebase_size_mb": 73.5,
+      "largest_category": "Markdown (documentation)",
+      "most_files": "Python modules"
+    }
+  },
+  "directory_structure": {
+    "root_level_categories": {
+      "source_code": [
+        "arbitrage/",
+        "arbitrage-core/",
+        "persona-agents/",
+        "mcp_servers/",
+        "dashboard/",
+        "uap/",
+        "micro-saas/"
+      ],
+      "infrastructure": [
+        "kubernetes/",
+        "docker-compose*.yml",
+        "Dockerfile*",
+        "scripts/",
+        "internal/",
+        "cmd/"
+      ],
+      "testing": ["tests/", "pytest.ini", ".pytest_cache/"],
+      "monitoring": ["monitoring/", "logs/"],
+      "documentation": [
+        "docs/",
+        "Genesis Record/",
+        "README.md",
+        "CHANGELOG.md"
+      ],
+      "config_management": [
+        "config/",
+        ".env*",
+        ".github/workflows/",
+        ".pre-commit-config.yaml"
+      ],
+      "archived": [
+        "Genesis Record/",
+        "legacy/",
+        "backups/",
+        "Phase2_Distribution_Package_Apr8_2026/"
+      ]
+    }
+  },
+  "main_modules": {
+    "arbitrage": {
+      "path": "arbitrage/",
+      "purpose": "Lead arbitrage engine with XRP trading, wholesale orchestration",
+      "key_files": [
+        "arbitrage/main.py - Entry point",
+        "arbitrage/orchestrator.py - Coordination logic",
+        "arbitrage/xrp_tracker.py - XRP market tracking",
+        "arbitrage/wholesale_orchestrator.py - Wholesale buyer coordination",
+        "arbitrage/trinity.py - Trinity weight system",
+        "arbitrage/guardian.py - Safety constraints enforcement",
+        "arbitrage/executor.py - Transaction execution",
+        "arbitrage/api.py - REST API interface"
+      ],
+      "file_count": "~35 Python modules"
+    },
+    "uap": {
+      "path": "uap/",
+      "purpose": "Universal Application Platform - Full-stack app (backend, frontend, desktop)",
+      "subdirs": {
+        "uap/backend/": "Flask API, WebSocket, Kubernetes integration, Auth, Chat orchestrator",
+        "uap/frontend/": "React.js UI components (in frontend/ subdirectory)",
+        "uap/desktop/electron/": "Electron desktop app + systray launcher",
+        "uap/desktop/systray/": "Windows systray integration",
+        "uap/tests/": "E2E, integration, auth tests"
+      },
+      "key_files": [
+        "uap/backend/api.py - Main API",
+        "uap/backend/websocket_server.py - Real-time communication",
+        "uap/backend/kubernetes_integration.py - K8s cluster control",
+        "uap/backend/chat_orchestrator.py - LLM conversation routing",
+        "uap/desktop/systray/uap_systray.py - Windows system tray"
+      ],
+      "file_count": "~200+ files (incl. frontend assets)"
+    },
+    "mcp_servers": {
+      "path": "mcp_servers/",
+      "purpose": "Model Context Protocol agents - Genesis, Guardian, Healer, Oracle, Vortex, Arbitrage",
+      "agents": [
+        "mcp_genesis_app.py - Event sourcing, immutable audit logs",
+        "mcp_guardian_app.py - Safety rules enforcement (9 Guardian Laws)",
+        "mcp_healer_app.py - Self-repair and error correction",
+        "mcp_oracle_app.py - Quantum forecasting and predictions",
+        "mcp_vortex_app.py - Stream data processor",
+        "mcp_router_app.py - Message routing and orchestration"
+      ],
+      "file_count": "~30-50 files"
+    },
+    "scripts": {
+      "path": "scripts/",
+      "purpose": "Automation, deployment, maintenance, testing",
+      "categories": {
+        "prod": "Production lifecycle (start/stop/status/healthcheck)",
+        "install": "Environment setup, database validation",
+        "maintenance": "Database backup/cleanup, service recovery",
+        "testing": "API testing, MCP validation, A-11 runtime validation",
+        "security": "PreCommit hooks, deployment gates, credential rotation",
+        "reporting": "KPI guard loops, LLM rollout monitoring, picture reorganization",
+        "mcp-testing": "MCP cluster smoke tests, phase3 orchestration"
+      },
+      "key_ps1_scripts": [
+        "scripts/prod/*.ps1 - Production stack lifecycle",
+        "scripts/security/*.ps1 - Deployment gates and pre-commit",
+        "scripts/reporting/*.ps1 - KPI monitoring and LLM rollout",
+        "scripts/mcp-testing/*.ps1 - MCP cluster verification"
+      ],
+      "file_count": "~70+ PowerShell scripts"
+    },
+    "kubernetes": {
+      "path": "kubernetes/",
+      "purpose": "K8s manifests for multi-tier deployment",
+      "structure": [
+        "00-namespace/ - ADRION namespace",
+        "01-secrets-configmaps.yaml - Credentials & configs",
+        "02-storage.yaml - PersistentVolumes",
+        "03-postgres/ - StatefulSet for PostgreSQL",
+        "04-backend.yaml - Core API services",
+        "05-frontend.yaml - Web UI",
+        "05-core/core-deployments.yaml - MCP servers",
+        "04-tier1/tier1-deployments.yaml - Arbitrage tier 1",
+        "06-monitoring/ - Prometheus, Loki, Grafana",
+        "06-ingress.yaml - API routing",
+        "07-networking/ - Network policies",
+        "08-jobs/ - Cron jobs, backups"
+      ],
+      "file_count": "~25 YAML files"
+    },
+    "monitoring": {
+      "path": "monitoring/",
+      "purpose": "Observability stack configuration",
+      "components": [
+        "prometheus.yml - Metrics scraping config",
+        "loki/ - Log aggregation (local-config.yaml, local-config-minimal.yaml)",
+        "promtail/ - Log forwarding config",
+        "grafana/provisioning/ - Dashboards, datasources, alerting rules"
+      ],
+      "file_count": "~15 config files"
+    },
+    "tests": {
+      "path": "tests/",
+      "purpose": "Comprehensive test suite",
+      "coverage": [
+        "tests/test_*.py - Unit and integration tests",
+        "tests/mcp/ - MCP-specific tests (E2E, signatures, load)",
+        "tests/uap/ - UAP backend/frontend tests",
+        "conftest.py - Pytest fixtures and setup"
+      ],
+      "file_count": "~100+ test files"
+    },
+    "docs": {
+      "path": "docs/",
+      "purpose": "Architecture, guides, troubleshooting",
+      "categories": {
+        "architecture": "ARCHITECTURE.md, INTEGRATED-ADVANCED-ARCHITECTURE.md, MCP_ARCHITECTURE.md",
+        "deployment": "DEPLOYMENT_RUNBOOK.md, KUBERNETES_MIGRATION_GUIDE.md, LOCAL_DEPLOYMENT_COMPLETE.md",
+        "security": "THREAT-MODEL.md, SQL_CERTIFICATE_DEPLOYMENT.md, OAUTH_SECURITY_BEST_PRACTICES.md",
+        "adr": "Architecture Decision Records (ADR-001 to ADR-010)",
+        "integration": "LINKEDIN-INTEGRATION.md, MEMORYOS-LOCAL-IMPLEMENTATION.md"
+      },
+      "file_count": "~80+ markdown docs"
+    },
+    "genesis_record": {
+      "path": "Genesis Record/",
+      "purpose": "Historical backups and phase-based reports",
+      "structure": [
+        "02_STRATEGY_PLANS/Phase2_Implementation/ - Phase 2 planning",
+        "03_TECHNICAL_SPECS/v1.0_Deployment/ - Complete v1.0 backup",
+        "06_SECURITY_BACKUPS/v1.0_Backups/ - Full source backup",
+        "10_RAPORTY_DZIALANIA_SYSTEMU/Phase2_Reports/ - Phase 2 execution logs"
+      ],
+      "size_estimate_mb": 15000,
+      "purpose_note": "Immutable audit trail and version control"
+    }
+  },
+  "infrastructure_files": {
+    "docker_compose": {
+      "files": [
+        "docker-compose.yml - Main stack (API, frontend, postgres)",
+        "docker-compose.prod.yml - Production hardened config",
+        "docker-compose.mcp-tier.yml - MCP servers stack",
+        "docker-compose.k8s-integration.yml - Kubernetes bridge",
+        "docker-compose.cloud.yml - Cloud deployment",
+        "docker-compose-orchestration.yml - Multi-stack coordinator",
+        "docker-compose.lmstudio.yml - LM Studio integration"
+      ],
+      "count": 7,
+      "purpose": "Multi-environment containerization"
+    },
+    "dockerfiles": {
+      "files": [
+        "Dockerfile - Main application",
+        "Dockerfile.genesis-mcp - Genesis MCP server",
+        "Dockerfile.guardian-mcp - Guardian MCP server",
+        "Dockerfile.healer-mcp - Healer MCP server",
+        "Dockerfile.oracle-mcp - Oracle MCP server",
+        "Dockerfile.vortex-mcp - Vortex stream processor",
+        "Dockerfile.healer - Healer service",
+        "Dockerfile.vortex - Vortex service",
+        "Dockerfile.mcp-router - Router service",
+        "Dockerfile.alert-handler - Alert handling service"
+      ],
+      "count": 10,
+      "purpose": "Containerized microservices"
+    },
+    "workflows": {
+      "location": ".github/workflows/",
+      "files": [
+        "python-ci.yml - Python linting, typing, tests",
+        "docker-ci.yml - Docker build and push",
+        "go-ci.yml - Go module testing",
+        "security-ci.yml - Security scans (SAST)",
+        "release.yml - Semantic versioning release",
+        "tier0-gate.yml - Pre-deployment validation",
+        "jednosc-162d-gate.yml - 162D decision space gate",
+        "adr-check.yml - Architecture Decision Record validation",
+        "micro-saas-security-check.yml - Micro-SaaS security gate",
+        "linkedin-publish.yml - LinkedIn content publishing"
+      ],
+      "count": 10,
+      "purpose": "CI/CD pipeline orchestration"
+    },
+    "config_files": {
+      "files": [
+        "pyproject.toml - Python dependencies and metadata",
+        "pytest.ini - Test runner configuration",
+        ".pre-commit-config.yaml - Pre-commit hook setup",
+        "requirements-arbitrage.txt - Arbitrage dependencies",
+        "requirements-mcp.txt - MCP server dependencies",
+        ".ruff_cache/ - Python linter cache",
+        ".coveragerc - Code coverage config",
+        ".env.template - Environment template",
+        ".dockerignore - Docker build exclusions",
+        ".gitignore - Git exclusions"
+      ],
+      "count": 10,
+      "purpose": "Build, test, and deployment configuration"
+    }
+  },
+  "key_operational_files": {
+    "deployment_stages": {
+      "etap_1": [
+        "ETAP_1_DEPLOY.ps1 - Stage 1 deployment script",
+        "ETAP_1_FINAL_REPORT.md - Completion report",
+        "ETAP_1_VERIFICATION_COMPLETE.md - Verification status"
+      ],
+      "etap_2": [
+        "ETAP_2_MCP_DEPLOYMENT_PLAN_2026-04-08.md - MCP staging plan",
+        "ETAP_2_DEPLOYMENT_FINAL_REPORT_2026-04-08.md - Final report",
+        "ETAP_2_VERIFICATION_REPORT_2026-04-08.md - Verification results"
+      ]
+    },
+    "system_management": {
+      "files": [
+        "admin.ps1 - Admin operations",
+        "ADRION_STARTUP_GUIDE.md - Quick start guide",
+        "ADRION_CONTROL_CENTER_README.md - Control center docs",
+        "uap_launcher.ps1 - UAP application launcher",
+        "setup_lmstudio_win.ps1 - LM Studio Windows setup"
+      ]
+    },
+    "monitoring_ops": {
+      "files": [
+        "scripts/reporting/run_llm_kpi_guard_loop.ps1 - LLM KPI monitoring",
+        "scripts/reporting/verify_historie_to_pictures_copy.ps1 - File sync verification",
+        "monitoring/llm_rollout_alert.json - KPI alerts state",
+        "monitoring/llm_rollout_alert_history.jsonl - Alert history"
+      ]
+    }
+  },
+  "technology_stack": {
+    "backend": {
+      "languages": ["Python 3.10+", "Go (vortex/oracle)"],
+      "frameworks": ["Flask", "SQLAlchemy", "Pydantic"],
+      "messaging": ["WebSocket", "Redis (implied)"],
+      "database": ["PostgreSQL"],
+      "api_protocols": ["REST", "MCP (Model Context Protocol)"]
+    },
+    "frontend": {
+      "languages": ["JavaScript/TypeScript", "HTML/CSS"],
+      "frameworks": ["React.js", "Electron (desktop)"],
+      "ui_targets": ["Web browser", "Windows desktop (systray)"]
+    },
+    "infrastructure": {
+      "containerization": ["Docker", "Docker Compose"],
+      "orchestration": ["Kubernetes"],
+      "observability": ["Prometheus", "Loki", "Grafana"],
+      "ci_cd": ["GitHub Actions"],
+      "version_control": ["Git", "GitHub"]
+    },
+    "ai_ml": {
+      "llm_frameworks": ["Ollama (local)", "OpenRouter (cloud)"],
+      "mcp_agents": ["Genesis", "Guardian", "Healer", "Oracle", "Vortex"],
+      "decision_systems": [
+        "162D decision space",
+        "Trinity weights",
+        "EBDI model"
+      ]
+    }
+  },
+  "critical_patterns": {
+    "9_guardian_laws": {
+      "location": "docs/LAWS.md, docs/adr/ADR-002-Guardian-Laws-Fail-Fast.md",
+      "implementation": "arbitrage/guardian.py, mcp_guardian_app.py"
+    },
+    "162d_decision_space": {
+      "location": "tests/test_jednosc_162d_final.py",
+      "workflow": ".github/workflows/jednosc-162d-gate.yml"
+    },
+    "trinity_weights": {
+      "location": "arbitrage/trinity.py",
+      "config": "config/trinity-weights.yml"
+    },
+    "ebdi_model": {
+      "location": "docs/EBDI-MODEL.md",
+      "implementation": "uap/backend/chat_orchestrator.py"
+    }
+  },
+  "summary_statistics": {
+    "codebase_maturity": "PRODUCTION READY (v1.0+)",
+    "deployment_phases_completed": "Phase 1 & Phase 2 (Etap1, Etap2 completed)",
+    "test_coverage_estimate": "HIGH (100+ test files)",
+    "documentation_status": "COMPREHENSIVE (80+ markdown docs)",
+    "backup_strategy": "Genesis Record tiering (6+ redundancy levels)",
+    "environment_support": [
+      "Local development (Ollama + Docker)",
+      "Production cloud (OpenRouter + K8s)",
+      "Windows desktop (Electron + systray)",
+      "CI/CD pipelines (GitHub Actions)"
+    ],
+    "key_modules": 7,
+    "microservices_count": 6,
+    "integration_points": [
+      "Google Drive (indexing/oauth)",
+      "LinkedIn (publishing)",
+      "LM Studio (local LLM)",
+      "OpenRouter (cloud LLM)",
+      "PostgreSQL (primary DB)",
+      "Kubernetes (orchestration)"
+    ]
+  }
+}

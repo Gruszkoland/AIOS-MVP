@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -208,25 +209,52 @@ func (h *Handler) SentinelScan(c echo.Context) error {
 }
 
 // GetThreats returns current threat monitoring status (A-01 to A-12).
-// NOTE: threat Details are static nominal baselines; dynamic anomaly detection
-// is not yet implemented. resonance and health reflect live Vortex state (P1-06).
+// Threat levels are derived dynamically from live Vortex resonance and health.
 func (h *Handler) GetThreats(c echo.Context) error {
-	// Sentinel monitors 12 threat vectors
+	resonance := h.Vortex.GetResonance()
+	health := h.Vortex.GetHealth()
+
+	// Normalize resonance from int (0-9 digital root) to 0.0-1.0 range.
+	// Resonance 0 means no market data processed yet — treat as nominal baseline.
+	resonanceNorm := float64(resonance) / float64(quantum.MaxSingularity)
+	if resonance == 0 {
+		resonanceNorm = 1.0
+	}
+
+	// Derive threat level from resonance and health
+	level := "nominal"
+	if resonanceNorm < 0.2 || health < 0.2 {
+		level = "critical"
+	} else if resonanceNorm < 0.4 && health < 0.4 {
+		level = "warning"
+	} else if resonanceNorm < 0.7 || health < 0.7 {
+		level = "elevated"
+	}
+
+	activeAlerts := 0
+	if level == "warning" {
+		activeAlerts = 1
+	}
+	if level == "critical" {
+		activeAlerts = 2
+	}
+
+	now := time.Now().UTC().Format(time.RFC3339)
 	threats := []ThreatEntry{
-		{Vector: "A-01", Level: "nominal", Detail: "EBDI sentiment: stable", Timestamp: time.Now().Format(time.RFC3339)},
-		{Vector: "A-04", Level: "nominal", Detail: "Material resources: available", Timestamp: time.Now().Format(time.RFC3339)},
-		{Vector: "A-07", Level: "nominal", Detail: "Authority: verified", Timestamp: time.Now().Format(time.RFC3339)},
-		{Vector: "A-10", Level: "nominal", Detail: "Privacy: local-first active", Timestamp: time.Now().Format(time.RFC3339)},
+		{Vector: "A-01", Level: level, Detail: fmt.Sprintf("EBDI sentiment: resonance=%.2f", resonanceNorm), Timestamp: now},
+		{Vector: "A-04", Level: level, Detail: fmt.Sprintf("Material resources: health=%.2f", health), Timestamp: now},
+		{Vector: "A-07", Level: level, Detail: "Authority: verified", Timestamp: now},
+		{Vector: "A-10", Level: level, Detail: "Privacy: local-first active", Timestamp: now},
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"threat_vectors_monitored": 12,
-		"active_alerts":            0,
+		"active_alerts":            activeAlerts,
 		"threats":                  threats,
 		"guardian_status":          "G7-G9 enforced",
-		"resonance":                h.Vortex.GetResonance(),
-		"health":                   h.Vortex.GetHealth(),
-		"timestamp":                time.Now().UTC(),
+		"resonance":                resonance,
+		"health":                   health,
+		"timestamp":                now,
 	})
 }
 

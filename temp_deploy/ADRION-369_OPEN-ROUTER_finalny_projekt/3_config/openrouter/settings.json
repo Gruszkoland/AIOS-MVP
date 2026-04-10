@@ -1,0 +1,35 @@
+﻿{
+  "deployment": {
+    "environment": "production",
+    "backend": "openrouter",
+    "disable_docker_inspect": true,
+    "max_workers": 4
+  },
+  "openrouter": {
+    "api_endpoint": "https://openrouter.ai/api/v1",
+    "timeout": 30,
+    "max_retries": 3,
+    "fallback_enabled": true,
+    "canary_enabled": true,
+    "canary_percentage": 10
+  },
+  "monitoring": {
+    "log_level": "INFO",
+    "prometheus_enabled": true,
+    "grafana_enabled": true,
+    "loki_enabled": true
+  },
+  "kpi_gates": {
+    "error_rate_threshold": 0.05,
+    "p95_latency_threshold_ms": 8000,
+    "availability_threshold": 0.99,
+    "auto_rollback": true,
+    "window_size_seconds": 300
+  },
+  "arbitrage": {
+    "min_lead_score": 0.65,
+    "batch_size": 10,
+    "tokens_per_analysis": 2000,
+    "cache_ttl_seconds": 3600
+  }
+}

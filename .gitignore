@@ -39,7 +39,12 @@ build/
 .pytest_cache/
 .coverage
 coverage.xml
+coverage*.json
+cov_*.txt
 tests/results/
+deployment_health_report.json
+integration_test_results.json
+temp_vortex_content.txt
 
 # ── TLS certs (never commit) ──────────────────────────────────────────────
 config/nginx/certs/
@@ -60,3 +65,9 @@ monitoring/*_history*.jsonl
 monitoring/*_test*.json
 .runtime/
 *.pid
+
+# ── Genesis Record clones (prevent accidental project snapshots) ─────────
+Genesis Record/**/Phase2_Reports/
+Genesis Record/**/Phase2_Implementation/
+Genesis Record/**/v1.0_Deployment/
+Genesis Record/**/v1.0_Backups/

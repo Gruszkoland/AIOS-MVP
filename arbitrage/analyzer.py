@@ -17,6 +17,10 @@ from .config import (
     ANALYZER_USER,
     ANTHROPIC_KEY,
     LLM_MODEL,
+    LMSTUDIO_URL,
+    LMSTUDIO_MODEL,
+    OLLAMA_URL,
+    OLLAMA_MODEL,
     MIN_ANALYZER_SCORE,
     MIN_PROFIT_USD,
     OPENAI_KEY,
@@ -72,6 +76,42 @@ def _call_anthropic(prompt: str) -> str:
     return message.content[0].text
 
 
+def _call_lmstudio(prompt: str) -> str:
+    """Call LM Studio local API (OpenAI-compatible interface)."""
+    from openai import OpenAI
+    client = OpenAI(
+        api_key="not-needed",  # LM Studio doesn't require key
+        base_url=f"{LMSTUDIO_URL}/v1",
+    )
+    response = client.chat.completions.create(
+        model=LMSTUDIO_MODEL,
+        messages=[
+            {"role": "system", "content": ANALYZER_SYSTEM},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.3,
+        max_tokens=400,
+    )
+    return response.choices[0].message.content
+
+
+def _call_ollama(prompt: str) -> str:
+    """Call Ollama local API."""
+    import requests
+    response = requests.post(
+        f"{OLLAMA_URL}/api/generate",
+        json={
+            "model": OLLAMA_MODEL,
+            "prompt": f"{ANALYZER_SYSTEM}\n\n{prompt}",
+            "stream": False,
+            "temperature": 0.3,
+        },
+        timeout=60,
+    )
+    response.raise_for_status()
+    return response.json().get("response", "")
+
+
 def _mock_analyze(job: dict) -> dict:
     budget_mid = (job.get("budget_min", 0) + job.get("budget_max", 100)) / 2
     score = random.randint(6, 10)
@@ -118,6 +158,10 @@ def analyze_job(job: dict) -> dict:
             raw = _call_openai(prompt)
         elif backend == "anthropic":
             raw = _call_anthropic(prompt)
+        elif backend == "lmstudio":
+            raw = _call_lmstudio(prompt)
+        elif backend == "ollama":
+            raw = _call_ollama(prompt)
         else:
             raw = None
 

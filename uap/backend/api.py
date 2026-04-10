@@ -34,6 +34,28 @@ from flask_cors import CORS
 
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
+# ────────────────────────────────────────────────────────────────────────────
+# LLM INTEGRATION (optional — graceful fallback if not available)
+# ────────────────────────────────────────────────────────────────────────────
+try:
+    from arbitrage.llm import chat as llm_chat
+    from arbitrage.config import get_active_llm_backend
+    LLM_AVAILABLE = True
+except Exception:
+    llm_chat = None
+    get_active_llm_backend = None
+    LLM_AVAILABLE = False
+
+# ────────────────────────────────────────────────────────────────────────────
+# CONFIG & LOGGING (must be before conditional imports that use logger)
+# ────────────────────────────────────────────────────────────────────────────
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s level=%(levelname)s logger=%(name)s %(message)s"
+)
+logger = logging.getLogger("adrion.uap.api")
+
 # Import database integration (SQLite fallback or PostgreSQL)
 from db import DatabaseEngine  # noqa: E402
 
@@ -56,16 +78,6 @@ except Exception as e:
     logger.warning(f"⚠️ Kubernetes WebSocket watcher not available: {e}")
     K8S_WATCHER = None
     K8S_WATCHER_ENABLED = False
-
-# ────────────────────────────────────────────────────────────────────────────
-# CONFIG & LOGGING
-# ────────────────────────────────────────────────────────────────────────────
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s level=%(levelname)s logger=%(name)s %(message)s"
-)
-logger = logging.getLogger("adrion.uap.api")
 
 app = Flask(__name__)
 _CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "*")  # Allow all origins for development
@@ -183,14 +195,10 @@ def generate_task_id() -> str:
     return f"upc-{timestamp}-{random_suffix}"
 
 
-def find_best_persona(task_description: str, agent_hint: Optional[str] = None) -> str:
-    """Route task to best persona based on EBDI + TSPA."""
-    if agent_hint and agent_hint in AGENT_TRUST_SCORES:
-        return agent_hint
-
+def _keyword_persona_match(task_description: str) -> str:
+    """Keyword-based routing heuristic (fallback when LLM is unavailable)."""
     keywords = task_description.lower()
 
-    # Simple routing heuristic (Phase 1)
     if "scout" in keywords or "find" in keywords or "search" in keywords:
         return "SAP"
     elif "analyze" in keywords or "evaluate" in keywords:
@@ -205,6 +213,31 @@ def find_best_persona(task_description: str, agent_hint: Optional[str] = None) -
         return "Librarian"
     else:
         return "SAP"  # Default
+
+
+def find_best_persona(task_description: str, agent_hint: Optional[str] = None) -> str:
+    """Route task to best persona using LLM with keyword fallback."""
+    if agent_hint and agent_hint in AGENT_TRUST_SCORES:
+        return agent_hint
+
+    if not LLM_AVAILABLE:
+        return _keyword_persona_match(task_description)
+
+    try:
+        agents = list(AGENT_TRUST_SCORES.keys())
+        prompt = (
+            f"Task: '{task_description}'. Choose the best agent: {agents}. "
+            "Reply with the agent name only, nothing else."
+        )
+        result = llm_chat(prompt, system="You are a task router for the ADRION 369 system.")
+        agent = result.strip().strip('"').strip("'")
+        if agent in AGENT_TRUST_SCORES:
+            return agent
+        logger.warning("LLM returned unknown agent '%s', falling back to keyword match", agent)
+    except Exception as exc:
+        logger.warning("LLM routing failed: %s, falling back to keyword match", exc)
+
+    return _keyword_persona_match(task_description)
 
 
 def check_trust_score(agent: str) -> bool:
@@ -397,9 +430,8 @@ def task_delegate():
         task_id, agent, task_desc[:50], dry_run
     )
 
-    # Simulate async execution
+    # Execute task via LLM or mock
     def _execute_task():
-        time.sleep(1)  # Simulate work
         task["status"] = "executing"
         task["updated_at"] = datetime.now().isoformat()
         if USE_DATABASE and db:
@@ -408,13 +440,22 @@ def task_delegate():
             except Exception as exc:
                 logger.error("Failed to update task status to 'executing' in DB: %s", exc)
 
-        time.sleep(2)  # More work
+        try:
+            system_prompt = (
+                f"You are {agent}, an AI agent in the ADRION 369 system. "
+                "Execute the following task thoroughly."
+            )
+            if LLM_AVAILABLE:
+                result_text = llm_chat(task_desc, system=system_prompt)
+            else:
+                result_text = f"[mock] Task '{task_desc}' processed by {agent}"
+            result = {"output": result_text, "agent": agent, "confidence": 0.85}
+        except Exception as e:
+            logger.error("Task execution error for %s: %s", task_id, e)
+            result = {"output": f"Execution error: {e}", "agent": agent, "confidence": 0.0, "error": True}
+
         task["status"] = "completed"
-        task["result"] = {
-            "output": f"{agent} processed: {task_desc}",
-            "items_found": 5,
-            "confidence": 0.92,
-        }
+        task["result"] = result
         task["updated_at"] = datetime.now().isoformat()
         if USE_DATABASE and db:
             try:
@@ -428,7 +469,7 @@ def task_delegate():
             status="completed",
             action="execution_success",
             guards_passed=9,
-            notes="Found 5 results with 92% confidence"
+            notes=f"Confidence: {result.get('confidence', 0):.2f}"
         )
 
     if not dry_run:

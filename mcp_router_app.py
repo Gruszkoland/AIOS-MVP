@@ -63,7 +63,7 @@ def status():
 # ════════════════════════════════════════════════════════════════════════════
 
 @app.route("/route", methods=["POST"])
-async def route_query():
+def route_query():
     """
     Main routing endpoint
 
@@ -94,8 +94,8 @@ async def route_query():
         if not query:
             return jsonify({"error": "Missing 'query' field"}), 400
 
-        result = await router.route_query(query, context)
-        logger.info(f"Routed query: {query[:50]} -> {result['decision']}")
+        result = router.route_query(query, context)
+        logger.info(f"Routed query: {query[:50]} -> {result.get('decision', 'unknown')}")
 
         return jsonify(result), 200
 

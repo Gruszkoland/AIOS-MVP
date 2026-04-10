@@ -12,5 +12,8 @@ docker>=7.1.0          # Docker SDK for runtime stack inspection/restart
 openai>=1.0.0           # OpenRouter + OpenAI + Ollama (OpenAI-compatible)
 anthropic>=0.18.0       # Claude direct (optional)
 
+# Configuration
+pydantic-settings>=2.0.0  # Typed settings with env/dotenv support
+
 # Scraping (optional — mock mode works without this)
 apify-client>=1.6.0     # Real Upwork/Fiverr scraping via Apify

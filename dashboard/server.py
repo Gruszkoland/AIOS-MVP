@@ -314,7 +314,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         return vf.read_text().strip() if vf.exists() else "unknown"
 
     def _api_status(self) -> None:
-        """Aggregated status: Docker + arbitrage-api + SQLite + Ollama."""
+        """Aggregated status: Docker + arbitrage-api + SQLite + LM Studio + Ollama."""
         # Docker containers
         containers = [_docker_status(c) for c in
                       ("adrion-db", "adrion-vortex", "adrion-healer", "adrion-n8n")]
@@ -331,7 +331,21 @@ class DashboardHandler(BaseHTTPRequestHandler):
             if sqlite_path.exists() else 0,
         }
 
-        # Ollama
+        # LM Studio (Local LLM Server)
+        lmstudio: dict = {"running": False}
+        try:
+            with urllib.request.urlopen(
+                "http://localhost:1234/v1/models", timeout=2
+            ) as resp:
+                data = json.loads(resp.read())
+                models = data.get("data", [])
+                lmstudio = {"running": True, "model_count": len(models)}
+                if models:
+                    lmstudio["active_model"] = models[0].get("id", "unknown")
+        except Exception:
+            pass
+
+        # Ollama (Local LLM Server)
         ollama: dict = {"running": False}
         try:
             with urllib.request.urlopen(
@@ -341,6 +355,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 ollama = {"running": True, "model_count": len(data.get("models", []))}
         except Exception:
             pass
+
+        # Determine active LLM backend
+        try:
+            from arbitrage.config import get_active_llm_backend
+            active_backend = get_active_llm_backend()
+        except Exception:
+            active_backend = "unknown"
 
         # Backups
         backup_dir = ROOT_DIR / "backups"
@@ -361,7 +382,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
             "containers": containers,
             "arbitrage_api": {"running": arb_ok, "data": arb if arb_ok else {}},
             "sqlite": sqlite,
+            "lmstudio": lmstudio,
             "ollama": ollama,
+            "llm_backend": active_backend,
             "latest_backup": latest_backup,
         })
 
@@ -417,15 +440,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
+    # ── Parse arguments first to set global ARB_API ──
     parser = argparse.ArgumentParser(description="ADRION 369 UAP Dashboard Server")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
-    parser.add_argument("--api", default=ARB_API,
-                        help="Arbitrage API base URL (default: %(default)s)")
+    parser.add_argument("--api",
+                        help="Arbitrage API base URL (default: http://127.0.0.1:8001)")
     parser.add_argument("--host", default="127.0.0.1")
     args = parser.parse_args()
 
+    # ── Set global ──
     global ARB_API
-    ARB_API = args.api
+    ARB_API = args.api if args.api else "http://127.0.0.1:8001"
 
     server = HTTPServer((args.host, args.port), DashboardHandler)
     dashboard_file = DASHBOARD_DIR / "index.html"

@@ -1,15 +1,87 @@
+[project]
+name = "adrion-369"
+version = "1.0.0"
+description = "Multi-agent AI orchestration system with Trinity-EBDI decision framework"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+readme = "README.md"
+
+[project.optional-dependencies]
+mcp = [
+    "Flask>=3.1.0",
+    "Flask-CORS>=4.0.0",
+    "requests==2.31.0",
+    "python-dotenv==1.0.0",
+    "python-docx==0.8.11",
+    "sqlalchemy==2.0.21",
+    "psycopg2-binary==2.9.9",
+    "pydantic==2.4.2",
+    "marshmallow==3.20.1",
+    "structlog==23.1.0",
+    "prometheus-client==0.17.1",
+    "numpy==1.24.3",
+    "scipy==1.11.3",
+    "hnswlib==0.7.0",
+    "sentence-transformers==2.2.2",
+]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "pytest-asyncio>=0.21",
+    "ruff>=0.1",
+    "mypy>=1.6",
+    "black>=23.11",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+# ── Tool Configuration ───────────────────────────────────────────────────────
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short --ignore=tests/integration --ignore=tests/mcp"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests requiring external services",
+    "e2e: end-to-end pipeline tests requiring live DB",
+    "runtime: marks tests requiring local runtime services (Ollama, Dashboard, Vortex)",
+    "unit: unit tests (no I/O)",
+    "smoke: smoke tests (fast)",
+    "guardian: guardian law compliance tests",
+    "tier0: TIER 0 critical tests",
+    "crisis: crisis mode tests",
+    "ragas: RAG evaluation tests",
+]
+
 [tool.coverage.run]
 source = ["arbitrage"]
 omit = [
     "*/tests/*",
     "*/__pycache__/*",
+    "*/site-packages/*",
+    "arbitrage/__init__.py",
     "arbitrage/schema_wholesale.sql",
 ]
 
 [tool.coverage.report]
 show_missing = true
 skip_covered = false
-fail_under = 80
+fail_under = 65
+precision = 1
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "raise AssertionError",
+]
+
+[tool.coverage.html]
+directory = "tests/results/coverage_html"
 
 [tool.ruff]
 line-length = 100

@@ -1,0 +1,5 @@
+﻿1.0.0
+Release Date: 2025-04-06
+Status: Production Ready
+Backend: OpenRouter
+Models: Llama 3.1 8B, Mistral 7B, Gemma 2 9B

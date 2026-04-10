@@ -2,10 +2,13 @@
 # Model Context Protocol Implementation for ADRION 369 v4.0
 
 # Core
-Flask==2.3.3
-Flask-CORS==4.0.0
+Flask>=3.1.0
+Flask-CORS>=4.0.0
 requests==2.31.0
 python-dotenv==1.0.0
+
+# Document Processing
+python-docx==0.8.11
 
 # Data & State Management
 sqlalchemy==2.0.21
@@ -31,6 +34,9 @@ mypy==1.6.1
 # openai==0.28.1
 # anthropic==0.7.6
 
-# Optional: Vector Search (for GENESIS RAG)
-# faiss-cpu==1.7.4
-# sentence-transformers==2.2.2
+# Optional: Vector Search & ML (for GENESIS RAG + Federated Learning)
+numpy==1.24.3
+scipy==1.11.3
+hnswlib==0.7.0
+sentence-transformers==2.2.2
+# faiss-cpu==1.7.4  # Alternative to hnswlib

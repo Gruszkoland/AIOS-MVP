@@ -147,17 +147,17 @@ A: Email SAP directly or post in Slack #adrion-phase2 channel.
 
 ## 📊 DISTRIBUTION MANIFEST
 
-| File                                    | Purpose                        | Read Time | Audience          |
-| --------------------------------------- | ------------------------------ | --------- | ----------------- |
-| INDEX_READ_ME_FIRST.md                  | This file (navigation)         | 5 min     | Everyone          |
-| PERSONA_PREP_GUIDES                     | Role-specific preparation      | 15 min    | Your role section |
-| ATAM_WORKSHOP_PREPARATION               | Apr 15 workshop structure      | 10 min    | All attendees     |
-| ADR-002_IMPLEMENTATION_PLAN             | First ADR details              | 20 min    | Implementers      |
-| PHASE2_MASTER_TIMELINE                  | Q2 2026 roadmap                | 15 min    | All               |
-| PHASE2_DAY1_EXECUTION_CHECKLIST         | Apr 22 day plan                | 10 min    | All               |
-| MASTER_SYNTHESIS_ADRION369_05-04-2026   | Phase 1 recap + recommendations | 15 min    | All (reference)   |
-| SCB_AUTO_UPDATE_README                  | Session Continuity system      | 5 min     | Technical roles   |
-| EMAIL_TEMPLATES_6_PERSONAS              | (Internal reference)           | -         | SAP only          |
+| File                                  | Purpose                         | Read Time | Audience          |
+| ------------------------------------- | ------------------------------- | --------- | ----------------- |
+| INDEX_READ_ME_FIRST.md                | This file (navigation)          | 5 min     | Everyone          |
+| PERSONA_PREP_GUIDES                   | Role-specific preparation       | 15 min    | Your role section |
+| ATAM_WORKSHOP_PREPARATION             | Apr 15 workshop structure       | 10 min    | All attendees     |
+| ADR-002_IMPLEMENTATION_PLAN           | First ADR details               | 20 min    | Implementers      |
+| PHASE2_MASTER_TIMELINE                | Q2 2026 roadmap                 | 15 min    | All               |
+| PHASE2_DAY1_EXECUTION_CHECKLIST       | Apr 22 day plan                 | 10 min    | All               |
+| MASTER_SYNTHESIS_ADRION369_05-04-2026 | Phase 1 recap + recommendations | 15 min    | All (reference)   |
+| SCB_AUTO_UPDATE_README                | Session Continuity system       | 5 min     | Technical roles   |
+| EMAIL_TEMPLATES_6_PERSONAS            | (Internal reference)            | -         | SAP only          |
 
 **Total Archive Size:** ~112 MB (all 9 files)
 **Total Read Time (minimum):** ~90-100 minutes over 6 days
