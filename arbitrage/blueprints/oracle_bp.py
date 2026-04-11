@@ -10,6 +10,8 @@ import logging
 
 from flask import Blueprint, jsonify, request
 
+from arbitrage.blueprints import safe_float
+
 oracle_bp = Blueprint("oracle", __name__)
 logger = logging.getLogger(__name__)
 
@@ -41,8 +43,8 @@ def handle_oracle_predict():
         return jsonify({"error": "Rate limit exceeded", "retry_after": 60}), 429
 
     body = request.get_json(silent=True) or {}
-    wholesale_price = float(body.get("wholesale_price", 0))
-    retail_price = float(body.get("retail_price", 0))
+    wholesale_price = safe_float(body.get("wholesale_price", 0))
+    retail_price = safe_float(body.get("retail_price", 0))
     price_history = body.get("price_history", [])
     channel_id = body.get("channel_id", "AUDIO_PREMIUM")
     oracle_predict, _ = _oracle()

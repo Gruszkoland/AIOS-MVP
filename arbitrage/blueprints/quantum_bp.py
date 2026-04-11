@@ -11,6 +11,8 @@ import logging
 
 from flask import Blueprint, jsonify, request
 
+from arbitrage.blueprints import safe_float
+
 quantum_bp = Blueprint("quantum", __name__)
 logger = logging.getLogger(__name__)
 
@@ -47,8 +49,8 @@ def handle_quantum_decide():
         return jsonify({"error": "Rate limit exceeded", "retry_after": 60}), 429
 
     body = request.get_json(silent=True) or {}
-    price_source = float(body.get("price_source", 0))
-    price_target = float(body.get("price_target", 0))
+    price_source = safe_float(body.get("price_source", 0))
+    price_target = safe_float(body.get("price_target", 0))
     channel_id = body.get("channel_id", "AUDIO_PREMIUM")
 
     if price_source <= 0 or price_target <= 0:

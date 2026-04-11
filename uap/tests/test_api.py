@@ -10,8 +10,14 @@ from pathlib import Path
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
-from api import app, API_KEY, TASKS_STORE, GENESIS_LOGS, AGENT_TRUST_SCORES
 import api as api_module
+from api import app, TASKS_STORE, GENESIS_LOGS, AGENT_TRUST_SCORES
+
+# Set a deterministic test API key so validate_api_key() succeeds.
+# Must be set before any request uses it.
+_TEST_API_KEY = "test-key-for-unit-tests"
+api_module.API_KEY = _TEST_API_KEY
+API_KEY = _TEST_API_KEY
 
 @pytest.fixture
 def client():
@@ -397,3 +403,315 @@ def test_not_found(client):
         headers={"X-API-Key": API_KEY},
     )
     assert resp.status_code == 404
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# LLM INTEGRATION TESTS
+# ──────────────────────────────────────────────────────────────────────────
+
+class TestFindBestPersonaLLM:
+    """Tests for LLM-based persona routing in find_best_persona()."""
+
+    def test_llm_returns_valid_agent(self, monkeypatch):
+        """When LLM returns a known agent name, find_best_persona should use it."""
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(api_module, "llm_chat", lambda prompt, system="": "Librarian")
+
+        from api import find_best_persona
+        result = find_best_persona("Do something complex")
+        assert result == "Librarian"
+
+    def test_llm_returns_garbage_falls_back(self, monkeypatch):
+        """When LLM returns an invalid agent name, should fall back to keyword match."""
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(api_module, "llm_chat", lambda prompt, system="": "INVALID_AGENT_XYZ")
+
+        from api import find_best_persona
+        # "search" keyword maps to SAP via _keyword_persona_match
+        result = find_best_persona("search for documents")
+        assert result == "SAP"
+
+    def test_llm_returns_garbage_no_keyword_match(self, monkeypatch):
+        """When LLM returns garbage and no keyword matches, should return default SAP."""
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(api_module, "llm_chat", lambda prompt, system="": "BOGUS")
+
+        from api import find_best_persona
+        result = find_best_persona("do a random unrecognized thing")
+        assert result == "SAP"  # default fallback
+
+    def test_llm_exception_falls_back(self, monkeypatch):
+        """When llm_chat raises an exception, should fall back to keyword match."""
+        def _raise(*args, **kwargs):
+            raise RuntimeError("LLM service down")
+
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(api_module, "llm_chat", _raise)
+
+        from api import find_best_persona
+        result = find_best_persona("analyze the data")
+        assert result == "Auditor"  # "analyze" keyword
+
+    def test_agent_hint_bypasses_llm(self, monkeypatch):
+        """When agent_hint is a known agent, LLM should not be called."""
+        call_count = 0
+
+        def _counting_llm(prompt, system=""):
+            nonlocal call_count
+            call_count += 1
+            return "Librarian"
+
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(api_module, "llm_chat", _counting_llm)
+
+        from api import find_best_persona
+        result = find_best_persona("anything", agent_hint="Sentinel")
+        assert result == "Sentinel"
+        assert call_count == 0, "LLM should not be called when agent_hint is valid"
+
+    def test_agent_hint_unknown_falls_through_to_llm(self, monkeypatch):
+        """When agent_hint is NOT in AGENT_TRUST_SCORES, LLM routing should be used."""
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(api_module, "llm_chat", lambda prompt, system="": "Auditor")
+
+        from api import find_best_persona
+        result = find_best_persona("something", agent_hint="UnknownBot")
+        assert result == "Auditor"
+
+    def test_llm_unavailable_uses_keyword(self, monkeypatch):
+        """When LLM_AVAILABLE is False, should use keyword matching directly."""
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", False)
+
+        from api import find_best_persona
+        assert find_best_persona("fix the broken service") == "Healer"
+        assert find_best_persona("design the architecture") == "Architect"
+        assert find_best_persona("urgent crisis alert") == "Sentinel"
+
+    def test_llm_returns_quoted_agent(self, monkeypatch):
+        """LLM may return agent name with quotes; stripping should handle it."""
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(api_module, "llm_chat", lambda prompt, system="": '"Healer"')
+
+        from api import find_best_persona
+        result = find_best_persona("optimize the system")
+        assert result == "Healer"
+
+
+class TestExecuteTaskLLM:
+    """Tests for LLM-based task execution via the /task/delegate endpoint."""
+
+    def test_llm_available_returns_real_output(self, client, monkeypatch):
+        """When LLM is available, _execute_task should use llm_chat result."""
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(
+            api_module, "llm_chat",
+            lambda prompt, system="": "LLM analysis: all systems nominal"
+        )
+
+        resp = client.post(
+            "/mapi/v1/task/delegate",
+            json={"task_description": "Analyze the XRP market trends"},
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 201
+        data = json.loads(resp.data)
+        task_id = data["task_id"]
+
+        # Wait for background thread to complete
+        import time
+        time.sleep(0.3)
+
+        # Retrieve task result
+        resp2 = client.get(
+            f"/mapi/v1/task/{task_id}",
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp2.status_code == 200
+        task = json.loads(resp2.data)
+        assert task["status"] == "completed"
+        assert task["result"]["output"] == "LLM analysis: all systems nominal"
+        assert "[mock]" not in task["result"]["output"]
+
+    def test_llm_unavailable_returns_mock(self, client, monkeypatch):
+        """When LLM_AVAILABLE is False, result should contain [mock] prefix."""
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", False)
+
+        resp = client.post(
+            "/mapi/v1/task/delegate",
+            json={"task_description": "Scout for opportunities"},
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 201
+        task_id = json.loads(resp.data)["task_id"]
+
+        import time
+        time.sleep(0.3)
+
+        resp2 = client.get(
+            f"/mapi/v1/task/{task_id}",
+            headers={"X-API-Key": API_KEY},
+        )
+        task = json.loads(resp2.data)
+        assert task["status"] == "completed"
+        assert "[mock]" in task["result"]["output"]
+
+    def test_llm_exception_returns_error(self, client, monkeypatch):
+        """When llm_chat raises, result should have error=True."""
+        def _explode(prompt, system=""):
+            raise ConnectionError("LLM backend unreachable")
+
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(api_module, "llm_chat", _explode)
+
+        resp = client.post(
+            "/mapi/v1/task/delegate",
+            json={"task_description": "Evaluate system health"},
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 201
+        task_id = json.loads(resp.data)["task_id"]
+
+        import time
+        time.sleep(0.3)
+
+        resp2 = client.get(
+            f"/mapi/v1/task/{task_id}",
+            headers={"X-API-Key": API_KEY},
+        )
+        task = json.loads(resp2.data)
+        assert task["status"] == "completed"
+        assert task["result"]["error"] is True
+        assert task["result"]["confidence"] == 0.0
+
+    def test_dry_run_does_not_execute(self, client, monkeypatch):
+        """When dry_run=True, _execute_task should NOT run (no LLM execution call)."""
+        execution_calls = []
+
+        def _tracking_llm(prompt, system=""):
+            execution_calls.append(system)
+            return "result"
+
+        monkeypatch.setattr(api_module, "LLM_AVAILABLE", True)
+        monkeypatch.setattr(api_module, "llm_chat", _tracking_llm)
+
+        resp = client.post(
+            "/mapi/v1/task/delegate",
+            json={
+                "task_description": "Scout test dry run",
+                "dry_run": True,
+                "agent_hint": "SAP",  # bypass LLM routing
+            },
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 201
+
+        import time
+        time.sleep(0.2)
+
+        # With agent_hint set, routing skips LLM. With dry_run, execution skips LLM.
+        # So no LLM calls should have been made at all.
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# AGENT UPDATE SECURITY (P0-1: SQL INJECTION FIX)
+# ──────────────────────────────────────────────────────────────────────────
+
+class TestAgentUpdateSecurity:
+    """Tests for agent update endpoint security (CVE: SQL injection prevention)."""
+
+    def test_update_agent_success_single_field(self, client):
+        """Test successful update with valid single field."""
+        resp = client.put(
+            "/mapi/v1/agents/agent-001",
+            json={"name": "Updated Agent"},
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 200
+        data = json.loads(resp.data)
+        assert data["success"] is True
+        assert data["id"] == "agent-001"
+
+    def test_update_agent_success_multiple_fields(self, client):
+        """Test successful update with multiple valid fields."""
+        resp = client.put(
+            "/mapi/v1/agents/agent-001",
+            json={
+                "name": "Updated Agent",
+                "role": "Analyzer",
+                "description": "Updated description",
+                "trust_score": 0.95,
+            },
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 200
+        data = json.loads(resp.data)
+        assert data["success"] is True
+
+    def test_update_agent_reject_unknown_field(self, client):
+        """Test that unknown fields are rejected (SQL injection prevention)."""
+        resp = client.put(
+            "/mapi/v1/agents/agent-001",
+            json={"name": "Valid", "DROP TABLE agents--": "malicious"},
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data["success"] is False
+        assert "Unknown fields" in data["error"]
+        assert "DROP TABLE agents--" in data["error"]
+
+    def test_update_agent_reject_sql_injection_via_semicolon(self, client):
+        """Test rejection of SQL injection attempts with semicolons."""
+        resp = client.put(
+            "/mapi/v1/agents/agent-001",
+            json={"id; DROP TABLE agents--": "x"},
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data["success"] is False
+        assert "Unknown fields" in data["error"]
+
+    def test_update_agent_no_data(self, client):
+        """Test update with empty data."""
+        resp = client.put(
+            "/mapi/v1/agents/agent-001",
+            json={},
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data["success"] is False
+        assert "No data provided" in data["error"]
+
+    def test_update_agent_only_unknown_fields(self, client):
+        """Test update where ALL fields are unknown."""
+        resp = client.put(
+            "/mapi/v1/agents/agent-001",
+            json={"unknown_field_1": "x", "unknown_field_2": "y"},
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data["success"] is False
+        assert "Unknown fields" in data["error"]
+        assert "allowed_fields" in data
+
+    def test_update_agent_allowed_fields_hint(self, client):
+        """Test that rejected request includes allowed fields hint."""
+        resp = client.put(
+            "/mapi/v1/agents/agent-001",
+            json={"invalid": "field"},
+            headers={"X-API-Key": API_KEY},
+        )
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert "allowed_fields" in data
+        allowed = set(data["allowed_fields"])
+        expected = {
+            "name", "role", "personality", "description", "trust_score",
+            "capability_level", "skills", "active"
+        }
+        assert allowed == expected
+
+

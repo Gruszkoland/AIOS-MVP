@@ -11,6 +11,8 @@ import logging
 
 from flask import Blueprint, jsonify, request
 
+from arbitrage.blueprints import safe_float, safe_int
+
 wholesale_bp = Blueprint("wholesale", __name__)
 logger = logging.getLogger(__name__)
 
@@ -46,8 +48,8 @@ def handle_wholesale_scout():
     feed_data = body.get("feed_data")
     feed_format = body.get("feed_format", "json")
     channel_filter = body.get("channel_filter")
-    min_margin = float(body.get("min_margin", 0.15))
-    min_stock = int(body.get("min_stock", 1))
+    min_margin = safe_float(body.get("min_margin", 0.15))
+    min_stock = safe_int(body.get("min_stock", 1))
     use_mock = body.get("use_mock", feed_data is None)
     scout_wholesale, _ = _wholesale()
     result = scout_wholesale(feed_data, feed_format, channel_filter,
@@ -65,7 +67,7 @@ def handle_wholesale_cycle():
 
     body = request.get_json(silent=True) or {}
     channel_filter = body.get("channel_filter")
-    min_margin = float(body.get("min_margin", 0.15))
+    min_margin = safe_float(body.get("min_margin", 0.15))
     auto_execute = body.get("auto_execute", False)
     use_mock = body.get("use_mock", True)
     cycle_fn = _wholesale_cycle()
@@ -84,8 +86,8 @@ def handle_wholesale_deals():
     channel_id = request.args.get("channel_id")
     status = request.args.get("status")
     min_margin_str = request.args.get("min_margin")
-    min_margin = float(min_margin_str) if min_margin_str is not None else None
-    limit = int(request.args.get("limit", "50"))
+    min_margin = safe_float(min_margin_str) if min_margin_str is not None else None
+    limit = safe_int(request.args.get("limit", "50"), default=50)
     _, get_deals = _wholesale()
     deals = get_deals(channel_id, status, min_margin, limit)
     return jsonify({"deals": deals, "count": len(deals)})

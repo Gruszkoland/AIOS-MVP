@@ -14,6 +14,8 @@ import os
 
 from flask import Blueprint, jsonify, request
 
+from arbitrage.blueprints import safe_float, safe_int
+
 payments_bp = Blueprint("payments", __name__)
 logger = logging.getLogger(__name__)
 
@@ -88,8 +90,8 @@ def handle_mass_generate():
 
     body = request.get_json(silent=True) or {}
     channel_filter = body.get("channel_filter")
-    min_margin = float(body.get("min_margin", 0.15))
-    min_stock = int(body.get("min_stock", 5))
+    min_margin = safe_float(body.get("min_margin", 0.15))
+    min_stock = safe_int(body.get("min_stock", 5))
     revalidate = body.get("revalidate", False)
     run_mass, _, _ = _mass_generator()
     result = run_mass(
