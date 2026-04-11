@@ -48,6 +48,12 @@ GUARDIAN_LAWS_STATUS: List[Dict[str, Any]] = [
     {"law": "G9", "name": "Sustainability", "status": "pass"},
 ]
 
+# Security: Agent column allowlist for UPDATE operations (P0-1: SQL injection prevention)
+ALLOWED_AGENT_COLUMNS = frozenset({
+    "name", "role", "personality", "description", "trust_score",
+    "capability_level", "skills", "active"
+})
+
 
 # ── Shared Utilities ─────────────────────────────────────────────────────────
 

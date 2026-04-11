@@ -352,6 +352,7 @@ Crisis Detection:
 ```
 
 Each MCP server:
+
 - **Listens on unique port**
 - **Exposes `/health` endpoint**
 - **Thread-safe with timeouts**
@@ -401,6 +402,7 @@ if evaluate_guardians(job, analysis, context)["denied"]:
 ```
 
 **CRITICAL Laws (instant veto):**
+
 - Law 7: Privacy
 - Law 8: Nonmaleficence
 
@@ -413,6 +415,7 @@ def call_llm(prompt):
 ```
 
 Monitors:
+
 - LLM (Ollama/OpenRouter)
 - Payment processor (Stripe)
 - Job source (Apify)
@@ -478,6 +481,7 @@ system_health{status="healthy|warning|critical"}
 ### Grafana Dashboards (Port 3000)
 
 Pre-configured dashboards:
+
 - **Agent Performance:** Success rates, latency, trust scores
 - **Hexagon Pipeline:** Stage duration, bottleneck detection
 - **Guardian Laws:** Law compliance rates, violation heatmap
@@ -512,6 +516,7 @@ python -m pytest tests/ -q --cov=arbitrage --cov-fail-under=80
 ```
 
 Critical modules:
+
 - `arbitrage/guardian.py` — 9 laws validation
 - `arbitrage/trinity.py` — 3-perspective scoring
 - `arbitrage/hexagon.py` — 6-stage pipeline
@@ -579,7 +584,7 @@ kubectl apply -f kubernetes/
       │      │      │     │   │    │    │      │
       ▼      ▼      ▼     ▼   ▼    ▼    ▼      ▼
     [6 Hexagon Stages] × [9 Guardian Laws]
-    
+
     Result: 3 perspectives × 6 stages × 9 laws = 162 decision vectors
 ```
 
@@ -599,4 +604,4 @@ Each decision gets scored across all 162 dimensions for comprehensive evaluation
 
 **ADRION 369 — Autonomous Decision-making with Real-time Integration & Orchestration Nexus**
 
-*Last Updated: 2026-04-11 | Architecture Version: 4.0 | Maintained by Backend Architecture Team*
+_Last Updated: 2026-04-11 | Architecture Version: 4.0 | Maintained by Backend Architecture Team_
