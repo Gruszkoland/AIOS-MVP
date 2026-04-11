@@ -53,12 +53,11 @@ services:
       - DB_PATH=/app/data/arbitrage.db
       - STACK_CONTAINERS=adrion-api,adrion-dashboard
       - MONITORING_CONTAINERS=adrion-loki,adrion-promtail,adrion-grafana
-      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DISABLE_DOCKER_INSPECT=true
     expose:
       - "9000"
     volumes:
       - ./data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock
     logging:
       driver: json-file
       options:
@@ -116,7 +115,6 @@ services:
     volumes:
       - ./monitoring/promtail/config.yml:/etc/promtail/config.yml:ro
       - ./.runtime:/var/log/adrion-runtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock
       - promtail-positions:/tmp
     depends_on:
       loki:
