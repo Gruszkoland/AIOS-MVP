@@ -1,32 +1,41 @@
 # ADRION 369 Code Ownership
-# Each line: pattern  owner(s)
+
+# Each line: pattern owner(s)
+
 # Owners are auto-requested for review on matching PRs
 
 # Default — project owner
-*                           @adiha
+
+-                           @adiha
 
 # Core arbitrage engine
-arbitrage/                  @adiha
-arbitrage/guardian.py       @adiha
-arbitrage/trinity.py        @adiha
+
+arbitrage/ @adiha
+arbitrage/guardian.py @adiha
+arbitrage/trinity.py @adiha
 
 # Go Vortex
-cmd/                        @adiha
-internal/                   @adiha
-go.mod                      @adiha
+
+cmd/ @adiha
+internal/ @adiha
+go.mod @adiha
 
 # UAP Orchestrator
-uap/                        @adiha
+
+uap/ @adiha
 
 # Infrastructure
-docker-compose*.yml         @adiha
-kubernetes/                 @adiha
-Dockerfile*                 @adiha
+
+docker-compose*.yml @adiha
+kubernetes/ @adiha
+Dockerfile* @adiha
 
 # CI/CD — changes here need explicit review
-.github/                    @adiha
+
+.github/ @adiha
 
 # Security-sensitive files
-arbitrage/config.py         @adiha
-arbitrage/database.py       @adiha
-arbitrage/llm.py            @adiha
+
+arbitrage/config.py @adiha
+arbitrage/database.py @adiha
+arbitrage/llm.py @adiha
