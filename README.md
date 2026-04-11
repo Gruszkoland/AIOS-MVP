@@ -48,13 +48,13 @@ backward compatibility (`from arbitrage.config import DB_PATH`).
 Every arbitrage decision is validated against nine ethical laws in sequence:
 
 1. **Unity** (MEDIUM) -- job aligns with system core purpose
-2. **Truth** (HIGH) -- analysis is genuine, non-zero, reasoned
+2. **Harmony** (HIGH) -- balance between competing objectives
 3. **Rhythm** (MEDIUM) -- bid pace is sustainable (daily limits)
 4. **Causality** (HIGH) -- price chain is traceable and non-negative
 5. **Transparency** (MEDIUM) -- all required analysis fields present
-6. **Nonmaleficence** (CRITICAL) -- no financial harm to operator
-7. **Autonomy** (HIGH) -- client not spammed beyond daily cap
-8. **Justice** (MEDIUM) -- budget within fair scout range
+6. **Authenticity** (CRITICAL) -- analysis is genuine and non-deceptive
+7. **Privacy** (CRITICAL) -- no external disclosure without consent
+8. **Nonmaleficence** (CRITICAL) -- no financial harm to operator
 9. **Sustainability** (HIGH) -- daily total operational cost within limit
 
 **Decision rules:** A CRITICAL law violation triggers an instant DENY. Two or
@@ -106,14 +106,14 @@ with configurable `CORS_ALLOWED_ORIGIN`, Vortex auth middleware
 
 ## 🧠 The Swarm Personas
 
-| Persona       | Role                | Law                      | Trigger      |
+| Persona       | Role                | Primary Law              | Trigger      |
 | ------------- | ------------------- | ------------------------ | ------------ |
-| **LIBRARIAN** | Knowledge Archiver  | 1: Historical Continuity | `@librarian` |
-| **SAP**       | Strategic Planner   | 2: Strategic Coherence   | `@sap`       |
-| **AUDITOR**   | Quality Overseer    | 3: Non-Regression        | `@auditor`   |
-| **SENTINEL**  | Error Guardian      | 4: Rapid Response        | `@sentinel`  |
-| **ARCHITECT** | Design Authority    | 5: Unified Design        | `@architect` |
-| **HEALER**    | Optimization Engine | 6: Continuous Healing    | `@healer`    |
+| **LIBRARIAN** | Knowledge Archiver  | 1: Unity                 | `@librarian` |
+| **SAP**       | Strategic Planner   | 2: Harmony               | `@sap`       |
+| **AUDITOR**   | Quality Overseer    | 5: Transparency          | `@auditor`   |
+| **SENTINEL**  | Error Guardian      | 8: Nonmaleficence        | `@sentinel`  |
+| **ARCHITECT** | Design Authority    | 4: Causality             | `@architect` |
+| **HEALER**    | Optimization Engine | 9: Sustainability        | `@healer`    |
 
 ---
 
