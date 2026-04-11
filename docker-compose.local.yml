@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for metrics and audit logging
+  postgres:
+    image: postgres:15-alpine
+    container_name: adrion-postgres
+    environment:
+      POSTGRES_DB: adrion_agents
+      POSTGRES_USER: adrion
+      POSTGRES_PASSWORD: adrion_local_dev_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adrion"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: adrion-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    depends_on:
+      - postgres
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: adrion-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for inter-agent communication (optional enhancement)
+  redis:
+    image: redis:7-alpine
+    container_name: adrion-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+  redis_data:
+
+networks:
+  default:
+    name: adrion-network
