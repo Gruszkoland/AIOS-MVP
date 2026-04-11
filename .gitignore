@@ -21,6 +21,9 @@ micro-saas/.env.local
 temp_*.txt
 _temp_*/
 _temp_*
+temp_deploy/
+Phase*_Distribution_Package*/
+_temp_extract/
 
 # ── Runtime API logs (root level) ────────────────────────────────────────────
 _a11_runtime_api_stderr.log
@@ -30,6 +33,7 @@ _a11_runtime_launcher_stdout.log
 _precommit_a11_api_stderr.log
 _precommit_a11_api_stdout.log
 *.log
+logs/
 
 # ── Build artifacts ────────────────────────────────────────────────────────
 dist/

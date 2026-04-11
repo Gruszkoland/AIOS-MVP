@@ -3,16 +3,16 @@ name: ADR Validation & Monitoring
 on:
   pull_request:
     paths:
-      - 'docs/adr/**'
-      - '**/*.md'
+      - "docs/adr/**"
+      - "**/*.md"
   push:
     branches:
       - main
       - develop
     paths:
-      - 'docs/adr/**'
-      - 'docs/ARCHITECTURE/**'
-      - 'Genesis Record/10_RAPORTY/**'
+      - "docs/adr/**"
+      - "docs/ARCHITECTURE/**"
+      - "Genesis Record/10_RAPORTY/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Check ADR file naming
         run: |
           echo "✓ Checking ADR naming convention (ADR-NNN.md)..."
@@ -35,13 +35,13 @@ jobs:
             fi
           done
           echo "✅ All ADR filenames valid"
-      
+
       - name: Validate ADR Content Structure
         run: |
           echo "✓ Validating ADR Markdown structure..."
           for file in docs/adr/ADR-*.md; do
             echo "  Checking: $(basename $file)"
-            
+
             # Required sections
             if ! grep -q "^# ADR-" "$file"; then
               echo "❌ Missing ADR title in $file"
@@ -73,7 +73,7 @@ jobs:
             fi
           done
           echo "✅ All ADR structures valid"
-      
+
       - name: Check for Guardian Laws Coverage
         run: |
           echo "✓ Checking Guardian Laws references..."
@@ -85,7 +85,7 @@ jobs:
             fi
           done
           echo "✅ Guardian Laws check completed"
-      
+
       - name: Validate JSON Trackers
         run: |
           echo "✓ Validating JSON monitoring files..."
@@ -93,14 +93,14 @@ jobs:
           python3 -m json.tool "Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/ATAM-Progress.json" > /dev/null
           python3 -m json.tool "Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/Tools-Integration-Status.json" > /dev/null
           echo "✅ All JSON trackers valid"
-      
+
       - name: Generate ADR Summary Report
         run: |
           echo "📊 ADR Summary Report"
           echo "===================="
           adr_count=$(ls -1 docs/adr/ADR-*.md 2>/dev/null | wc -l)
           echo "Total ADRs: $adr_count"
-          
+
           accepted=$(grep -l "^- \[x\] Accepted" docs/adr/*.md 2>/dev/null | wc -l)
           proposed=$(grep -l "^- \[ \] Proposed" docs/adr/*.md 2>/dev/null | wc -l)
           echo "  ✅ Accepted: $accepted"
@@ -113,12 +113,12 @@ jobs:
     needs: validate-adr-structure
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      
+          python-version: "3.11"
+
       - name: Update ADR Adoption Status
         run: |
           python3 << 'EOF'
@@ -126,20 +126,20 @@ jobs:
           import os
           from pathlib import Path
           from datetime import datetime
-          
+
           adr_dir = Path("docs/adr")
           adr_files = sorted(adr_dir.glob("ADR-*.md"))
-          
+
           accepted_count = 0
           proposed_count = 0
-          
+
           for adr_file in adr_files:
             content = adr_file.read_text()
             if "- [x] Accepted" in content:
               accepted_count += 1
             elif "- [ ] Proposed" in content:
               proposed_count += 1
-          
+
           # Update JSON tracker
           tracker_path = Path("Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/ADR-Adoption-Status.json")
           with open(tracker_path, "r+") as f:
@@ -148,14 +148,14 @@ jobs:
             tracker["adr_summary"]["accepted"] = accepted_count
             tracker["adr_summary"]["proposed"] = proposed_count
             tracker["adr_summary"]["coverage_percentage"] = int(accepted_count * 100 / len(adr_files)) if adr_files else 0
-            
+
             f.seek(0)
             json.dump(tracker, f, indent=2)
             f.truncate()
-          
+
           print(f"✅ Updated ADR status: {accepted_count} accepted, {proposed_count} proposed")
           EOF
-      
+
       - name: Commit Updated Status
         if: github.actor != 'github-actions[bot]'
         run: |
@@ -171,7 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Verify ATAM Documentation
         run: |
           echo "✓ Checking ATAM documentation..."
@@ -180,13 +180,13 @@ jobs:
           else
             echo "⚠️  Note: ATAM Findings not yet created (planned for Q2 2026)"
           fi
-      
+
       - name: Check Design Patterns
         run: |
           echo "✓ Verifying Design Patterns catalog..."
           pattern_count=$(ls -1 docs/DESIGN-PATTERNS/*.md 2>/dev/null | wc -l || echo 0)
           echo "Design Patterns documented: $pattern_count/5 (planned)"
-      
+
       - name: Verify Tooling Matrix
         run: |
           echo "✓ Checking Tooling Matrix..."

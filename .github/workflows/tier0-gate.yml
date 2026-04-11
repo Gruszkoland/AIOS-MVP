@@ -15,7 +15,7 @@ jobs:
   tier0_gate:
     name: TIER 0a-0e Gates
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         python-version: ["3.11"]
@@ -86,11 +86,11 @@ jobs:
           import sys
           sys.path.insert(0, 'internal')
           from rag_and_scb import RAGLoaderBasic, SCBSessionContinuity
-          
+
           # Test RAG
           rag = RAGLoaderBasic()
           print(f'RAG initialized OK')
-          
+
           # Test SCB export
           from pathlib import Path
           export_file = SCBSessionContinuity.save_session_context(
@@ -108,22 +108,22 @@ jobs:
           import sys
           sys.path.insert(0, 'internal')
           from live_telemetry import LiveTelemetryCollector, SentinelCrisisHandler
-          
+
           collector = LiveTelemetryCollector()
-          
+
           # Record states
           collector.record_ebdi_state('auditor', 0.3, 0.1, 0.5)
           collector.record_ebdi_state('sentinel', 0.4, 0.75, 0.9)  # Crisis trigger
-          
+
           # Check states
           latest = collector.get_all_latest_states()
           print(f'✓ Recorded {len(latest)} agent states')
-          
+
           # Check crisis detection
           sentinel = SentinelCrisisHandler(collector)
           if sentinel.check_crisis_status():
               print('✓ Crisis detection working')
-          
+
           # Export telemetry
           collector.export_telemetry()
           collector.export_crisis_events()
