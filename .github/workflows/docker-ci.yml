@@ -27,4 +27,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Optional: Add Trivy scan here in production
+      - name: Trivy security scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: adrion:latest
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: "1"
