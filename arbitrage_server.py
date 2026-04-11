@@ -3,10 +3,12 @@ ADRION 369 - Arbitrage Flask API Server
 Endpoints under /api/arbitrage/*
 Run: python arbitrage_server.py
 """
+import os
 import sys
 import threading
 import logging
 import time
+import warnings
 from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -33,8 +35,17 @@ from arbitrage.stream_emitters import run_aux_streams, get_stream_sources_status
 logging.basicConfig(level=logging.INFO, format="%(asctime)s level=%(levelname)s logger=%(name)s %(message)s")
 logger = logging.getLogger("adrion.api")
 
+warnings.warn(
+    "arbitrage_server.py is deprecated. Use arbitrage.app:create_app() instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+logger.warning("arbitrage_server.py is deprecated. Use arbitrage.app:create_app() instead.")
+
+STREAMS_CONNECTOR_TOKEN = os.getenv("STREAMS_CONNECTOR_TOKEN", "")
+
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[os.getenv("CORS_ALLOWED_ORIGIN", "http://localhost:8003")])
 
 
 @app.before_request
@@ -263,21 +274,21 @@ def stream_ingest_webhook():
 
     body = request.get_json(silent=True) or {}
     stream = str(body.get("stream", "")).strip().lower()
-    
+
     if stream not in {"ugc", "resale"}:
         return jsonify({"error": "Invalid stream. Expected 'ugc' or 'resale'"}), 400
 
     from arbitrage.stream_emitters import _normalize_external_events, _emit_events
-    
+
     # Normalize potential single event or list of events
     payload = body.get("data") or body.get("events") or [body]
     events = _normalize_external_events(stream, payload)
-    
+
     if not events:
         return jsonify({"status": "ignored", "reason": "no_valid_events_found"}), 200
 
     emitted = _emit_events(stream, events, dry_run=False)
-    
+
     return jsonify({
         "status": "received",
         "stream": stream,

@@ -50,10 +50,22 @@ except Exception:
 # CONFIG & LOGGING (must be before conditional imports that use logger)
 # ────────────────────────────────────────────────────────────────────────────
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s level=%(levelname)s logger=%(name)s %(message)s"
-)
+# ── Structured JSON logging for Loki/Grafana ────────────────────────────────
+try:
+    from pythonjsonlogger import jsonlogger
+    _handler = logging.StreamHandler()
+    _handler.setFormatter(jsonlogger.JsonFormatter(
+        "%(asctime)s %(name)s %(levelname)s %(message)s",
+        rename_fields={"asctime": "timestamp", "levelname": "level"},
+    ))
+    logging.root.handlers = [_handler]
+    logging.root.setLevel(logging.INFO)
+except ImportError:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(name)s %(levelname)s %(message)s",
+    )
+
 logger = logging.getLogger("adrion.uap.api")
 
 # Import database integration (SQLite fallback or PostgreSQL)
@@ -80,8 +92,20 @@ except Exception as e:
     K8S_WATCHER_ENABLED = False
 
 app = Flask(__name__)
-_CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "*")  # Allow all origins for development
+_CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "http://localhost:8003")
 CORS(app, origins=[_CORS_ORIGIN])
+
+# ── CSRF Origin check ─────────────────────────────────────────────────────
+_ALLOWED_ORIGINS = {_CORS_ORIGIN, "http://localhost:8003"}
+
+
+@app.before_request
+def _check_csrf():
+    if request.method in ("POST", "PUT", "DELETE"):
+        origin = request.headers.get("Origin")
+        if origin and origin not in _ALLOWED_ORIGINS:
+            return jsonify({"error": "Origin not allowed"}), 403
+
 
 # Initialize database (SQLite or PostgreSQL)
 try:
@@ -96,6 +120,12 @@ except Exception as e:
 MAPI_HOST = os.getenv("MAPI_HOST", "localhost")
 MAPI_PORT = int(os.getenv("MAPI_PORT", "8002"))
 API_KEY = os.getenv("UAP_API_KEY", "")
+
+# ── Agent column allowlist for UPDATE operations (security: prevent SQL injection) ──
+ALLOWED_AGENT_COLUMNS = frozenset({
+    "name", "role", "personality", "description", "trust_score",
+    "capability_level", "skills", "active"
+})
 
 # PRIORITY 7 FIX: Fail hard if API key is empty in production
 if not API_KEY:
@@ -295,14 +325,62 @@ def log_genesis_record(
 # HEALTH & STATUS
 # ────────────────────────────────────────────────────────────────────────────
 
+_UAP_SERVER_START = time.time()
+
+
+def _run_uap_health_checks() -> dict:
+    """Run cascade health checks against downstream dependencies."""
+    checks: dict = {"uptime": round(time.time() - _UAP_SERVER_START, 2)}
+    overall = True
+
+    # DB check
+    if USE_DATABASE and db:
+        try:
+            result = db.query("SELECT 1", [])
+            checks["db"] = "ok"
+        except Exception as e:
+            checks["db"] = f"error: {e}"
+            overall = False
+    else:
+        checks["db"] = "in-memory-fallback"
+
+    # Ollama / LLM check (non-critical)
+    try:
+        import requests as _req
+        resp = _req.get("http://localhost:11434/api/tags", timeout=2)
+        checks["ollama"] = "ok" if resp.status_code == 200 else "degraded"
+    except Exception:
+        checks["ollama"] = "unreachable"
+
+    # LLM backend availability
+    checks["llm_available"] = LLM_AVAILABLE
+
+    checks["status"] = "healthy" if overall else "degraded"
+    return checks
+
+
 @app.route("/mapi/v1/health", methods=["GET"])
 def health():
-    """Health check endpoint."""
-    return jsonify({
-        "status": "online",
-        "version": "1.0.0",
-        "timestamp": datetime.now().isoformat(),
-    })
+    """Deep health check endpoint with cascade dependency checks."""
+    checks = _run_uap_health_checks()
+    checks["version"] = "1.0.0"
+    checks["timestamp"] = datetime.now().isoformat()
+    status_code = 200 if checks["status"] == "healthy" else 503
+    return jsonify(checks), status_code
+
+
+@app.route("/mapi/v1/health/live", methods=["GET"])
+def liveness():
+    """Liveness probe — returns 200 if the process is running."""
+    return jsonify({"status": "alive"}), 200
+
+
+@app.route("/mapi/v1/health/ready", methods=["GET"])
+def readiness():
+    """Readiness probe — returns 503 if any critical dependency is down."""
+    checks = _run_uap_health_checks()
+    status_code = 200 if checks["status"] == "healthy" else 503
+    return jsonify(checks), status_code
 
 
 @app.route("/mapi/v1/status", methods=["GET"])
@@ -1310,11 +1388,20 @@ def update_agent(agent_id):
         if not data:
             return jsonify({"success": False, "error": "No data provided"}), 400
 
+        # SECURITY: Validate that only allowed columns are requested
+        unknown_fields = set(data.keys()) - ALLOWED_AGENT_COLUMNS
+        if unknown_fields:
+            return jsonify({
+                "success": False,
+                "error": f"Unknown fields: {', '.join(sorted(unknown_fields))}",
+                "allowed_fields": sorted(ALLOWED_AGENT_COLUMNS)
+            }), 400
+
         if USE_DATABASE and db:
             fields, values = [], []
-            for field in ['name', 'role', 'personality', 'description', 'trust_score', 'capability_level', 'skills', 'active']:
+            for field in sorted(ALLOWED_AGENT_COLUMNS):
                 if field in data:
-                    fields.append(f"{field} = %s")
+                    fields.append(f"{field} = ?")
                     values.append(json.dumps(data[field]) if field == 'skills' else data[field])
 
             if not fields:

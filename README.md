@@ -1,10 +1,10 @@
-# ADRION 369 v2.0 - Advanced AI System
+# ADRION 369 v4.0 - Advanced AI System
 
 ## Overview
 
-**ADRION 369 v2.0** is an elite, security-hardened autonomous execution environment based on the **Trinity-EBDI** framework. It orchestrates high-performance components across Go and Python to deliver predictive intelligence (Vortex Oracle) and real-time governance.
+**ADRION 369 v4.0** is an elite, security-hardened autonomous execution environment based on the **Trinity-EBDI** framework. It orchestrates high-performance components across Go and Python to deliver predictive intelligence (Vortex Oracle) and real-time governance.
 
-### 🚀 Key Innovations (v2.0)
+### Key Innovations (v4.0)
 
 - **Go Sentinel 174Hz**: Low-latency execution monitoring and rapid-response logic in Go.
 - **Python Quantum**: Advanced decision-making and pattern recognition using high-dimensional modeling.
@@ -20,7 +20,82 @@
 
 ---
 
-## 🏗️ Architecture
+## Architecture
+
+### Flask App Factory with Blueprints
+
+The Python backend uses a Flask application factory (`arbitrage/app.py`) with five
+registered blueprints:
+
+| Blueprint      | Prefix           | Responsibility                          |
+| -------------- | ---------------- | --------------------------------------- |
+| `arbitrage_bp` | `/api/arbitrage` | Job scouting, analysis, bidding         |
+| `quantum_bp`   | `/api/quantum`   | Quantum scan channels, circuit breakers |
+| `oracle_bp`    | `/api/oracle`    | Vortex Oracle predictions               |
+| `wholesale_bp` | `/api/wholesale` | Wholesale deal orchestration            |
+| `payments_bp`  | `/api/payments`  | XRP tracking, Stripe integration        |
+
+Additional top-level routes: `GET /health`, `GET /metrics` (Prometheus text format).
+
+### Pydantic BaseSettings (`arbitrage/config.py`)
+
+All configuration is managed through `AdrionSettings(BaseSettings)` with typed
+fields, `.env` loading, and field validators. Module-level aliases preserve
+backward compatibility (`from arbitrage.config import DB_PATH`).
+
+### 9 Guardian Laws Engine (`arbitrage/guardian.py`)
+
+Every arbitrage decision is validated against nine ethical laws in sequence:
+
+1. **Unity** (MEDIUM) -- job aligns with system core purpose
+2. **Truth** (HIGH) -- analysis is genuine, non-zero, reasoned
+3. **Rhythm** (MEDIUM) -- bid pace is sustainable (daily limits)
+4. **Causality** (HIGH) -- price chain is traceable and non-negative
+5. **Transparency** (MEDIUM) -- all required analysis fields present
+6. **Nonmaleficence** (CRITICAL) -- no financial harm to operator
+7. **Autonomy** (HIGH) -- client not spammed beyond daily cap
+8. **Justice** (MEDIUM) -- budget within fair scout range
+9. **Sustainability** (HIGH) -- daily total operational cost within limit
+
+**Decision rules:** A CRITICAL law violation triggers an instant DENY. Two or
+more violations of any severity also trigger a DENY. Zero or one non-critical
+violations result in APPROVE.
+
+Canonical definitions: [`docs/GUARDIAN_LAWS_CANONICAL.json`](docs/GUARDIAN_LAWS_CANONICAL.json)
+
+### Trinity Score Engine (`arbitrage/trinity.py`)
+
+Three perspectives evaluate every decision in a 162-dimensional space:
+
+- **Material** -- system resource availability (CPU/RAM via `psutil`).
+  Aggregation: harmonic mean. All components must pass (fail-fast).
+- **Intellectual** -- LLM analysis quality (score + reasoning).
+  Aggregation: harmonic mean. Low quality blocks the entire analysis.
+- **Essential** -- purpose alignment + profitability.
+  Aggregation: geometric mean. Both must be high (multiplicative).
+
+Combined score: `(material + intellectual + essential) / 3`. Approved when
+`material >= 0.3`, `intellectual >= 0.5`, `essential >= 0.2`, and
+`combined >= TRINITY_MIN_COMBINED`.
+
+### MCP Layer (6 Microservices)
+
+| Service  | Port | Role                          |
+| -------- | ---- | ----------------------------- |
+| Router   | 9000 | Request routing and balancing |
+| Vortex   | 9001 | EBDI state management         |
+| Guardian | 9002 | Law evaluation gateway        |
+| Oracle   | 9003 | Predictive intelligence       |
+| Genesis  | 9004 | Immutable audit log           |
+| Healer   | 9005 | Self-healing and optimization |
+
+### Go Vortex Server
+
+Echo framework on port 1740. Provides high-speed EBDI state management, CORS
+with configurable `CORS_ALLOWED_ORIGIN`, Vortex auth middleware
+(`X-Vortex-Key`), and 174Hz oscillation monitoring.
+
+### Supporting Infrastructure
 
 - **vortex-core (Go)**: High-speed API and system telemetry.
 - **quantum-oracle (Python)**: Strategic arbitrage and predictive analysis.
@@ -211,34 +286,74 @@ Old logic (e.g., `oracle.py`, `quantum.py`) has been moved to the `legacy/` dire
 
 ---
 
-## �📁 Project Structure
+## Project Structure
 
 ```
 .
-├── .github/
-│   └── copilot-instructions.md          # Global system instructions
-├── .vscode/
-│   ├── settings.json                    # VS Code configuration
-│   └── tasks.json                       # Aider launcher tasks
-├── .aider/
-│   ├── config.yml                       # Aider + Ollama configuration
-│   └── logs/                            # Genesis Record (session logs)
+├── arbitrage/
+│   ├── app.py                               # Flask app factory (create_app)
+│   ├── config.py                            # Pydantic BaseSettings configuration
+│   ├── guardian.py                           # 9 Guardian Laws Engine
+│   ├── trinity.py                           # Trinity Score Engine (Material/Intellectual/Essential)
+│   ├── blueprints/
+│   │   ├── arbitrage_bp.py                  # Job scouting, analysis, bidding
+│   │   ├── quantum_bp.py                    # Quantum scan channels
+│   │   ├── oracle_bp.py                     # Vortex Oracle predictions
+│   │   ├── wholesale_bp.py                  # Wholesale deal orchestration
+│   │   └── payments_bp.py                   # XRP tracking, Stripe integration
+│   ├── circuit_breaker.py                   # Circuit breaker (LLM/Stripe/Apify/XRP)
+│   ├── database.py                          # Connection pooling (SQLite/PostgreSQL)
+│   ├── metrics.py                           # Prometheus pool metrics
+│   └── rate_limiter.py                      # Sliding window rate limiter
+├── cmd/
+│   └── vortex-server/                       # Go Vortex Server (Echo, port 1740)
+├── internal/
+│   ├── api/                                 # Go API handlers
+│   └── quantum/                             # Go Vortex/EBDI/Oracle
+├── kubernetes/
+│   ├── 00-namespace/                        # Namespace definitions
+│   ├── 01-storage/                          # Persistent volume claims
+│   ├── 02-config/                           # ConfigMaps and secrets
+│   ├── 03-postgres/                         # PostgreSQL StatefulSet
+│   ├── 04-tier1/                            # Tier-1 services
+│   ├── 05-core/                             # Core application pods
+│   ├── 06-monitoring/                       # Prometheus, Grafana, Loki
+│   ├── 07-networking/                       # Ingress and service mesh
+│   └── 08-jobs/                             # CronJobs and batch tasks
+├── monitoring/
+│   ├── grafana/                             # Grafana dashboards and provisioning
+│   ├── alerts/                              # Alerting rules
+│   ├── loki/                                # Loki log aggregation config
+│   ├── promtail/                            # Promtail log shipping config
+│   └── prometheus.yml                       # Prometheus scrape configuration
+├── scripts/
+│   ├── reporting/                           # LLM KPI guards, session reports, CI gate reports
+│   ├── security/                            # Secret loading, git hooks
+│   ├── install/                             # One-click installer (setup-ADRION.ps1)
+│   ├── monitoring/                          # Service health monitoring
+│   └── backup/                              # PostgreSQL and SQLite backup scripts
+├── db/
+│   ├── migrations/                          # SQL migration files (001-004)
+│   └── MIGRATION_GUIDE.md
+├── docs/
+│   ├── ARCHITECTURE.md                      # System design & data flow
+│   ├── LAWS.md                              # The 9 governing laws explained
+│   ├── GUARDIAN_LAWS_CANONICAL.json          # Machine-readable law definitions
+│   ├── API_SCHEMA.yaml                      # OpenAPI specification
+│   └── DEPLOYMENT_RUNBOOK.md                # Production deployment guide
 ├── config/
-│   └── personas.yml                     # 6 persona definitions + system prompts
-├── persona-agents/                      # Individual persona agent files
+│   └── personas.yml                         # 6 persona definitions + system prompts
+├── persona-agents/                          # Individual persona agent files
 │   ├── librarian.agent.md
 │   ├── sap.agent.md
 │   ├── auditor.agent.md
 │   ├── sentinel.agent.md
 │   ├── architect.agent.md
 │   └── healer.agent.md
-├── docs/
-│   ├── INSTALL.md                       # Installation & setup guide
-│   ├── ARCHITECTURE.md                  # System design & data flow
-│   ├── LAWS.md                          # The 9 governing laws explained
-│   ├── WORKFLOW.md                      # How to use the personas
-│   └── TROUBLESHOOTING.md               # Common issues & fixes
-└── README.md                            # This file
+├── .github/
+│   └── workflows/                           # CI/CD (python-ci, release, security-ci)
+├── tests/                                   # Python test suite (83%+ coverage)
+└── README.md                                # This file
 ```
 
 ---
@@ -476,8 +591,8 @@ ADRION 369 System created with:
 
 ---
 
-**Version:** 1.0  
-**Last Updated:** March 29, 2026  
-**Status:** ✅ READY FOR DEPLOYMENT
+**Version:** 4.0
+**Last Updated:** April 11, 2026
+**Status:** PRODUCTION-GRADE (83%+ test coverage, CI/CD gated)
 
 **🚀 Your local AI coding army is ready to go!**

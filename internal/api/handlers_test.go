@@ -247,3 +247,138 @@ func TestOraclePredictSignalField(t *testing.T) {
 		t.Error("signal field missing in oracle response")
 	}
 }
+
+// ── GetThreats Dynamic Level Tests ──────────────────────────────────────────
+
+func TestGetThreatsCriticalLevel(t *testing.T) {
+	// resonance=1 → norm=1/9≈0.111 < 0.2 → critical
+	h := testHandler()
+	h.Vortex.Resonance = 1
+	h.Vortex.Health = 0.1
+
+	c, rec := request(http.MethodGet, "/sentinel/threats", "")
+	if err := h.GetThreats(c); err != nil {
+		t.Fatal(err)
+	}
+
+	var resp map[string]interface{}
+	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
+
+	threats := resp["threats"].([]interface{})
+	firstThreat := threats[0].(map[string]interface{})
+	if firstThreat["level"] != "critical" {
+		t.Errorf("level = %v, want critical", firstThreat["level"])
+	}
+	if resp["active_alerts"].(float64) != 2 {
+		t.Errorf("active_alerts = %v, want 2", resp["active_alerts"])
+	}
+}
+
+func TestGetThreatsWarningLevel(t *testing.T) {
+	// resonance=3 → norm=3/9≈0.333 < 0.4, health=0.3 < 0.4 → warning (both AND)
+	h := testHandler()
+	h.Vortex.Resonance = 3
+	h.Vortex.Health = 0.3
+
+	c, rec := request(http.MethodGet, "/sentinel/threats", "")
+	_ = h.GetThreats(c)
+
+	var resp map[string]interface{}
+	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
+
+	threats := resp["threats"].([]interface{})
+	firstThreat := threats[0].(map[string]interface{})
+	if firstThreat["level"] != "warning" {
+		t.Errorf("level = %v, want warning", firstThreat["level"])
+	}
+	if resp["active_alerts"].(float64) != 1 {
+		t.Errorf("active_alerts = %v, want 1", resp["active_alerts"])
+	}
+}
+
+func TestGetThreatsElevatedLevel(t *testing.T) {
+	// resonance=5 → norm=5/9≈0.556 < 0.7 → elevated (OR condition)
+	// health=0.8 >= 0.7, so only resonance triggers elevated
+	h := testHandler()
+	h.Vortex.Resonance = 5
+	h.Vortex.Health = 0.8
+
+	c, rec := request(http.MethodGet, "/sentinel/threats", "")
+	_ = h.GetThreats(c)
+
+	var resp map[string]interface{}
+	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
+
+	threats := resp["threats"].([]interface{})
+	firstThreat := threats[0].(map[string]interface{})
+	if firstThreat["level"] != "elevated" {
+		t.Errorf("level = %v, want elevated", firstThreat["level"])
+	}
+	if resp["active_alerts"].(float64) != 0 {
+		t.Errorf("active_alerts = %v, want 0", resp["active_alerts"])
+	}
+}
+
+func TestGetThreatsNominalLevel(t *testing.T) {
+	// resonance=8 → norm=8/9≈0.889 >= 0.7, health=0.9 >= 0.7 → nominal
+	h := testHandler()
+	h.Vortex.Resonance = 8
+	h.Vortex.Health = 0.9
+
+	c, rec := request(http.MethodGet, "/sentinel/threats", "")
+	_ = h.GetThreats(c)
+
+	var resp map[string]interface{}
+	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
+
+	threats := resp["threats"].([]interface{})
+	firstThreat := threats[0].(map[string]interface{})
+	if firstThreat["level"] != "nominal" {
+		t.Errorf("level = %v, want nominal", firstThreat["level"])
+	}
+	if resp["active_alerts"].(float64) != 0 {
+		t.Errorf("active_alerts = %v, want 0", resp["active_alerts"])
+	}
+}
+
+func TestGetThreatsBoundaryResonanceTwo(t *testing.T) {
+	// resonance=2 → norm=2/9≈0.222 >= 0.2, NOT critical from resonance alone.
+	// health=0.3 < 0.4. Since resonanceNorm < 0.4 AND health < 0.4 → warning.
+	h := testHandler()
+	h.Vortex.Resonance = 2
+	h.Vortex.Health = 0.3
+
+	c, rec := request(http.MethodGet, "/sentinel/threats", "")
+	_ = h.GetThreats(c)
+
+	var resp map[string]interface{}
+	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
+
+	threats := resp["threats"].([]interface{})
+	firstThreat := threats[0].(map[string]interface{})
+	if firstThreat["level"] != "warning" {
+		t.Errorf("level = %v, want warning (boundary: resonance=2 norm≈0.222, health=0.3)", firstThreat["level"])
+	}
+}
+
+func TestGetThreatsBoundaryResonanceSeven(t *testing.T) {
+	// resonance=7 → norm=7/9≈0.778 >= 0.7, health=0.75 >= 0.7 → nominal
+	h := testHandler()
+	h.Vortex.Resonance = 7
+	h.Vortex.Health = 0.75
+
+	c, rec := request(http.MethodGet, "/sentinel/threats", "")
+	_ = h.GetThreats(c)
+
+	var resp map[string]interface{}
+	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
+
+	threats := resp["threats"].([]interface{})
+	firstThreat := threats[0].(map[string]interface{})
+	if firstThreat["level"] != "nominal" {
+		t.Errorf("level = %v, want nominal (boundary: resonance=7 norm≈0.778, health=0.75)", firstThreat["level"])
+	}
+	if resp["active_alerts"].(float64) != 0 {
+		t.Errorf("active_alerts = %v, want 0 at nominal", resp["active_alerts"])
+	}
+}

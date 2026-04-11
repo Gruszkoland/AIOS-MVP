@@ -8,6 +8,7 @@ import logging
 import os
 import sqlite3
 from datetime import datetime
+from typing import Optional
 
 from .config import DB_ENGINE, DB_PATH, DB_URL
 
@@ -51,7 +52,7 @@ def init_pool(db_url: str = "", min_conn: int = 2, max_conn: int = 10) -> bool:
     return False
 
 
-def get_pooled_conn():
+def get_pooled_conn() -> sqlite3.Connection:
     """
     Return a connection checked out from the pool (PostgreSQL) or a fresh
     SQLite connection. Caller must call return_conn() when done.
@@ -82,7 +83,7 @@ def graceful_drain() -> None:
         finally:
             _pool = None
 
-def get_conn():
+def get_conn() -> sqlite3.Connection:
     """Returns a connection based on the configured engine."""
     if DB_ENGINE == "postgres" and DB_URL:
         try:
@@ -102,7 +103,7 @@ def get_conn():
     return conn
 
 
-def init_db(db_path=None):
+def init_db(db_path: Optional[str] = None) -> None:
     """Initialize database using migration files."""
     path = db_path or DB_PATH
     conn = sqlite3.connect(str(path))
@@ -159,7 +160,7 @@ def get_jobs(status: str = None, limit: int = 50) -> list[dict]:
         return [dict(r) for r in rows]
 
 
-def set_job_status(job_id: str, status: str):
+def set_job_status(job_id: str, status: str) -> None:
     with get_conn() as conn:
         conn.execute("UPDATE jobs SET status=? WHERE id=?", (status, job_id))
 
@@ -187,7 +188,7 @@ def get_pending_bids() -> list[dict]:
         return [dict(r) for r in rows]
 
 
-def approve_bid(bid_id: int, approved: bool):
+def approve_bid(bid_id: int, approved: bool) -> None:
     status = 1 if approved else -1
     sent_at = datetime.now().isoformat() if approved else None
     with get_conn() as conn:
@@ -210,7 +211,7 @@ def get_all_bids(limit: int = 100) -> list[dict]:
 
 # ── KPIs ──────────────────────────────────────────────────────────────────────
 
-def record_kpi(kpi: dict):
+def record_kpi(kpi: dict) -> None:
     with get_conn() as conn:
         conn.execute(
             "INSERT INTO kpis "
@@ -232,7 +233,7 @@ def get_totals() -> dict:
         return dict(row) if row else {}
 
 
-def record_autopilot_run(run_data: dict):
+def record_autopilot_run(run_data: dict) -> None:
     """Persist one autopilot cycle result for observability and reporting."""
     with get_conn() as conn:
         conn.execute(
@@ -427,7 +428,7 @@ def get_deals(channel_id: str = None, status: str = None, min_margin: float = No
         return [dict(r) for r in rows]
 
 
-def update_deal_status(deal_id: int, status: str):
+def update_deal_status(deal_id: int, status: str) -> None:
     with get_conn() as conn:
         conn.execute("UPDATE deals SET status=?, executed_at=datetime('now') WHERE id=?",
                       (status, deal_id))

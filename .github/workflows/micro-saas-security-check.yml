@@ -14,6 +14,10 @@ on:
       - ".github/workflows/micro-saas-security-check.yml"
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate-env-template:
     runs-on: ubuntu-latest

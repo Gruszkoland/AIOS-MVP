@@ -32,6 +32,10 @@ on:
       - ".github/workflows/jednosc-162d-gate.yml"
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   classification-gate:
     runs-on: ubuntu-latest

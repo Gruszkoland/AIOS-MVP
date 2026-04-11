@@ -1,7 +1,7 @@
 # ADRION 369 - LOCAL DEPLOYMENT GUIDE
 
-**Status**: Production-Ready System  
-**Date**: 2026-04-11  
+**Status**: Production-Ready System
+**Date**: 2026-04-11
 **Target**: Windows 10/11 + Docker Desktop
 
 ---
@@ -29,6 +29,7 @@ powershell -ExecutionPolicy Bypass -File scripts/deploy-local.ps1
 ```
 
 **Expected output:**
+
 ```
 [1/7] Checking environment... ✓
 [2/7] Installing Python dependencies... ✓
@@ -46,6 +47,7 @@ python scripts/run-agent-session.py --num-analyzers 4 --enable-rag
 ```
 
 **Expected output:**
+
 ```
 [2026-04-11 14:30:00] Starting session local-20260411-143000 with 4 analyzers
 [2026-04-11 14:30:05] Executing parallel orchestration pipeline...
@@ -81,14 +83,17 @@ MONITORING:
 ### Step 3: View Dashboards
 
 **Grafana** (Real-time Agent Monitoring)
+
 ```
 URL: http://localhost:3000
 User: admin
 Pass: admin
 ```
+
 Navigate to: Dashboards → ADRION 369 - Agent Performance
 
 **Prometheus** (Metrics Query)
+
 ```
 URL: http://localhost:9090
 Queries:
@@ -130,12 +135,12 @@ Queries:
 
 ### Services
 
-| Service | Port | Purpose | Status |
-|---------|------|---------|--------|
-| PostgreSQL | 5432 | Metrics & audit logging | Health check enabled |
-| Prometheus | 9090 | Metrics collection | Health check enabled |
-| Grafana | 3000 | Dashboard visualization | Health check enabled |
-| Redis | 6379 | Inter-agent communication | Health check enabled |
+| Service    | Port | Purpose                   | Status               |
+| ---------- | ---- | ------------------------- | -------------------- |
+| PostgreSQL | 5432 | Metrics & audit logging   | Health check enabled |
+| Prometheus | 9090 | Metrics collection        | Health check enabled |
+| Grafana    | 3000 | Dashboard visualization   | Health check enabled |
+| Redis      | 6379 | Inter-agent communication | Health check enabled |
 
 ---
 
@@ -154,6 +159,7 @@ docker-compose -f docker-compose.local.yml ps
 ```
 
 **Expected output:**
+
 ```
 NAME                  STATUS
 adrion-postgres       Up (healthy)
@@ -211,6 +217,7 @@ python scripts/run-agent-session.py --num-analyzers 1
 ### Output Files
 
 Results saved to `reports/local-sessions/`:
+
 - `{session-id}_results.json` — Full orchestration results
 - `{session-id}_report.json` — Performance analysis + bottleneck detection
 
@@ -240,24 +247,29 @@ Results saved to `reports/local-sessions/`:
 ### Dashboard Panels
 
 **Gauges** (3 panels)
+
 - Agent Status (success rate: 0% red → 95% green)
 - Agent Trust Scores (TSPA: 0.6 yellow → 0.85 green)
 - Average Duration (0ms green → 1000ms+ red)
 
 **Graphs** (2 panels)
+
 - Tasks Completed vs Failed (time series)
 - Latency Trends per agent (time series)
 
 **Stats** (3 panels)
+
 - Session Duration (ms)
 - Jobs Pipeline (processed, worthy, bids)
 - Throughput (jobs/sec)
 
 **Tables** (2 panels)
+
 - Recent Agent Actions
 - Alerts & Bottlenecks
 
 **Additional** (2 panels)
+
 - Parallelization Factor (gauge)
 - System Health (stat)
 
@@ -352,6 +364,7 @@ python scripts/run-agent-session.py --num-analyzers 8   # Maximum (local)
 ```
 
 **Expected scalability:**
+
 - 1 analyzer: ~15 jobs → 4.5 seconds
 - 2 analyzers: ~15 jobs → 2.5 seconds (1.8x speedup)
 - 4 analyzers: ~15 jobs → 1.5 seconds (3.0x speedup)
@@ -360,12 +373,14 @@ python scripts/run-agent-session.py --num-analyzers 8   # Maximum (local)
 ### Docker Resource Allocation
 
 **Current Configuration:**
+
 - PostgreSQL: 256MB RAM (adjustable)
 - Prometheus: 512MB RAM (adjustable)
 - Grafana: 256MB RAM (adjustable)
 - Redis: 256MB RAM (adjustable)
 
 **Increase if needed:**
+
 ```yaml
 # In docker-compose.local.yml
 services:
@@ -503,4 +518,4 @@ docker cp adrion-prometheus:/etc/prometheus ./backups/
 
 Your autonomous agent system is production-ready and fully deployable locally with full monitoring and observability!
 
-*ADRION 369 - Local Deployment Guide - Complete*
+_ADRION 369 - Local Deployment Guide - Complete_

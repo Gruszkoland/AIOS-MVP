@@ -14,12 +14,16 @@ on:
       - 'docs/ARCHITECTURE/**'
       - 'Genesis Record/10_RAPORTY/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate-adr-structure:
     name: Validate ADR Schema
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Check ADR file naming
         run: |
@@ -108,10 +112,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate-adr-structure
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       
@@ -153,11 +157,12 @@ jobs:
           EOF
       
       - name: Commit Updated Status
+        if: github.actor != 'github-actions[bot]'
         run: |
           git config user.name "ADRION-Bot"
           git config user.email "adrion@369.local"
           git add Genesis\ Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/
-          git commit -m "AUTO: Update ADR adoption status (CI/CD)" || echo "No changes to commit"
+          git commit -m "chore: update ADR adoption status [skip ci]" || echo "No changes to commit"
           git push || echo "Push skipped (no upstream)"
         continue-on-error: true
 
@@ -165,7 +170,7 @@ jobs:
     name: Architecture Quality Gates
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Verify ATAM Documentation
         run: |
