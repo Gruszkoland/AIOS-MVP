@@ -38,6 +38,7 @@ docker-compose -f docker-compose.local.yml up -d
 ```
 
 **Expected services:**
+
 - PostgreSQL (5432)
 - Prometheus (9090)
 - Grafana (3000)
@@ -85,6 +86,7 @@ python scripts/run-agent-session.py --num-analyzers 4
 **Error:** `open //./pipe/dockerDesktopLinuxEngine: file not found`
 
 **Solution:**
+
 1. Open Docker Desktop application manually
 2. Wait 60 seconds for WSL2 backend to initialize
 3. Run `docker ps` to verify daemon is ready
@@ -110,6 +112,7 @@ docker-compose -f docker-compose.local.yml exec postgres pg_isready -U adrion
 ### Memory Issues
 
 If Docker runs out of memory, increase Docker Desktop allocation:
+
 1. Docker Desktop → Settings → Resources
 2. Set Memory ≥ 8GB (recommended)
 3. Set CPUs ≥ 4 cores
