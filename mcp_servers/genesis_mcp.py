@@ -11,9 +11,14 @@ DSPy Signature:
 
 from mcp_servers import MCPBaseServer, DSPySignature
 from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from datetime import datetime
 import json
+import logging
+import os
+import time
+
+logger = logging.getLogger("adrion.mcp.genesis")
 
 
 genesis_signature = DSPySignature(
@@ -68,10 +73,11 @@ class GenesisMCP(MCPBaseServer):
         self.sessions: Dict[str, SessionState] = {}
         self.logs: List[LogEntry] = []
         self.rag_documents: List[Dict[str, Any]] = []
-        self.record_path = "Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU"
+        self.record_path = os.path.join("Genesis Record", "10_RAPORTY_DZIALANIA_SYSTEMU")
+        self._rag: Optional[Any] = None  # Lazy init to avoid import-time model load
 
     def handle_save_session(self, session_id: str, state: Dict[str, Any]) -> dict:
-        """POST /session/save — Save session state"""
+        """POST /session/save — Save session state to memory and disk."""
         def operation_fn():
             session = SessionState(
                 session_id=session_id,
@@ -80,7 +86,12 @@ class GenesisMCP(MCPBaseServer):
             )
             self.sessions[session_id] = session
 
-            filepath = f"{self.record_path}/{session_id}.json"
+            filepath = os.path.join(self.record_path, f"{session_id}.json")
+
+            # Persist to disk
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            with open(filepath, "w", encoding="utf-8") as f:
+                json.dump(session.to_dict(), f, indent=2, ensure_ascii=False)
 
             return {
                 "saved": True,
@@ -146,25 +157,73 @@ class GenesisMCP(MCPBaseServer):
         )
         return result
 
+    def _get_rag(self):
+        """Lazy-initialize RAG engine. Returns None if dependencies unavailable."""
+        if self._rag is None:
+            try:
+                from scripts.orchestration.rag_context_optimizer import RAGContextOptimizer
+                self._rag = RAGContextOptimizer()
+                logger.info("RAG engine initialized for Genesis MCP")
+            except (ImportError, SystemExit, Exception) as exc:
+                logger.warning("RAG dependencies unavailable (%s), using mock search", exc)
+                self._rag = False  # Sentinel: tried and failed
+        return self._rag if self._rag is not False else None
+
     def handle_rag_search(self, embedding: List[float], top_k: int = 5) -> dict:
-        """POST /rag/search — Semantic search on Genesis Record"""
+        """POST /rag/search — Semantic search on Genesis Record.
+
+        Uses real HNSW knn_query when RAGContextOptimizer is available,
+        falls back to mock results otherwise.
+        """
         def operation_fn():
-            # Simplified: mock semantic similarity
+            rag = self._get_rag()
+            start_ms = time.time()
+
+            if rag is not None and rag.doc_counter > 0:
+                try:
+                    import numpy as np
+                    query_vec = np.array([embedding], dtype=np.float32)
+                    k = min(top_k, rag.doc_counter)
+                    labels, distances = rag.index.knn_query(query_vec, k=k)
+
+                    docs = []
+                    for i, doc_id in enumerate(labels[0]):
+                        doc = rag.documents.get(int(doc_id), {})
+                        docs.append({
+                            "doc_id": f"doc_{doc_id}",
+                            "title": doc.get("metadata", {}).get("title", f"Document {doc_id}"),
+                            "score": round(float(1.0 - distances[0][i]), 4),
+                            "content": doc.get("text", "")[:500],
+                        })
+
+                    elapsed = (time.time() - start_ms) * 1000
+                    return {
+                        "docs": docs,
+                        "count": len(docs),
+                        "embedding_dim": len(embedding),
+                        "search_time_ms": round(elapsed, 1),
+                        "source": "hnsw",
+                    }
+                except Exception as exc:
+                    logger.warning("HNSW search failed: %s, using mock fallback", exc)
+
+            # Fallback: mock semantic similarity
             docs = [
                 {
                     "doc_id": f"doc_{i}",
                     "title": f"Document {i}",
-                    "score": 0.9 - (i * 0.1),
-                    "content": f"Content snippet for doc {i}"
+                    "score": round(0.9 - (i * 0.1), 2),
+                    "content": f"Content snippet for doc {i}",
                 }
                 for i in range(top_k)
             ]
-
+            elapsed = (time.time() - start_ms) * 1000
             return {
                 "docs": docs,
                 "count": len(docs),
                 "embedding_dim": len(embedding),
-                "search_time_ms": 42
+                "search_time_ms": round(elapsed, 1),
+                "source": "mock",
             }
 
         result = self.execute_step(
@@ -179,7 +238,7 @@ class GenesisMCP(MCPBaseServer):
         return result
 
     def handle_log_event(self, event: str, level: str = "info") -> dict:
-        """POST /log/append — Append to Genesis Record (append-only)"""
+        """POST /log/append — Append to Genesis Record (append-only, persisted to JSONL)."""
         def operation_fn():
             entry_id = f"LOG-{len(self.logs)}"
             log_entry = LogEntry(
@@ -193,8 +252,16 @@ class GenesisMCP(MCPBaseServer):
 
             self.logs.append(log_entry)
 
-            # Append to Genesis Record file
-            log_path = f"{self.record_path}/genesis_audit.jsonl"
+            # Persist to Genesis Record JSONL file
+            log_path = os.path.join(self.record_path, "genesis_audit.jsonl")
+            os.makedirs(os.path.dirname(log_path), exist_ok=True)
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps({
+                    "entry_id": entry_id,
+                    "timestamp": log_entry.timestamp,
+                    "level": level,
+                    "event": event,
+                }, ensure_ascii=False) + "\n")
 
             return {
                 "logged_at": log_entry.timestamp,
@@ -216,10 +283,14 @@ class GenesisMCP(MCPBaseServer):
         return result
 
     def handle_checkpoint_create(self, checkpoint_id: str, data: Dict[str, Any]) -> dict:
-        """Create rollback checkpoint"""
+        """Create rollback checkpoint (persisted to disk)."""
         def operation_fn():
-            # Store checkpoint
-            checkpoint_path = f"{self.record_path}/checkpoints/{checkpoint_id}.json"
+            checkpoint_path = os.path.join(self.record_path, "checkpoints", f"{checkpoint_id}.json")
+
+            # Persist checkpoint to disk
+            os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
+            with open(checkpoint_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
 
             return {
                 "checkpoint_id": checkpoint_id,

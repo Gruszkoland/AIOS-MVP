@@ -1,6 +1,7 @@
 """
 ADRION 369 - Autopilot Service
 Background scheduler for fully automated orchestrator cycles.
+Includes optional Healer integration (U5) for periodic health checks.
 """
 import logging
 import threading
@@ -13,9 +14,12 @@ from .stream_emitters import run_aux_streams
 
 log = logging.getLogger("autopilot")
 
+# U5: Default healer interval — run every N autopilot cycles (0 = disabled)
+HEALER_CYCLE_INTERVAL = 3  # every 3rd autopilot cycle (~90 min at default 30-min interval)
+
 
 class AutopilotService:
-    def __init__(self):
+    def __init__(self, healer_cycle_interval: int = HEALER_CYCLE_INTERVAL):
         self._thread = None
         self._stop_event = threading.Event()
         self._lock = threading.Lock()
@@ -24,6 +28,10 @@ class AutopilotService:
         self._last_started_at = None
         self._last_finished_at = None
         self._last_error = None
+        # U5: Healer integration
+        self._healer_cycle_interval = max(0, healer_cycle_interval)
+        self._cycle_count = 0
+        self._healer = None  # Lazy-init to avoid import at module load
 
     def start(self, interval_minutes: int = 30, dry_run: bool = False) -> dict:
         with self._lock:
@@ -73,6 +81,35 @@ class AutopilotService:
             "last_run": last_run,
         }
 
+    def _get_healer(self):
+        """Lazy-init AdrionHealer to avoid circular imports."""
+        if self._healer is None:
+            try:
+                from scripts.adrion_healer import AdrionHealer
+                self._healer = AdrionHealer()
+                log.info("Healer integration initialized")
+            except ImportError:
+                log.warning("AdrionHealer not available — healer integration disabled")
+                self._healer_cycle_interval = 0
+        return self._healer
+
+    def _run_healer(self):
+        """Run a healer cycle if interval has elapsed. Non-fatal on failure."""
+        if self._healer_cycle_interval <= 0:
+            return
+        self._cycle_count += 1
+        if self._cycle_count % self._healer_cycle_interval != 0:
+            return
+        healer = self._get_healer()
+        if healer is None:
+            return
+        try:
+            log.info("Running Healer cycle (every %d autopilot cycles)", self._healer_cycle_interval)
+            healer.run_cycle()
+            log.info("Healer cycle completed successfully")
+        except Exception as exc:
+            log.error("Healer cycle failed (non-fatal): %s", exc, exc_info=True)
+
     def _loop(self):
         init_db()
         while not self._stop_event.is_set():
@@ -120,6 +157,9 @@ class AutopilotService:
                 self._last_finished_at = finished_at
                 run_data["finished_at"] = finished_at
                 record_autopilot_run(run_data)
+
+            # U5: Run healer after main cycle completes
+            self._run_healer()
 
             wait_seconds = self._interval_minutes * 60
             if self._stop_event.wait(wait_seconds):

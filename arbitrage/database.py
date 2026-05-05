@@ -8,9 +8,20 @@ import logging
 import os
 import sqlite3
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional, Protocol
 
 from .config import DB_ENGINE, DB_PATH, DB_URL
+
+
+class DBConnection(Protocol):
+    """Protocol for database connections (SQLite or PostgreSQL)."""
+
+    def execute(self, query: str, params: Any = ...) -> Any: ...
+    def cursor(self) -> Any: ...
+    def commit(self) -> None: ...
+    def close(self) -> None: ...
+    def __enter__(self) -> "DBConnection": ...
+    def __exit__(self, *args: Any) -> None: ...
 
 logger = logging.getLogger("adrion.db")
 
@@ -52,7 +63,7 @@ def init_pool(db_url: str = "", min_conn: int = 2, max_conn: int = 10) -> bool:
     return False
 
 
-def get_pooled_conn() -> sqlite3.Connection:
+def get_pooled_conn() -> DBConnection:
     """
     Return a connection checked out from the pool (PostgreSQL) or a fresh
     SQLite connection. Caller must call return_conn() when done.
@@ -83,7 +94,7 @@ def graceful_drain() -> None:
         finally:
             _pool = None
 
-def get_conn() -> sqlite3.Connection:
+def get_conn() -> DBConnection:
     """Returns a connection based on the configured engine."""
     if DB_ENGINE == "postgres" and DB_URL:
         try:

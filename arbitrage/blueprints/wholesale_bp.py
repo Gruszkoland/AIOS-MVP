@@ -33,8 +33,8 @@ def _wholesale_cycle():
 
 
 def _rate_limiters():
-    from arbitrage.rate_limiter import cycle_limiter
-    return cycle_limiter
+    from arbitrage.rate_limiter import cycle_limiter, scout_limiter
+    return cycle_limiter, scout_limiter
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -44,6 +44,11 @@ def _rate_limiters():
 @wholesale_bp.route("/api/arbitrage/wholesale/scout", methods=["POST"])
 def handle_wholesale_scout():
     """POST /api/arbitrage/wholesale/scout -- B2B Wholesale Scout Bridge."""
+    _, scout_limiter = _rate_limiters()
+    client_ip = request.remote_addr
+    if not scout_limiter.is_allowed(client_ip):
+        return jsonify({"error": "Rate limit exceeded", "retry_after": 60}), 429
+
     body = request.get_json(silent=True) or {}
     feed_data = body.get("feed_data")
     feed_format = body.get("feed_format", "json")
@@ -60,7 +65,7 @@ def handle_wholesale_scout():
 @wholesale_bp.route("/api/arbitrage/wholesale/cycle", methods=["POST"])
 def handle_wholesale_cycle():
     """POST /api/arbitrage/wholesale/cycle -- Full Singularity Run pipeline."""
-    cycle_limiter = _rate_limiters()
+    cycle_limiter, _ = _rate_limiters()
     client_ip = request.remote_addr
     if not cycle_limiter.is_allowed(client_ip):
         return jsonify({"error": "Rate limit exceeded", "retry_after": 60}), 429

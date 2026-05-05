@@ -30,17 +30,17 @@
 
 Unikalny w branży system etycznej walidacji każdej decyzji AI:
 
-| # | Prawo | Co chroni | Implementacja |
-|---|-------|-----------|---------------|
-| 1 | Unity | Spójność systemu | Cel score check |
-| 2 | Truth | Zakaz dezinformacji | Fact validation |
-| 3 | Rhythm | Przewidywalność | Rate check |
-| 4 | Causality | Przejrzystość przyczyn | Chain logging |
-| 5 | Transparency | Uzasadnienie każdej decyzji | Required justification |
-| 6 | **Nonmaleficence** | **Zakaz wyrządzania szkody** | **Najwyższy priorytet** |
-| 7 | Autonomy | Szanowanie decyzji użytkownika | Consent check |
-| 8 | Justice | Brak bias, sprawiedliwy dostęp | Fairness audit |
-| 9 | Sustainability | Długoterminowy wpływ | Resource check |
+| #   | Prawo              | Co chroni                        | Implementacja           |
+| --- | ------------------ | -------------------------------- | ----------------------- |
+| 1   | Unity              | Spójność systemu                 | Cel score check         |
+| 2   | Harmony            | Balans między celami             | Fact validation         |
+| 3   | Rhythm             | Przewidywalność                  | Rate check              |
+| 4   | Causality          | Przejrzystość przyczyn           | Chain logging           |
+| 5   | Transparency       | Uzasadnienie każdej decyzji      | Required justification  |
+| 6   | **Nonmaleficence** | **Zakaz wyrządzania szkody**     | **Najwyższy priorytet** |
+| 7   | Privacy            | Brak ujawniania danych bez zgody | Consent check           |
+| 8   | Nonmaleficence     | Zakaz wyrządzania szkody         | Harm prevention         |
+| 9   | Sustainability     | Długoterminowy wpływ             | Resource check          |
 
 **Mechanizm:** ≥2 naruszeń = MANDATORY DENY. Wynik Trinity ignorowany.
 **Roadmap:** Ważone prawa — Nonmaleficence = instant DENY (ADR-002b)
@@ -60,6 +60,7 @@ manage-secrets.ps1      # rotacja i walidacja kluczy
 ```
 
 **Narzędzia CI:**
+
 - `bandit` — skanowanie podatności w Python (blokuje PR)
 - `safety` — skan zależności pod kątem CVE (blokuje PR)
 - `truffleHog` / `gitleaks` — skanowanie git history (pre-commit)
@@ -117,6 +118,7 @@ DANE UŻYTKOWNIKA
 ```
 
 **Gwarancje prywatności:**
+
 - ✅ **Zero PII** wysyłanych do cloud LLM
 - ✅ Genesis Record przechowywany lokalnie
 - ✅ Logi nie zawierają wrażliwych danych (zweryfikowane w code review)
@@ -124,12 +126,12 @@ DANE UŻYTKOWNIKA
 
 ### Compliance status
 
-| Standard | Status | Uwagi |
-|----------|--------|-------|
-| RODO (EU) | ✅ By design | Local-first = brak transferu do USA |
-| SOC2 | 🔜 Planowany | Wymaga audit Q3 2026 |
-| ISO 27001 | 🔜 Planowany | Po SOC2 |
-| PCI DSS | ⚠️ Delegowany | Stripe obsługuje PCI compliance |
+| Standard  | Status        | Uwagi                               |
+| --------- | ------------- | ----------------------------------- |
+| RODO (EU) | ✅ By design  | Local-first = brak transferu do USA |
+| SOC2      | 🔜 Planowany  | Wymaga audit Q3 2026                |
+| ISO 27001 | 🔜 Planowany  | Po SOC2                             |
+| PCI DSS   | ⚠️ Delegowany | Stripe obsługuje PCI compliance     |
 
 ---
 
@@ -140,11 +142,11 @@ DANE UŻYTKOWNIKA
 ```yaml
 # docker-compose — network isolation
 networks:
-  adrion-internal:   # tylko internal services
-  adrion-external:   # tylko publiczne endpointy
+  adrion-internal: # tylko internal services
+  adrion-external: # tylko publiczne endpointy
 
 # CORS
-CORS_ALLOWED_ORIGIN: $CORS_ALLOWED_ORIGIN  # nie "*"
+CORS_ALLOWED_ORIGIN: $CORS_ALLOWED_ORIGIN # nie "*"
 ```
 
 ### Database security
@@ -179,14 +181,14 @@ GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA public TO adrion_app;
 
 ### Incident Response Plan
 
-| Zdarzenie | Odpowiedź | Czas |
-|-----------|-----------|------|
-| Agent crash | Watchdog auto-restart | <5s |
-| DB connection exhaustion | Pool monitoring + alert | real-time |
-| Circuit breaker open | Log + fallback mode | instant |
-| Security CVE w dependency | safety CI blokuje PR | per PR |
+| Zdarzenie                 | Odpowiedź               | Czas      |
+| ------------------------- | ----------------------- | --------- |
+| Agent crash               | Watchdog auto-restart   | <5s       |
+| DB connection exhaustion  | Pool monitoring + alert | real-time |
+| Circuit breaker open      | Log + fallback mode     | instant   |
+| Security CVE w dependency | safety CI blokuje PR    | per PR    |
 
 ---
 
-*ADRION 369 v1.0.0 — Genesis Record 2026-04-05*
-*Pełny threat model: [docs/THREAT-MODEL.md](../../docs/THREAT-MODEL.md)*
+_ADRION 369 v1.0.0 — Genesis Record 2026-04-05_
+_Pełny threat model: [docs/THREAT-MODEL.md](../../docs/THREAT-MODEL.md)_

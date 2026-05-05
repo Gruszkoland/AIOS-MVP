@@ -19,59 +19,63 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  # ADRION API
+  # ADRION API (Flask on port 8001 — see docker-compose.prod.yml)
   - job_name: "adrion-api"
     static_configs:
       - targets: ["adrion-api:8001"]
     metrics_path: "/metrics"
     scrape_interval: 30s
 
-  # ADRION UAP
+  # ADRION UAP Orchestrator
   - job_name: "adrion-uap"
     static_configs:
-      - targets: ["adrion-api:8001"]
+      - targets: ["adrion-uap:8002"]
     metrics_path: "/mapi/v1/metrics"
     scrape_interval: 30s
 
-  # Vortex Engine (174Hz)
-  - job_name: "vortex-engine"
-    static_configs:
-      - targets: ["vortex-engine:1740"]
-    metrics_path: "/metrics"
-    scrape_interval: 30s
+  # Vortex Engine (Go, port 1740)
+  # Uncomment when vortex-server is added to docker-compose.prod.yml
+  # - job_name: "vortex-engine"
+  #   static_configs:
+  #     - targets: ["vortex-server:1740"]
+  #   metrics_path: "/metrics"
+  #   scrape_interval: 30s
 
   # Ollama LLM
-  - job_name: "ollama"
-    static_configs:
-      - targets: ["ollama:11434"]
-    metrics_path: "/metrics"
-    scrape_interval: 30s
+  # Uncomment when ollama service is added to docker-compose.prod.yml
+  # - job_name: "ollama"
+  #   static_configs:
+  #     - targets: ["ollama:11434"]
+  #   metrics_path: "/metrics"
+  #   scrape_interval: 30s
 
-  # PostgreSQL (via postgres_exporter if available)
+  # PostgreSQL (via postgres_exporter sidecar)
   - job_name: "postgres"
     static_configs:
-      - targets: ["postgres:5432"]
+      - targets: ["postgres-exporter:9187"]
+    metrics_path: "/metrics"
     scrape_interval: 60s
 
   # N8N Workflow
-  - job_name: "n8n"
-    static_configs:
-      - targets: ["n8n:5678"]
-    metrics_path: "/metrics"
-    scrape_interval: 30s
+  # Uncomment when n8n service is added to docker-compose.prod.yml
+  # - job_name: "n8n"
+  #   static_configs:
+  #     - targets: ["n8n:5678"]
+  #   metrics_path: "/metrics"
+  #   scrape_interval: 30s
 
-  # Loki Log Aggregation
+  # Loki Log Aggregation (service name: loki in docker-compose.prod.yml)
   - job_name: "loki"
     static_configs:
       - targets: ["loki:3100"]
     metrics_path: "/metrics"
     scrape_interval: 30s
 
-  # Grafana Monitoring
+  # Grafana Monitoring (service name: grafana in docker-compose.prod.yml)
   - job_name: "grafana"
     static_configs:
       - targets: ["grafana:3000"]
-    metrics_path: "/api/health"
+    metrics_path: "/metrics"
     scrape_interval: 30s
 
   # Alert Handler

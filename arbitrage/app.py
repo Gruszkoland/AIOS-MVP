@@ -41,15 +41,25 @@ def create_app() -> Flask:
     app = Flask(__name__)
     CORS(app, origins=[_CORS_ORIGIN])
 
-    # ── CSRF Origin check ───────────────────────────────────────────────────
+    # ── CSRF Origin/Referer check (API-appropriate, no tokens needed) ─────
     _ALLOWED_ORIGINS = {_CORS_ORIGIN, "http://localhost:8003"}
 
     @app.before_request
     def _check_csrf():
-        if request.method in ("POST", "PUT", "DELETE"):
+        if request.method in ("POST", "PUT", "DELETE", "PATCH"):
             origin = request.headers.get("Origin")
+            referer = request.headers.get("Referer")
+            # JSON API requests without Origin/Referer are allowed (non-browser)
+            if not origin and not referer:
+                return None
             if origin and origin not in _ALLOWED_ORIGINS:
                 return jsonify({"error": "Origin not allowed"}), 403
+            if not origin and referer:
+                from urllib.parse import urlparse
+                referer_origin = f"{urlparse(referer).scheme}://{urlparse(referer).netloc}"
+                if referer_origin not in _ALLOWED_ORIGINS:
+                    return jsonify({"error": "Referer not allowed"}), 403
+            return None
 
     # ── Register Blueprints ──────────────────────────────────────────────────
     from arbitrage.blueprints.arbitrage_bp import arbitrage_bp
