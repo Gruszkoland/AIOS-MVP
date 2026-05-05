@@ -1,6 +1,6 @@
 param(
     [int]$Port = 8011,
-    [int]$StartupTimeoutSeconds = 20
+    [int]$StartupTimeoutSeconds = 30
 )
 
 $ErrorActionPreference = "Stop"
@@ -42,7 +42,7 @@ Invoke-Step -Name "validate_session_reports" -Action {
 }
 
 Invoke-Step -Name "check_llm_kpi_gate_warmup" -Action {
-    & ".\.venv\Scripts\python.exe" "scripts\reporting\check_llm_kpi_gate.py" "--window" "200" "--min-events" "30" "--rollback-on-fail" "--warmup-ok"
+    & ".\.venv\Scripts\python.exe" "scripts\reporting\check_llm_kpi_gate.py" "--window" "200" "--min-events" "30" "--rollback-on-fail" "--warmup-ok" "--max-age-days" "7"
 }
 
 Invoke-Step -Name "validate_powershell_tasks" -Action {

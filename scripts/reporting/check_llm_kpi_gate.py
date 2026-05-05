@@ -128,6 +128,16 @@ def main() -> int:
         default=0,
         help="Optional monitor loop iteration id for audit traceability.",
     )
+    parser.add_argument(
+        "--max-age-days",
+        type=float,
+        default=7.0,
+        help=(
+            "Ignore KPI events older than this many days (default: 7). "
+            "Prevents historical outages from poisoning the rolling metric. "
+            "Set to 0 to disable age filtering."
+        ),
+    )
     args = parser.parse_args()
     alert_path = Path(args.alert_path)
     history_path = Path(args.history_path)
@@ -165,7 +175,10 @@ def main() -> int:
     print(f" - percent: {settings.get('canary_percent')}")
     print(f" - backend: {settings.get('canary_backend')}")
 
-    snapshot = llm.get_kpi_snapshot(max_events=args.window)
+    snapshot = llm.get_kpi_snapshot(
+        max_events=args.window,
+        age_limit_seconds=args.max_age_days * 86400 if args.max_age_days > 0 else None,
+    )
     count = int(snapshot.get("count", 0))
 
     print("LLM KPI Snapshot")

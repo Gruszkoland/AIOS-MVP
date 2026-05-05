@@ -738,11 +738,11 @@ def run_api_server():
     from arbitrage.database import init_db
     init_db()
     server = HTTPServer(("0.0.0.0", ARB_PORT), ArbitrageHandler)
-    print(f"✅ Arbitrage API running on http://localhost:{ARB_PORT}")
+    print(f"[OK] Arbitrage API running on http://localhost:{ARB_PORT}", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\n✋ Arbitrage API stopped")
+        print("[STOP] Arbitrage API stopped")
         server.shutdown()
 
 
