@@ -85,26 +85,26 @@ Job → analyze_job() → score < MIN → IGNORE
 
 ### Hexagon — 6 trybów sekwencyjnych
 
-| Tryb | Funkcja | Output |
-|------|---------|--------|
-| `Inventory` | Kataloguje dostępne zasoby i narzędzia | Resource manifest |
-| `Empathy` | Analizuje kontekst użytkownika/rynku | Context map |
-| `Process` | Przetwarza zgodnie z regulami biznesowymi | Processed data |
-| `Debate` | Waży alternatywne podejścia | Decision rationale |
-| `Healing` | Naprawia niespójności, optymalizuje | Corrected state |
-| `Action` | Generuje finalną odpowiedź/akcję | Executable action |
+| Tryb        | Funkcja                                   | Output             |
+| ----------- | ----------------------------------------- | ------------------ |
+| `Inventory` | Kataloguje dostępne zasoby i narzędzia    | Resource manifest  |
+| `Empathy`   | Analizuje kontekst użytkownika/rynku      | Context map        |
+| `Process`   | Przetwarza zgodnie z regulami biznesowymi | Processed data     |
+| `Debate`    | Waży alternatywne podejścia               | Decision rationale |
+| `Healing`   | Naprawia niespójności, optymalizuje       | Corrected state    |
+| `Action`    | Generuje finalną odpowiedź/akcję          | Executable action  |
 
 ### Guardians — 9 Praw Etycznych
 
 ```
 1. Unity         — Jeden cel, spójność systemu
-2. Truth         — Brak dezinformacji, weryfikowalność
+2. Harmony       — Balans między konkurującymi celami
 3. Rhythm        — Regularność i przewidywalność działania
 4. Causality     — Przezroczystość łańcuchów przyczynowych
 5. Transparency  — Każda decyzja explicite uzasadniona
 6. Nonmaleficence — Nie szkodź (primum non nocere)
-7. Autonomy      — Szanuj autonomię użytkownika
-8. Justice       — Sprawiedliwy dostęp, brak bias
+7. Privacy       — Brak ujawniania danych bez zgody
+8. Nonmaleficence — Nie szkodź użytkownikom, systemom, danym
 9. Sustainability — Długoterminowa zrównoważoność
 
 Próg: ≥2 naruszeń → MANDATORY DENY (niezależnie od Trinity score)
@@ -126,18 +126,18 @@ Próg: ≥2 naruszeń → MANDATORY DENY (niezależnie od Trinity score)
 
 **Kluczowe moduły (`arbitrage/`):**
 
-| Moduł | Funkcja | Test coverage |
-|-------|---------|---------------|
-| `api.py` | HTTP server (30+ endpoints) | 87.6% |
-| `scout.py` | Lead discovery (Apify + mock) | 97.1% |
-| `analyzer.py` | LLM-powered bid analysis | ~65% |
-| `wholesale_scout.py` | B2B product discovery | 95.5% |
-| `wholesale_orchestrator.py` | Wholesale lifecycle | 98.5% |
-| `payments.py` | Stripe integration | 97.1% |
-| `oracle.py` | Predictive pricing | 87.1% |
-| `quantum.py` | EBDI state engine | 80.0% |
-| `rate_limiter.py` | SlidingWindowRateLimiter | 73.3% |
-| `circuit_breaker.py` | Per-service breakers | ~75% |
+| Moduł                       | Funkcja                       | Test coverage |
+| --------------------------- | ----------------------------- | ------------- |
+| `api.py`                    | HTTP server (30+ endpoints)   | 87.6%         |
+| `scout.py`                  | Lead discovery (Apify + mock) | 97.1%         |
+| `analyzer.py`               | LLM-powered bid analysis      | ~65%          |
+| `wholesale_scout.py`        | B2B product discovery         | 95.5%         |
+| `wholesale_orchestrator.py` | Wholesale lifecycle           | 98.5%         |
+| `payments.py`               | Stripe integration            | 97.1%         |
+| `oracle.py`                 | Predictive pricing            | 87.1%         |
+| `quantum.py`                | EBDI state engine             | 80.0%         |
+| `rate_limiter.py`           | SlidingWindowRateLimiter      | 73.3%         |
+| `circuit_breaker.py`        | Per-service breakers          | ~75%          |
 
 ### Rate limits (per endpoint)
 
@@ -155,22 +155,22 @@ Próg: ≥2 naruszeń → MANDATORY DENY (niezależnie od Trinity score)
 
 ### Rdzeń (6 agentów)
 
-| Agent | Rola | Trigger |
-|-------|------|---------|
+| Agent     | Rola                                        | Trigger         |
+| --------- | ------------------------------------------- | --------------- |
 | Librarian | Kontekst historyczny, pamięć długoterminowa | Każde wywołanie |
-| SAP | Planowanie strategiczne, priorytetyzacja | Nowe zadanie |
-| Auditor | Walidacja jakości, code review | Post-action |
-| Sentinel | Monitoring błędów, watchdog | 174Hz (Vortex) |
-| Architect | Decyzje architektoniczne | Design changes |
-| Healer | Naprawa długu technicznego | Degradacja |
+| SAP       | Planowanie strategiczne, priorytetyzacja    | Nowe zadanie    |
+| Auditor   | Walidacja jakości, code review              | Post-action     |
+| Sentinel  | Monitoring błędów, watchdog                 | 174Hz (Vortex)  |
+| Architect | Decyzje architektoniczne                    | Design changes  |
+| Healer    | Naprawa długu technicznego                  | Degradacja      |
 
 ### Rozszerzenie (3 agenty)
 
-| Agent | Rola |
-|-------|------|
-| Amplifier | Wzmacnianie sygnałów rynkowych |
-| BoosterLever | Optymalizacja dźwigni finansowej |
-| Chronos | Zarządzanie harmonogramem, timing |
+| Agent        | Rola                              |
+| ------------ | --------------------------------- |
+| Amplifier    | Wzmacnianie sygnałów rynkowych    |
+| BoosterLever | Optymalizacja dźwigni finansowej  |
+| Chronos      | Zarządzanie harmonogramem, timing |
 
 ---
 
@@ -180,32 +180,32 @@ Próg: ≥2 naruszeń → MANDATORY DENY (niezależnie od Trinity score)
 
 ```yaml
 serwisy:
-  adrion-api:        Python Flask/BaseHTTP  :5000
-  adrion-uap:        UAP Dashboard          :8003
-  vortex-engine:     Go sentinel            :1740
-  postgres:          genesis_record DB      :5432
-  redis:             AI-Binder IPC          :6379
-  n8n:               Workflow automation    :5678
-  ollama:            Local LLM              :11434
-  prometheus:        Metrics                :9090
-  grafana:           Visualization          :3000
-  loki:              Log aggregation
+  adrion-api: Python Flask/BaseHTTP  :5000
+  adrion-uap: UAP Dashboard          :8003
+  vortex-engine: Go sentinel            :1740
+  postgres: genesis_record DB      :5432
+  redis: AI-Binder IPC          :6379
+  n8n: Workflow automation    :5678
+  ollama: Local LLM              :11434
+  prometheus: Metrics                :9090
+  grafana: Visualization          :3000
+  loki: Log aggregation
 ```
 
 ### Stack technologiczny
 
-| Warstwa | Technologie |
-|---------|-------------|
-| Runtime | Python 3.11, Go 1.21 |
-| Framework | BaseHTTPRequestHandler, Flask 3.x |
-| Database | PostgreSQL 15, SQLite (dev) |
-| Cache/IPC | Redis 7.x |
-| LLM | Ollama + DeepSeek-Coder-V2 |
-| Monitoring | Prometheus, Grafana, Loki |
-| CI/CD | GitHub Actions |
-| Linting | Ruff, mypy (partial) |
-| Testing | pytest, coverage.py |
-| Containers | Docker Compose, K8s-ready |
+| Warstwa    | Technologie                       |
+| ---------- | --------------------------------- |
+| Runtime    | Python 3.11, Go 1.21              |
+| Framework  | BaseHTTPRequestHandler, Flask 3.x |
+| Database   | PostgreSQL 15, SQLite (dev)       |
+| Cache/IPC  | Redis 7.x                         |
+| LLM        | Ollama + DeepSeek-Coder-V2        |
+| Monitoring | Prometheus, Grafana, Loki         |
+| CI/CD      | GitHub Actions                    |
+| Linting    | Ruff, mypy (partial)              |
+| Testing    | pytest, coverage.py               |
+| Containers | Docker Compose, K8s-ready         |
 
 ---
 
@@ -230,4 +230,4 @@ serwisy:
 
 ---
 
-*ADRION 369 v1.0.0 — Genesis Record 2026-04-05*
+_ADRION 369 v1.0.0 — Genesis Record 2026-04-05_

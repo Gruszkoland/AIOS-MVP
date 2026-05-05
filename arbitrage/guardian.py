@@ -8,7 +8,7 @@ Rules:
   - ≥2 violations          → DENY
   - 0-1 non-critical violations → APPROVE
 
-Laws:
+Laws (runtime names — see DESYNC NOTE below):
   1. Unity          (MEDIUM)   — job aligns with system's core purpose
   2. Truth          (HIGH)     — analysis is genuine, non-zero, reasoned
   3. Rhythm         (MEDIUM)   — bid pace is sustainable (daily limits)
@@ -18,6 +18,18 @@ Laws:
   7. Autonomy       (HIGH)     — client not spammed beyond daily cap
   8. Justice        (MEDIUM)   — budget within fair scout range
   9. Sustainability (HIGH)     — daily total operational cost within limit
+
+DESYNC NOTE (P1-5):
+  This module uses LEGACY law names and severities that differ from the
+  canonical source of truth (docs/GUARDIAN_LAWS_CANONICAL.json).
+  Mapping of divergent entries:
+    Code "Truth"          (Law 2, HIGH)     → Canonical G2 "Harmony"        (HIGH)
+    Code "Nonmaleficence" (Law 6, CRITICAL) → Canonical G6 "Authenticity"   (HIGH)
+    Code "Autonomy"       (Law 7, HIGH)     → Canonical G7 "Privacy"        (CRITICAL)
+    Code "Justice"        (Law 8, MEDIUM)   → Canonical G8 "Nonmaleficence" (CRITICAL)
+  DO NOT rename without also updating tests (test_guardian.py,
+  test_pipeline_unified.py, test_rag_integration.py) and downstream
+  consumers that match on law names in API responses.
 """
 from __future__ import annotations
 

@@ -11,6 +11,7 @@
         "id": 1,
         "title": "Agent Status",
         "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
         "targets": [
           {
@@ -37,6 +38,7 @@
         "id": 2,
         "title": "Agent Trust Scores",
         "type": "gauge",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
         "targets": [
           {
@@ -64,6 +66,7 @@
         "id": 3,
         "title": "Agent Average Duration (ms)",
         "type": "gauge",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
         "targets": [
           {
@@ -89,6 +92,7 @@
         "id": 4,
         "title": "Tasks Completed vs Failed",
         "type": "graph",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
         "targets": [
           {
@@ -106,6 +110,7 @@
         "id": 5,
         "title": "Session Duration (ms)",
         "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
         "targets": [
           {
@@ -124,6 +129,7 @@
         "id": 6,
         "title": "Jobs Processing Pipeline",
         "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 4, "w": 6, "x": 12, "y": 12 },
         "targets": [
           {
@@ -144,6 +150,7 @@
         "id": 7,
         "title": "Parallelization Factor",
         "type": "gauge",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 4, "w": 6, "x": 0, "y": 16 },
         "targets": [
           {
@@ -171,6 +178,7 @@
         "id": 8,
         "title": "Throughput (jobs/sec)",
         "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 4, "w": 6, "x": 6, "y": 16 },
         "targets": [
           {
@@ -189,6 +197,7 @@
         "id": 9,
         "title": "Agent Latency Trends",
         "type": "graph",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
         "targets": [
           {
@@ -202,6 +211,7 @@
         "id": 10,
         "title": "Recent Agent Actions",
         "type": "table",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
         "targets": [
           {
@@ -232,6 +242,7 @@
         "id": 11,
         "title": "Alerts & Bottlenecks",
         "type": "table",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
         "targets": [
           {
@@ -259,6 +270,7 @@
         "id": 12,
         "title": "System Health",
         "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
         "gridPos": { "h": 4, "w": 6, "x": 12, "y": 28 },
         "targets": [
           {
