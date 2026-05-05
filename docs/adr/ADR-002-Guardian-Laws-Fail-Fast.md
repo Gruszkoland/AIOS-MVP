@@ -17,7 +17,11 @@ Analizowane opcje:
 - **(C) Tylko log** — nie blokuj, tylko rejestruj naruszenia
 - **(D) Ważone prawa** — różna waga dla różnych praw (Critical/High/Medium)
 
-9 Guardian Laws: Unity, Truth, Rhythm, Causality, Transparency, Nonmaleficence, Autonomy, Justice, Sustainability
+9 Guardian Laws (canonical names per `docs/GUARDIAN_LAWS_CANONICAL.json`):
+Unity, Harmony, Rhythm, Causality, Transparency, Authenticity, Privacy, Nonmaleficence, Sustainability
+
+> **Note:** The runtime code (`arbitrage/guardian.py`) still uses legacy names
+> (Truth, Autonomy, Justice) — see P1-5 desync note in that module.
 
 ## Decyzja
 
@@ -49,9 +53,9 @@ if compliance < 7:  # (9 - 2) = 7 praw musi przejść
 Rozważyć ważone prawa:
 
 ```
-CRITICAL laws (Nonmaleficence) → instant DENY bez względu na liczbę
-HIGH laws (Privacy, Justice) → próg = 1
-MEDIUM laws (Rhythm, Aesthetics) → próg = 2
+CRITICAL laws (Privacy, Nonmaleficence) → instant DENY bez względu na liczbę
+HIGH laws (Harmony, Causality, Authenticity, Sustainability) → próg = 1
+MEDIUM laws (Unity, Rhythm, Transparency) → próg = 2
 ```
 
 ## Powiązane ADR

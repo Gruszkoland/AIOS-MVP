@@ -1,0 +1,6 @@
+DCIM <-> MIX|groups=231
+DCIM <-> samojebki|groups=9
+MIX <-> samojebki|groups=9
+MIX <-> ScreenShot|groups=5
+Studniówka Marty <-> Studniówka Marty 6.01.2007|groups=4
+Naprawde stare zdjecia <-> Naprawde Stare zdjęcia|groups=1
