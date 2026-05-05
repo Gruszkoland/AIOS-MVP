@@ -114,23 +114,41 @@ def generate_checkpoint_id() -> str:
 
 
 def keyword_persona_match(task_description: str) -> str:
-    """Keyword-based routing heuristic (fallback when LLM is unavailable)."""
-    keywords = task_description.lower()
+    """Keyword-based routing heuristic (fallback when LLM is unavailable).
 
-    if "scout" in keywords or "find" in keywords or "search" in keywords:
-        return "SAP"
-    elif "analyze" in keywords or "evaluate" in keywords:
-        return "Auditor"
-    elif "crisis" in keywords or "urgent" in keywords or "error" in keywords:
-        return "Sentinel"
-    elif "design" in keywords or "architecture" in keywords:
-        return "Architect"
-    elif "heal" in keywords or "fix" in keywords or "optimize" in keywords:
-        return "Healer"
-    elif "history" in keywords or "document" in keywords or "archive" in keywords:
-        return "Librarian"
-    else:
-        return "SAP"  # Default
+    Uses overlap scoring instead of first-match to avoid misrouting
+    (e.g., 'find and fix the error' no longer always routes to SAP).
+    Priority order for tie-breaking: Sentinel > Healer > ... > Chronos.
+    """
+    text = task_description.lower()
+
+    agent_keywords = {
+        "Sentinel": ["crisis", "urgent", "error", "security", "threat", "alert", "anomaly"],
+        "Healer": ["heal", "fix", "optimize", "repair", "debt", "refactor", "patch"],
+        "Auditor": ["analyze", "evaluate", "audit", "verify", "compliance", "check"],
+        "Architect": ["design", "architecture", "blueprint", "structure", "plan"],
+        "SAP": ["scout", "find", "search", "discover", "locate", "scan"],
+        "Librarian": ["history", "document", "archive", "record", "retrieve", "knowledge"],
+        "Amplifier": ["amplify", "boost", "scale", "expand", "grow", "promote"],
+        "BoosterLever": ["leverage", "accelerate", "multiply", "enhance", "turbo"],
+        "Chronos": ["schedule", "time", "deadline", "calendar", "recurring"],
+    }
+
+    scores = {
+        agent: sum(1 for kw in kws if kw in text)
+        for agent, kws in agent_keywords.items()
+    }
+
+    # Priority order for tie-breaking (highest priority first)
+    priority_order = [
+        "Sentinel", "Healer", "Auditor", "Architect", "SAP",
+        "Librarian", "Amplifier", "BoosterLever", "Chronos",
+    ]
+
+    best_agent = max(priority_order, key=lambda a: scores.get(a, 0))
+    if scores.get(best_agent, 0) == 0:
+        return "SAP"  # Default fallback
+    return best_agent
 
 
 def find_best_persona(task_description: str, agent_hint: Optional[str] = None) -> str:
@@ -155,7 +173,6 @@ def find_best_persona(task_description: str, agent_hint: Optional[str] = None) -
     # Try LLM routing (optional)
     try:
         from arbitrage.llm import chat as llm_chat
-        from arbitrage.config import get_active_llm_backend
 
         llm_available = True  # Gracefully set to False if import fails
     except ImportError:
