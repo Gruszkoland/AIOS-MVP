@@ -188,8 +188,15 @@ def _log_kpi_event(event: dict) -> None:
         logger.warning("KPI logging failed: %s", exc)
 
 
-def get_kpi_snapshot(max_events: int = 200) -> dict:
-    """Read latest KPI events and compute simple rollout metrics."""
+def get_kpi_snapshot(max_events: int = 200, age_limit_seconds: float | None = None) -> dict:
+    """Read latest KPI events and compute simple rollout metrics.
+
+    Args:
+        max_events: Maximum number of most-recent events to evaluate.
+        age_limit_seconds: If set, exclude events older than this many seconds
+            from ``now``. Useful to avoid stale historical outages poisoning
+            the rolling metric (e.g. ``age_limit_seconds=7*86400`` for 7 days).
+    """
     if max_events <= 0:
         return {"count": 0, "error_rate": 0.0, "p95_latency_ms": 0.0}
 
@@ -210,6 +217,10 @@ def get_kpi_snapshot(max_events: int = 200) -> dict:
     except Exception as exc:
         logger.warning("KPI snapshot read failed: %s", exc)
         return {"count": 0, "error_rate": 0.0, "p95_latency_ms": 0.0}
+
+    if age_limit_seconds is not None and age_limit_seconds > 0:
+        cutoff = time.time() - age_limit_seconds
+        events = [e for e in events if float(e.get("ts", 0)) >= cutoff]
 
     window = events[-max_events:]
     if not window:
