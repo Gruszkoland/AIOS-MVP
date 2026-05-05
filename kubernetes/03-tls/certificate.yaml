@@ -1,0 +1,17 @@
+---
+# Explicit Certificate resource for the adrion369.dev domain.
+# cert-manager will use the ClusterIssuer to obtain and auto-renew the cert.
+# The resulting TLS secret (adrion-tls) is referenced by the Ingress.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: adrion-tls
+  namespace: adrion-369
+spec:
+  secretName: adrion-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - adrion369.dev
+    - "*.adrion369.dev"
