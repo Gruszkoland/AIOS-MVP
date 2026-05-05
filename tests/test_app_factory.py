@@ -76,6 +76,76 @@ def _mock_pool_metrics_snapshot():
 # ═══════════════════════════════════════════════════════════════════════════
 
 
+class TestCSRFOriginCheck:
+    """Tests for the _check_csrf before_request hook (Origin/Referer validation)."""
+
+    def test_post_with_bad_origin_returns_403(self, client):
+        """POST from an untrusted Origin must be rejected with 403."""
+        resp = client.post(
+            "/health",
+            headers={"Origin": "https://evil.example.com"},
+        )
+        assert resp.status_code == 403
+        data = resp.get_json()
+        assert data["error"] == "Origin not allowed"
+
+    def test_post_with_bad_referer_returns_403(self, client):
+        """POST with no Origin but an untrusted Referer must be rejected with 403."""
+        resp = client.post(
+            "/health",
+            headers={"Referer": "https://evil.example.com/page"},
+        )
+        assert resp.status_code == 403
+        data = resp.get_json()
+        assert data["error"] == "Referer not allowed"
+
+    def test_post_with_allowed_origin_passes(self, client):
+        """POST from the allowed Origin should not be blocked by CSRF check."""
+        resp = client.post(
+            "/health",
+            headers={"Origin": "http://localhost:8003"},
+        )
+        # Should not be 403 -- the endpoint itself may return 405 or 200
+        assert resp.status_code != 403
+
+    def test_post_without_origin_or_referer_passes(self, client):
+        """Non-browser API requests (no Origin/Referer) should be allowed."""
+        resp = client.post("/health")
+        assert resp.status_code != 403
+
+    def test_get_with_bad_origin_passes(self, client):
+        """GET requests are exempt from CSRF check regardless of Origin."""
+        resp = client.get(
+            "/health",
+            headers={"Origin": "https://evil.example.com"},
+        )
+        assert resp.status_code != 403
+
+    def test_put_with_bad_origin_returns_403(self, client):
+        """PUT from an untrusted Origin must also be rejected."""
+        resp = client.put(
+            "/health",
+            headers={"Origin": "https://evil.example.com"},
+        )
+        assert resp.status_code == 403
+
+    def test_delete_with_bad_origin_returns_403(self, client):
+        """DELETE from an untrusted Origin must also be rejected."""
+        resp = client.delete(
+            "/health",
+            headers={"Origin": "https://evil.example.com"},
+        )
+        assert resp.status_code == 403
+
+    def test_patch_with_bad_origin_returns_403(self, client):
+        """PATCH from an untrusted Origin must also be rejected."""
+        resp = client.patch(
+            "/health",
+            headers={"Origin": "https://evil.example.com"},
+        )
+        assert resp.status_code == 403
+
+
 class TestCreateApp:
     """Tests for create_app() and core Flask configuration."""
 
