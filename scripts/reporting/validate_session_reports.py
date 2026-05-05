@@ -5,9 +5,7 @@ import re
 from pathlib import Path
 
 
-DEFAULT_BASE_DIR = Path(
-    r"C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU"
-)
+DEFAULT_BASE_DIR = Path(__file__).parents[2] / "Genesis Record" / "10_RAPORTY_DZIALANIA_SYSTEMU"
 LAST_SESSION_FILENAME = ".session_reports_last.txt"
 
 REQUIRED_PLAN = [
