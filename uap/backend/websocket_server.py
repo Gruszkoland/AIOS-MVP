@@ -2,11 +2,14 @@
 Unified Admin Panel (UAP) — WebSocket Server
 Real-time telemetry push (<500ms latency)
 
+U8: Unified EBDI state from Flask EBDI_TELEMETRY + homeostasis broadcast.
+
 Run: python websocket_server.py
 Port: 8004
 """
 import asyncio
 import json
+import logging
 import os
 import sys
 import time
@@ -22,30 +25,50 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from db import get_db
 
+logger = logging.getLogger("adrion.uap.websocket")
+
 WS_HOST = os.getenv("WS_HOST", "localhost")
 WS_PORT = int(os.getenv("WS_PORT", "8004"))
 
 # Store active WebSocket connections
 clients: set[WebSocketServerProtocol] = set()
 
-# In-memory EBDI state (replicated from API)
-EBDI_STATE = {
-    "Librarian": {"pleasure": 0.5, "arousal": 0.3, "dominance": 0.6},
-    "SAP": {"pleasure": 0.6, "arousal": 0.4, "dominance": 0.7},
-    "Auditor": {"pleasure": 0.55, "arousal": 0.35, "dominance": 0.65},
-    "Sentinel": {"pleasure": 0.4, "arousal": 0.8, "dominance": 0.75},
-    "Architect": {"pleasure": 0.65, "arousal": 0.3, "dominance": 0.6},
-    "Healer": {"pleasure": 0.7, "arousal": 0.25, "dominance": 0.55},
-    "Amplifier": {"pleasure": 0.6, "arousal": 0.5, "dominance": 0.65},
-    "BoosterLever": {"pleasure": 0.55, "arousal": 0.45, "dominance": 0.6},
-    "Chronos": {"pleasure": 0.5, "arousal": 0.3, "dominance": 0.62},
-}
+# U8: Use the shared EBDI_TELEMETRY from blueprints as the single source of truth.
+# Fallback to local state only when running standalone (not inside Flask process).
+_EBDI_SOURCE = None  # Will be set to EBDI_TELEMETRY dict reference
+
+def _get_ebdi_store() -> Dict:
+    """Return the shared EBDI telemetry dict, falling back to local defaults."""
+    global _EBDI_SOURCE
+    if _EBDI_SOURCE is not None:
+        return _EBDI_SOURCE
+    try:
+        from uap.backend.blueprints import EBDI_TELEMETRY
+        _EBDI_SOURCE = EBDI_TELEMETRY
+        return _EBDI_SOURCE
+    except ImportError:
+        # Standalone mode — use local defaults
+        _EBDI_SOURCE = {
+            "Librarian": {"pleasure": 0.5, "arousal": 0.3, "dominance": 0.6},
+            "SAP": {"pleasure": 0.6, "arousal": 0.4, "dominance": 0.7},
+            "Auditor": {"pleasure": 0.55, "arousal": 0.35, "dominance": 0.65},
+            "Sentinel": {"pleasure": 0.4, "arousal": 0.8, "dominance": 0.75},
+            "Architect": {"pleasure": 0.65, "arousal": 0.3, "dominance": 0.6},
+            "Healer": {"pleasure": 0.7, "arousal": 0.25, "dominance": 0.55},
+            "Amplifier": {"pleasure": 0.6, "arousal": 0.5, "dominance": 0.65},
+            "BoosterLever": {"pleasure": 0.55, "arousal": 0.45, "dominance": 0.6},
+            "Chronos": {"pleasure": 0.5, "arousal": 0.3, "dominance": 0.62},
+        }
+        return _EBDI_SOURCE
 
 TRUST_SCORES = {
     "Librarian": 0.85, "SAP": 0.90, "Auditor": 0.88,
     "Sentinel": 0.92, "Architect": 0.87, "Healer": 0.83,
     "Amplifier": 0.80, "BoosterLever": 0.78, "Chronos": 0.82,
 }
+
+# U8: Async event queue for homeostasis event -> WebSocket broadcast
+_event_queue: asyncio.Queue = asyncio.Queue()
 
 
 class TelemetryServer:
@@ -117,23 +140,18 @@ class TelemetryServer:
         }
 
     def get_ebdi_telemetry(self) -> Dict:
-        """Get EBDI telemetry with simulation."""
-        # Simulate small changes in EBDI values
-        for agent in EBDI_STATE:
-            for key in EBDI_STATE[agent]:
-                change = (os.urandom(1)[0] % 5 - 2) * 0.01
-                EBDI_STATE[agent][key] += change
-                EBDI_STATE[agent][key] = max(0, min(1, EBDI_STATE[agent][key]))
+        """Get EBDI telemetry — pure read from shared store (no mutation)."""
+        ebdi = _get_ebdi_store()
 
         crisis_agents = [
-            agent for agent, pad in EBDI_STATE.items()
+            agent for agent, pad in ebdi.items()
             if pad.get("arousal", 0) > 0.7
         ]
 
         return {
             "action": "telemetry",
             "timestamp": datetime.now().isoformat(),
-            "telemetry": EBDI_STATE,
+            "telemetry": ebdi,
             "crisis_detected": len(crisis_agents) > 0,
             "crisis_agents": crisis_agents,
         }
@@ -200,16 +218,54 @@ class TelemetryServer:
         # Start broadcast tasks
         asyncio.create_task(self.broadcast_telemetry())
         asyncio.create_task(self.broadcast_trust_scores())
+        asyncio.create_task(self._consume_event_queue())
 
         # Start server
         async with websockets.serve(self.handle_client, WS_HOST, WS_PORT):
-            print(f"✅ WebSocket server running: ws://{WS_HOST}:{WS_PORT}")
+            logger.info("WebSocket server running: ws://%s:%s", WS_HOST, WS_PORT)
             while self.running:
                 await asyncio.sleep(1)
+
+    async def _consume_event_queue(self):
+        """U8: Consume EBDI events from homeostasis service and broadcast immediately."""
+        while self.running:
+            try:
+                event = await asyncio.wait_for(_event_queue.get(), timeout=1.0)
+                if clients:
+                    message = json.dumps(event)
+                    disconnected = set()
+                    for client in clients:
+                        try:
+                            await client.send(message)
+                        except Exception:
+                            disconnected.add(client)
+                    for client in disconnected:
+                        await self.unregister(client)
+            except asyncio.TimeoutError:
+                continue
 
     def stop(self):
         """Stop WebSocket server."""
         self.running = False
+
+
+def push_ebdi_event(agent: str, event_type: str, pad: Dict):
+    """U8: Callback for EBDIHomeostaticService.on_event() — thread-safe enqueue.
+
+    Called from the homeostasis background thread; puts event into the
+    asyncio queue for broadcast to WebSocket clients.
+    """
+    event = {
+        "action": "ebdi_event",
+        "agent": agent,
+        "event_type": event_type,
+        "pad": {k: round(v, 4) for k, v in pad.items()},
+        "timestamp": datetime.now().isoformat(),
+    }
+    try:
+        _event_queue.put_nowait(event)
+    except asyncio.QueueFull:
+        logger.warning("EBDI event queue full — dropping event for %s", agent)
 
 
 async def main():
