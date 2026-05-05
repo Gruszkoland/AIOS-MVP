@@ -221,6 +221,12 @@ class TaskRepository:
                             )
                             ON CONFLICT (id) DO UPDATE SET
                                 status = EXCLUDED.status,
+                                started_at = EXCLUDED.started_at,
+                                completed_at = EXCLUDED.completed_at,
+                                metadata = EXCLUDED.metadata,
+                                result_data = EXCLUDED.result_data,
+                                error_message = EXCLUDED.error_message,
+                                retry_count = EXCLUDED.retry_count,
                                 updated_at = CURRENT_TIMESTAMP
                         """
 
@@ -233,8 +239,8 @@ class TaskRepository:
                             task.created_at,
                             task.started_at,
                             task.completed_at,
-                            json.dumps(task.metadata),
-                            json.dumps(task.result_data) if task.result_data else None,
+                            Json(task.metadata),
+                            Json(task.result_data) if task.result_data else None,
                             task.error_message,
                             task.retry_count
                         ))
@@ -317,7 +323,8 @@ class SyncWorker:
         db_url: str,
         interval_seconds: int = 5,
         batch_size: int = 100,
-        log_level: str = 'INFO'
+        log_level: str = 'INFO',
+        task_store_getter=None,
     ):
         self.interval_seconds = interval_seconds
         self.batch_size = batch_size
@@ -331,6 +338,7 @@ class SyncWorker:
             'uptime_seconds': 0
         }
         self.start_time = None
+        self._task_store_getter = task_store_getter
 
         # Set logging level
         logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
@@ -385,11 +393,33 @@ class SyncWorker:
 
     def _get_sample_tasks(self) -> List[Task]:
         """
-        TODO: Replace with actual application task retrieval
-        This is a placeholder that returns sample tasks for testing
+        Retrieve tasks from application TASKS_STORE (or external callable).
+
+        Returns Task objects converted from the in-memory store dict format:
+            { task_id: { "agent": str, "task_description": str, "status": str, ... } }
         """
-        # In production, this would retrieve from app's TASKS_STORE
-        return []
+        if self._task_store_getter is None:
+            return []
+
+        try:
+            raw_store = self._task_store_getter()
+            if not raw_store:
+                return []
+
+            tasks = []
+            for task_id, data in raw_store.items():
+                tasks.append(Task(
+                    id=task_id if len(task_id) >= 32 else task_id.ljust(32, "0"),
+                    agent_id=data.get("agent", "unknown"),
+                    task_name=data.get("task_description", "")[:255],
+                    status=data.get("status", "pending"),
+                    priority=data.get("priority", 0),
+                    metadata=data,
+                ))
+            return tasks[:self.batch_size]
+        except Exception as e:
+            logger.warning("Failed to retrieve tasks from store: %s", e)
+            return []
 
     def _shutdown(self):
         """Graceful shutdown"""
