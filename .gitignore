@@ -8,11 +8,18 @@ __pycache__/
 .aider/logs/
 data/
 arbitrage.db
+arbitrage.db-shm
+arbitrage.db-wal
 .runtime/
+.venv/
+venv/
+.hypothesis/
+.roo/roo.profiles.json
+.roo/roo.rules.json
 node_modules/
 **/node_modules/
 **/.next/
-micro-saas/.env.local
+frontend/micro-saas/.env.local
 .env.local
 
 .aider*
@@ -45,10 +52,15 @@ build/
 coverage.xml
 coverage*.json
 cov_*.txt
+htmlcov/
 tests/results/
 deployment_health_report.json
 integration_test_results.json
+lmstudio_test_report.json
+TEST_RESULTS_*.json
+WORKSPACE_STRUCTURE_SCAN_*.json
 temp_vortex_content.txt
+compose.rendered.yml
 
 # ── TLS certs (never commit) ──────────────────────────────────────────────
 config/nginx/certs/
@@ -60,8 +72,8 @@ adrion-swarm/.env
 adrion-swarm/postgres_data/
 adrion-swarm/n8n_data/
 adrion-swarm/ollama_data/
-harmonia-dashboard/chroma_db/
-harmonia-dashboard/.chromadb/
+frontend/harmonia-dashboard/chroma_db/
+frontend/harmonia-dashboard/.chromadb/
 
 # Runtime monitoring data
 monitoring/*.jsonl
