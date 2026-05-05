@@ -1,7 +1,7 @@
 # Changelog — ADRION 369
 
-All notable changes to this project will be documented in this file.  
-Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
+All notable changes to this project will be documented in this file.
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 versioning based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
@@ -9,34 +9,45 @@ versioning based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [1.1.0] - 2026-04-05
 
 ### Added
+
 - **UAP tests CI step** — `pytest uap/tests/ -v` added as separate step in `python-ci.yml` with env vars `UAP_API_KEY`, `ENVIRONMENT`, `JWT_SECRET`
 - **GUARDIAN_LAWS_CANONICAL.json** (`docs/`) — single-source canonical definition of all 9 Guardian Laws (G1–G9)
 
 ### Changed
+
 - **Coverage gate unified** — `--cov-fail-under` raised from 37 → 65 in `.github/workflows/release.yml` (aligned with `python-ci.yml` and `pyproject.toml`)
 - **Resource limits** added to all major services in `docker-compose.prod.yml` (`deploy.resources.limits`): adrion-api (512m/0.5cpu), adrion-uap (512m/0.5cpu), adrion-dashboard (256m/0.25cpu), loki (512m/0.5cpu), grafana (512m/0.5cpu), adrion-nginx (128m/0.25cpu)
 - **Pre-commit hook cross-platform** — `powershell.exe` call in `.githooks/pre-commit` wrapped in shell detection (powershell.exe → pwsh → warning fallback)
 
 ### Security
+
 - **Bandit SAST** — `continue-on-error: false` made explicit in `security-ci.yml` to ensure hard block on findings
 - **Safety dependency check** — `continue-on-error: false` made explicit in `security-ci.yml`
 
 ### Fixed
+
 - **`.gitignore`** — added `monitoring/*.jsonl`, `monitoring/*_history*.jsonl`, `monitoring/*_test*.json`, `.runtime/`, `*.pid` to prevent runtime data from being committed
 
 ---
 
 ## [Unreleased]
 
+### Deprecated
+
+- **`arbitrage_server.py`** — replaced with thin redirect stub (~20 lines). Use `wsgi.py` → `arbitrage.app.create_app()`. Will be **removed in v5.0** (planned Q3 2026).
+
 ### Security
+
 - Added startup `logger.warning` in `uap/backend/api.py` when `UAP_API_KEY` env var is not set (insecure default key "local-dev-key-123")
 - Added startup `logger.warning` in `uap/backend/auth.py` when `JWT_SECRET` env var is not set (insecure default)
 
 ### Fixed
+
 - Removed duplicated `_SlidingWindowRateLimiter` class from `arbitrage/api.py` — now uses `quantum_limiter` from `arbitrage/rate_limiter.py` (single source of truth)
 - Removed orphaned `import collections` from `arbitrage/api.py` after class removal
 
 ### Changed
+
 - Coverage gate raised from `fail_under = 37` → `65` in `pyproject.toml`
 - Coverage gate raised from `--cov-fail-under=37` → `65` in `.github/workflows/python-ci.yml`
 - Added `mypy` type-checking step to `python-ci.yml` CI workflow
@@ -47,6 +58,7 @@ versioning based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [1.0.0] — 2026-04-04
 
 ### Added
+
 - **Core Arbitrage Engine** — Scout → Analyze → Bid pipeline (Fiverr/Upwork, Apify integration)
 - **Quantum Module** (`arbitrage/quantum.py`) — Łukasiewicz 3-value logic, Autopojeza self-reset
 - **Vortex Oracle** (`arbitrage/oracle.py`) — Fibonacci retracement + Enneagram prediction
@@ -75,6 +87,7 @@ versioning based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **XRP Tracker** (`arbitrage/xrp.py`, `xrp_tracker.py`) — Progress toward XRP target snapshots
 
 ### Infrastructure
+
 - Python 3.11, Ruff linting, pytest + pytest-cov
 - Go 1.21+ (`go.mod`) for Vortex engine skeleton
 - Makefile with `test`, `lint`, `build`, `docker-build`, `dev`, `install` targets

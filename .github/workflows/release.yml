@@ -11,6 +11,8 @@ concurrency:
 
 permissions:
   contents: write
+  packages: write
+  id-token: write
 
 jobs:
   validate:
@@ -132,3 +134,31 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/adrion-healer:${{ github.ref_name }},ghcr.io/${{ github.repository_owner }}/adrion-healer:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  sign-containers:
+    name: Sign container images with cosign
+    needs: build-containers
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      id-token: write
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sign Vortex image
+        run: cosign sign --yes ghcr.io/${{ github.repository_owner }}/adrion-vortex:${{ github.ref_name }}
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+
+      - name: Sign Healer image
+        run: cosign sign --yes ghcr.io/${{ github.repository_owner }}/adrion-healer:${{ github.ref_name }}
+        env:
+          COSIGN_EXPERIMENTAL: "1"

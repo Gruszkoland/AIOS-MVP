@@ -310,6 +310,27 @@ services:
       retries: 5
       start_period: 15s
 
+  # ── PostgreSQL Metrics Exporter ───────────────────────────────────────────
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: adrion-postgres-exporter
+    environment:
+      - DATA_SOURCE_NAME=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/adrion?sslmode=disable}
+    expose:
+      - "9187"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9187/metrics"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+          cpus: "0.1"
+
 volumes:
   loki-data:
   grafana-data:
