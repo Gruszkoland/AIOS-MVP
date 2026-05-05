@@ -1,0 +1,38 @@
+[
+  {
+    "id": "ebadf59c8304bba1",
+    "timestamp": "2026-03-30T21:55:06.739673+00:00",
+    "prompt": "Jak uruchomic pipeline leadow?",
+    "golden_response": "Wyslij POST na /api/pipeline/run z parametrami niche, city, radius_km. Pipeline przejdzie 5 etapow: CHRONOS, SENTINEL, AUDYTOR, BOOSTERLEVER, SAP.",
+    "category": "pipeline",
+    "source": "user",
+    "usage_count": 0
+  },
+  {
+    "id": "6d3b3c1c9e75a2e7",
+    "timestamp": "2026-03-30T21:55:13.119336+00:00",
+    "prompt": "Jak uruchomic pipeline?",
+    "golden_response": "POST /api/pipeline/run z niche, city, radius_km.",
+    "category": "pipeline",
+    "source": "user",
+    "usage_count": 1
+  },
+  {
+    "id": "8c0fc7efda5a6c26",
+    "timestamp": "2026-03-31T13:35:53.871829+00:00",
+    "prompt": "Jak poprawic wizytowke Google?",
+    "golden_response": "Uzupelnij NAP, dodaj 10+ zdjec z EXIF, zbierz min 20 opinii.",
+    "category": "general",
+    "source": "user",
+    "usage_count": 0
+  },
+  {
+    "id": "bd408f6dc3956dcb",
+    "timestamp": "2026-03-31T14:14:51.063565+00:00",
+    "prompt": "E2E benchmark",
+    "golden_response": "Standard answer",
+    "category": "general",
+    "source": "user",
+    "usage_count": 0
+  }
+]

@@ -1,0 +1,67 @@
+name: DAST — OWASP ZAP API Scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 3 * * 3" # Every Wednesday at 03:23 UTC
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap-scan:
+    name: OWASP ZAP API Scan
+    runs-on: ubuntu-latest
+
+    services:
+      adrion-api:
+        image: adrion:ci
+        ports:
+          - 8003:8003
+        env:
+          DB_ENGINE: sqlite
+          LLM_BACKEND: mock
+        options: >-
+          --health-cmd "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8003/health')\""
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --health-start-period 20s
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build CI image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: adrion:ci
+
+      - name: Wait for API health
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8003/health; then
+              echo "API is healthy"
+              break
+            fi
+            echo "Waiting for API... ($i/30)"
+            sleep 2
+          done
+
+      - name: Run ZAP API scan
+        uses: zaproxy/action-api-scan@v0.7.0
+        with:
+          target: http://localhost:8003/api/openapi.json
+          format: openapi
+          fail_action: true
+          rules_file_name: .zap/rules.conf
+          cmd_options: "-I -l WARN"
+
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-scan-report
+          path: report_html.html

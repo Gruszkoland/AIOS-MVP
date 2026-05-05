@@ -1,0 +1,13 @@
+apiVersion: v2
+name: adrion
+description: ADRION 369 — Multi-Agent AI Orchestration System
+type: application
+version: 0.1.0
+appVersion: "4.0.0"
+keywords:
+  - ai
+  - orchestration
+  - multi-agent
+  - trinity-ebdi
+maintainers:
+  - name: Adrian Halicki
