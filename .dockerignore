@@ -8,6 +8,7 @@ __pycache__/
 !.env.adrion
 !.env.example
 .git/
+.github/
 .vscode/
 .aider/
 .aider.tags.cache.v4/
@@ -32,8 +33,14 @@ arbitrage-core/
 *.log
 Phase2_Distribution_Package_Apr8_2026/
 tests/
-docs/
+docs/*
+!docs/openapi.yaml
+!docs/GUARDIAN_LAWS_CANONICAL.json
 kubernetes/
 repositories/
 .claude/
 .roo/
+htmlcov/
+logs/
+*.txt
+db/MIGRATION_GUIDE.md

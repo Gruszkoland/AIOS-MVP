@@ -90,10 +90,16 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/rate-limit: "100"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: nginx # Requires nginx ingress controller
+  tls:
+    - hosts:
+        - adrion369.dev
+      secretName: adrion-tls
   rules:
-    - host: "arbitrage.local" # Change to your domain
+    - host: adrion369.dev
       http:
         paths:
           - path: /api

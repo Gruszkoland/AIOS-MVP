@@ -409,17 +409,22 @@ Escalate to HEALER (if recurring)
 
 ---
 
-## ⚖️ The Nine Governing Laws
+## The Nine Guardian Laws
 
-1. **Historical Continuity** - Never erase institutional knowledge
-2. **Strategic Coherence** - All actions align with long-term goals
-3. **Non-Regression** - No change degrades existing functionality
-4. **Rapid Response** - Errors demand sub-second intervention
-5. **Unified Design** - All components follow shared principles
-6. **Continuous Healing** - System grows more resilient over time
-7. **Privacy Protection** - Genesis Record: local-only logging
-8. **Transparency in Reasoning** - Every decision is explained
-9. **Fail-Safe Defaults** - When uncertain, be conservative
+Canonical definitions: [`docs/GUARDIAN_LAWS_CANONICAL.json`](docs/GUARDIAN_LAWS_CANONICAL.json)
+
+1. **G1 Unity** (MEDIUM) -- All actions must serve system coherence
+2. **G2 Harmony** (HIGH) -- Balance between competing objectives
+3. **G3 Rhythm** (MEDIUM) -- Maintain consistent cadence and timing of operations
+4. **G4 Causality** (HIGH) -- Every action must have a traceable, justified cause
+5. **G5 Transparency** (MEDIUM) -- All decisions and reasoning must be visible and auditable
+6. **G6 Authenticity** (HIGH) -- Outputs must be genuine and free from deception
+7. **G7 Privacy** (CRITICAL) -- No external disclosure without consent
+8. **G8 Nonmaleficence** (CRITICAL) -- Never cause harm to users, systems, or data
+9. **G9 Sustainability** (HIGH) -- Operate within resource limits and preserve long-term system health
+
+**Decision rules:** A CRITICAL law violation triggers an instant DENY. Two or
+more violations of any severity also trigger a DENY.
 
 **Learn more:** See [docs/LAWS.md](docs/LAWS.md)
 

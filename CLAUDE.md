@@ -1,8 +1,12 @@
 # CLAUDE.md — ADRION 369 Project Control File
 
-> **Version:** 5.0-plan | **Updated:** 2026-04-11 | **Score:** 75/100 (target: 100/100)
+> **Version:** 5.1-plan | **Updated:** 2026-04-22 | **Score:** 77/100 (target: 100/100)
 > **Plan:** 23 tasks in 5 waves × 4 phases | 18 agents parallel | 5 verification gates
 > This file is the single source of truth for Claude Code. It is loaded at conversation start.
+
+> 📋 **Standards & Architecture:** See [`MANIFEST.md`](MANIFEST.md) — Full coding standards,
+> naming conventions, test markers, Git conventions, Guardian Laws, Trinity-EBDI framework.
+> **All AI agents must read MANIFEST.md before making code changes.**
 
 ---
 
@@ -165,7 +169,8 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 ### PHASE 1: CRITICAL FIXES (75→85) — P0 — Branch: `fix/p0-critical`
 
 #### P0-1: Fix SQL injection in UAP `[SECURITY-CRITICAL]`
-- **Status:** `[ ]` NOT STARTED
+
+- **Status:** `[x]` DONE — `ALLOWED_AGENT_COLUMNS` frozenset + column iteration from allowlist, not user input. See `uap/backend/blueprints/__init__.py:52` and `agents_bp.py:199`.
 - **File:** `uap/backend/api.py:1396`
 - **Problem:** `f"UPDATE agents SET {', '.join(fields)} WHERE id = ?"` — unsanitized column names from user input
 - **Fix steps:**
@@ -178,6 +183,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `fix/p0-1-sql-injection`
 
 #### P0-2: Root cleanup v2 `[HYGIENE]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Inventory (verified 2026-04-11):**
   - 45 `.md` files in root (keep: README.md, CLAUDE.md, CHANGELOG.md → move rest to `docs/sessions/`)
@@ -201,9 +207,11 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `general-purpose` | **Branch:** `chore/p0-2-root-cleanup`
 
 #### P0-3: UAP monolith refactor `[ARCHITECTURE]`
+
 - **Status:** `[ ]` NOT STARTED
 - **File:** `uap/backend/api.py` (2110 lines → target: 5 files × ~400 lines)
 - **Target structure:**
+
   ```
   uap/backend/
     api.py              (~200 lines — app factory, shared middleware, health)
@@ -215,6 +223,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
       ebdi_bp.py        (EBDI state machine, digital root, decision pipeline)
       admin_bp.py       (admin dashboard, system config, diagnostics)
   ```
+
 - **Fix steps:**
   1. Read full `uap/backend/api.py` — map all routes and their line ranges
   2. Extract shared utilities (db helpers, auth, error handlers) into `blueprints/__init__.py`
@@ -226,7 +235,8 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `refactor/p0-3-uap-blueprints`
 
 #### P0-4: Remove Docker socket from prod `[SECURITY]`
-- **Status:** `[ ]` NOT STARTED
+
+- **Status:** `[x]` DONE — Verified `docker-compose.prod.yml` contains no `docker.sock` or `DOCKER_HOST` references.
 - **File:** `docker-compose.prod.yml` — lines 56, 61, 119
 - **Fix steps:**
   1. Read `docker-compose.prod.yml`
@@ -238,6 +248,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `fix/p0-4-docker-socket`
 
 #### P0-5: Rewrite ARCHITECTURE.md `[DOCS]`
+
 - **Status:** `[ ]` NOT STARTED
 - **File:** `docs/ARCHITECTURE.md`
 - **Fix steps:**
@@ -259,6 +270,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 ### PHASE 2: SECURITY HARDENING (85→90) — P1 — Branch: `feature/p1-security`
 
 #### P1-1: Token-based CSRF `[SECURITY]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Files:** `arbitrage/app.py`, `requirements-arbitrage.txt`
 - **Fix steps:**
@@ -271,6 +283,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `feature/p1-1-csrf`
 
 #### P1-2: K8s TLS with cert-manager `[INFRA]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Files:** `kubernetes/` directory
 - **Fix steps:**
@@ -282,6 +295,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `feature/p1-2-k8s-tls`
 
 #### P1-3: Fix database.py type hints `[CODE-QUALITY]`
+
 - **Status:** `[ ]` NOT STARTED
 - **File:** `arbitrage/database.py`
 - **Fix steps:**
@@ -292,6 +306,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `python-pro` | **Branch:** `fix/p1-3-db-types`
 
 #### P1-4: Genesis Record cleanup `[DOCS]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Files:** `Genesis Record/` directory, `Genesis Record/README.md`
 - **Fix steps:**
@@ -302,6 +317,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `general-purpose` | **Branch:** `chore/p1-4-genesis-cleanup`
 
 #### P1-5: Guardian Laws sync `[INTEGRITY]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Files:** `README.md`, `docs/GUARDIAN_LAWS_CANONICAL.json`
 - **Fix steps:**
@@ -312,6 +328,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `python-pro` | **Branch:** `fix/p1-5-laws-sync`
 
 #### P1-6: Fix Prometheus targets `[MONITORING]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Files:** `docker-compose.prod.yml`, `monitoring/` directory
 - **Fix steps:**
@@ -322,11 +339,13 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `fix/p1-6-prometheus`
 
 #### P1-7: Multi-stage Dockerfile `[INFRA]`
+
 - **Status:** `[ ]` NOT STARTED
 - **File:** `Dockerfile`
 - **Fix steps:**
   1. Read current `Dockerfile`
   2. Rewrite as multi-stage:
+
      ```dockerfile
      # Stage 1: Builder
      FROM python:3.11-slim AS builder
@@ -341,6 +360,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
      EXPOSE 8003
      CMD ["python", "wsgi.py"]
      ```
+
   3. Test: `docker build -t adrion-test .` — verify size reduction ~60%
   4. Update all other Dockerfiles that follow same pattern
 - **Agent:** `backend-developer` | **Branch:** `feature/p1-7-multistage-docker`
@@ -350,6 +370,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 ### PHASE 3: QUALITY POLISH (90→95) — P2 — Branch: `feature/p2-quality`
 
 #### P2-1: Remove UAP hardcoded mock data `[CODE-QUALITY]`
+
 - **Status:** `[ ]` NOT STARTED
 - **File:** `uap/backend/api.py` (or post-refactor: `uap/backend/blueprints/tasks_bp.py`)
 - **Fix steps:**
@@ -361,6 +382,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `fix/p2-1-uap-mock-data`
 
 #### P2-2: Property-based testing with Hypothesis `[TESTING]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Files:** `tests/test_guardian_hypothesis.py` (new), `tests/test_trinity_hypothesis.py` (new)
 - **Fix steps:**
@@ -378,6 +400,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `python-pro` | **Branch:** `feature/p2-2-hypothesis-tests`
 
 #### P2-3: Update Go dependencies `[MAINTENANCE]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Files:** `go.mod`, `go.sum`
 - **Fix steps:**
@@ -388,6 +411,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `chore/p2-3-go-deps`
 
 #### P2-4: Rate limit wholesale_bp.handle_wholesale_scout `[SECURITY]`
+
 - **Status:** `[ ]` NOT STARTED
 - **File:** `arbitrage/blueprints/wholesale_bp.py`
 - **Fix steps:**
@@ -397,6 +421,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `fix/p2-4-rate-limit`
 
 #### P2-5: Deprecation roadmap `[DOCS]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Files:** `CHANGELOG.md`, `arbitrage_server.py`
 - **Fix steps:**
@@ -406,10 +431,12 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `chore/p2-5-deprecation`
 
 #### P2-6: Stub deprecated server `[CLEANUP]`
+
 - **Status:** `[ ]` NOT STARTED
 - **File:** `arbitrage_server.py` (currently ~380 lines)
 - **Fix steps:**
   1. Replace entire file with thin redirect stub (~30 lines):
+
      ```python
      """DEPRECATED: Use wsgi.py → arbitrage.app.create_app() instead.
      This file will be removed in v5.0. See CHANGELOG.md."""
@@ -420,6 +447,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
      if __name__ == "__main__":
          app.run(port=8003)
      ```
+
   2. Update any references pointing to old server
 - **Depends on:** P2-5 (deprecation roadmap)
 - **Agent:** `backend-developer` | **Branch:** `chore/p2-6-stub-server`
@@ -429,6 +457,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 ### PHASE 4: EXCELLENCE (95→100) — P3 — Branch: `feature/p3-excellence`
 
 #### P3-1: Contract testing `[TESTING]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Fix steps:**
   1. Add `schemathesis` to dev dependencies
@@ -439,6 +468,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `python-pro` | **Branch:** `feature/p3-1-contract-tests`
 
 #### P3-2: DAST scanning with OWASP ZAP `[SECURITY]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Fix steps:**
   1. Create `.github/workflows/dast-zap.yml`
@@ -449,6 +479,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `feature/p3-2-dast-zap`
 
 #### P3-3: Container image signing `[SUPPLY-CHAIN]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Fix steps:**
   1. Add cosign step to `.github/workflows/release.yml`
@@ -459,6 +490,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `feature/p3-3-cosign`
 
 #### P3-4: OpenTelemetry distributed tracing `[OBSERVABILITY]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Files:** `arbitrage/app.py`, `uap/backend/api.py`, Go Vortex
 - **Fix steps:**
@@ -471,6 +503,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Agent:** `backend-developer` | **Branch:** `feature/p3-4-otel-traces`
 
 #### P3-5: Helm charts `[INFRA]`
+
 - **Status:** `[ ]` NOT STARTED
 - **Target:** `kubernetes/charts/adrion/`
 - **Fix steps:**
@@ -505,6 +538,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 ### Zasada Matrycy 3-6-9
 
 Każde zadanie oceniane przez 3 perspektywy:
+
 - **LOGOS (Prawda):** Czy naprawia faktyczny błąd? Czy kod jest poprawny?
 - **ETHOS (Dobro):** Czy chroni system i użytkowników? Czy jest etyczne?
 - **EROS (Tworzenie):** Czy posuwa projekt do przodu? Czy jest eleganckie?
@@ -541,6 +575,7 @@ WAVE 6 (after all above):
 ### Agent Assignment (5 parallel agents per wave)
 
 **WAVE 1 — P0 Quick Wins (4 agents parallel):**
+
 | Agent | Task | Type | Effort | Branch |
 |-------|------|------|--------|--------|
 | A1 | P0-1: SQL injection fix | backend-developer | S | `fix/p0-1-sql-injection` |
@@ -549,11 +584,13 @@ WAVE 6 (after all above):
 | A4 | P0-5: ARCHITECTURE.md rewrite | backend-developer | M | `docs/p0-5-architecture` |
 
 **WAVE 2 — P0 Major Refactor (1 agent, focused):**
+
 | Agent | Task | Type | Effort | Branch |
 |-------|------|------|--------|--------|
 | A1 | P0-3: UAP refactor (2110→5 files) | backend-developer | XL | `refactor/p0-3-uap-blueprints` |
 
 **WAVE 3 — P1 Security (5 agents parallel):**
+
 | Agent | Task | Type | Effort | Branch |
 |-------|------|------|--------|--------|
 | A1 | P1-1: CSRF + P1-2: K8s TLS | backend-developer | M+M | `feature/p1-1-csrf`, `feature/p1-2-k8s-tls` |
@@ -563,6 +600,7 @@ WAVE 6 (after all above):
 | A5 | P2-1: UAP mocks + P2-4: Rate limit | backend-developer | M+S | `fix/p2-1-uap-mock-data`, `fix/p2-4-rate-limit` |
 
 **WAVE 4 — P2 Quality (3 agents parallel):**
+
 | Agent | Task | Type | Effort | Branch |
 |-------|------|------|--------|--------|
 | A1 | P2-2: Hypothesis tests | python-pro | M | `feature/p2-2-hypothesis-tests` |
@@ -570,6 +608,7 @@ WAVE 6 (after all above):
 | A3 | P2-5 + P2-6: Deprecation + Stub | backend-developer | S+S | `chore/p2-5-deprecation`, `chore/p2-6-stub-server` |
 
 **WAVE 5 — P3 Excellence (5 agents parallel):**
+
 | Agent | Task | Type | Effort | Branch |
 |-------|------|------|--------|--------|
 | A1 | P3-1: Contract testing | python-pro | M | `feature/p3-1-contract-tests` |
