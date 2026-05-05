@@ -1,7 +1,7 @@
 # Oracle Cloud Deployment Guide — ADRION 369
 
-**Cost:** $0/mo ∞ (Always-Free Tier)  
-**Resources:** 2x Micro VMs (2 OCPU, 2-4GB RAM total) + 200GB storage  
+**Cost:** $0/mo ∞ (Always-Free Tier)
+**Resources:** 2x Micro VMs (2 OCPU, 2-4GB RAM total) + 200GB storage
 **Setup Time:** 45-60 minutes
 
 ---
@@ -48,7 +48,7 @@ Shape: VM.Standard.E2.1.Micro (always-free eligible)
 Region: US Phoenix (PHX) or UK London (LHR) — always-free regions
 VCN: Create new or use default
 Subnet: Public
-Security Group: 
+Security Group:
   - Allow SSH (22) from your IP
   - Allow HTTP (80) from anywhere
   - Allow HTTPS (443) from anywhere
@@ -219,7 +219,7 @@ EOF
 Create `docker-compose.oracle.yml`:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   # Flask API (localhost:8003)
@@ -271,8 +271,8 @@ services:
     ports:
       - "9090:9090"
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.retention.time=720h'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=720h"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9090/-/ready"]
@@ -333,7 +333,7 @@ sudo usermod -aG docker ubuntu
 Create `docker-compose.db.yml` on database VM:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -465,15 +465,16 @@ chmod +x /home/ubuntu/backup-postgres.sh
 
 ## Monthly Cost Projection
 
-| Component | Cost |
-|-----------|------|
-| VM #1 (App) | $0 (free tier) |
-| VM #2 (DB) | $0 (free tier) |
+| Component       | Cost           |
+| --------------- | -------------- |
+| VM #1 (App)     | $0 (free tier) |
+| VM #2 (DB)      | $0 (free tier) |
 | Storage (200GB) | $0 (free tier) |
-| Bandwidth | $0 (free tier) |
-| **Total** | **$0/mo** |
+| Bandwidth       | $0 (free tier) |
+| **Total**       | **$0/mo**      |
 
 **Limits Before Charges:**
+
 - CPU: 2 OCPU (2 cores)
 - RAM: 2-4 GB
 - Storage: 200 GB
@@ -484,16 +485,19 @@ chmod +x /home/ubuntu/backup-postgres.sh
 ## Maintenance & Monitoring
 
 ### Daily Tasks
+
 - Monitor disk usage: `df -h`
 - Check service health: `docker-compose ps`
 - Review logs: `docker-compose logs --tail=100`
 
 ### Weekly Tasks
+
 - Backup verification: `ls -lh /home/ubuntu/backups/`
 - Performance review in Grafana
 - Check for Docker updates: `docker version`
 
 ### Monthly Tasks
+
 - Update base images: `docker pull postgres:15-alpine`
 - Review Guardian Laws compliance
 - Test disaster recovery (restore from backup)
@@ -561,7 +565,7 @@ sudo ufw allow 8003/tcp
 6. ✅ Access Grafana dashboards
 7. ✅ Monitor for 30 days to ensure no billing surprises
 
-**Total Setup Time:** 45-60 minutes  
+**Total Setup Time:** 45-60 minutes
 **Total Monthly Cost:** $0 (forever)
 
 ---
