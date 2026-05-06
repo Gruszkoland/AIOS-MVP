@@ -91,3 +91,4 @@ Genesis Record/**/v1.0_Backups/
 # ── Runtime state — must not be committed ────────────────────────────────────
 backups/
 memories/
+monitoring/llm_rollout_state.json
