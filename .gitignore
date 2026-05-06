@@ -87,3 +87,7 @@ Genesis Record/**/Phase2_Reports/
 Genesis Record/**/Phase2_Implementation/
 Genesis Record/**/v1.0_Deployment/
 Genesis Record/**/v1.0_Backups/
+-e 
+# ── Runtime state — must not be committed ────────────────────────────────────
+backups/
+memories/

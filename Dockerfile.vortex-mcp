@@ -1,3 +1,7 @@
+# DEPRECATED — use Dockerfile.mcp-tier instead:
+#   docker build -f Dockerfile.mcp-tier --build-arg APP=mcp_vortex_app.py --build-arg PORT=9001 -t adrion-Dockerfile.vortex-mcp .
+# This file will be removed in v5.0.
+
 # VORTEX-MCP Dockerfile
 # Harmonic Orchestration @ 174Hz (Port 9001)
 

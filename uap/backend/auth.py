@@ -22,16 +22,23 @@ from db import get_db
 
 _JWT_SECRET_DEFAULT = "uap-secret-key-change-in-production"
 JWT_SECRET = os.getenv("JWT_SECRET", _JWT_SECRET_DEFAULT)
+_AUTH_LOGGER = __import__("logging").getLogger("adrion.uap.auth")
+_AUTH_ENV = os.getenv("ENVIRONMENT", "").lower()
+_AUTH_DEV_ENVS = {"development", "dev", "test", "testing"}
+
 if JWT_SECRET == _JWT_SECRET_DEFAULT:
-    import logging as _logging
-    _logging.getLogger("adrion.uap.auth").warning(
-        "[SECURITY] JWT_SECRET is not set — using insecure default. "
-        "Set JWT_SECRET env var (min 32 chars) before exposing this service on a network."
-    )
-    if os.getenv("ENVIRONMENT") == "production":
-        import logging as _logging2
-        _logging2.getLogger("adrion.uap.auth").critical(
-            "[SECURITY] JWT_SECRET is default in PRODUCTION — refusing to start."
+    if _AUTH_ENV in _AUTH_DEV_ENVS:
+        _AUTH_LOGGER.warning(
+            "[SECURITY] JWT_SECRET is not set — using insecure default in %s mode. "
+            "Set JWT_SECRET env var (min 32 chars) before network exposure.",
+            _AUTH_ENV or "unspecified",
+        )
+    else:
+        _AUTH_LOGGER.critical(
+            "[SECURITY] JWT_SECRET is default and ENVIRONMENT=%r is not a "
+            "recognised dev/test environment. Refusing to start. "
+            "Set JWT_SECRET (min 32 chars) or set ENVIRONMENT=development.",
+            _AUTH_ENV,
         )
         sys.exit(1)
 JWT_ALGORITHM = "HS256"

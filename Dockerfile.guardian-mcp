@@ -1,3 +1,7 @@
+# DEPRECATED — use Dockerfile.mcp-tier instead:
+#   docker build -f Dockerfile.mcp-tier --build-arg APP=mcp_guardian_app.py --build-arg PORT=9002 -t adrion-Dockerfile.guardian-mcp .
+# This file will be removed in v5.0.
+
 # GUARDIAN-MCP Dockerfile
 # Security & Compliance Engine (Port 9002)
 

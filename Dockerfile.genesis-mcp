@@ -1,3 +1,7 @@
+# DEPRECATED — use Dockerfile.mcp-tier instead:
+#   docker build -f Dockerfile.mcp-tier --build-arg APP=mcp_genesis_app.py --build-arg PORT=9004 -t adrion-Dockerfile.genesis-mcp .
+# This file will be removed in v5.0.
+
 # GENESIS-MCP Dockerfile
 # State Management, RAG & Local-First Persistence (Port 9004)
 

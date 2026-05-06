@@ -86,15 +86,24 @@ except Exception as e:
 MAPI_HOST = os.getenv("MAPI_HOST", "localhost")
 MAPI_PORT = int(os.getenv("MAPI_PORT", "8002"))
 API_KEY = os.getenv("UAP_API_KEY", "")
+_ENV = os.getenv("ENVIRONMENT", "").lower()
+_DEV_ENVS = {"development", "dev", "test", "testing"}
 
 if not API_KEY:
-    if os.getenv("ENVIRONMENT") == "production":
+    if _ENV in _DEV_ENVS:
+        logger.warning(
+            "[SECURITY] UAP_API_KEY is not set — running in %s mode only. "
+            "Set UAP_API_KEY before network exposure.",
+            _ENV or "unspecified",
+        )
+    else:
         logger.critical(
-            "[SECURITY] UAP_API_KEY is not set in PRODUCTION -- refusing to start."
+            "[SECURITY] UAP_API_KEY is not set and ENVIRONMENT=%r is not a "
+            "recognised dev/test environment. Refusing to start. "
+            "Set UAP_API_KEY or set ENVIRONMENT=development.",
+            _ENV,
         )
         sys.exit(1)
-    else:
-        logger.warning("[SECURITY] UAP_API_KEY is not set -- using empty key.")
 
 # ── Flask App ──────────────────────────────────────────────────────────────
 app = Flask(__name__)
