@@ -4,19 +4,36 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: "openai"
+        versions: [">=2.0.0"]  # SDK v2 breaking — manual review required
+    labels:
+      - "dependencies"
+      - "python"
+
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "python"
+        versions: ["3.14.*"]  # RC — not stable
+    labels:
+      - "dependencies"
+      - "docker"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
