@@ -1,6 +1,6 @@
 [project]
 name = "adrion-369"
-version = "1.0.0"
+version = "1.2.0"
 description = "Multi-agent AI orchestration system with Trinity-EBDI decision framework"
 requires-python = ">=3.11"
 license = {text = "MIT"}

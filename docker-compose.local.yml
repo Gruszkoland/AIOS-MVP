@@ -70,11 +70,48 @@ services:
       timeout: 5s
       retries: 5
 
+  # micro-saas SaaS REST API (plans, subscriptions, quota, products)
+  micro-saas:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE: micro-saas
+    container_name: adrion-micro-saas
+    command: >
+      python -c "
+      import sys; sys.path.insert(0, '/app/micro-saas');
+      from api import create_saas_app;
+      app = create_saas_app();
+      app.run(host='0.0.0.0', port=8003)
+      "
+    environment:
+      UAP_API_KEY: ${UAP_API_KEY:-dev-local-key-change-in-prod}
+      SAAS_DB_PATH: /app/data/subscriptions.db
+      ENVIRONMENT: development
+      FLASK_ENV: development
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./micro-saas:/app/micro-saas:ro
+      - saas_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/saas/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   prometheus_data:
   grafana_data:
   redis_data:
+  saas_data:
 
 networks:
   default:
