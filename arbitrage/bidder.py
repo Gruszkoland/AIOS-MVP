@@ -12,6 +12,7 @@ from .config import (
     LLM_MODEL,
     OPENAI_KEY,
     OPENROUTER_KEY,
+    check_external_service_allowed,
     get_active_llm_backend,
 )
 from .database import insert_bid, set_job_status
@@ -63,6 +64,7 @@ def _generate_cover_letter(job: dict, our_price: float, est_hours: float) -> str
     try:
         logger.info("event=llm_cover_letter backend=%s mode=attempt job_id=%s", backend, job_id)
         if backend == "openrouter":
+            check_external_service_allowed("openrouter")
             from openai import OpenAI
             client = OpenAI(api_key=OPENROUTER_KEY, base_url="https://openrouter.ai/api/v1")
             resp = client.chat.completions.create(
@@ -78,6 +80,7 @@ def _generate_cover_letter(job: dict, our_price: float, est_hours: float) -> str
             return resp.choices[0].message.content
 
         elif backend == "openai":
+            check_external_service_allowed("openai")
             from openai import OpenAI
             client = OpenAI(api_key=OPENAI_KEY)
             resp = client.chat.completions.create(
@@ -93,6 +96,7 @@ def _generate_cover_letter(job: dict, our_price: float, est_hours: float) -> str
             return resp.choices[0].message.content
 
         elif backend == "anthropic":
+            check_external_service_allowed("anthropic")
             import anthropic
             client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
             msg = client.messages.create(

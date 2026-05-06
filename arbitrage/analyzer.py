@@ -25,6 +25,7 @@ from .config import (
     MIN_PROFIT_USD,
     OPENAI_KEY,
     OPENROUTER_KEY,
+    check_external_service_allowed,
     get_active_llm_backend,
 )
 
@@ -32,6 +33,7 @@ logger = logging.getLogger("adrion.llm.analyzer")
 
 
 def _call_openrouter(prompt: str, model: str = LLM_MODEL) -> str:
+    check_external_service_allowed("openrouter")
     from openai import OpenAI
     client = OpenAI(
         api_key=OPENROUTER_KEY,
@@ -50,6 +52,7 @@ def _call_openrouter(prompt: str, model: str = LLM_MODEL) -> str:
 
 
 def _call_openai(prompt: str) -> str:
+    check_external_service_allowed("openai")
     from openai import OpenAI
     client = OpenAI(api_key=OPENAI_KEY)
     response = client.chat.completions.create(
@@ -65,6 +68,7 @@ def _call_openai(prompt: str) -> str:
 
 
 def _call_anthropic(prompt: str) -> str:
+    check_external_service_allowed("anthropic")
     import anthropic
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
     message = client.messages.create(
@@ -78,6 +82,7 @@ def _call_anthropic(prompt: str) -> str:
 
 def _call_lmstudio(prompt: str) -> str:
     """Call LM Studio local API (OpenAI-compatible interface)."""
+    check_external_service_allowed("lmstudio")
     from openai import OpenAI
     client = OpenAI(
         api_key="not-needed",  # LM Studio doesn't require key
@@ -97,6 +102,7 @@ def _call_lmstudio(prompt: str) -> str:
 
 def _call_ollama(prompt: str) -> str:
     """Call Ollama local API."""
+    check_external_service_allowed("ollama")
     import requests
     response = requests.post(
         f"{OLLAMA_URL}/api/generate",
