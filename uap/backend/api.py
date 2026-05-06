@@ -179,7 +179,7 @@ def _run_uap_health_checks() -> dict:
 def health():
     """Deep health check endpoint with cascade dependency checks."""
     checks = _run_uap_health_checks()
-    checks["version"] = "1.0.0"
+    checks["version"] = "1.2.0"
     checks["timestamp"] = datetime.now().isoformat()
     status_code = 200 if checks["status"] == "healthy" else 503
     return jsonify(checks), status_code
@@ -270,6 +270,40 @@ def _register_blueprints():
     app.register_blueprint(_admin_mod.admin_bp)
 
     logger.info("All 5 UAP blueprints registered (tasks, agents, genesis, ebdi, admin)")
+
+    # Register Phase B blueprint (tasks/agents management endpoints)
+    # NOTE: Phase B endpoints have been migrated to blueprints/tasks_phase_b.py
+    # and blueprints/agents_phase_b.py. api_phase_b.py is kept for compatibility
+    # and will be removed in v2.0.0.
+    try:
+        from blueprints.tasks_phase_b import tasks_phase_b_bp
+        from blueprints.agents_phase_b import agents_phase_b_bp
+        app.register_blueprint(tasks_phase_b_bp)
+        app.register_blueprint(agents_phase_b_bp)
+        logger.info("Phase B blueprints registered (tasks + agents endpoints)")
+    except Exception as e:
+        # Fallback to legacy api_phase_b.py
+        logger.warning("Phase B blueprints unavailable (%s) — falling back to api_phase_b", e)
+        try:
+            from api_phase_b import phase_b_bp
+            app.register_blueprint(phase_b_bp)
+            logger.info("Phase B legacy blueprint registered (7 tasks/agents endpoints)")
+        except Exception as e2:
+            logger.warning("Phase B blueprint not registered: %s", e2)
+
+    # Register micro-saas blueprint (products, plans, subscriptions)
+    try:
+        import importlib.util as _iutil
+        from pathlib import Path as _Path
+        _saas_api_path = _Path(__file__).parent.parent.parent / "micro-saas" / "api.py"
+        _spec = _iutil.spec_from_file_location("micro_saas_api", _saas_api_path)
+        _saas_mod = _iutil.module_from_spec(_spec)
+        _spec.loader.exec_module(_saas_mod)
+        _saas_mod.init_saas_db()
+        app.register_blueprint(_saas_mod.saas_bp)
+        logger.info("micro-saas blueprint registered (/saas/* endpoints)")
+    except Exception as e:
+        logger.warning("micro-saas blueprint not registered: %s", e)
 
 
 _register_blueprints()
