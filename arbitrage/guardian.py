@@ -38,6 +38,7 @@ Name/canonical mapping note:
 """
 from __future__ import annotations
 
+import hashlib
 import logging
 from dataclasses import dataclass, field
 from typing import Literal
@@ -356,18 +357,69 @@ def _law_sustainability(context: dict) -> LawResult:
     )
 
 
+def _law_authenticity(analysis: dict, context: dict) -> LawResult:
+    """Law 10: Authenticity (G6-ext) — LLM output must not be frozen or copy-pasted.
+
+    Detects:
+    - Identical fit/risks text (copy-paste / degenerate output)
+    - Response too short to contain genuine reasoning
+    - Hash collision with the previous response (frozen LLM loop)
+
+    The analysis dict is mutated in-place: ``analysis["_response_hash"]`` is set
+    so the orchestrator can persist it and pass it back via context["prev_fit_hash"].
+    """
+    fit = (analysis.get("fit") or "").strip()
+    risks = (analysis.get("risks") or "").strip()
+
+    # 1. Copy-paste: fit == risks (exact match on non-empty strings)
+    if fit and risks and fit == risks:
+        return LawResult(
+            "Authenticity", False,
+            "fit and risks are identical — likely copy-paste or frozen LLM output",
+            "MEDIUM",
+        )
+
+    # 2. Minimal-entropy check: too little meaningful content
+    meaningful = (fit + risks).replace(" ", "").replace(".", "").replace(",", "")
+    if len(meaningful) < 10:
+        return LawResult(
+            "Authenticity", False,
+            f"LLM output too short to be genuine ({len(meaningful)} non-trivial chars)",
+            "MEDIUM",
+        )
+
+    # 3. Frozen-output detection: compare with previous response hash
+    current_hash = hashlib.sha256((fit + risks).encode()).hexdigest()[:16]
+    analysis["_response_hash"] = current_hash  # expose for orchestrator persistence
+
+    prev_hash = context.get("prev_fit_hash")
+    if prev_hash and prev_hash == current_hash:
+        return LawResult(
+            "Authenticity", False,
+            f"Response hash '{current_hash}' matches previous response — frozen LLM loop detected",
+            "MEDIUM",
+        )
+
+    return LawResult(
+        "Authenticity", True,
+        f"Output distinct (hash={current_hash}, {len(meaningful)} non-trivial chars)",
+        "MEDIUM",
+    )
+
+
 # ═══════════════════════════════════════════════════════════════
 # MAIN EVALUATOR
 # ═══════════════════════════════════════════════════════════════
 
 def evaluate_guardians(job: dict, analysis: dict, context: dict) -> GuardianEval:
     """
-    Evaluate all 9 Guardian Laws sequentially.
+    Evaluate all 9 Guardian Laws + Authenticity supplemental check sequentially.
 
     Args:
         job:      dict with title, platform, budget_min, budget_max, description, client
         analysis: dict with score, fit, risks, our_price, est_cost, est_profit, llm_backend
-        context:  dict built via build_context()
+        context:  dict built via build_context(); optionally include prev_fit_hash for
+                  frozen-output detection (Law 10 Authenticity).
 
     Returns:
         GuardianEval — approved=True only when violation_weight < DENY_WEIGHTED_THRESHOLD
@@ -382,6 +434,7 @@ def evaluate_guardians(job: dict, analysis: dict, context: dict) -> GuardianEval
         _law_autonomy(job, context),
         _law_justice(job),
         _law_sustainability(context),
+        _law_authenticity(analysis, context),   # G6-ext: frozen/copy-paste detection
     ]
 
     all_violations = [law for law in laws if not law.passed]
