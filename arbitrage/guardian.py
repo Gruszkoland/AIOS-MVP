@@ -3,33 +3,38 @@ ADRION 369 — Guardian Laws Engine
 
 9 Ethical laws validated sequentially for every arbitrage decision.
 
-Rules:
-  - CRITICAL law violation → instant DENY (regardless of count)
-  - ≥2 violations          → DENY
-  - 0-1 non-critical violations → APPROVE
+Decision rules (weighted system):
+  WEIGHT_MAP: CRITICAL=10, HIGH=2, MEDIUM=1
+  DENY_WEIGHTED_THRESHOLD = 4
 
-Laws (runtime names — see DESYNC NOTE below):
+  Any CRITICAL violation triggers instant DENY (weight >= 10).
+  Otherwise: sum(weights of failed laws) >= threshold -> DENY.
+
+  Rationale:
+    2x MEDIUM = 2  -> APPROVE (two low-severity edge cases)
+    1x HIGH    = 2  -> APPROVE (single moderate issue)
+    1x HIGH+1x MED = 3 -> APPROVE
+    2x HIGH    = 4  -> DENY (two moderate issues compound)
+    1x CRITICAL    = 10 -> always DENY
+
+Laws (runtime names aligned with docs/GUARDIAN_LAWS_CANONICAL.json):
   1. Unity          (MEDIUM)   — job aligns with system's core purpose
   2. Truth          (HIGH)     — analysis is genuine, non-zero, reasoned
   3. Rhythm         (MEDIUM)   — bid pace is sustainable (daily limits)
   4. Causality      (HIGH)     — price chain is traceable and non-negative
   5. Transparency   (MEDIUM)   — all required analysis fields present
   6. Nonmaleficence (CRITICAL) — no financial harm to operator
-  7. Autonomy       (HIGH)     — client not spammed beyond daily cap
-  8. Justice        (MEDIUM)   — budget within fair scout range
+  7. Autonomy       (CRITICAL) — client not spammed (maps to G7 Privacy)
+  8. Justice        (CRITICAL) — budget in fair range (maps to G8 Nonmaleficence)
   9. Sustainability (HIGH)     — daily total operational cost within limit
 
-DESYNC NOTE (P1-5):
-  This module uses LEGACY law names and severities that differ from the
-  canonical source of truth (docs/GUARDIAN_LAWS_CANONICAL.json).
-  Mapping of divergent entries:
-    Code "Truth"          (Law 2, HIGH)     → Canonical G2 "Harmony"        (HIGH)
-    Code "Nonmaleficence" (Law 6, CRITICAL) → Canonical G6 "Authenticity"   (HIGH)
-    Code "Autonomy"       (Law 7, HIGH)     → Canonical G7 "Privacy"        (CRITICAL)
-    Code "Justice"        (Law 8, MEDIUM)   → Canonical G8 "Nonmaleficence" (CRITICAL)
-  DO NOT rename without also updating tests (test_guardian.py,
-  test_pipeline_unified.py, test_rag_integration.py) and downstream
-  consumers that match on law names in API responses.
+Name/canonical mapping note:
+  Code "Truth"    (Law 2) maps to Canonical G2 "Harmony"
+  Code "Autonomy" (Law 7) maps to Canonical G7 "Privacy"        [CRITICAL]
+  Code "Justice"  (Law 8) maps to Canonical G8 "Nonmaleficence" [CRITICAL]
+  Runtime names preserved for API/test backward-compatibility.
+  DO NOT rename without updating: test_guardian.py,
+  test_pipeline_unified.py, test_rag_integration.py.
 """
 from __future__ import annotations
 
@@ -51,7 +56,10 @@ logger = logging.getLogger("adrion.guardian")
 
 Weight = Literal["CRITICAL", "HIGH", "MEDIUM"]
 
-DENY_THRESHOLD = 2  # number of non-critical violations that trigger DENY
+# Weighted violation scoring
+_WEIGHT_MAP: dict[Weight, int] = {"CRITICAL": 10, "HIGH": 2, "MEDIUM": 1}
+DENY_WEIGHTED_THRESHOLD = 4  # sum of violation weights triggering DENY
+
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -273,29 +281,38 @@ def _law_nonmaleficence(analysis: dict) -> LawResult:
 
 
 def _law_autonomy(job: dict, context: dict) -> LawResult:
-    """Law 7: Autonomy — Respect client autonomy; do not spam same client."""
+    """Law 7: Autonomy (G7 Privacy) — Do not spam the same client; respect privacy.
+
+    Severity raised to CRITICAL: repeated unsolicited bids violate the
+    Privacy principle (G7) and constitute harassment, not just a process issue.
+    """
     client_name = (job.get("client") or "").strip()
     bids_for_client = int(context.get("bids_for_client_today", 0))
     limit = int(context.get("max_bids_per_client", MAX_BIDS_PER_CLIENT_PER_DAY))
 
     if not client_name:
-        return LawResult("Autonomy", True, "Anonymous client — no spam risk", "HIGH")
+        return LawResult("Autonomy", True, "Anonymous client — no spam risk", "CRITICAL")
 
     if bids_for_client >= limit:
         return LawResult(
             "Autonomy", False,
             f"Client '{client_name}' already has {bids_for_client}/{limit} bid(s) today",
-            "HIGH",
+            "CRITICAL",
         )
     return LawResult(
         "Autonomy", True,
         f"Client '{client_name}': {bids_for_client}/{limit} bids today",
-        "HIGH",
+        "CRITICAL",
     )
 
 
 def _law_justice(job: dict) -> LawResult:
-    """Law 8: Justice — Budget within fair scout range; no exploitation."""
+    """Law 8: Justice (G8 Nonmaleficence) — Budget in fair range; no exploitation.
+
+    Severity raised to CRITICAL: operating outside the scouted budget range
+    constitutes direct financial nonmaleficence — bidding on jobs we cannot
+    deliver profitably harms the operator.
+    """
     budget_min = float(job.get("budget_min") or 0)
     budget_max = float(job.get("budget_max") or 0)
 
@@ -303,19 +320,19 @@ def _law_justice(job: dict) -> LawResult:
         return LawResult(
             "Justice", False,
             f"Budget ${budget_min:.0f}-{budget_max:.0f} below minimum ${SCOUT_MIN_BUDGET}",
-            "MEDIUM",
+            "CRITICAL",
         )
     sanity_cap = SCOUT_MAX_BUDGET * 10
     if budget_max > sanity_cap:
         return LawResult(
             "Justice", False,
             f"Budget ${budget_max:.0f} exceeds sanity cap ${sanity_cap:.0f} — possible data error",
-            "MEDIUM",
+            "CRITICAL",
         )
     return LawResult(
         "Justice", True,
         f"Budget ${budget_min:.0f}-{budget_max:.0f} within fair range",
-        "MEDIUM",
+        "CRITICAL",
     )
 
 
@@ -353,7 +370,7 @@ def evaluate_guardians(job: dict, analysis: dict, context: dict) -> GuardianEval
         context:  dict built via build_context()
 
     Returns:
-        GuardianEval — approved=True only when CRITICAL=0 and violations < 2
+        GuardianEval — approved=True only when violation_weight < DENY_WEIGHTED_THRESHOLD
     """
     laws = [
         _law_unity(job),
@@ -369,20 +386,24 @@ def evaluate_guardians(job: dict, analysis: dict, context: dict) -> GuardianEval
 
     all_violations = [law for law in laws if not law.passed]
     compliance = len(laws) - len(all_violations)
+    violation_weight = sum(_WEIGHT_MAP[law.weight] for law in all_violations)
 
-    # CRITICAL violation → instant DENY
+    # CRITICAL violation → instant DENY (weight = 10, always >= threshold)
     critical = [law for law in all_violations if law.weight == "CRITICAL"]
     if critical:
         denial = f"CRITICAL: {critical[0].name} — {critical[0].reason}"
-        logger.warning("Guardian DENY [CRITICAL]: %s", denial)
+        logger.warning("Guardian DENY [CRITICAL w=%d]: %s", violation_weight, denial)
         return GuardianEval(laws, compliance, len(all_violations), False, denial)
 
-    # ≥ DENY_THRESHOLD non-critical violations → DENY
-    if len(all_violations) >= DENY_THRESHOLD:
-        names = ", ".join(law.name for law in all_violations)
-        denial = f"{len(all_violations)} violations: {names}"
-        logger.warning("Guardian DENY [%d violations]: %s", len(all_violations), denial)
+    # Weighted violations exceed threshold → DENY
+    if violation_weight >= DENY_WEIGHTED_THRESHOLD:
+        names = ", ".join(f"{law.name}({law.weight})" for law in all_violations)
+        denial = f"Weighted violations={violation_weight}/{DENY_WEIGHTED_THRESHOLD}: {names}"
+        logger.warning("Guardian DENY [w=%d]: %s", violation_weight, denial)
         return GuardianEval(laws, compliance, len(all_violations), False, denial)
 
-    logger.info("Guardian APPROVE: %d/%d laws passed", compliance, len(laws))
+    logger.info(
+        "Guardian APPROVE: %d/%d laws passed (violation_weight=%d)",
+        compliance, len(laws), violation_weight,
+    )
     return GuardianEval(laws, compliance, len(all_violations), True, "")

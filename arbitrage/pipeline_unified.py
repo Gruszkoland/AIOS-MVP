@@ -11,7 +11,7 @@ Complete demonstration integrating:
 
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 logger = logging.getLogger("adrion.pipeline_unified")
@@ -225,7 +225,7 @@ def run_unified_demonstration(
 
     response = {
         "job_id": job_id,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "trinity": {
             "material": round(trinity_scores["material"], 4),
             "intellectual": round(trinity_scores["intellectual"], 4),

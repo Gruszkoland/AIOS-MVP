@@ -1,3 +1,7 @@
+# DEPRECATED — use Dockerfile.mcp-tier instead:
+#   docker build -f Dockerfile.mcp-tier --build-arg APP=mcp_router_app.py --build-arg PORT=9000 -t adrion-Dockerfile.mcp-router .
+# This file will be removed in v5.0.
+
 # MCP Router Dockerfile
 # Central orchestration layer (Port 9000)
 

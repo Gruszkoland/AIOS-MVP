@@ -1,3 +1,7 @@
+# DEPRECATED — use Dockerfile.mcp-tier instead:
+#   docker build -f Dockerfile.mcp-tier --build-arg APP=mcp_oracle_app.py --build-arg PORT=9003 -t adrion-Dockerfile.oracle-mcp .
+# This file will be removed in v5.0.
+
 # ORACLE-MCP Dockerfile
 # Decision Routing & 162D Space Navigation (Port 9003)
 

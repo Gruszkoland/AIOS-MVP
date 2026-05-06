@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 versioning based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+> **Version note:** Semantic version (CHANGELOG) is the authoritative release identifier.
+> The marketing label "v4.0" in README refers to the product generation, not the code release.
+> Mapping: `v4.0 product` = `1.x.x semantic`. Do not conflate the two.
+
+---
+
+## [1.2.0] — 2026-05-06
+
+### Security
+
+- **`uap/backend/api.py`** — `UAP_API_KEY` guard now triggers `sys.exit(1)` for any environment that is not explicitly `ENVIRONMENT=development|dev|test|testing`. Previously only blocked on `ENVIRONMENT=production` (opt-in). Now blocks by default, opt-out requires explicit dev env declaration.
+- **`uap/backend/auth.py`** — `JWT_SECRET` default guard applies same logic: `sys.exit(1)` unless `ENVIRONMENT` is a recognised dev/test value. Removed duplicate `import logging` anti-pattern; uses single `_AUTH_LOGGER`.
+
+### Fixed
+
+- **Guardian Laws: weighted violation scoring** — replaced binary `DENY_THRESHOLD=2` with weighted system (`CRITICAL=10, HIGH=2, MEDIUM=1, deny_if weight >= 4`). Prevents false DENY on 2× low-severity MEDIUM violations (e.g. Unity + Rhythm = weight 2 → APPROVE). Two HIGH violations (weight 4) correctly deny.
+- **Guardian Law G7 (Autonomy) severity** — corrected from `HIGH` to `CRITICAL`, aligned with `docs/GUARDIAN_LAWS_CANONICAL.json` (G7 = Privacy = CRITICAL).
+- **Guardian Law G8 (Justice) severity** — corrected from `MEDIUM` to `CRITICAL`, aligned with canonical G8 = Nonmaleficence = CRITICAL.
+- **`GUARDIAN_LAWS_CANONICAL.json`** — updated to v2.0: added `severity` field to all 9 laws, added `weight_map` and `deny_weighted_threshold` fields; added `runtime_name` for backward-compat mapping.
+- **`arbitrage/pipeline_unified.py`** — replaced deprecated `datetime.utcnow()` with `datetime.now(timezone.utc)`.
+- **`pyproject.toml`** — `fail_under` raised from `65` → `80` to match `--cov-fail-under=80` in CI workflow (was inconsistent).
+
+### Deprecated
+
+- **`Dockerfile.genesis-mcp`, `Dockerfile.guardian-mcp`, `Dockerfile.healer-mcp`, `Dockerfile.mcp-router`, `Dockerfile.oracle-mcp`, `Dockerfile.vortex-mcp`** — replaced by unified `Dockerfile.mcp-tier` with `--build-arg APP=<entrypoint> --build-arg PORT=<port>`. Old files retain deprecation header; will be removed in v5.0.
+
+### Changed
+
+- **`backups/` and `memories/`** — added to `.gitignore`, untracked from git index. Runtime state must not be versioned.
+- **Coverage gate** — `pyproject.toml fail_under` unified at 80 (was 65, CI was already at 80).
+- **README** — Guardian Laws decision rules updated to reflect weighted system. Coverage claim updated from "83%+" to "80%+ gate enforced by CI".
+
 ---
 
 ## [1.1.0] - 2026-04-05

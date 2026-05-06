@@ -425,11 +425,14 @@ def test_evaluate_guardians_critical_deny():
 
 
 def test_evaluate_guardians_two_violations_deny():
-    """Two non-critical violations → DENY."""
+    """CRITICAL violation (Justice) + MEDIUM violation (Unity) → instant DENY.
+
+    Justice is CRITICAL — single CRITICAL triggers deny regardless of Unity.
+    """
     bad_job = _job(
-        title="Build a mobile app",            # Law 1 Unity: FAIL
+        title="Build a mobile app",            # Law 1 Unity: FAIL (MEDIUM)
         description="React Native development", # no content keywords
-        budget_min=10, budget_max=30,           # Law 8 Justice: FAIL
+        budget_min=10, budget_max=30,           # Law 8 Justice: FAIL (CRITICAL)
     )
     result = evaluate_guardians(bad_job, _analysis(), _ctx())
     assert result.approved is False
@@ -446,13 +449,58 @@ def test_evaluate_guardians_one_violation_approve():
     assert result.violations == 1
 
 
-def test_evaluate_guardians_rhythm_deny():
-    """Daily limit reached → Rhythm fails — combined with Unity failure gives DENY."""
+def test_evaluate_guardians_two_medium_violations_approve():
+    """Two MEDIUM violations (weight=1+1=2) are below threshold=4 → APPROVE.
+
+    This validates the weighted system: low-severity edge cases should not
+    block legitimate bids that pass all financial/critical checks.
+    """
     bad_job = _job(title="Build a mobile app", description="React Native development")
-    ctx = _ctx(bids_today=20, daily_bid_limit=20)  # Rhythm: FAIL
+    ctx = _ctx(bids_today=20, daily_bid_limit=20)  # Rhythm MEDIUM: FAIL
+    # Unity MEDIUM (no keywords) + Rhythm MEDIUM (limit reached) = weight 2 < 4
     result = evaluate_guardians(bad_job, _analysis(), ctx)
+    # With weighted system: 2 MEDIUM violations = weight 2 < threshold 4 → APPROVE
+    assert result.violations >= 2
+    # Rhythm + Unity both fail but combined weight < DENY_WEIGHTED_THRESHOLD
+    assert result.approved is True
+
+
+def test_evaluate_guardians_two_high_violations_deny():
+    """Two HIGH violations (weight=2+2=4) reach threshold → DENY."""
+    bad_job = _job(title="Build a mobile app", description="React Native development")
+    # Sustainability HIGH fails + Truth HIGH fails
+    ctx = _ctx(daily_est_cost=25.0, max_daily_cost=25.0)  # Sustainability HIGH: FAIL
+    bad_analysis = _analysis(score=0)  # Truth HIGH: FAIL (score=0)
+    result = evaluate_guardians(bad_job, bad_analysis, ctx)
     assert result.approved is False
     assert result.violations >= 2
+
+
+def test_evaluate_guardians_rhythm_single_medium_approve():
+    """Single Rhythm (MEDIUM) violation alone → APPROVE (weight=1 < 4)."""
+    ctx = _ctx(bids_today=20, daily_bid_limit=20)  # Rhythm MEDIUM: FAIL
+    result = evaluate_guardians(_job(), _analysis(), ctx)  # good job, all else passes
+    assert result.approved is True
+    assert result.violations == 1
+
+
+def test_evaluate_guardians_sustainability_high_plus_medium_approve():
+    """Sustainability (HIGH=2) + Unity (MEDIUM=1) = weight 3 < 4 → APPROVE."""
+    bad_job = _job(title="React Native mobile app", description="Mobile development project")
+    ctx = _ctx(daily_est_cost=25.0, max_daily_cost=25.0)  # Sustainability HIGH: FAIL
+    result = evaluate_guardians(bad_job, _analysis(), ctx)
+    # Unity(1) + Sustainability(2) = 3 < 4 → APPROVE
+    assert result.approved is True
+    assert result.violations >= 2
+
+
+def test_evaluate_guardians_sustainability_deny():
+    """Sustainability (HIGH) + Truth (HIGH) → weight 4 = threshold → DENY."""
+    bad_job = _job(title="Build a React Native app", description="Mobile development project")
+    ctx = _ctx(daily_est_cost=25.0, max_daily_cost=25.0)  # Sustainability HIGH: FAIL
+    bad_analysis = _analysis(score=0)  # Truth HIGH: FAIL
+    result = evaluate_guardians(bad_job, bad_analysis, ctx)
+    assert result.approved is False
 
 
 def test_evaluate_guardians_returns_9_laws():
@@ -480,13 +528,6 @@ def test_evaluate_guardians_to_dict():
         assert "reason" in law
         assert "weight" in law
 
-
-def test_evaluate_guardians_sustainability_deny():
-    """Sustainability failure combined with Unity failure → DENY."""
-    bad_job = _job(title="Build a React Native app", description="Mobile development project")
-    ctx = _ctx(daily_est_cost=25.0, max_daily_cost=25.0)  # Sustainability: FAIL
-    result = evaluate_guardians(bad_job, _analysis(), ctx)
-    assert result.approved is False
 
 
 # ─────────────────────────────────────────────────────────────

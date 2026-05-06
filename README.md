@@ -1,4 +1,6 @@
-# ADRION 369 v4.0 - Advanced AI System
+# ADRION 369 v4.0 — Advanced AI System
+
+> **Versioning:** `v4.0` is the product generation label. Semantic release version: `1.2.0` (see [CHANGELOG.md](CHANGELOG.md)).
 
 ## Overview
 
@@ -57,9 +59,7 @@ Every arbitrage decision is validated against nine ethical laws in sequence:
 8. **Nonmaleficence** (CRITICAL) -- no financial harm to operator
 9. **Sustainability** (HIGH) -- daily total operational cost within limit
 
-**Decision rules:** A CRITICAL law violation triggers an instant DENY. Two or
-more violations of any severity also trigger a DENY. Zero or one non-critical
-violations result in APPROVE.
+**Decision rules:** Weighted scoring: CRITICAL=10, HIGH=2, MEDIUM=1. A CRITICAL violation triggers instant DENY. Combined violation weight ≥ 4 triggers DENY (2× HIGH=4 → DENY, 2× MEDIUM=2 → APPROVE). Low-severity edge cases no longer block legitimate bids.
 
 Canonical definitions: [`docs/GUARDIAN_LAWS_CANONICAL.json`](docs/GUARDIAN_LAWS_CANONICAL.json)
 
@@ -352,7 +352,7 @@ Old logic (e.g., `oracle.py`, `quantum.py`) has been moved to the `legacy/` dire
 │   └── healer.agent.md
 ├── .github/
 │   └── workflows/                           # CI/CD (python-ci, release, security-ci)
-├── tests/                                   # Python test suite (83%+ coverage)
+├── tests/                                   # Python test suite (80%+ gate enforced by CI)
 └── README.md                                # This file
 ```
 
@@ -423,8 +423,7 @@ Canonical definitions: [`docs/GUARDIAN_LAWS_CANONICAL.json`](docs/GUARDIAN_LAWS_
 8. **G8 Nonmaleficence** (CRITICAL) -- Never cause harm to users, systems, or data
 9. **G9 Sustainability** (HIGH) -- Operate within resource limits and preserve long-term system health
 
-**Decision rules:** A CRITICAL law violation triggers an instant DENY. Two or
-more violations of any severity also trigger a DENY.
+**Decision rules:** Weighted scoring: CRITICAL=10, HIGH=2, MEDIUM=1. A CRITICAL violation triggers instant DENY. Combined weight ≥ 4 triggers DENY.
 
 **Learn more:** See [docs/LAWS.md](docs/LAWS.md)
 
@@ -598,6 +597,6 @@ ADRION 369 System created with:
 
 **Version:** 4.0
 **Last Updated:** April 11, 2026
-**Status:** PRODUCTION-GRADE (83%+ test coverage, CI/CD gated)
+**Status:** PRODUCTION-GRADE (80%+ coverage gate, CI/CD gated)
 
 **🚀 Your local AI coding army is ready to go!**
