@@ -9,7 +9,7 @@ waitress>=3.0.0        # Production WSGI server
 docker>=7.1.0          # Docker SDK for runtime stack inspection/restart
 
 # LLM integrations (at least one required for non-mock mode)
-openai>=1.0.0           # OpenRouter + OpenAI + Ollama (OpenAI-compatible)
+openai>=2.34.0           # OpenRouter + OpenAI + Ollama (OpenAI-compatible)
 anthropic>=0.18.0       # Claude direct (optional)
 
 # Configuration
