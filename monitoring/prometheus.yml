@@ -33,6 +33,13 @@ scrape_configs:
     metrics_path: "/mapi/v1/metrics"
     scrape_interval: 30s
 
+  # micro-saas billing & subscriptions (port 8003)
+  - job_name: "adrion-micro-saas"
+    static_configs:
+      - targets: ["micro-saas:8003"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
   # Vortex Engine (Go, port 1740)
   # Uncomment when vortex-server is added to docker-compose.prod.yml
   # - job_name: "vortex-engine"
