@@ -46,9 +46,10 @@
     {
       "id": "G6",
       "runtime_name": "Nonmaleficence",
-      "name": "Nonmaleficence",
-      "severity": "CRITICAL",
-      "description": "No financial harm to the operator per bid"
+      "name": "Authenticity",
+      "severity": "HIGH",
+      "description": "Outputs must be genuine and free from deception",
+      "runtime_note": "Runtime guardian.py implements '_law_nonmaleficence' at pipeline position 6 for architectural G8 (financial harm). G6 Authenticity is enforced implicitly via G2 Truth/Harmony (analysis must be genuine and reasoned). Explicit G6 implementation planned for v1.3."
     },
     {
       "id": "G7",
