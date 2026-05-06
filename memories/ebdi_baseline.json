@@ -1,0 +1,100 @@
+{
+  "version": "1.0",
+  "generated": "2026-04-05",
+  "protocol": "EBDI Baseline States (PHM [10] — Persona Health Monitor)",
+  "description": "Emotional-Behavioral Dynamics Intelligence baseline per agent. Used for Identity Reset detection (>3 std-dev from baseline triggers re-calibration)",
+  "baseline_states": {
+    "librarian": {
+      "name": "Librarian",
+      "pleasure": 0.55,
+      "arousal": 0.25,
+      "dominance": 0.50,
+      "stability_threshold": 0.15,
+      "state_confidence": 0.85,
+      "health_status": "NOMINAL"
+    },
+    "sap": {
+      "name": "Strategic Action Planner",
+      "pleasure": 0.60,
+      "arousal": 0.40,
+      "dominance": 0.80,
+      "stability_threshold": 0.20,
+      "state_confidence": 0.88,
+      "health_status": "NOMINAL"
+    },
+    "auditor": {
+      "name": "Auditor",
+      "pleasure": 0.30,
+      "arousal": 0.10,
+      "dominance": 0.50,
+      "stability_threshold": 0.10,
+      "state_confidence": 0.95,
+      "health_status": "NOMINAL"
+    },
+    "sentinel": {
+      "name": "Sentinel",
+      "pleasure": 0.40,
+      "arousal": 0.70,
+      "dominance": 0.90,
+      "stability_threshold": 0.30,
+      "state_confidence": 0.90,
+      "health_status": "HIGH_ALERT_NORMAL"
+    },
+    "architect": {
+      "name": "Architect",
+      "pleasure": 0.65,
+      "arousal": 0.50,
+      "dominance": 0.70,
+      "stability_threshold": 0.20,
+      "state_confidence": 0.87,
+      "health_status": "NOMINAL"
+    },
+    "healer": {
+      "name": "Healer",
+      "pleasure": 0.70,
+      "arousal": 0.30,
+      "dominance": 0.60,
+      "stability_threshold": 0.18,
+      "state_confidence": 0.82,
+      "health_status": "NOMINAL"
+    },
+    "amplifier": {
+      "name": "Amplifier",
+      "pleasure": 0.75,
+      "arousal": 0.80,
+      "dominance": 0.85,
+      "stability_threshold": 0.25,
+      "state_confidence": 0.80,
+      "health_status": "OPERATING_HIGH"
+    },
+    "boosterlever": {
+      "name": "BoosterLever",
+      "pleasure": 0.80,
+      "arousal": 0.90,
+      "dominance": 0.95,
+      "stability_threshold": 0.35,
+      "state_confidence": 0.75,
+      "health_status": "EXTREME_MODE"
+    },
+    "chronos": {
+      "name": "Chronos",
+      "pleasure": 0.55,
+      "arousal": 0.45,
+      "dominance": 0.65,
+      "stability_threshold": 0.18,
+      "state_confidence": 0.83,
+      "health_status": "NOMINAL"
+    }
+  },
+  "crisis_thresholds": {
+    "arousal_crisis_trigger": 0.70,
+    "dominance_collapse_trigger": 0.20,
+    "pleasure_despair_trigger": 0.10,
+    "deviation_identity_reset": 3.0
+  },
+  "update_mechanism": {
+    "trigger": "Session end, agent report",
+    "measurement": "Real-time telemetry (TEL [9]) via platform APIs",
+    "cascade": "Master Orchestrator → Healer (if deviation > threshold)"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "canary_enabled": false,
+  "canary_percent": 0.0,
+  "reason": "kpi_gate_failed:error_rate",
+  "ts": 1778020535
+}
