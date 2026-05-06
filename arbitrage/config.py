@@ -65,6 +65,12 @@ class AdrionSettings(BaseSettings):
     ugc_events_daily_cap: int = Field(4, alias="UGC_EVENTS_DAILY_CAP")
     resale_events_daily_cap: int = Field(4, alias="RESALE_EVENTS_DAILY_CAP")
 
+    # ═══ G7 Autonomy — External Service Allowlist ═══
+    allowed_external_services: str = Field(
+        "openrouter,openai,anthropic,apify,lmstudio,ollama",
+        alias="ALLOWED_EXTERNAL_SERVICES",
+    )
+
     # ═══ Source URLs / Tokens ═══
     ugc_source_url: str = Field("", alias="UGC_SOURCE_URL")
     resale_source_url: str = Field("", alias="RESALE_SOURCE_URL")
@@ -215,8 +221,28 @@ ANALYZER_USER: str = settings.analyzer_user
 COVER_LETTER_SYSTEM: str = settings.cover_letter_system
 COVER_LETTER_USER: str = settings.cover_letter_user
 
+ALLOWED_EXTERNAL_SERVICES: list[str] = [
+    s.strip().lower()
+    for s in settings.allowed_external_services.split(",")
+    if s.strip()
+]
+
 
 # ─── Helper functions ─────────────────────────────────────────────────────────
+
+
+def check_external_service_allowed(service: str) -> None:
+    """G7 Autonomy gate: raise PermissionError if service not in ALLOWED_EXTERNAL_SERVICES.
+
+    Call this before making any external API call (OpenRouter, OpenAI, Apify, Stripe…).
+    Configure via env: ALLOWED_EXTERNAL_SERVICES=openrouter,openai,anthropic,apify
+    """
+    if service.lower() not in ALLOWED_EXTERNAL_SERVICES:
+        raise PermissionError(
+            f"G7 Autonomy violation: external service '{service}' is not in "
+            f"ALLOWED_EXTERNAL_SERVICES ({','.join(ALLOWED_EXTERNAL_SERVICES)}). "
+            "Add it to the env var to permit this service."
+        )
 
 
 def get_active_llm_backend() -> str:
