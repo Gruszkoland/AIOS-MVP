@@ -54,7 +54,7 @@ def banner(text: str):
     print(f"{'=' * 70}\n")
 
 
-def test_endpoint(method: str, endpoint: str, expected_status: int = 200,
+def _test_endpoint(method: str, endpoint: str, expected_status: int = 200,
                  json_data: Dict = None, params: Dict = None) -> Tuple[bool, str]:
     """Test a single API endpoint."""
     url = f"{API_BASE}{endpoint}"
@@ -85,7 +85,7 @@ def test_endpoint(method: str, endpoint: str, expected_status: int = 200,
 def run_test(name: str, method: str, endpoint: str, expected_status: int = 200,
             json_data: Dict = None, params: Dict = None) -> bool:
     """Run a test and track results."""
-    success, message = test_endpoint(method, endpoint, expected_status, json_data, params)
+    success, message = _test_endpoint(method, endpoint, expected_status, json_data, params)
     if success:
         log_success(message)
         PASSED.append(name)
