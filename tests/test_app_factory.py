@@ -591,7 +591,8 @@ class TestWholesaleBP:
     @patch("arbitrage.blueprints.wholesale_bp._rate_limiters")
     @patch("arbitrage.blueprints.wholesale_bp._wholesale_cycle")
     def test_cycle_returns_200(self, mock_cycle_fn, mock_rl, client):
-        mock_rl.return_value = _allow_all_rate_limiter()
+        # _rate_limiters() returns (cycle_limiter, scout_limiter) tuple
+        mock_rl.return_value = (_allow_all_rate_limiter(), MagicMock())
         mock_cycle_fn.return_value = MagicMock(
             return_value={"stage": "complete", "deals_processed": 5}
         )
@@ -600,7 +601,8 @@ class TestWholesaleBP:
 
     @patch("arbitrage.blueprints.wholesale_bp._rate_limiters")
     def test_cycle_rate_limited(self, mock_rl, client):
-        mock_rl.return_value = _deny_all_rate_limiter()
+        # _rate_limiters() returns (cycle_limiter, scout_limiter) tuple
+        mock_rl.return_value = (_deny_all_rate_limiter(), MagicMock())
         resp = client.post("/api/arbitrage/wholesale/cycle", json={})
         assert resp.status_code == 429
 
