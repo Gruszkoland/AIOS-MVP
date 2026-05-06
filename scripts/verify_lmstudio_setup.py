@@ -212,7 +212,7 @@ if not ollama_ok:
 
 print(f"\n{Color.CYAN}🚀 To start ADRIAN 369:{Color.END}")
 print(f"  .\\\.venv\\\Scripts\\\Activate.ps1")
-print(f"  python arbitrage_server.py")
+print(f"  python wsgi.py")  # previously: python arbitrage_server.py (deprecated)
 print(f"  python dashboard/server.py  # (another terminal)")
 
 print(f"\n{Color.CYAN}═══════════════════════════════════════════════════════════{Color.END}\n")
