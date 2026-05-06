@@ -18,7 +18,7 @@ try:
     from docx.text.paragraph import Paragraph
     from docx.table import Table
 except ImportError:
-    print("❌ ERROR: python-docx nie zainstalowany. Uruchom: pip install python-docx==0.8.11")
+    print("❌ ERROR: python-docx nie zainstalowany. Uruchom: pip install python-docx>=1.2.0")
     sys.exit(1)
 
 # Konfiguracja loggingu
