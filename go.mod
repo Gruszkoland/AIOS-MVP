@@ -2,7 +2,7 @@ module adrion-vortex
 
 go 1.22.0
 
-require github.com/labstack/echo/v4 v4.11.4
+require github.com/labstack/echo/v4 v4.15.2
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
