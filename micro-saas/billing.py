@@ -213,3 +213,32 @@ def consume_bid(user_id: str) -> None:
             (today, sub.sub_id),
         )
         conn.commit()
+
+
+def emit_event(sub_id: str, event_type: str, payload: Optional[dict] = None) -> None:
+    """
+    Persist an event to saas_events for webhook delivery.
+
+    event_type examples:
+      - subscription.created
+      - bid.quota_exceeded
+      - subscription.expired
+    """
+    import json as _json
+    import uuid
+
+    event_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    payload_str = _json.dumps(payload or {})
+
+    with _get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO saas_events
+                (event_id, sub_id, event_type, payload, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (event_id, sub_id, event_type, payload_str, now),
+        )
+        conn.commit()
+    logger.debug("Event emitted: %s type=%s sub=%s", event_id, event_type, sub_id)
