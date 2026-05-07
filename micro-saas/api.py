@@ -40,6 +40,8 @@ from billing import (  # noqa: E402 — path manipulation above
 )
 from metrics import record_bid, record_bid_consumed, record_subscribe, prometheus_wsgi_app  # noqa: E402
 from key_provider import get_api_key, register_sighup_handler  # noqa: E402
+from webhook_worker import start_webhook_worker  # noqa: E402
+from rate_limiter import rate_limit  # noqa: E402
 
 # ── Backend selection: SQLite (default) vs PostgreSQL ─────────────────────
 _DB_DRIVER = os.getenv("SAAS_DB_DRIVER", "sqlite").lower()
@@ -117,6 +119,7 @@ def list_products():
 
 @saas_bp.route("/subscribe", methods=["POST"])
 @require_api_key
+@rate_limit
 def subscribe():
     """Create or upgrade a subscription.
 
@@ -134,6 +137,12 @@ def subscribe():
     try:
         sub = create_subscription(user_id, tier)
         record_subscribe(tier)
+        # Emit event for webhook delivery (P14)
+        try:
+            from billing import emit_event
+            emit_event(sub.sub_id, "subscription.created", {"user_id": user_id, "tier": tier})
+        except Exception as ev_exc:  # non-fatal — don't break subscription response
+            logger.warning("emit_event failed: %s", ev_exc)
     except Exception as exc:
         logger.error("Subscription creation failed: %s", exc)
         return jsonify({"error": "Subscription failed"}), 500
@@ -156,6 +165,7 @@ def subscribe():
 
 @saas_bp.route("/quota/<user_id>", methods=["GET"])
 @require_api_key
+@rate_limit
 def quota(user_id: str):
     """Check remaining bid quota for a user today."""
     if not user_id or len(user_id) > 128:
@@ -165,6 +175,14 @@ def quota(user_id: str):
     record_bid(allowed)
     sub = get_subscription(user_id)
     tier = sub.tier if sub else "none"
+
+    # Emit quota_exceeded event for webhook delivery (P14)
+    if not allowed and sub:
+        try:
+            from billing import emit_event
+            emit_event(sub.sub_id, "bid.quota_exceeded", {"user_id": user_id, "reason": reason})
+        except Exception as ev_exc:
+            logger.warning("emit_event failed: %s", ev_exc)
 
     return jsonify({
         "user_id": user_id,
@@ -203,6 +221,9 @@ def create_saas_app() -> Flask:
 
     # Register SIGHUP handler for zero-downtime key rotation (POSIX only)
     register_sighup_handler()
+
+    # Start webhook delivery worker thread (WEBHOOK_ENABLED=true to activate)
+    start_webhook_worker()
 
     @app.errorhandler(404)
     def not_found(e):
