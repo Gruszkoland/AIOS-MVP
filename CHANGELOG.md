@@ -1,125 +1,159 @@
-# Changelog — ADRION 369
+# 📋 CHANGELOG — ADRION 369
 
-All notable changes to this project will be documented in this file.
-Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-versioning based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-> **Version note:** Semantic version (CHANGELOG) is the authoritative release identifier.
-> The marketing label "v4.0" in README refers to the product generation, not the code release.
-> Mapping: `v4.0 product` = `1.x.x semantic`. Do not conflate the two.
+> Historia wszystkich zmian bezpieczeństwa projektu.
+> Format: [wersja] — data — opis
 
 ---
 
-## [1.2.0] — 2026-05-06
+## [v5.6-B6] — 2026-05-11 — Redis Sorted Set backend dla CVC (B6 Fix)
 
-### Security
+### Zmodyfikowane pliki
 
-- **`uap/backend/api.py`** — `UAP_API_KEY` guard now triggers `sys.exit(1)` for any environment that is not explicitly `ENVIRONMENT=development|dev|test|testing`. Previously only blocked on `ENVIRONMENT=production` (opt-in). Now blocks by default, opt-out requires explicit dev env declaration.
-- **`uap/backend/auth.py`** — `JWT_SECRET` default guard applies same logic: `sys.exit(1)` unless `ENVIRONMENT` is a recognised dev/test value. Removed duplicate `import logging` anti-pattern; uses single `_AUTH_LOGGER`.
+- `core/security_hardening.py` — pełna migracja `_CumulativeViolationCounter` na Redis Sorted Set
+- `tests/test_g5_redis.py` — dodano klasę `TestCVCRedisBackend` (8 nowych testów)
 
-### Fixed
+### Poprawka B6 — Brak persystencji CVC w deploymencie multi-instance
 
-- **Guardian Laws: weighted violation scoring** — replaced binary `DENY_THRESHOLD=2` with weighted system (`CRITICAL=10, HIGH=2, MEDIUM=1, deny_if weight >= 4`). Prevents false DENY on 2× low-severity MEDIUM violations (e.g. Unity + Rhythm = weight 2 → APPROVE). Two HIGH violations (weight 4) correctly deny.
-- **Guardian Law G7 (Autonomy) severity** — corrected from `HIGH` to `CRITICAL`, aligned with `docs/GUARDIAN_LAWS_CANONICAL.json` (G7 = Privacy = CRITICAL).
-- **Guardian Law G8 (Justice) severity** — corrected from `MEDIUM` to `CRITICAL`, aligned with canonical G8 = Nonmaleficence = CRITICAL.
-- **`GUARDIAN_LAWS_CANONICAL.json`** — updated to v2.0: added `severity` field to all 9 laws, added `weight_map` and `deny_weighted_threshold` fields; added `runtime_name` for backward-compat mapping.
-- **`arbitrage/pipeline_unified.py`** — replaced deprecated `datetime.utcnow()` with `datetime.now(timezone.utc)`.
-- **`pyproject.toml`** — `fail_under` raised from `65` → `80` to match `--cov-fail-under=80` in CI workflow (was inconsistent).
-
-### Deprecated
-
-- **`Dockerfile.genesis-mcp`, `Dockerfile.guardian-mcp`, `Dockerfile.healer-mcp`, `Dockerfile.mcp-router`, `Dockerfile.oracle-mcp`, `Dockerfile.vortex-mcp`** — replaced by unified `Dockerfile.mcp-tier` with `--build-arg APP=<entrypoint> --build-arg PORT=<port>`. Old files retain deprecation header; will be removed in v5.0.
-
-### Changed
-
-- **`backups/` and `memories/`** — added to `.gitignore`, untracked from git index. Runtime state must not be versioned.
-- **Coverage gate** — `pyproject.toml fail_under` unified at 80 (was 65, CI was already at 80).
-- **README** — Guardian Laws decision rules updated to reflect weighted system. Coverage claim updated from "83%+" to "80%+ gate enforced by CI".
+- **Problem:** `_CumulativeViolationCounter` używał in-memory `dict` z timestampami. W deploymencie
+  wieloinstancyjnym każda instancja miała niezależne okno naruszeń → salami slicing przez
+  routing do różnych pod-ów był niewidzialny dla CVC.
+- **Rozwiązanie:** Opcjonalny backend Redis Sorted Set (backward compatible):
+  - Nowe parametry `__init__`: `redis_url: Optional[str] = None`, `redis_prefix: str = "adrion:cvc:"`
+  - Każda sesja → klucz `{prefix}cvc:{session_id}` typu Sorted Set
+  - Members = UUID (pozwala wiele naruszeń/sek bez kolizji), score = Unix timestamp
+  - Pipeline atomowy: `ZADD → ZREMRANGEBYSCORE → ZCARD → EXPIRE`
+  - TTL = `WINDOW_HOURS * 3600 + 3600` = 90 000 s (25h buffor)
+  - `reset()` → `DEL` klucza; `get_status()` → `ZREMRANGEBYSCORE + ZCARD` pipeline
+  - Fallback do in-memory gdy Redis niedostępny (brak błędu przy starcie)
+- **SecurityHardeningEngine:** nowy parametr `cvc_redis_url: Optional[str] = None`
+- **Zależność:** `redis>=4.0` (opcjonalna — `pip install redis`)
+- **Wsteczna kompatybilność:** Brak `cvc_redis_url` → identyczne zachowanie jak v5.6-B5
 
 ---
 
-## [1.1.0] - 2026-04-05
+## [v5.6-B5] — 2026-05-11 — Redis Session Sync for G5 (B5 Fix)
 
-### Added
+### Zmodyfikowane pliki
 
-- **UAP tests CI step** — `pytest uap/tests/ -v` added as separate step in `python-ci.yml` with env vars `UAP_API_KEY`, `ENVIRONMENT`, `JWT_SECRET`
-- **GUARDIAN_LAWS_CANONICAL.json** (`docs/`) — single-source canonical definition of all 9 Guardian Laws (G1–G9)
+- `core/security_hardening.py` — dodano opcjonalny backend Redis do `G5TransparencyGuard`
 
-### Changed
+### Poprawka B5 — Brak synchronizacji sesji G5 w deploymencie multi-instance
 
-- **Coverage gate unified** — `--cov-fail-under` raised from 37 → 65 in `.github/workflows/release.yml` (aligned with `python-ci.yml` and `pyproject.toml`)
-- **Resource limits** added to all major services in `docker-compose.prod.yml` (`deploy.resources.limits`): adrion-api (512m/0.5cpu), adrion-uap (512m/0.5cpu), adrion-dashboard (256m/0.25cpu), loki (512m/0.5cpu), grafana (512m/0.5cpu), adrion-nginx (128m/0.25cpu)
-- **Pre-commit hook cross-platform** — `powershell.exe` call in `.githooks/pre-commit` wrapped in shell detection (powershell.exe → pwsh → warning fallback)
-
-### Security
-
-- **Bandit SAST** — `continue-on-error: false` made explicit in `security-ci.yml` to ensure hard block on findings
-- **Safety dependency check** — `continue-on-error: false` made explicit in `security-ci.yml`
-
-### Fixed
-
-- **`.gitignore`** — added `monitoring/*.jsonl`, `monitoring/*_history*.jsonl`, `monitoring/*_test*.json`, `.runtime/`, `*.pid` to prevent runtime data from being committed
-
----
-
-## [Unreleased]
-
-### Deprecated
-
-- **`arbitrage_server.py`** — replaced with thin redirect stub (~20 lines). Use `wsgi.py` → `arbitrage.app.create_app()`. Will be **removed in v5.0** (planned Q3 2026).
-
-### Security
-
-- Added startup `logger.warning` in `uap/backend/api.py` when `UAP_API_KEY` env var is not set (insecure default key "local-dev-key-123")
-- Added startup `logger.warning` in `uap/backend/auth.py` when `JWT_SECRET` env var is not set (insecure default)
-
-### Fixed
-
-- Removed duplicated `_SlidingWindowRateLimiter` class from `arbitrage/api.py` — now uses `quantum_limiter` from `arbitrage/rate_limiter.py` (single source of truth)
-- Removed orphaned `import collections` from `arbitrage/api.py` after class removal
-
-### Changed
-
-- Coverage gate raised from `fail_under = 37` → `65` in `pyproject.toml`
-- Coverage gate raised from `--cov-fail-under=37` → `65` in `.github/workflows/python-ci.yml`
-- Added `mypy` type-checking step to `python-ci.yml` CI workflow
-- Added `mypy` pre-commit hook to `.pre-commit-config.yaml` (scoped to `arbitrage/` module)
+- **Problem:** `G5TransparencyGuard` używał in-memory `__sessions` dict i `__global_count`.
+  W deploymencie wieloinstancyjnym każda instancja miała niezależny stan → rate limit i
+  depth limit były efektywnie omijalne przez routing do różnych instancji.
+- **Rozwiązanie:** Opcjonalny backend Redis (backward compatible):
+  - Nowe parametry `__init__`: `redis_url: Optional[str] = None`, `redis_prefix: str = "adrion:g5:"`
+  - Gdy `redis_url` podany: sesje jako Redis HASH z automatycznym TTL (`EXPIRE`)
+  - Globalny licznik jako atomowy Redis `INCR` (dokładnie 1 per instancja, bez race conditions)
+  - Licznik sesji jako Redis `INCR` na kluczu `sess_count`
+  - Fallback do in-memory gdy Redis niedostępny (brak błędu przy starcie)
+  - Nowa metoda: `_sync_session_to_redis(sid, session)` — persystuje stan po każdej klasyfikacji
+- **Zależność:** `redis>=4.0` (opcjonalna — `pip install redis`)
+- **Wsteczna kompatybilność:** Brak `redis_url` → identyczne zachowanie jak v5.6
 
 ---
 
-## [1.0.0] — 2026-04-04
+## [v5.3] — 2026-04-11 — Grock Report Hardening
 
-### Added
+### Nowe pliki
 
-- **Core Arbitrage Engine** — Scout → Analyze → Bid pipeline (Fiverr/Upwork, Apify integration)
-- **Quantum Module** (`arbitrage/quantum.py`) — Łukasiewicz 3-value logic, Autopojeza self-reset
-- **Vortex Oracle** (`arbitrage/oracle.py`) — Fibonacci retracement + Enneagram prediction
-- **Wholesale Pipeline** (`arbitrage/wholesale_orchestrator.py`) — B2B full Singularity Run
-- **Mass Generator** (`arbitrage/mass_generator.py`) — Bulk manifest for Next.js ISR
-- **Stripe Payments** (`arbitrage/payments.py`) — Checkout + webhook with HMAC verification
-- **Circuit Breaker** (`arbitrage/circuit_breaker.py`) — Exponential backoff, CLOSED/OPEN/HALF_OPEN
-- **Rate Limiter** (`arbitrage/rate_limiter.py`) — Per-endpoint, per-IP sliding-window, 5 named instances
-- **LLM Layer** (`arbitrage/llm.py`) — Ollama↔OpenRouter fallback, canary rollout, KPI gate, injection detection
-- **Autopilot** (`arbitrage/autopilot.py`) — Background scheduler for automated cycles
-- **PostgreSQL connection pool** (`arbitrage/database.py`) — psycopg2 pool with graceful drain
-- **Prometheus metrics** (`arbitrage/metrics.py`) — Optional prometheus_client gauges/histograms
-- **HTTP API Server** (`arbitrage/api.py`) — 20+ endpoints, stdlib HTTPServer, port 8001
-- **Unified Admin Panel** (`uap/`) — Flask API port 8002, JWT+RBAC auth, MCTS planner, WebSocket server
-- **Harmonia Dashboard** (`harmonia-dashboard/`) — Lead pipeline, RAG memory, VERA scoring, ChromaDB
-- **Micro-SaaS** (`micro-saas/`) — Next.js 15, pdf-parse, Stripe, Resend
-- **ADRION Swarm** (`adrion-swarm/`) — Docker Compose: Ollama, n8n, PostgreSQL stack
-- **Docker production stack** — `docker-compose.prod.yml` with Grafana/Loki/Promtail monitoring
-- **Pre-commit hooks** — Ruff, go-fmt, go-vet, trailing-whitespace, secret detection, no-commit-to-main
-- **Genesis Record** — PLAN/PROGRESS/REPORTS audit trail, Session Continuity Bridge (SCB)
-- **162D Decision Space** — 3×6×9 Trinity-EBDI framework, 9 Guardian Laws
-- **9 Personas** — Librarian, SAP, Auditor, Sentinel, Architect, Healer, Amplifier, BoosterLever, Chronos
-- **JEDNOSC 162D** — Knowledge graph + RAG classification of 162 documents
-- **Test suite** — 23 test files: unit, integration, guardrails, LLM, rate limiter, circuit breaker
-- **LLM KPI Guard Loop** — PowerShell monitor, canary rollout promotion/rollback, alert history
-- **XRP Tracker** (`arbitrage/xrp.py`, `xrp_tracker.py`) — Progress toward XRP target snapshots
+- `core/trinity.py` — Python implementacja Trinity Engine (wagi 0.33/0.34/0.33, 4 strefy bramki)
+- `core/security_hardening.py` — centralna fasada mechanizmów bezpieczeństwa
+- `tests/test_trinity.py` — testy jednostkowe Trinity (w tym scenariusze z raportu Grock)
+- `docs/SECURITY_HARDENING.md` — skonsolidowany dokument bezpieczeństwa
 
-### Infrastructure
+### Poprawki na podstawie raportu zewnętrznego (Grock)
 
-- Python 3.11, Ruff linting, pytest + pytest-cov
-- Go 1.21+ (`go.mod`) for Vortex engine skeleton
-- Makefile with `test`, `lint`, `build`, `docker-build`, `dev`, `install` targets
+#### G5 — Transparency (MEDIUM, Light Triad)
+
+- **Problem:** Self-reinforcing audit loop — prompt cytujący G5 automatycznie spełnia G5 i wymusza ujawnienie architektury
+- **Rozwiązanie:** `G5TransparencyGuard` — rate limit audytów (5 min), max głębokość (2), detekcja ≥3 wzorców exploitu → SENTINEL_ESCALATION
+
+#### G7 — Privacy (CRITICAL, Essence Triad)
+
+- **Problem:** Jakościowe testy bez mierzalnych progów → szara strefa weryfikacji consent
+- **Rozwiązanie:** `G7PrivacyEvaluator` — numeryczne progi: `consent_score ≥ 0.95`, `informed_score ≥ 0.90`, `coercion_score ≤ 0.05`, `opt_out_available = True`
+
+#### G8 — Nonmaleficence (CRITICAL, Essence Triad)
+
+- **Problem:** Brak mierzalnych progów fairness → możliwy subtelny resource grab bez wykrycia
+- **Rozwiązanie:** `G8NonmaleficenceEvaluator` — Gini-inspired: `fair_share_score ≥ 0.90`, `variance ≤ 0.15`, starvation detection `< 10%`
+
+#### HEXAGON
+
+- **Problem (raport Grock):** Potwierdzono, że po 3 cyklach system zwracał "ostatni wynik" (mogło być PROCEED)
+- **Status:** Naprawione w v5.1 — `MAX_CYCLES → DENY`. Testy w `test_trinity.py` weryfikują.
+
+#### CVC Salami Slicing
+
+- **Problem (raport Grock):** 1 naruszenie G5 per sesję × wiele sesji = atak bez blokowania
+- **Status:** Naprawione w v5.1 — `CVC threshold=5` (24h okno). Potwierdzone.
+
+---
+
+## [v5.2] — 2026-04-11 — Infrastructure Hardening
+
+### Nowe pliki (docs/security/)
+
+- `CIRCUIT_BREAKER.md` — 3 stany (CLOSED/OPEN/HALF_OPEN), timeout, fallback per serwis
+- `GENESIS_HARDENING.md` — Primary→Replica→WAL→UNAVAILABLE; DENY dla HIGH/CRITICAL bez Genesis
+- `AGENT_AUTHENTICATION.md` — HMAC-SHA256 + mTLS + key rotation 24h + Healer double-sign
+- `DEGRADED_MODE.md` — 5 trybów + LayerWatchdog (co 10s)
+- `GO_VORTEX_HARDENING.md` — JWT(TTL 5min) + mTLS + localhost-only + iptables
+- `RATE_LIMITING.md` — 5 poziomów: Global/IP/User/Severity/Anomaly
+
+### Poprawki
+
+- Circuit Breaker: OPEN po N błędach, MCP Guardian/Genesis `failure_threshold=2`
+- Genesis: brak dostępu + HIGH/CRITICAL → DENY; CVC w awaryjnym trybie zwraca 999
+- Agent Auth: replay protection (nonce + 30s freshness)
+- Degraded Mode: Guardians DOWN = EMERGENCY_DENY dla wszystkiego
+- Vortex: port 1740 dostępny tylko z localhost; tylko 3/6 agentów
+- Rate Limit: `AnomalyDetector` — burst >20/5s, HIGH farming >8/2min → BLOCK
+
+---
+
+## [v5.1] — 2026-04-11 — Core Security Hardening
+
+### Zmienione pliki (docs/)
+
+- `01_CORE_TRINITY.md` — 4 deterministyczne strefy bramki; jawne wagi; min_per_perspective=0.25; asymmetry detection
+- `02_CORE_HEXAGON.md` — MAX_CYCLES → DENY (było PROCEED); Healing G8 checkpoint; LoopGuard
+- `03_CORE_GUARDIANS.md` — VETO próg 3→**2**; Cumulative Violation Counter (CVC); ochrona replay attack G4
+- `04_CORE_EBDI.md` — STRESS_FLOOR=0.08; PADTherapyDetector; PAD rate limit delta 0.15
+- `docs/security/SECURITY_HARDENING.md` — Sygnatura 369 nonce+TTL; Goodness Analyzer 4 warstwy
+
+### Kluczowe zmiany
+
+| Komponent | Przed v5.1 | Po v5.1 |
+|-----------|-----------|---------|
+| VETO próg | 3 naruszenia | **2 naruszenia** |
+| Trinity gray zone 0.3–0.7 | niezdefiniowana | 4 strefy deterministyczne |
+| Hexagon po MAX_CYCLES | PROCEED | **DENY** |
+| EBDI min Stress | 0.0 (brak) | **0.08** (floor) |
+| Sygnatura 369 | hash bez nonce | hash + nonce + TTL |
+
+---
+
+## [v5.0] — 2026-04-11 — Wersja inicjalna (1 commit)
+
+### Pliki
+
+- `README.md` — Glass-Box Declaration; Matryca 3-6-9; dokumentacja PL/EN
+- `docs/00_MATRYCA_369.md` — Geometria 162D
+- `docs/01_CORE_TRINITY.md` — System 3 Perspektyw (wagi jawne: 0.33/0.34/0.33)
+- `docs/02_CORE_HEXAGON.md` — System 6 Trybów
+- `docs/03_CORE_GUARDIANS.md` — System 9 Praw (G7/G8 CRITICAL, VETO przy ≥2 naruszeniach)
+- `docs/04_CORE_EBDI.md` — Model Emocjonalny
+- `docs/05_PERSPECTIVES.md` — `docs/12_DATA_FLOWS.md` — Pozostała dokumentacja
+
+### Stan bezpieczeństwa v5.0
+
+- ✅ 9 Praw Guardians jawne
+- ✅ Wagi Trinity jawne (0.33/0.34/0.33)
+- ✅ G7/G8 CRITICAL z immediate VETO
+- ❌ VETO próg = 3 (zbyt wysoki)
+- ❌ Trinity gray zone niezdefiniowana
+- ❌ Hexagon po MAX_CYCLES → PROCEED (błąd)
+- ❌ Brak CVC, STRESS_FLOOR, replay protection, Circuit Breaker, Agent Auth, itd.
