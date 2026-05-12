@@ -12,7 +12,7 @@ DSPy Signature:
 from mcp_servers import MCPBaseServer, DSPySignature
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import logging
 import os
@@ -41,7 +41,7 @@ genesis_signature = DSPySignature(
 class SessionState:
     """Session memory entry"""
     session_id: str
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     state_data: Dict[str, Any] = field(default_factory=dict)
     retention_ttl_seconds: int = 86400  # 24h default
     scope: str = "local"  # "local" or "global"

@@ -2,11 +2,18 @@
 Phase B: Backend API Integration
 File: uap/backend/api_phase_b.py
 Date: 2026-04-05
-Status: IMPLEMENTATION
+Status: ACTIVE — registered in api.py _register_blueprints()
 
-7 NEW REST ENDPOINTS FOR TASKS & AGENTS MANAGEMENT
-All endpoints require X-API-Key header: "local-dev-key-123"
+NOTE: This file is scheduled for consolidation into uap/backend/blueprints/ in v2.0.0.
+      Until then, it is the authoritative source for tasks/agents management endpoints.
+
+7 REST ENDPOINTS FOR TASKS & AGENTS MANAGEMENT
+All endpoints require X-API-Key header (value from UAP_API_KEY env var).
 """
+
+import hmac
+import os
+import sys
 
 from flask import request, jsonify, Blueprint
 from datetime import datetime
@@ -16,6 +23,18 @@ import logging
 
 logger = logging.getLogger("adrion.uap.api_phase_b")
 
+_UAP_API_KEY = os.getenv("UAP_API_KEY", "")
+if not _UAP_API_KEY:
+    if os.getenv("ENVIRONMENT") == "production":
+        logger.critical(
+            "[SECURITY] UAP_API_KEY is not set in PRODUCTION — refusing to start."
+        )
+        sys.exit(1)
+    else:
+        logger.warning(
+            "[SECURITY] UAP_API_KEY is not set — all authenticated requests will be rejected."
+        )
+
 # Create blueprint for Phase B endpoints
 phase_b_bp = Blueprint('phase_b', __name__, url_prefix='/mapi/v1')
 
@@ -24,11 +43,11 @@ phase_b_bp = Blueprint('phase_b', __name__, url_prefix='/mapi/v1')
 # ──────────────────────────────────────────────────────────────────────────
 
 def require_api_key(f):
-    """Decorator to require X-API-Key authentication"""
+    """Decorator to require X-API-Key authentication (timing-safe comparison)."""
     def decorated_function(*args, **kwargs):
-        api_key = request.headers.get('X-API-Key')
-        if not api_key or api_key != 'local-dev-key-123':
-            logger.warning(f"Unauthorized API request: {request.endpoint}")
+        api_key = request.headers.get('X-API-Key', '')
+        if not _UAP_API_KEY or not hmac.compare_digest(api_key, _UAP_API_KEY):
+            logger.warning("Unauthorized API request: %s", request.endpoint)
             return jsonify({"success": False, "error": "Unauthorized. Invalid or missing X-API-Key"}), 401
         return f(*args, **kwargs)
     decorated_function.__name__ = f.__name__

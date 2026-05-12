@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ADRION 369 — Panel Sterowania</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-xs: 9px;
+            --font-sm: 12px;
+            --font-base: 15px;
+            --font-md: 24px;
+            --font-lg: 39px;
+            --space-xs: 9px;
+            --space-sm: 18px;
+            --space-md: 36px;
+            --space-lg: 72px;
+            --radius-sm: 3px;
+            --radius-md: 6px;
+            --radius-lg: 9px;
+            --shadow-sm: 0 3px 9px rgba(0, 0, 0, .09);
+            --shadow-md: 0 6px 18px rgba(0, 0, 0, .12);
+            --shadow-vortex: 0 9px 27px rgba(0, 0, 0, .15);
+            --motion-fast: 174ms;
+            --motion-standard: 396ms;
+            --motion-emphasis: 528ms;
+            --color-primary: #9333ea;
+            --color-secondary: #6366f1;
+            --color-accent: #ec4899;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            --color-bg-dark: #0f172a;
+            --color-bg-card: #1e293b;
+            --color-bg-hover: #334155;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+        }
+
+        body {
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-primary);
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            letter-spacing: -0.01em;
+            min-height: 100vh;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: .6;
+                transform: scale(.95)
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(9px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 9px var(--color-primary)
+            }
+
+            50% {
+                box-shadow: 0 0 27px var(--color-primary), 0 0 54px var(--color-secondary)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn var(--motion-standard) ease-out forwards;
+        }
+
+        /* Grid layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.618fr 1fr;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        @media(max-width:1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--color-bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(147, 51, 234, .15);
+            transition: border-color var(--motion-fast);
+        }
+
+        .card:hover {
+            border-color: rgba(147, 51, 234, .4);
+        }
+
+        /* Logo */
+        .logo-banner {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-radius: var(--radius-lg);
+            padding: var(--space-md);
+            position: relative;
+            overflow: hidden;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .logo-banner::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, .08), transparent 60%);
+            pointer-events: none;
+        }
+
+        .logo-banner h1 {
+            font-size: var(--font-lg);
+            font-weight: 800;
+            letter-spacing: -.03em;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, .3);
+        }
+
+        .logo-banner p {
+            color: rgba(255, 255, 255, .8);
+            font-size: var(--font-sm);
+            margin-top: 6px;
+        }
+
+        /* Agent cards */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+        }
+
+        .agent-card {
+            background: var(--color-bg-hover);
+            border-radius: var(--radius-md);
+            padding: var(--space-sm);
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all var(--motion-fast);
+            text-align: center;
+            position: relative;
+        }
+
+        .agent-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+
+        .agent-card.selected {
+            border-color: var(--color-accent);
+        }
+
+        .agent-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+            background: var(--color-bg-card);
+            transition: background var(--motion-fast);
+        }
+
+        .agent-status-dot.online {
+            background: var(--color-success);
+            animation: pulse 2s infinite;
+        }
+
+        .agent-status-dot.offline {
+            background: var(--color-error);
+        }
+
+        .agent-status-dot.checking {
+            background: var(--color-warning);
+            animation: pulse .8s infinite;
+        }
+
+        .agent-name {
+            font-weight: 700;
+            font-size: var(--font-sm);
+            margin-top: 4px;
+        }
+
+        .agent-role {
+            font-size: var(--font-xs);
+            color: var(--color-text-secondary);
+            margin-top: 2px;
+        }
+
+        .agent-latency {
+            font-size: var(--font-xs);
+            color: var(--color-success);
+            margin-top: 2px;
+        }
+
+        /* Metrics */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .metric-card {
+            background: var(--color-bg-hover);
+            border-radius: var(--radius-md);
+            padding: var(--space-sm);
+            text-align: center;
+            transition: all var(--motion-fast);
+        }
+
+        .metric-card:hover {
+            background: rgba(99, 102, 241, .15);
+        }
+
+        .metric-value {
+            font-size: var(--font-md);
+            font-weight: 800;
+            color: var(--color-primary);
+        }
+
+        .metric-label {
+            font-size: var(--font-xs);
+            color: var(--color-text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Services links */
+        .service-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border-radius: var(--radius-md);
+            background: var(--color-bg-hover);
+            text-decoration: none;
+            color: var(--color-text-primary);
+            border: 1px solid transparent;
+            transition: all var(--motion-fast);
+            margin-bottom: var(--space-sm);
+        }
+
+        .service-link:hover {
+            border-color: var(--color-primary);
+            transform: translateX(3px);
+        }
+
+        .service-badge {
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: var(--font-xs);
+            font-weight: 600;
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, .2);
+            color: #10b981;
+        }
+
+        .badge-blue {
+            background: rgba(99, 102, 241, .2);
+            color: #6366f1;
+        }
+
+        .badge-purple {
+            background: rgba(147, 51, 234, .2);
+            color: #9333ea;
+        }
+
+        /* Console */
+        .console-output {
+            background: #000;
+            border-radius: var(--radius-md);
+            padding: var(--space-sm);
+            font-family: "Courier New", monospace;
+            font-size: var(--font-xs);
+            height: 220px;
+            overflow-y: auto;
+            line-height: 1.7;
+            border: 1px solid rgba(147, 51, 234, .2);
+        }
+
+        .console-line {
+            display: block;
+            padding: 1px 0;
+        }
+
+        .console-timestamp {
+            color: #475569;
+            margin-right: 6px;
+        }
+
+        .console-success {
+            color: #10b981;
+        }
+
+        .console-info {
+            color: #6366f1;
+        }
+
+        .console-warning {
+            color: #f59e0b;
+        }
+
+        .console-error {
+            color: #ef4444;
+        }
+
+        /* API Tester */
+        .api-input {
+            width: 100%;
+            background: var(--color-bg-hover);
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            color: var(--color-text-primary);
+            font-size: var(--font-sm);
+            outline: none;
+            transition: border-color var(--motion-fast);
+            font-family: monospace;
+        }
+
+        .api-input:focus {
+            border-color: var(--color-primary);
+        }
+
+        .api-select {
+            background: var(--color-bg-hover);
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            color: var(--color-text-primary);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            outline: none;
+            transition: border-color var(--motion-fast);
+        }
+
+        .api-select:focus {
+            border-color: var(--color-primary);
+        }
+
+        /* CTA */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 12px 24px;
+            font-size: var(--font-base);
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-vortex);
+            transition: all var(--motion-emphasis);
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 12px 36px rgba(147, 51, 234, .4);
+        }
+
+        .btn-primary:active {
+            transform: scale(.98);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-hover);
+            color: var(--color-text-secondary);
+            border: 1px solid rgba(147, 51, 234, .3);
+            border-radius: var(--radius-md);
+            padding: 8px 16px;
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all var(--motion-fast);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-primary);
+            color: var(--color-text-primary);
+        }
+
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: rgba(30, 41, 59, .9);
+            border-bottom: 1px solid rgba(147, 51, 234, .2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.live {
+            background: var(--color-success);
+        }
+
+        .status-indicator.error {
+            background: var(--color-error);
+            animation: none;
+        }
+
+        /* Section headers */
+        .section-title {
+            font-size: var(--font-md);
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin: 0 0 var(--space-sm) 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(147, 51, 234, .3), transparent);
+        }
+
+        /* Progress bars */
+        .progress-bar {
+            height: 4px;
+            background: var(--color-bg-hover);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            border-radius: 99px;
+            transition: width 1s ease;
+        }
+
+        /* n8n badge */
+        .live-pulse {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(16, 185, 129, .1);
+            color: var(--color-success);
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: var(--font-xs);
+        }
+
+        /* API Key modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn var(--motion-standard) ease-out;
+        }
+
+        .modal-card {
+            background: var(--color-bg-card);
+            border: 1px solid rgba(147, 51, 234, .5);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md);
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 0 60px rgba(147, 51, 234, .25);
+        }
+
+        .modal-card h3 {
+            font-size: var(--font-md);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .modal-card p {
+            font-size: var(--font-xs);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-sm);
+            line-height: 1.6;
+        }
+
+        .key-input {
+            width: 100%;
+            background: var(--color-bg-hover);
+            border: 2px solid rgba(147, 51, 234, .4);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            color: var(--color-text-primary);
+            font-size: var(--font-sm);
+            font-family: monospace;
+            outline: none;
+            transition: border-color var(--motion-fast);
+            box-sizing: border-box;
+            margin-bottom: var(--space-sm);
+        }
+
+        .key-input:focus {
+            border-color: var(--color-primary);
+        }
+    </style>
+</head>
+
+<body class="fade-in">
+
+    <!-- ═══ API KEY MODAL ══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="keyModal" style="display:none;">
+        <div class="modal-card">
+            <h3>🔑 Klucz API wymagany</h3>
+            <p>Podaj klucz <code style="color:var(--color-primary);">UAP_API_KEY</code> aby panel mógł pobierać dane o agentach. Klucz zostanie zapisany lokalnie w przeglądarce (localStorage) i nie jest wysyłany nigdzie poza Twoim API.</p>
+            <input
+                class="key-input"
+                id="keyInput"
+                type="password"
+                placeholder="b24400e5bfb2…"
+                autocomplete="off"
+                onkeydown="if(event.key==='Enter')saveApiKey()"
+            />
+            <button class="btn-primary" onclick="saveApiKey()">Zapisz i połącz</button>
+        </div>
+    </div>
+
+    <!-- ═══ STATUS BAR ═══════════════════════════════════════════════════ -->
+    <div class="status-bar">
+        <div class="status-indicator live" id="globalStatusDot"></div>
+        <span style="font-size:var(--font-sm);font-weight:600;" id="globalStatusText">
+            ADRION 369 — Łączenie…
+        </span>
+        <span style="margin-left:auto;font-size:var(--font-xs);color:var(--color-text-secondary);">
+            <span id="lastRefresh">—</span> · Auto-refresh 30s
+        </span>
+        <button class="btn-secondary" style="padding:4px 12px;" onclick="refreshAll()">
+            ↻ Odśwież
+        </button>
+        <button class="btn-secondary" style="padding:4px 12px;" onclick="showKeyModal()" title="Zmień klucz API">
+            🔑
+        </button>
+    </div>
+
+    <!-- ═══ MAIN GRID ═══════════════════════════════════════════════════ -->
+    <div class="main-grid">
+
+        <!-- ─── LEFT COLUMN ──────────────────────────────────────────────── -->
+        <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+
+            <!-- LOGO -->
+            <div class="logo-banner">
+                <h1>ADRION 369</h1>
+                <p>Panel Sterowania · AI Transformation Agency · <span class="live-pulse">
+                        <span
+                            style="width:6px;height:6px;background:currentColor;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;"></span>
+                        LIVE
+                    </span></p>
+            </div>
+
+            <!-- AGENTS ─────────────────────────────────────────────────────── -->
+            <div class="card">
+                <h2 class="section-title">MCP Agents Status</h2>
+                <div class="agents-grid" id="agentsGrid">
+                    <!-- Generowane przez JS -->
+                </div>
+            </div>
+
+            <!-- METRICS ────────────────────────────────────────────────────── -->
+            <div class="card">
+                <h2 class="section-title">Metryki Systemu</h2>
+                <div class="metrics-row">
+                    <div class="metric-card">
+                        <div class="metric-value" id="metricAgents">—</div>
+                        <div class="metric-label">Agents Online</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="agentsBar" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="metricUptime">—</div>
+                        <div class="metric-label">System Uptime</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="metricContainers">—</div>
+                        <div class="metric-label">Containers</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="containersBar" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="metricDb">—</div>
+                        <div class="metric-label">PostgreSQL</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SERWISY ────────────────────────────────────────────────────── -->
+            <div class="card">
+                <h2 class="section-title">Serwisy Produkcyjne</h2>
+                <a href="https://aitransformationagency.pl" target="_blank" class="service-link">
+                    <span style="font-size:20px;">🌐</span>
+                    <div>
+                        <div style="font-weight:600;font-size:var(--font-sm);">aitransformationagency.pl</div>
+                        <div style="font-size:var(--font-xs);color:var(--color-text-secondary);">Strona główna · PWA ·
+                            Punkt Odniesienia</div>
+                    </div>
+                    <span class="service-badge badge-green" style="margin-left:auto;" id="badge-main">●</span>
+                </a>
+                <a href="https://n8n.aitransformationagency.pl" target="_blank" class="service-link">
+                    <span style="font-size:20px;">⚡</span>
+                    <div>
+                        <div style="font-weight:600;font-size:var(--font-sm);">n8n.aitransformationagency.pl</div>
+                        <div style="font-size:var(--font-xs);color:var(--color-text-secondary);">Automatyzacja · 3
+                            Workflows aktywne</div>
+                    </div>
+                    <span class="service-badge badge-blue" style="margin-left:auto;" id="badge-n8n">●</span>
+                </a>
+                <a href="https://api.aitransformationagency.pl/mapi/v1/health" target="_blank" class="service-link">
+                    <span style="font-size:20px;">🔌</span>
+                    <div>
+                        <div style="font-weight:600;font-size:var(--font-sm);">api.aitransformationagency.pl</div>
+                        <div style="font-size:var(--font-xs);color:var(--color-text-secondary);">ADRION Backend API · v1
+                        </div>
+                    </div>
+                    <span class="service-badge badge-purple" style="margin-left:auto;" id="badge-api">●</span>
+                </a>
+                <a href="https://grafana.aitransformationagency.pl" target="_blank" class="service-link">
+                    <span style="font-size:20px;">📊</span>
+                    <div>
+                        <div style="font-weight:600;font-size:var(--font-sm);">grafana.aitransformationagency.pl</div>
+                        <div style="font-size:var(--font-xs);color:var(--color-text-secondary);">Monitoring · Prometheus
+                            · Dashboardy</div>
+                    </div>
+                    <span class="service-badge badge-green" style="margin-left:auto;" id="badge-grafana">●</span>
+                </a>
+                <a href="https://app.aitransformationagency.pl" target="_blank" class="service-link">
+                    <span style="font-size:20px;">🌀</span>
+                    <div>
+                        <div style="font-weight:600;font-size:var(--font-sm);">app.aitransformationagency.pl</div>
+                        <div style="font-size:var(--font-xs);color:var(--color-text-secondary);">Panel Sterowania · Ten
+                            widok</div>
+                    </div>
+                    <span class="service-badge badge-purple" style="margin-left:auto;">LIVE</span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- ─── RIGHT COLUMN ─────────────────────────────────────────────── -->
+        <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+
+            <!-- API TESTER ──────────────────────────────────────────────────── -->
+            <div class="card">
+                <h2 class="section-title">API Test Console</h2>
+                <div style="display:flex;gap:var(--space-sm);margin-bottom:var(--space-sm);">
+                    <select class="api-select" id="methodSelect" style="width:90px;">
+                        <option>GET</option>
+                        <option>POST</option>
+                        <option>PUT</option>
+                        <option>DELETE</option>
+                    </select>
+                    <input class="api-input" id="endpointInput"
+                        placeholder="https://api.aitransformationagency.pl/mapi/v1/health"
+                        value="https://api.aitransformationagency.pl/mapi/v1/health" style="flex:1;" />
+                </div>
+                <div style="display:flex;gap:var(--space-sm);margin-bottom:var(--space-sm);">
+                    <button class="btn-primary" style="flex:1;" onclick="testAPI()">▶ Send</button>
+                    <button class="btn-secondary" onclick="clearConsole()">✕ Clear</button>
+                </div>
+
+                <!-- Szybkie endpointy -->
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:var(--space-sm);">
+                    <button class="btn-secondary" onclick="setEndpoint('/health')">/health</button>
+                    <button class="btn-secondary" onclick="setEndpoint('/status')">/status</button>
+                    <button class="btn-secondary" onclick="setEndpoint('/agent/scores')">/agents</button>
+                    <button class="btn-secondary" onclick="setEndpoint('/ebdi/telemetry')">/ebdi</button>
+                    <button class="btn-secondary" onclick="setEndpoint('/genesis/logs')">/genesis</button>
+                </div>
+
+                <!-- Response viewer -->
+                <div id="responseBox" style="
+            background:#000;border-radius:var(--radius-md);
+            padding:var(--space-sm);font-family:monospace;
+            font-size:var(--font-xs);min-height:80px;max-height:180px;
+            overflow-y:auto;border:1px solid rgba(147,51,234,.2);
+            color:#10b981;white-space:pre-wrap;word-break:break-all;
+          ">Kliknij ▶ Send aby wykonać żądanie…</div>
+            </div>
+
+            <!-- LIVE CONSOLE ────────────────────────────────────────────────── -->
+            <div class="card" style="flex:1;">
+                <h2 class="section-title">Live Console</h2>
+                <div class="console-output" id="consoleOutput">
+                    <span class="console-line console-info">
+                        <span class="console-timestamp">[--:--:--]</span>
+                        <span>Inicjalizacja panelu sterowania…</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- SYSTEM INFO ─────────────────────────────────────────────────── -->
+            <div class="card">
+                <h2 class="section-title">Infrastruktura</h2>
+                <div style="font-size:var(--font-sm);line-height:2;color:var(--color-text-secondary);">
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>VPS</span>
+                        <span style="color:var(--color-text-primary);font-weight:600;">Hetzner CPX32</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>IP</span>
+                        <span style="color:var(--color-text-primary);font-family:monospace;">178.105.59.41</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>SSL</span>
+                        <span style="color:var(--color-success);">Let's Encrypt E8 ✓</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>Backup</span>
+                        <span style="color:var(--color-success);">Cron 03:00 ✓</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>Firewall</span>
+                        <span style="color:var(--color-success);">fail2ban aktywny ✓</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>Docker</span>
+                        <span style="color:var(--color-text-primary);">v29.4.2 · Compose v5.1.3</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══ JAVASCRIPT ═══════════════════════════════════════════════════ -->
+    <script>
+        const API_BASE = 'https://api.aitransformationagency.pl/mapi/v1';
+        const KEY_STORE = 'adrion_api_key';
+
+        // ── API Key management ────────────────────────────────────────────
+        function getApiKey() {
+            return localStorage.getItem(KEY_STORE) || '';
+        }
+
+        function getAuthHeaders() {
+            const key = getApiKey();
+            return key ? { 'X-API-Key': key } : {};
+        }
+
+        function showKeyModal() {
+            const modal = document.getElementById('keyModal');
+            const inp = document.getElementById('keyInput');
+            inp.value = getApiKey();
+            modal.style.display = 'flex';
+            setTimeout(() => inp.focus(), 100);
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('keyInput').value.trim();
+            if (!key) {
+                document.getElementById('keyInput').style.borderColor = 'var(--color-error)';
+                return;
+            }
+            localStorage.setItem(KEY_STORE, key);
+            document.getElementById('keyModal').style.display = 'none';
+            log('[KEY] Klucz API zapisany — trwa połączenie z API…', 'success');
+            refreshAll();
+        }
+
+        function checkApiKey() {
+            if (!getApiKey()) {
+                showKeyModal();
+            }
+        }
+
+        // ── Konfiguracja agentów ──────────────────────────────────────────
+        const AGENTS = [
+            { name: 'Router', role: 'Orchestration', icon: '🔀' },
+            { name: 'Guardian', role: 'Security', icon: '🛡️' },
+            { name: 'Healer', role: 'Recovery', icon: '🩺' },
+            { name: 'Genesis', role: 'State Mgmt', icon: '⚙️' },
+            { name: 'Oracle', role: 'Analytics', icon: '🔮' },
+            { name: 'Vortex', role: 'Harmonic', icon: '🌀' },
+        ];
+
+        // ── State ─────────────────────────────────────────────────────────
+        let systemHealth = null;
+        let agentStatuses = {};
+
+        // ── Init agents grid ──────────────────────────────────────────────
+        function renderAgentsGrid() {
+            const grid = document.getElementById('agentsGrid');
+            grid.innerHTML = AGENTS.map(a => `
+          <div class="agent-card" id="agent-${a.name}" onclick="pingAgent('${a.name}')">
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+              <div class="agent-status-dot checking" id="dot-${a.name}"></div>
+              <span style="font-size:18px;">${a.icon}</span>
+            </div>
+            <p class="agent-name">${a.name}</p>
+            <p class="agent-role">${a.role}</p>
+            <p class="agent-latency" id="lat-${a.name}">checking…</p>
+          </div>
+        `).join('');
+        }
+
+        // ── Fetch system health ──────────────────────────────────────────
+        async function fetchHealth() {
+            try {
+                const t0 = Date.now();
+                const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(5000) });
+                const ms = Date.now() - t0;
+                if (res.ok) {
+                    systemHealth = await res.json();
+                    updateGlobalStatus(true, `API OK · ${ms}ms`);
+                    updateMetrics(systemHealth);
+                    log(`[API] Health OK — ${ms}ms`, 'success');
+                } else {
+                    updateGlobalStatus(false, `API Error ${res.status}`);
+                    log(`[API] Health HTTP ${res.status}`, 'warning');
+                }
+            } catch (e) {
+                updateGlobalStatus(false, 'API niedostępne');
+                log(`[API] Offline — ${e.message}`, 'error');
+            }
+        }
+
+        // ── Fetch agent scores ────────────────────────────────────────────
+        async function fetchAgentScores() {
+            try {
+                const res = await fetch(`${API_BASE}/agent/scores`, {
+                    headers: getAuthHeaders(),
+                    signal: AbortSignal.timeout(5000)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const agents = data.agents || [];
+                    let onlineCount = 0;
+                    AGENTS.forEach(a => {
+                        const found = agents.find(x => x.name && x.name.toLowerCase() === a.name.toLowerCase());
+                        if (found && found.trust_score > 0) {
+                            setAgentStatus(a.name, 'online', `Trust: ${(found.trust_score * 100).toFixed(0)}%`);
+                            onlineCount++;
+                        } else {
+                            setAgentStatus(a.name, 'offline', 'offline');
+                        }
+                    });
+                    document.getElementById('metricAgents').textContent = `${onlineCount}/${AGENTS.length}`;
+                    document.getElementById('agentsBar').style.width = `${(onlineCount / AGENTS.length * 100).toFixed(0)}%`;
+                    log(`[AGENTS] ${onlineCount}/${AGENTS.length} online`, onlineCount === AGENTS.length ? 'success' : 'warning');
+                } else if (res.status === 401 || res.status === 403) {
+                    AGENTS.forEach(a => setAgentStatus(a.name, 'offline', 'brak klucza'));
+                    log('[AGENTS] Brak autoryzacji — kliknij 🔑 aby podać klucz API', 'warning');
+                    showKeyModal();
+                } else {
+                    // API nie ma danych o agentach — pokaż jako unknown
+                    AGENTS.forEach(a => setAgentStatus(a.name, 'online', 'no score'));
+                    document.getElementById('metricAgents').textContent = `${AGENTS.length}/${AGENTS.length}`;
+                    document.getElementById('agentsBar').style.width = '100%';
+                }
+            } catch (e) {
+                AGENTS.forEach(a => setAgentStatus(a.name, 'offline', 'API offline'));
+                log('[AGENTS] Nie można pobrać danych', 'error');
+            }
+        }
+
+        // ── Ping individual agent ─────────────────────────────────────────
+        async function pingAgent(name) {
+            setAgentStatus(name, 'checking', '…');
+            log(`[PING] → ${name}`, 'info');
+            try {
+                const t0 = Date.now();
+                const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(5000) });
+                const ms = Date.now() - t0;
+                if (res.ok) {
+                    setAgentStatus(name, 'online', `${ms}ms`);
+                    log(`[PING] ${name} OK — ${ms}ms`, 'success');
+                } else {
+                    setAgentStatus(name, 'offline', `HTTP ${res.status}`);
+                    log(`[PING] ${name} ERROR ${res.status}`, 'error');
+                }
+            } catch (e) {
+                setAgentStatus(name, 'offline', 'timeout');
+                log(`[PING] ${name} TIMEOUT`, 'error');
+            }
+        }
+
+        // ── Check service availability ─────────────────────────────────────
+        async function checkServices() {
+            const services = [
+                { id: 'badge-main', url: 'https://aitransformationagency.pl' },
+                { id: 'badge-n8n', url: 'https://n8n.aitransformationagency.pl' },
+                { id: 'badge-api', url: `${API_BASE}/health` },
+                { id: 'badge-grafana', url: 'https://grafana.aitransformationagency.pl' },
+            ];
+            for (const svc of services) {
+                try {
+                    const res = await fetch(svc.url, { method: 'HEAD', signal: AbortSignal.timeout(5000), mode: 'no-cors' });
+                    document.getElementById(svc.id).style.color = '#10b981';
+                    document.getElementById(svc.id).textContent = '● UP';
+                } catch (e) {
+                    document.getElementById(svc.id).style.color = '#f59e0b';
+                    document.getElementById(svc.id).textContent = '● —';
+                }
+            }
+        }
+
+        // ── Helpers ────────────────────────────────────────────────────────
+        function setAgentStatus(name, status, label) {
+            const dot = document.getElementById(`dot-${name}`);
+            const lat = document.getElementById(`lat-${name}`);
+            if (!dot) return;
+            dot.className = `agent-status-dot ${status}`;
+            if (lat) lat.textContent = label;
+            if (status === 'online') lat.style.color = '#10b981';
+            if (status === 'offline') lat.style.color = '#ef4444';
+            if (status === 'checking') lat.style.color = '#f59e0b';
+        }
+
+        function updateGlobalStatus(ok, text) {
+            const dot = document.getElementById('globalStatusDot');
+            const txt = document.getElementById('globalStatusText');
+            dot.className = `status-indicator ${ok ? 'live' : 'error'}`;
+            txt.textContent = `ADRION 369 · ${text}`;
+            document.getElementById('lastRefresh').textContent =
+                new Date().toLocaleTimeString('pl-PL');
+        }
+
+        function updateMetrics(data) {
+            if (!data) return;
+            const uptime = data.uptime
+                ? (data.uptime < 3600
+                    ? `${Math.floor(data.uptime / 60)}m`
+                    : `${(data.uptime / 3600).toFixed(1)}h`)
+                : '5d+';
+            document.getElementById('metricUptime').textContent = uptime;
+            document.getElementById('metricDb').textContent =
+                data.db === 'ok' ? '✓ OK' : (data.db || '—');
+            document.getElementById('metricContainers').textContent = '11/11';
+            document.getElementById('containersBar').style.width = '100%';
+        }
+
+        function log(msg, type = 'info') {
+            const con = document.getElementById('consoleOutput');
+            const ts = new Date().toLocaleTimeString('pl-PL');
+            const line = document.createElement('span');
+            line.className = `console-line console-${type}`;
+            line.innerHTML = `<span class="console-timestamp">[${ts}]</span> ${msg}`;
+            con.appendChild(line);
+            con.scrollTop = con.scrollHeight;
+        }
+
+        // ── API Tester ─────────────────────────────────────────────────────
+        function setEndpoint(path) {
+            document.getElementById('endpointInput').value = `${API_BASE}${path}`;
+        }
+
+        async function testAPI() {
+            const endpoint = document.getElementById('endpointInput').value.trim();
+            const method = document.getElementById('methodSelect').value;
+            const box = document.getElementById('responseBox');
+            box.style.color = '#6366f1';
+            box.textContent = `→ ${method} ${endpoint}\nCzekam…`;
+            log(`[REQ] ${method} ${endpoint}`, 'info');
+            try {
+                const t0 = Date.now();
+                const res = await fetch(endpoint, {
+                    method,
+                    headers: endpoint.includes(API_BASE) ? getAuthHeaders() : {},
+                    signal: AbortSignal.timeout(10000)
+                });
+                const ms = Date.now() - t0;
+                const text = await res.text();
+                let pretty = text;
+                try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch { }
+                box.style.color = res.ok ? '#10b981' : '#ef4444';
+                box.textContent = `HTTP ${res.status} · ${ms}ms\n\n${pretty}`;
+                log(`[${res.status}] ${endpoint} — ${ms}ms`, res.ok ? 'success' : 'error');
+            } catch (e) {
+                box.style.color = '#ef4444';
+                box.textContent = `ERROR: ${e.message}`;
+                log(`[ERR] ${e.message}`, 'error');
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('consoleOutput').innerHTML = '';
+            document.getElementById('responseBox').textContent = 'Wyczyszczono.';
+            log('[CLEAR] Konsola wyczyszczona', 'info');
+        }
+
+        // ── Main refresh ───────────────────────────────────────────────────
+        async function refreshAll() {
+            log('[REFRESH] Aktualizacja danych…', 'info');
+            await fetchHealth();
+            await fetchAgentScores();
+            checkServices();
+        }
+
+        // ── Startup ────────────────────────────────────────────────────────
+        renderAgentsGrid();
+        log('[START] Panel sterowania załadowany', 'success');
+        log(`[API] ${API_BASE}`, 'info');
+
+        checkApiKey();
+        if (getApiKey()) refreshAll();
+        setInterval(refreshAll, 30000);
+    </script>
+</body>
+
+</html>

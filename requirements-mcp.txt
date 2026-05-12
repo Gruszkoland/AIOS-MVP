@@ -33,8 +33,14 @@ flake8==6.1.0
 mypy>=1.20.2
 
 # Optional: LLM Integration (for ORACLE)
-# openai==0.28.1
+# openai>=2.0.0  # v2 SDK (updated from legacy 0.28.1 — use AsyncOpenAI/OpenAI client)
 # anthropic==0.7.6
+
+# Optional: Redis (for G5TransparencyGuard multi-instance session sync — B5 fix)
+# redis>=4.0.0  # pip install redis[hiredis]
+
+# Optional: Browser Automation
+browser-use
 
 # Optional: Vector Search & ML (for GENESIS RAG + Federated Learning)
 numpy==1.24.3
