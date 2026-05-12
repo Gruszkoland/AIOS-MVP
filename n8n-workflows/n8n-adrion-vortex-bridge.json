@@ -10,7 +10,10 @@
       "name": "Webhook Price Sync",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [100, 300]
+      "position": [
+        100,
+        300
+      ]
     },
     {
       "parameters": {
@@ -24,7 +27,10 @@
       "name": "Vortex Decision Call",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [350, 300]
+      "position": [
+        350,
+        300
+      ]
     },
     {
       "parameters": {
@@ -41,7 +47,10 @@
       "name": "Is Singularity (9)?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [600, 300]
+      "position": [
+        600,
+        300
+      ]
     },
     {
       "parameters": {
@@ -66,7 +75,10 @@
       "name": "Execute Arbitrage",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [850, 200]
+      "position": [
+        850,
+        200
+      ]
     },
     {
       "parameters": {
@@ -75,7 +87,10 @@
       "name": "Bridge Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [100, 100]
+      "position": [
+        100,
+        100
+      ]
     }
   ],
   "connections": {
@@ -112,5 +127,9 @@
         ]
       ]
     }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
   }
 }

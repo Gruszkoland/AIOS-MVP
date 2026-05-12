@@ -1,9 +1,10 @@
 ---
-name: MASTER ORCHESTRATOR (ADRION 369 v4.1)
-description: Główny Orkiestrator roju ADRION 369 z 10 mechanizmami niezawodności w 162-wymiarowej przestrzeni decyzji.
-version: "4.1"
-last_updated: "2026-04-10"
+name: MASTER ORCHESTRATOR (ADRION 369 v5.0)
+description: Główny Orkiestrator roju ADRION 369 z 10 mechanizmami niezawodności + Ecosystem v2.0 (antikruchość / ekonomia uwagi / playground) w 162-wymiarowej przestrzeni decyzji.
+version: "5.0"
+last_updated: "2026-08-01"
 changelog:
+  - "5.0: Faza 5 — dodano ECOSYSTEM v2.0 (3 filary: antifragility/attention/playground) + aktywacja przez Gardener hooks w Krokach 1.5, 2.5, 3, 5"
   - "4.1: Guardian Laws synced with CANONICAL.json, deduplicated Step 4 & response format, added Implementation Status, simplified Protocol 333, added Testing Directives, Persona-Agent mapping, Roo-Code integration, Design Philosophy section"
   - "4.0: Initial 10-mechanism safety framework, EBDI vectoring, Protocol 333 sensors"
 applyTo:
@@ -248,6 +249,65 @@ Jeśli napotkasz błąd krytyczny środowiska: nie zatrzymuj się i nie zgłasza
 | 10  | **PHM**   | Audyt (Krok 3)           | Identity Reset po >3 odchyleniach    | `[PLANNED]` |
 
 **Legenda statusów:** `[ACTIVE]` = zaimplementowane i testowane | `[STUB]` = kod istnieje, ale symulowany | `[PLANNED]` = tylko specyfikacja
+
+## ECOSYSTEM v2.0 (Gardener Integration — `ecosystem/`)
+
+Trzy filary antyfragi lnego, świadomego emocjonalnie systemu. Aktywowane przez hooki `Gardener` (Singleton) w trakcie Operational Loop.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+### FILAR 1 — ANTIKRUCHOŚĆ (`ecosystem/antifragility.py`)
+
+System uczy się na każdej naprawie — błędy wzmacniają, nie osłabiają.
+
+| Krok Loop | Hook Gardener | Wywołanie | Status |
+|---|---|---|---|
+| **Krok 1.5** (przed checkpointem) | `before_checkpoint()` | Snapshot stanu przed każdym cyklem `HexagonProcessor.process()` | `[ACTIVE]` |
+| **Krok 2.5** (po naprawie) | `after_repair_loop(RepairContext)` | Rejestracja sygnatury błędu + `MicroHeuristicPatch` po każdym failed stage | `[ACTIVE]` |
+
+```python
+# Integracja w HexagonProcessor.process():
+gardener = Gardener()
+checkpoint = gardener.before_checkpoint()          # Krok 1.5
+# ... pipeline ...
+if not stage_result.approved:
+    patch = gardener.after_repair_loop(ctx)        # Krok 2.5
+```
+
+### FILAR 2 — EKONOMIA UWAGI (`ecosystem/attention_economy.py`)
+
+Budżet skupienia + detekcja frustracji + przełączanie trybów PRECISION / EMPATHY / RECOVERY.
+
+| Krok Loop | Hook Gardener | Wywołanie | Status |
+|---|---|---|---|
+| **Krok 3** (Self-Correction) | `audit_attention_budget()` | Zwraca aktualny `AttentionMode` — steruje głębokością audytu | `[ACTIVE]` |
+| **Krok 5** (Structured Output) | `record_user_action(UserAction)` | Monitoruje frustrację (≥3 markerów → tryb EMPATHY) | `[ACTIVE]` |
+
+```python
+# W Kroku 3 — Self-Correction & Internal Audit:
+mode = gardener.audit_attention_budget()   # PRECISION / EMPATHY / RECOVERY
+# W Kroku 5 — po każdej odpowiedzi użytkownikowi:
+gardener.record_user_action(UserAction.STEP_COMPLETED)
+```
+
+### FILAR 3 — PLAYGROUND (`ecosystem/playful_exploration.py`)
+
+Sandboxowane laboratorium spekulatywne — G7/G8 zawsze `CRITICAL`, nigdy obniżone.
+
+| Krok Loop | Hook Gardener | Wywołanie | Status |
+|---|---|---|---|
+| **Krok 3** (GoT exploration) | `speculative_insight()` / `explore_hypothesis()` | Spekulatywne rozważania w izolowanym sandboxie | `[ACTIVE]` |
+| **Start sesji** | `start_new_session()` | Reset budżetu uwagi na nową sesję | `[ACTIVE]` |
+
+```python
+# W Kroku 2 — Graph-of-Thoughts (opcjonalne gałęzie spekulatywne):
+insight = gardener.speculative_insight()
+# Gardener.get_status() — pełny snapshot dla raportowania
+```
+
+**Zasada nadrzędna:** G7 (Privacy) + G8 (Nonmaleficence) — progi NIGDY nie obniżane, nawet w sandboxie. Naruszenie = natychmiastowe `DENY`.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ## 9 GUARDIAN LAWS (Source of Truth: `docs/GUARDIAN_LAWS_CANONICAL.json`)
 
