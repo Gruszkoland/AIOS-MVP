@@ -97,8 +97,8 @@ class TestUnifiedPipeline:
         assert "approved" in guardians
         assert "laws" in guardians
 
-        assert guardians["laws_evaluated"] == 9  # 9 Guardian Laws
-        assert len(guardians["laws"]) == 9
+        assert guardians["laws_evaluated"] == 10  # 10 Guardian Laws (G6 Authenticity added)
+        assert len(guardians["laws"]) == 10
         assert guardians["laws_passed"] <= guardians["laws_evaluated"]
 
     def test_decision_logic_approved(self):
@@ -243,7 +243,7 @@ class TestUnifiedPipeline:
         # Check that all 9 laws are present (capitalized names)
         expected_laws = {
             "Unity", "Truth", "Rhythm", "Causality", "Transparency",
-            "Nonmaleficence", "Autonomy", "Justice", "Sustainability"
+            "Authenticity", "Nonmaleficence", "Autonomy", "Justice", "Sustainability"
         }
         assert law_names == expected_laws
 
