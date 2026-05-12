@@ -532,6 +532,15 @@ class HexagonProcessor:
 
         total_start = time.time()
 
+        # Ecosystem v2.0 — Gardener hook: Krok 1.5 (before_checkpoint)
+        _gardener = None
+        try:
+            from ecosystem.gardener import Gardener  # lazy import — brak hard dependency
+            _gardener = Gardener()
+            _gardener.before_checkpoint()
+        except Exception:
+            pass  # ecosystem not installed — degraded gracefully
+
         # Stage 1: Inventory
         inventory = _inventory_stage(trinity_scores)
         self.logger.info(
@@ -539,30 +548,100 @@ class HexagonProcessor:
             inventory.score,
             inventory.approved,
         )
+        if not inventory.approved and _gardener is not None:
+            try:
+                from ecosystem.antifragility import RepairContext
+                ctx = RepairContext(
+                    error_signature="hexagon_inventory_rejected",
+                    hexagon_cycle=1,
+                    convergence_score=inventory.score,
+                    patched_files=tuple(),
+                    timestamp=time.time(),
+                    extra={"stage": "inventory", "trinity_scores": trinity_scores},
+                )
+                _gardener.after_repair_loop(ctx)
+            except Exception:
+                pass
 
         # Stage 2: Empathy
         empathy = _empathy_stage(inventory)
         self.logger.info(
             "Empathy complete: score=%.3f approved=%s", empathy.score, empathy.approved
         )
+        if not empathy.approved and _gardener is not None:
+            try:
+                from ecosystem.antifragility import RepairContext
+                ctx = RepairContext(
+                    error_signature="hexagon_empathy_rejected",
+                    hexagon_cycle=2,
+                    convergence_score=empathy.score,
+                    patched_files=tuple(),
+                    timestamp=time.time(),
+                    extra={"stage": "empathy"},
+                )
+                _gardener.after_repair_loop(ctx)
+            except Exception:
+                pass
 
         # Stage 3: Process
         process = _process_stage(empathy)
         self.logger.info(
             "Process complete: score=%.3f approved=%s", process.score, process.approved
         )
+        if not process.approved and _gardener is not None:
+            try:
+                from ecosystem.antifragility import RepairContext
+                ctx = RepairContext(
+                    error_signature="hexagon_process_rejected",
+                    hexagon_cycle=3,
+                    convergence_score=process.score,
+                    patched_files=tuple(),
+                    timestamp=time.time(),
+                    extra={"stage": "process"},
+                )
+                _gardener.after_repair_loop(ctx)
+            except Exception:
+                pass
 
         # Stage 4: Debate
         debate = _debate_stage(process)
         self.logger.info(
             "Debate complete: score=%.3f approved=%s", debate.score, debate.approved
         )
+        if not debate.approved and _gardener is not None:
+            try:
+                from ecosystem.antifragility import RepairContext
+                ctx = RepairContext(
+                    error_signature="hexagon_debate_rejected",
+                    hexagon_cycle=4,
+                    convergence_score=debate.score,
+                    patched_files=tuple(),
+                    timestamp=time.time(),
+                    extra={"stage": "debate"},
+                )
+                _gardener.after_repair_loop(ctx)
+            except Exception:
+                pass
 
         # Stage 5: Healing
         healing = _healing_stage(debate)
         self.logger.info(
             "Healing complete: score=%.3f approved=%s", healing.score, healing.approved
         )
+        if not healing.approved and _gardener is not None:
+            try:
+                from ecosystem.antifragility import RepairContext
+                ctx = RepairContext(
+                    error_signature="hexagon_healing_rejected",
+                    hexagon_cycle=5,
+                    convergence_score=healing.score,
+                    patched_files=tuple(),
+                    timestamp=time.time(),
+                    extra={"stage": "healing"},
+                )
+                _gardener.after_repair_loop(ctx)
+            except Exception:
+                pass
 
         # Stage 6: Action
         action = _action_stage(healing)
@@ -592,5 +671,12 @@ class HexagonProcessor:
             overall_approved,
             total_duration_ms,
         )
+
+        # Ecosystem v2.0 — Gardener hook: Krok 3 (audit_attention_budget po pipeline)
+        if _gardener is not None:
+            try:
+                _gardener.audit_attention_budget()
+            except Exception:
+                pass
 
         return result

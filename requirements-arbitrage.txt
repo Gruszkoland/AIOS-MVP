@@ -17,6 +17,7 @@ pydantic-settings>=2.14.0  # Typed settings with env/dotenv support
 
 # Scraping (optional — mock mode works without this)
 apify-client>=1.6.0     # Real Upwork/Fiverr scraping via Apify
+browser-use             # Browser automation framework (Playwright-based)
 
 # YAML parsing (OpenAPI spec serving)
 PyYAML>=6.0                 # Load openapi.yaml for /api/openapi.json

@@ -12,7 +12,10 @@
       "name": "🎯 Trigger: Daily 10AM",
       "type": "n8n-nodes-base.cron",
       "typeVersion": 1,
-      "position": [100, 200]
+      "position": [
+        100,
+        200
+      ]
     },
     {
       "parameters": {
@@ -23,7 +26,10 @@
       "name": "🔍 Scout: Google Maps Scraper",
       "type": "n8n-nodes-base.http",
       "typeVersion": 4,
-      "position": [300, 200],
+      "position": [
+        300,
+        200
+      ],
       "credentials": {
         "httpBasicAuth": "ApifyToken"
       },
@@ -37,7 +43,10 @@
       "name": "🔎 Filter: Pain Points",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
-      "position": [500, 200],
+      "position": [
+        500,
+        200
+      ],
       "notes": "Keep only leads with rating < 3.5 OR unanswered_reviews > 3"
     },
     {
@@ -58,7 +67,10 @@
       "name": "💾 SQLite: Store Qualified Leads",
       "type": "n8n-nodes-base.sqlite",
       "typeVersion": 1,
-      "position": [700, 200]
+      "position": [
+        700,
+        200
+      ]
     },
     {
       "parameters": {
@@ -68,7 +80,10 @@
       "name": "📋 Get Unanalyzed Leads",
       "type": "n8n-nodes-base.sqlite",
       "typeVersion": 1,
-      "position": [900, 200]
+      "position": [
+        900,
+        200
+      ]
     },
     {
       "parameters": {
@@ -88,7 +103,10 @@
       "name": "🧠 Analyzer: LLM Assessment",
       "type": "n8n-nodes-base.http",
       "typeVersion": 4,
-      "position": [1100, 200],
+      "position": [
+        1100,
+        200
+      ],
       "notes": "OpenRouter gpt-3.5-turbo - determines fit score and approach"
     },
     {
@@ -99,7 +117,10 @@
       "name": "✅ Filter: Fit Score >= High",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
-      "position": [1300, 200]
+      "position": [
+        1300,
+        200
+      ]
     },
     {
       "parameters": {
@@ -117,7 +138,10 @@
       "name": "💾 SQLite: Store Analysis",
       "type": "n8n-nodes-base.sqlite",
       "typeVersion": 1,
-      "position": [1500, 200]
+      "position": [
+        1500,
+        200
+      ]
     },
     {
       "parameters": {
@@ -127,7 +151,10 @@
       "name": "📧 Get Ready-to-Email Leads",
       "type": "n8n-nodes-base.sqlite",
       "typeVersion": 1,
-      "position": [1700, 200]
+      "position": [
+        1700,
+        200
+      ]
     },
     {
       "parameters": {
@@ -145,7 +172,10 @@
       "name": "✉️ Mailer: Generate Email",
       "type": "n8n-nodes-base.http",
       "typeVersion": 4,
-      "position": [1900, 200]
+      "position": [
+        1900,
+        200
+      ]
     },
     {
       "parameters": {
@@ -156,7 +186,10 @@
       "name": "👤 HUMAN IN LOOP: Review Email",
       "type": "n8n-nodes-base.pause",
       "typeVersion": 1,
-      "position": [2100, 200],
+      "position": [
+        2100,
+        200
+      ],
       "notes": "CRITICAL: You must review and approve each email before sending"
     },
     {
@@ -171,7 +204,10 @@
       "name": "📨 Send via Gmail",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [2300, 200],
+      "position": [
+        2300,
+        200
+      ],
       "credentials": {
         "gmailOAuth2": "YourGmailCredentials"
       }
@@ -184,7 +220,10 @@
       "name": "📊 Log Email Sent",
       "type": "n8n-nodes-base.sqlite",
       "typeVersion": 1,
-      "position": [2500, 200]
+      "position": [
+        2500,
+        200
+      ]
     },
     {
       "parameters": {
@@ -196,7 +235,10 @@
       "name": "📬 Monitor: Check Replies",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [2700, 200],
+      "position": [
+        2700,
+        200
+      ],
       "credentials": {
         "gmailOAuth2": "YourGmailCredentials"
       }
@@ -214,7 +256,10 @@
       "name": "🤖 Classify: Email Response Type",
       "type": "n8n-nodes-base.http",
       "typeVersion": 4,
-      "position": [2900, 200]
+      "position": [
+        2900,
+        200
+      ]
     },
     {
       "parameters": {
@@ -231,83 +276,176 @@
       "name": "💾 Log Reply",
       "type": "n8n-nodes-base.sqlite",
       "typeVersion": 1,
-      "position": [3100, 200]
+      "position": [
+        3100,
+        200
+      ]
     }
   ],
   "connections": {
     "Trigger_Daily": {
       "main": [
-        [{"node": "Node_Scout_Apify", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Scout_Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Scout_Apify": {
       "main": [
-        [{"node": "Node_Filter_PainPoints", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Filter_PainPoints",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Filter_PainPoints": {
       "main": [
-        [{"node": "Node_Store_Leads", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Store_Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Store_Leads": {
       "main": [
-        [{"node": "Node_Get_Unanalyzed", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Get_Unanalyzed",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Get_Unanalyzed": {
       "main": [
-        [{"node": "Node_Analyzer_LLM", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Analyzer_LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Analyzer_LLM": {
       "main": [
-        [{"node": "Node_Filter_Fit", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Filter_Fit",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Filter_Fit": {
       "main": [
-        [{"node": "Node_Store_Analysis", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Store_Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Store_Analysis": {
       "main": [
-        [{"node": "Node_Get_Ready_To_Email", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Get_Ready_To_Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Get_Ready_To_Email": {
       "main": [
-        [{"node": "Node_Mailer_Generate", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Mailer_Generate",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Mailer_Generate": {
       "main": [
-        [{"node": "Node_Human_Review", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Human_Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Human_Review": {
       "main": [
-        [{"node": "Node_Send_Email", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Send_Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Send_Email": {
       "main": [
-        [{"node": "Node_Log_Email", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Log_Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Log_Email": {
       "main": [
-        [{"node": "Node_Monitor_Replies", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Monitor_Replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Monitor_Replies": {
       "main": [
-        [{"node": "Node_Classify_Reply", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Classify_Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Node_Classify_Reply": {
       "main": [
-        [{"node": "Node_Log_Reply", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Node_Log_Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -318,5 +456,6 @@
     "maxRetries": 2,
     "concurrency": 1
   },
-  "notes": "Lead Arbitrage System v2.0 - ADRION 369. Scout → Analyze → Mail → Monitor. All data stored in SQLite."
+  "notes": "Lead Arbitrage System v2.0 - ADRION 369. Scout → Analyze → Mail → Monitor. All data stored in SQLite.",
+  "active": false
 }
