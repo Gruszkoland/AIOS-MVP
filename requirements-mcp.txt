@@ -33,8 +33,9 @@ flake8==6.1.0
 mypy>=1.20.2
 
 # Optional: LLM Integration (for ORACLE)
-# openai>=2.0.0  # v2 SDK (updated from legacy 0.28.1 — use AsyncOpenAI/OpenAI client)
-# anthropic==0.7.6
+openai>=2.3.0,<3.0.0  # v2 SDK with AsyncOpenAI/OpenAI clients (breaking changes from 0.28.1)
+anthropic>=0.7.0,<1.0.0  # Anthropic Claude API
+litellm>=1.0.0  # Unified LLM router for multi-model support
 
 # Optional: Redis (for G5TransparencyGuard multi-instance session sync — B5 fix)
 # redis>=4.0.0  # pip install redis[hiredis]
