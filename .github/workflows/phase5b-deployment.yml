@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - main
+            - master
         paths:
             - "arbitrage/guardian_g4_enhanced.py"
             - "arbitrage/endpoints/g4_enhanced.py"
