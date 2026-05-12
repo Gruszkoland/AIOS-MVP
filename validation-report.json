@@ -1,0 +1,1036 @@
+{
+  "summary": {
+    "total": 34,
+    "passed": 0,
+    "warned": 0,
+    "failed": 34
+  },
+  "results": {
+    "01 - Master Prompt Generator (MPG) - Prompt Engineering - Audyt instrukcji AI.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "02 - PROGRAMATOR WEBOWY - Full-stack Development - SaaS (Next.jsSupabaseStripe).md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "03 - Creator of Visualization and Animation (CVA) - AI Art Generative Design - Prompty dla DALL-E 3 & Midjourney.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "04 - Quantum Pattern Analyst (QPA) - Analiza techniczna rynk\u00f3w - Detekcja manipulacji (WyckoffSmart Money).md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "05 - Strategic Architect & Planner (SAP) - Planowanie strategiczne - Roadmapping.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "06 - BoosterLever - Growth hacking - D\u017awignie marketingowe.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "07 - The Arbiter (ARB) - Podejmowanie decyzji - Rozstrzyganie konflikt\u00f3w multi-agentowych.md": {
+      "status": "FAIL",
+      "score": 10,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": true
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD",
+        "Unsubstituted placeholders detected: [AKRONIM] or [NR]"
+      ]
+    },
+    "08 - Etos Guardian OS (EGO) - Bezpiecze\u0144stwo AI - TEE Enclave.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "09 - Chronos The Guardian (CTG) - Duchowa m\u0105dro\u015b\u0107 - Archetypowa interpretacja.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "10 - Echo Archetyp\u00f3w - Meta-persona - Dynamiczne wcielanie archetyp\u00f3w.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "11 - Content Engine & Copywriter (CEC) - Copywriting konwersyjny - Content marketing.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "12 - Research & OSINT Agent (ROA) - Deep research - OSINT.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "13 - Agent Orchestrator (AOR) - Multi-agent coordination - Workflow routing.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "14 - Legal & Compliance Advisor (LCA) - Prawo cyfrowe - RODOGDPR.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "15 - Data Analyst & BI (DBI) - Analiza danych - Business Intelligence.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "16 - UX UI Designer (UXD) - UX Research - UI Design.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "17 - DevOps & Cloud Architect (DCA) - Cloud Architecture (AWSGCPAzure) - CICD Pipelines.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "18 - Sales & Negotiation Expert (SNE) - Sprzeda\u017c B2BB2C - Negocjacje.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "19 - QA & Test Engineer (QTE) - Quality Assurance - Test automation (PlaywrightCypressPytest).md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "20 - SEO Specialist (SEO) - SEO techniczne - On-page optimization.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "21 - Educator & Tutor (EDU) - E-learning - Pedagogika.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "22 - Personal Coach (PCH) - Rozw\u00f3j osobisty - Nawyki (Atomic Habits).md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "23 - Video & Audio Producer (VAP) - Produkcja video - Skrypty youtube.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "24 - Social Media Manager (SMM) - Social media strategy - Content calendar.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "25 - Translator & Localizer (TLO) - T\u0142umaczenia PL-EN-DE - Lokalizacja kulturowa.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "26 - CRM & Customer Success (CRM) - Customer Relationship Management - Retencja.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "27 - Personal Finance & Tax (PFT) - Finanse osobiste - Bud\u017cetowanie.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "28 - Cybersecurity Specialist (CSO) - Offensive security - Defensive security.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "29 - Knowledge Manager (KMS) - Knowledge management - Bazy wiedzy.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "30 - HR & Recruitment (HRR) - Rekrutacja ITbiznes - Job descriptions.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "31 - Product Manager (PMO) - Product strategy - Backlog management.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "32 - Technical Writer (TWR) - Dokumentacja techniczna - API docs.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "33 - Evaluation & Observability Architect (EVA) - EvalOps - Niezawodno\u015b\u0107 ekosystemu agent\u00f3w.md": {
+      "status": "FAIL",
+      "score": 20,
+      "rope_version": "2.0",
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    "validation_report_v3.md": {
+      "status": "FAIL",
+      "score": 0,
+      "rope_version": null,
+      "sections": {
+        "I_CONTEXT": false,
+        "II_REASONING": false,
+        "III_CONSTRAINTS": false,
+        "IV_OUTPUT_FORMAT": false,
+        "V_SAFETY_CHECKS": false,
+        "VI_EXAMPLES": false,
+        "SYSTEM_PAYLOAD": false
+      },
+      "placeholders": {
+        "has_agent_id": false,
+        "agent_id_in_content": false,
+        "has_unsubstituted_placeholders": false
+      },
+      "issues": [
+        "ROPE version not found",
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    }
+  },
+  "failed_agents": [
+    {
+      "file": "01 - Master Prompt Generator (MPG) - Prompt Engineering - Audyt instrukcji AI.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "02 - PROGRAMATOR WEBOWY - Full-stack Development - SaaS (Next.jsSupabaseStripe).md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "03 - Creator of Visualization and Animation (CVA) - AI Art Generative Design - Prompty dla DALL-E 3 & Midjourney.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "04 - Quantum Pattern Analyst (QPA) - Analiza techniczna rynk\u00f3w - Detekcja manipulacji (WyckoffSmart Money).md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "05 - Strategic Architect & Planner (SAP) - Planowanie strategiczne - Roadmapping.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "06 - BoosterLever - Growth hacking - D\u017awignie marketingowe.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "07 - The Arbiter (ARB) - Podejmowanie decyzji - Rozstrzyganie konflikt\u00f3w multi-agentowych.md",
+      "status": "FAIL",
+      "score": 10,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD",
+        "Unsubstituted placeholders detected: [AKRONIM] or [NR]"
+      ]
+    },
+    {
+      "file": "08 - Etos Guardian OS (EGO) - Bezpiecze\u0144stwo AI - TEE Enclave.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "09 - Chronos The Guardian (CTG) - Duchowa m\u0105dro\u015b\u0107 - Archetypowa interpretacja.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "10 - Echo Archetyp\u00f3w - Meta-persona - Dynamiczne wcielanie archetyp\u00f3w.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "11 - Content Engine & Copywriter (CEC) - Copywriting konwersyjny - Content marketing.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "12 - Research & OSINT Agent (ROA) - Deep research - OSINT.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "13 - Agent Orchestrator (AOR) - Multi-agent coordination - Workflow routing.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "14 - Legal & Compliance Advisor (LCA) - Prawo cyfrowe - RODOGDPR.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "15 - Data Analyst & BI (DBI) - Analiza danych - Business Intelligence.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "16 - UX UI Designer (UXD) - UX Research - UI Design.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "17 - DevOps & Cloud Architect (DCA) - Cloud Architecture (AWSGCPAzure) - CICD Pipelines.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "18 - Sales & Negotiation Expert (SNE) - Sprzeda\u017c B2BB2C - Negocjacje.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "19 - QA & Test Engineer (QTE) - Quality Assurance - Test automation (PlaywrightCypressPytest).md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "20 - SEO Specialist (SEO) - SEO techniczne - On-page optimization.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "21 - Educator & Tutor (EDU) - E-learning - Pedagogika.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "22 - Personal Coach (PCH) - Rozw\u00f3j osobisty - Nawyki (Atomic Habits).md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "23 - Video & Audio Producer (VAP) - Produkcja video - Skrypty youtube.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "24 - Social Media Manager (SMM) - Social media strategy - Content calendar.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "25 - Translator & Localizer (TLO) - T\u0142umaczenia PL-EN-DE - Lokalizacja kulturowa.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "26 - CRM & Customer Success (CRM) - Customer Relationship Management - Retencja.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "27 - Personal Finance & Tax (PFT) - Finanse osobiste - Bud\u017cetowanie.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "28 - Cybersecurity Specialist (CSO) - Offensive security - Defensive security.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "29 - Knowledge Manager (KMS) - Knowledge management - Bazy wiedzy.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "30 - HR & Recruitment (HRR) - Rekrutacja ITbiznes - Job descriptions.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "31 - Product Manager (PMO) - Product strategy - Backlog management.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "32 - Technical Writer (TWR) - Dokumentacja techniczna - API docs.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "33 - Evaluation & Observability Architect (EVA) - EvalOps - Niezawodno\u015b\u0107 ekosystemu agent\u00f3w.md",
+      "status": "FAIL",
+      "score": 20,
+      "issues": [
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    },
+    {
+      "file": "validation_report_v3.md",
+      "status": "FAIL",
+      "score": 0,
+      "issues": [
+        "ROPE version not found",
+        "Missing sections: I_CONTEXT, II_REASONING, III_CONSTRAINTS, IV_OUTPUT_FORMAT, V_SAFETY_CHECKS, VI_EXAMPLES, SYSTEM_PAYLOAD"
+      ]
+    }
+  ]
+}

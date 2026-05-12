@@ -1,0 +1,163 @@
+# ADRION 369 Prometheus Alerting Rules
+# Phase 3B Observability & Monitoring
+
+groups:
+  - name: adrion_369_alerts
+    interval: 30s
+    rules:
+      # ────────────────────────────────────────────────────────────────────
+      # CVC (Cumulative Violation Counter) Alerts
+      # ────────────────────────────────────────────────────────────────────
+      
+      - alert: CVCYellowState
+        expr: cvc_state_value >= 1
+        for: 1m
+        labels:
+          severity: warning
+          subsystem: cvc
+        annotations:
+          summary: "CVC entered YELLOW state"
+          description: "CVC violation counter {{ $value }} indicates potential salami-slicing attack (G8 awareness)"
+      
+      - alert: CVCOrangeState
+        expr: cvc_state_value >= 2
+        for: 1m
+        labels:
+          severity: critical
+          subsystem: cvc
+        annotations:
+          summary: "CVC entered ORANGE state - Sentinel routing required"
+          description: "CVC counter {{ $value }}: System approaching RED state. Sentinel agent must approve all operations."
+      
+      - alert: CVCRedState
+        expr: cvc_state_value >= 3
+        for: 30s
+        labels:
+          severity: critical
+          subsystem: cvc
+        annotations:
+          summary: "CVC RED - SYSTEM HALTED"
+          description: "CVC counter {{ $value }} - Cumulative violations threshold exceeded. All non-admin requests blocked."
+      
+      # ────────────────────────────────────────────────────────────────────
+      # Guardian Laws - Critical Violations (G6-G8)
+      # ────────────────────────────────────────────────────────────────────
+      
+      - alert: GuardianCriticalViolationSpike
+        expr: increase(guardian_critical_violations_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: critical
+          subsystem: guardian
+        annotations:
+          summary: "Guardian critical violations spike detected"
+          description: "More than 5 critical violations (G6-G8) in 5 minutes. Investigate potential attack."
+      
+      - alert: PrivacyViolationDetected
+        expr: increase(guardian_violations_total{law="G7_Privacy"}[1h]) > 3
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: guardian
+          law: G7
+        annotations:
+          summary: "G7 Privacy violation threshold exceeded"
+          description: "{{ $value }} privacy violations in 1 hour. Check client spam/data leakage patterns."
+      
+      - alert: NonmaleficenceViolationDetected
+        expr: guardian_violations_total{law="G8_Nonmaleficence"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          subsystem: guardian
+          law: G8
+        annotations:
+          summary: "G8 Nonmaleficence violation - Immediate VETO applied"
+          description: "Harmful action detected and blocked. Action: {{ $labels.action }} blocked by Sentinel."
+      
+      # ────────────────────────────────────────────────────────────────────
+      # TSPA (Trust Score & Performance Assessment)
+      # ────────────────────────────────────────────────────────────────────
+      
+      - alert: TSPAScoreDeclining
+        expr: tspa_score{agent="SENTINEL"} < 0.85
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: tspa
+          agent: SENTINEL
+        annotations:
+          summary: "SENTINEL TSPA score declining below baseline"
+          description: "SENTINEL trust score {{ $value }} (baseline: 0.95). Check for repeated guideline violations."
+      
+      - alert: TSPAScoreCritical
+        expr: tspa_score < 0.70
+        for: 2m
+        labels:
+          severity: critical
+          subsystem: tspa
+        annotations:
+          summary: "{{ $labels.agent }} TSPA score critical"
+          description: "Agent {{ $labels.agent }} TSPA score {{ $value }} - access restrictions activated (read-only mode)"
+      
+      # ────────────────────────────────────────────────────────────────────
+      # Genesis Record Integrity
+      # ────────────────────────────────────────────────────────────────────
+      
+      - alert: GenesisRecordIntegrityViolation
+        expr: genesis_verification_ok == 0
+        for: 1m
+        labels:
+          severity: critical
+          subsystem: genesis
+        annotations:
+          summary: "Genesis Record hash chain integrity failure"
+          description: "Genesis Record verification failed. Possible tampering detected. Audit trail may be compromised."
+      
+      - alert: GenesisRecordNotGrowing
+        expr: increase(genesis_records_total[1h]) == 0
+        for: 30m
+        labels:
+          severity: warning
+          subsystem: genesis
+        annotations:
+          summary: "Genesis Record no new entries in 1 hour"
+          description: "No new Genesis Record entries detected in 1 hour. Check if audit logging is functioning."
+      
+      # ────────────────────────────────────────────────────────────────────
+      # LTM (Long-Term Memory) Health
+      # ────────────────────────────────────────────────────────────────────
+      
+      - alert: LTMColdStartMode
+        expr: ltm_cold_start == 1
+        for: 1m
+        labels:
+          severity: warning
+          subsystem: ltm
+        annotations:
+          summary: "LTM running in cold-start mode"
+          description: "LTM profile not found or failed to load. User context continuity may be affected."
+      
+      # ────────────────────────────────────────────────────────────────────
+      # Infrastructure & Performance
+      # ────────────────────────────────────────────────────────────────────
+      
+      - alert: DBPoolExhaustion
+        expr: adrion_db_pool_checked_out / adrion_db_pool_size > 0.9
+        for: 2m
+        labels:
+          severity: warning
+          subsystem: infrastructure
+        annotations:
+          summary: "Database connection pool near exhaustion"
+          description: "DB pool utilization {{ $value | humanizePercentage }} - potential connection leak"
+      
+      - alert: HighDBTimeouts
+        expr: increase(adrion_db_pool_timeouts_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          subsystem: infrastructure
+        annotations:
+          summary: "High database connection timeout rate"
+          description: "{{ $value }} DB timeouts in 5 minutes. Check database performance and connection pool size."

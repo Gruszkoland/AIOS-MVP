@@ -290,6 +290,118 @@ def genesis_verify():
         return jsonify({"error": str(e), "integrity": False}), 500
 
 
+@mcp_bp.post("/guardian/checkpoint")
+def guardian_checkpoint():
+    """
+    Guardian Laws v11 validation checkpoint (pre-execution gate).
+
+    DSPy Signature:
+        In(job:dict, analysis:dict, context:dict, flags:str|None)
+        → Out(approved:bool, laws:list, denial_reason:str, genesis_record:dict)
+
+    Body (JSON):
+    - job: Job metadata (title, client, budget_min, budget_max, description)
+    - analysis: Analysis results (score, fit, risks, our_price, est_cost, est_profit)
+    - context: Execution context (bids_today, daily_est_cost, etc.)
+    - flags (optional): HARMONIA-GATEWAY flags, e.g., [SYS:ETH_A369][FMT:SBAR]
+
+    Example:
+        POST /api/mcp/guardian/checkpoint
+        Body: {
+            "job": {"title": "...", "client": "...", "budget_min": 100, "budget_max": 500},
+            "analysis": {"score": 8, "fit": "Good fit", "risks": "None", ...},
+            "context": {"bids_today": 2, "daily_est_cost": 50.0},
+            "flags": "[SYS:ETH_A369][FMT:SBAR]"
+        }
+
+    Returns 400 if any Guardian Law (G1–G11) is violated; otherwise 200 with approval.
+    """
+    try:
+        data = request.get_json() or {}
+        job = data.get("job", {})
+        analysis = data.get("analysis", {})
+        context = data.get("context", {})
+        flags = data.get("flags")
+
+        # Import Guardian Laws (v11)
+        from arbitrage.guardian import evaluate_guardians, build_context as build_guardian_context
+
+        # Ensure context has all required fields
+        full_context = build_guardian_context(
+            bids_today=int(context.get("bids_today", 0)),
+            daily_est_cost=float(context.get("daily_est_cost", 0.0)),
+            bids_for_client_today=int(context.get("bids_for_client_today", 0)),
+        )
+        # Merge with EBDI/PME fields for G10, G11
+        full_context.update({
+            "pme_enabled": context.get("pme_enabled", True),
+            "error_count_session": int(context.get("error_count_session", 0)),
+            "user_arousal": float(context.get("user_arousal", 0.0)),
+            "token_budget_used": float(context.get("token_budget_used", 0.0)),
+            "token_budget_max": float(context.get("token_budget_max", 1.0)),
+            "prev_fit_hash": context.get("prev_fit_hash"),
+        })
+
+        # Evaluate 11 Guardian Laws
+        eval_result = evaluate_guardians(job, analysis, full_context)
+
+        # Parse flags and determine output format
+        parsed_flags = FlagRegistry.parse_flags(flags or "")
+
+        # Create Genesis Record (DECISION type)
+        gr = create_genesis_record(
+            agent="SENTINEL",
+            action_type="DECISION",
+            payload={
+                "description": f"Guardian checkpoint: {'APPROVE' if eval_result.approved else 'DENY'}",
+                "guardian_refs": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10", "G11"],
+                "compliance": eval_result.compliance,
+                "violations": eval_result.violations,
+                "denial_reason": eval_result.denial_reason,
+            },
+        )
+
+        # Log to Genesis Record
+        try:
+            gr_path = Path("memories/genesis_record.jsonl")
+            with open(gr_path, "a") as f:
+                f.write(gr.to_jsonl() + "\n")
+            logger.info(f"Guardian checkpoint logged: {gr.genesis_id}")
+        except Exception as e:
+            logger.warning(f"Failed to log Guardian checkpoint to Genesis Record: {e}")
+
+        # Build response
+        response = {
+            "approved": eval_result.approved,
+            "compliance": eval_result.compliance,
+            "violations": eval_result.violations,
+            "denial_reason": eval_result.denial_reason,
+            "laws": [
+                {
+                    "name": law.name,
+                    "passed": law.passed,
+                    "reason": law.reason,
+                    "weight": law.weight,
+                }
+                for law in eval_result.laws
+            ],
+            "genesis_record": {
+                "genesis_id": gr.genesis_id,
+                "timestamp": gr.timestamp,
+                "entry_hash": gr.entry_hash[:16] + "...",
+            },
+        }
+
+        # Return 400 if DENY, else 200
+        status_code = 200 if eval_result.approved else 400
+
+        return jsonify(response), status_code
+
+    except Exception as e:
+        logger.exception(f"Error in guardian_checkpoint: {e}")
+        return jsonify({"error": str(e), "status": 500}), 500
+
+
 @mcp_bp.get("/flags/help")
 def flags_help():
     """
@@ -331,9 +443,146 @@ def flags_help():
     })
 
 
+# ────────────────────────────────────────────────────────────────────────────
+# MEMORY MANAGEMENT ENDPOINTS (Phase 3)
+# ────────────────────────────────────────────────────────────────────────────
+
+@mcp_bp.get("/memory/status")
+def memory_status():
+    """
+    Get memory subsystem status (CVC + LTM profile).
+
+    DSPy Signature:
+        In(user_id:str|None) → Out(cvc_state:str, cvc_counter:int, ltm_session_count:int, 
+                                     ltm_tspa:dict, ltm_ebdi:dict, genesis_records:int)
+    """
+    try:
+        from arbitrage.memory import CVCManager, LTMManager
+        from flask import g
+        
+        cvc = CVCManager()
+        ltm = LTMManager()
+        
+        # Count Genesis records
+        gr_path = Path("memories/genesis_record.jsonl")
+        gr_count = 0
+        if gr_path.exists():
+            with open(gr_path, "r") as f:
+                gr_count = sum(1 for line in f if line.strip())
+        
+        return jsonify({
+            "cvc": {
+                "state": cvc.state,
+                "counter": cvc.counter,
+                "violations": len(cvc.violations),
+                "require_sentinel": cvc.require_sentinel,
+            },
+            "ltm": {
+                "session_count": ltm.profile.session_count if ltm.profile else 0,
+                "tspa_scores": ltm.profile.tspa_scores if ltm.profile else {},
+                "ebdi_state": ltm.profile.ebdi_state if ltm.profile else {},
+                "last_seen": str(ltm.profile.last_seen) if ltm.profile else None,
+            },
+            "genesis": {
+                "records": gr_count,
+                "path": str(gr_path),
+            },
+        })
+
+    except Exception as e:
+        logger.exception(f"Error in memory_status: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@mcp_bp.post("/cvc/reset")
+def cvc_reset():
+    """
+    Reset CVC state to GREEN (admin-only operation).
+
+    Query Params:
+    - admin_token (str): Admin authorization token
+
+    Returns:
+        {approved: bool, prev_state: str, new_state: str, reason: str|None}
+    """
+    try:
+        from arbitrage.memory import CVCManager
+        
+        admin_token = request.args.get("admin_token")
+        expected_token = __import__("os").getenv("ADMIN_TOKEN", "change_me_in_prod")
+        
+        if not admin_token or admin_token != expected_token:
+            logger.warning(f"CVC reset denied: invalid token from {request.remote_addr}")
+            return jsonify({"error": "Unauthorized"}), 403
+        
+        cvc = CVCManager()
+        prev_state = cvc.state
+        
+        # Reset counters
+        cvc.counter = 0
+        cvc.violations = []
+        cvc.save()
+        
+        return jsonify({
+            "approved": True,
+            "prev_state": prev_state,
+            "new_state": cvc.state,
+            "reason": "Admin reset",
+            "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
+        })
+
+    except Exception as e:
+        logger.exception(f"Error in cvc_reset: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@mcp_bp.get("/ltm/profile")
+def ltm_profile():
+    """
+    Get current user's LTM profile (Long-Term Memory).
+
+    Headers:
+    - X-User-ID (str): User identifier (optional, defaults to IP)
+
+    Returns:
+        {user_id: str, session_count: int, tspa_scores: dict, ebdi_state: dict, 
+         last_seen: str, preferences: dict}
+    """
+    try:
+        from arbitrage.memory import LTMManager
+        
+        user_id = request.headers.get("X-User-ID", request.remote_addr or "default")
+        ltm = LTMManager()
+        profile = ltm.load_profile(user_id)
+        
+        if not profile:
+            return jsonify({
+                "user_id": user_id,
+                "message": "No profile found (cold start)",
+                "session_count": 0,
+            })
+        
+        return jsonify({
+            "user_id": user_id,
+            "session_count": profile.session_count,
+            "tspa_scores": profile.tspa_scores,
+            "ebdi_state": profile.ebdi_state,
+            "last_seen": str(profile.last_seen),
+            "preferences": profile.preferences,
+        })
+
+    except Exception as e:
+        logger.exception(f"Error in ltm_profile: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     print("MCP Blueprint registered. Routes:")
     print("  POST /api/mcp/invoke/<server>")
     print("  GET  /api/mcp/status")
     print("  GET  /api/mcp/genesis/verify")
+    print("  POST /api/mcp/guardian/checkpoint")
     print("  GET  /api/mcp/flags/help")
+    print("  GET  /api/mcp/memory/status")
+    print("  POST /api/mcp/cvc/reset")
+    print("  GET  /api/mcp/ltm/profile")
