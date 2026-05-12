@@ -67,12 +67,14 @@ def create_app() -> Flask:
     from arbitrage.blueprints.oracle_bp import oracle_bp
     from arbitrage.blueprints.wholesale_bp import wholesale_bp
     from arbitrage.blueprints.payments_bp import payments_bp
+    from arbitrage.blueprints.mcp_bp import mcp_bp
 
     app.register_blueprint(arbitrage_bp)
     app.register_blueprint(quantum_bp)
     app.register_blueprint(oracle_bp)
     app.register_blueprint(wholesale_bp)
     app.register_blueprint(payments_bp)
+    app.register_blueprint(mcp_bp)
 
     # ── Swagger UI / OpenAPI spec ──────────────────────────────────────────
     _SWAGGER_HTML = """<!DOCTYPE html>
