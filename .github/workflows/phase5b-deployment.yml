@@ -55,14 +55,15 @@ jobs:
               uses: actions/cache@v3
               with:
                   path: ~/.cache/pip
-                  key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-mcp.txt') }}
+                  key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
                   restore-keys: |
                       ${{ runner.os }}-pip-
 
             - name: Install dependencies
               run: |
                   python -m pip install --upgrade pip
-                  pip install -r requirements-mcp.txt
+                  [ -f requirements-mcp.txt ] && pip install -r requirements-mcp.txt || echo "requirements-mcp.txt not found, skipping"
+                  [ -f requirements.txt ] && pip install -r requirements.txt || echo "requirements.txt not found, skipping"
                   pip install pytest pytest-asyncio black flake8 bandit
 
             - name: Code Format Check (Black)
