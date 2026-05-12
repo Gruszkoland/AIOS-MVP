@@ -10,7 +10,7 @@ import os
 import sys
 
 # Ensure harmonia-dashboard is on the path
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "harmonia-dashboard"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend", "harmonia-dashboard"))
 
 def test_feedback_split_all():
     passed = 0

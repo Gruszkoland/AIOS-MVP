@@ -92,3 +92,9 @@ Genesis Record/**/v1.0_Backups/
 backups/
 memories/
 monitoring/llm_rollout_state.json
+
+# ── Runtime logs / generated data (not source) ───────────────────────────────
+frontend/harmonia-dashboard/behavior_log.json
+frontend/harmonia-dashboard/judge_log.json
+frontend/harmonia-dashboard/vera_scores.json
+monitoring/llm_kpi_events.jsonl

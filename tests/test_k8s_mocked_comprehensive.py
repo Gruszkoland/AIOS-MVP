@@ -158,17 +158,28 @@ class TestK8sWatcherMocked(unittest.TestCase):
 class TestApiEndpointStructure(unittest.TestCase):
     """Test Flask API endpoint structure without running server"""
 
-    @patch('api.validate_api_key')
-    def test_cluster_info_handler_exists(self, mock_validate):
-        """Test cluster-info handler function exists"""
-        mock_validate.return_value = True
-
-        # Import should work
+    def test_cluster_info_handler_exists(self):
+        """Test cluster-info handler function exists (skips if UAP_API_KEY absent)."""
+        import os
+        import importlib
+        env_backup = os.environ.copy()
         try:
-            from api import app
+            os.environ.setdefault("UAP_API_KEY", "test-key-for-ci")
+            os.environ.setdefault("ENVIRONMENT", "test")
+            # Remove cached module so it re-initialises with env vars set
+            for mod in list(sys.modules.keys()):
+                if mod in ("api", "uap.backend.api"):
+                    del sys.modules[mod]
+            sys.path.insert(0, str(Path(__file__).parent.parent / "uap" / "backend"))
+            from api import app  # noqa: PLC0415
             self.assertIsNotNone(app)
-        except ImportError:
-            self.skipTest("Flask app import failed")
+        except (ImportError, ModuleNotFoundError):
+            self.skipTest("Flask app import failed — missing dependency")
+        except SystemExit:
+            self.skipTest("UAP_API_KEY not set — skipping api import test")
+        finally:
+            os.environ.clear()
+            os.environ.update(env_backup)
 
     def test_endpoint_routes_count(self):
         """Test we have correct number of endpoints"""

@@ -409,10 +409,10 @@ def test_sustainability_pass_zero_cost():
 def test_evaluate_guardians_all_pass():
     result = evaluate_guardians(_job(), _analysis(), _ctx())
     assert result.approved is True
-    assert result.compliance == 9
+    assert result.compliance == 10
     assert result.violations == 0
     assert result.denial_reason == ""
-    assert len(result.laws) == 9
+    assert len(result.laws) == 10
 
 
 def test_evaluate_guardians_critical_deny():
@@ -503,13 +503,14 @@ def test_evaluate_guardians_sustainability_deny():
     assert result.approved is False
 
 
-def test_evaluate_guardians_returns_9_laws():
+def test_evaluate_guardians_returns_10_laws():
+    """Pipeline now has 10 laws: original 9 + G6 Authenticity."""
     result = evaluate_guardians(_job(), _analysis(), _ctx())
-    assert len(result.laws) == 9
+    assert len(result.laws) == 10
     names = [law.name for law in result.laws]
     assert names == [
         "Unity", "Truth", "Rhythm", "Causality", "Transparency",
-        "Nonmaleficence", "Autonomy", "Justice", "Sustainability",
+        "Nonmaleficence", "Autonomy", "Justice", "Sustainability", "Authenticity",
     ]
 
 
@@ -521,7 +522,7 @@ def test_evaluate_guardians_to_dict():
     assert "violations" in d
     assert "approved" in d
     assert "denial_reason" in d
-    assert len(d["laws"]) == 9
+    assert len(d["laws"]) == 10
     for law in d["laws"]:
         assert "name" in law
         assert "passed" in law
@@ -561,10 +562,10 @@ def test_law_result_fields():
 
 
 def test_guardian_eval_to_dict_structure():
-    laws = [LawResult(f"Law{i}", True, "ok", "MEDIUM") for i in range(9)]
-    g = GuardianEval(laws, 9, 0, True, "")
+    laws = [LawResult(f"Law{i}", True, "ok", "MEDIUM") for i in range(10)]
+    g = GuardianEval(laws, 10, 0, True, "")
     d = g.to_dict()
-    assert d["compliance"] == 9
+    assert d["compliance"] == 10
     assert d["violations"] == 0
     assert d["approved"] is True
-    assert len(d["laws"]) == 9
+    assert len(d["laws"]) == 10

@@ -15,7 +15,7 @@ from arbitrage.guardian import (
     LawResult,
     evaluate_guardians,
     build_context,
-    DENY_THRESHOLD,
+    DENY_WEIGHTED_THRESHOLD,
     _law_unity,
     _law_truth,
     _law_rhythm,
@@ -70,11 +70,11 @@ def test_evaluate_guardians_returns_valid_structure(job, analysis, context):
 
     assert isinstance(result, GuardianEval)
     assert isinstance(result.laws, list)
-    assert len(result.laws) == 9
+    assert len(result.laws) == 10
     assert isinstance(result.compliance, int)
     assert isinstance(result.violations, int)
     assert isinstance(result.approved, bool)
-    assert result.compliance + result.violations == 9
+    assert result.compliance + result.violations == 10
     assert result.compliance >= 0
     assert result.violations >= 0
 
@@ -94,20 +94,33 @@ def test_critical_violation_always_denies(job, analysis, context):
         )
 
 
-# ── Invariant: ≥2 violations → always DENY ──────────────────────────────────
+_WEIGHT_MAP = {"CRITICAL": 10, "HIGH": 2, "MEDIUM": 1}
+
+
+# ── Invariant: violation weight >= threshold → always DENY ───────────────────
 
 @given(job=job_strategy, analysis=analysis_strategy, context=context_strategy)
 @settings(max_examples=200, deadline=2000)
 def test_multiple_violations_deny(job, analysis, context):
     result = evaluate_guardians(job, analysis, context)
 
-    if result.violations >= DENY_THRESHOLD:
+    violation_weight = sum(
+        _WEIGHT_MAP[law.weight]
+        for law in result.laws
+        if not law.passed
+    )
+    has_critical = any(
+        not law.passed and law.weight == "CRITICAL"
+        for law in result.laws
+    )
+
+    if has_critical or violation_weight >= DENY_WEIGHTED_THRESHOLD:
         assert result.approved is False, (
-            f"{result.violations} violations but approved=True"
+            f"weight={violation_weight}, critical={has_critical} but approved=True"
         )
 
 
-# ── Invariant: approved=True → violations < threshold and no CRITICAL ────────
+# ── Invariant: approved=True → weight < threshold and no CRITICAL ─────────────
 
 @given(job=job_strategy, analysis=analysis_strategy, context=context_strategy)
 @settings(max_examples=200, deadline=2000)
@@ -115,7 +128,12 @@ def test_approved_implies_low_violations(job, analysis, context):
     result = evaluate_guardians(job, analysis, context)
 
     if result.approved:
-        assert result.violations < DENY_THRESHOLD
+        violation_weight = sum(
+            _WEIGHT_MAP[law.weight]
+            for law in result.laws
+            if not law.passed
+        )
+        assert violation_weight < DENY_WEIGHTED_THRESHOLD
         critical = [law for law in result.laws if not law.passed and law.weight == "CRITICAL"]
         assert len(critical) == 0
 
@@ -148,7 +166,7 @@ def test_to_dict_returns_serialisable(job, analysis, context):
     assert "compliance" in d
     assert "violations" in d
     assert "approved" in d
-    assert len(d["laws"]) == 9
+    assert len(d["laws"]) == 10
     for law_dict in d["laws"]:
         assert "name" in law_dict
         assert "passed" in law_dict
