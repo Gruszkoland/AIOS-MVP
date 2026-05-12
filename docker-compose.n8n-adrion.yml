@@ -1,0 +1,204 @@
+version: '3.8'
+
+# Docker Compose Override for n8n + ADRION 369 Integration
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.n8n-adrion.yml up
+
+services:
+  # ────────────────────────────────────────────────────────────────────────
+  # ADRION 369 API Backend
+  # ────────────────────────────────────────────────────────────────────────
+  
+  adrion-api:
+    image: adrion369:latest
+    container_name: adrion-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=arbitrage/app.py
+      - DATABASE_URL=postgresql://adrion:adrion@postgres:5432/adrion369
+      - REDIS_URL=redis://redis:6379
+      - CORS_ALLOWED_ORIGIN=http://n8n:5678
+      - LOG_LEVEL=INFO
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-change_me_in_prod}
+    ports:
+      - "8000:5000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - adrion-net
+    volumes:
+      - ./memories:/app/memories
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  # n8n Workflow Engine
+  # ────────────────────────────────────────────────────────────────────────
+  
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-orchestration
+    environment:
+      - WEBHOOK_URL=http://n8n:5678/
+      - GENERIC_TIMEZONE=UTC
+      - DB_TYPE=postgresql
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=n8n_secure_password
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+    ports:
+      - "5678:5678"
+    depends_on:
+      - postgres
+      - adrion-api
+    networks:
+      - adrion-net
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n-workflows:/home/node/.n8n/workflows:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5678/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  # PostgreSQL Database (Shared for ADRION 369 and n8n)
+  # ────────────────────────────────────────────────────────────────────────
+  
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-adrion-n8n
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_secure_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    networks:
+      - adrion-net
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-postgres.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Redis Cache (Shared for caching and queue)
+  # ────────────────────────────────────────────────────────────────────────
+  
+  redis:
+    image: redis:7-alpine
+    container_name: redis-adrion
+    ports:
+      - "6379:6379"
+    networks:
+      - adrion-net
+    command: redis-server --appendonly yes --requirepass redis_secure_password
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Prometheus Monitoring
+  # ────────────────────────────────────────────────────────────────────────
+  
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-adrion
+    ports:
+      - "9090:9090"
+    networks:
+      - adrion-net
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerting_rules.yaml:/etc/prometheus/alerting_rules.yaml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Grafana Dashboards
+  # ────────────────────────────────────────────────────────────────────────
+  
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-adrion
+    ports:
+      - "3000:3000"
+    networks:
+      - adrion-net
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docs/grafana-dashboard.json:/etc/grafana/provisioning/dashboards/adrion-369.json:ro
+      - ./monitoring/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/prometheus.yaml:ro
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+# ────────────────────────────────────────────────────────────────────────────
+# Networks
+# ────────────────────────────────────────────────────────────────────────────
+
+networks:
+  adrion-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ────────────────────────────────────────────────────────────────────────────
+# Volumes
+# ────────────────────────────────────────────────────────────────────────────
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  n8n_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

@@ -35,6 +35,12 @@ logger = logging.getLogger(__name__)
 _SERVER_START = time.time()
 _CORS_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "http://localhost:8003")
 
+# K0 Memory Restoration — Initialize LTM and CVC on app startup
+from arbitrage.memory import k0_memory_restoration, CVCManager
+_k0_result = k0_memory_restoration()
+_cvc_manager = CVCManager()
+logger.info(f"K0 Memory Restoration: {_k0_result['message']}, session_count={_k0_result['session_count']}")
+
 
 def create_app() -> Flask:
     """Create and configure the Flask application with all blueprints."""
@@ -60,6 +66,49 @@ def create_app() -> Flask:
                 if referer_origin not in _ALLOWED_ORIGINS:
                     return jsonify({"error": "Referer not allowed"}), 403
             return None
+
+    # ── CVC State Validation (Salami-Slicing Detection) ──────────────────────
+    @app.before_request
+    def _cvc_check():
+        """CVC state validation before request processing."""
+        from flask import g
+        
+        # Skip health checks and internal endpoints
+        if request.path in ("/metrics", "/health", "/api/docs", "/api/openapi.json"):
+            return None
+        
+        # Get CVC state from module-level manager
+        cvc = _cvc_manager
+        if cvc.state == "RED":
+            logger.warning("CVC RED state detected — rejecting request")
+            return jsonify({"error": "CVC RED — system halted by ethical guardrail"}), 423
+        
+        # Store CVC reference in g for downstream use
+        g.cvc_manager = cvc
+        return None
+
+    # ── K0 Memory Restoration (LTM Profile + TSPA Scores) ──────────────────
+    @app.before_request
+    def _ltm_restore():
+        """K0 Memory Restoration before request."""
+        from arbitrage.memory import LTMManager
+        from flask import g
+        
+        # Skip health checks
+        if request.path in ("/metrics", "/health", "/api/docs", "/api/openapi.json"):
+            return None
+        
+        user_id = request.headers.get("X-User-ID", request.remote_addr or "default")
+        ltm = LTMManager()
+        cvc = g.get("cvc_manager")
+        cold_start, message, metrics = k0_memory_restoration(user_id, ltm, cvc=cvc)
+        
+        # Store in request context for downstream handlers
+        g.ltm_profile = ltm.profile
+        g.ltm_metrics = metrics
+        g.ltm_cold_start = cold_start
+        logger.debug(f"K0 Restore user_id={user_id} cold_start={cold_start}")
+        return None
 
     # ── Register Blueprints ──────────────────────────────────────────────────
     from arbitrage.blueprints.arbitrage_bp import arbitrage_bp
@@ -113,9 +162,17 @@ def create_app() -> Flask:
     @app.route("/metrics", methods=["GET"])
     def handle_metrics():
         """GET /metrics -- Prometheus text format metrics endpoint."""
-        from arbitrage.metrics import pool_metrics
+        from arbitrage.metrics import pool_metrics, get_metrics_collector
+        from arbitrage.memory import CVCManager, LTMManager
+        
         snap = pool_metrics.snapshot()
         uptime = time.time() - _SERVER_START
+        
+        # Collect ADRION 369 subsystem metrics
+        collector = get_metrics_collector()
+        cvc = CVCManager()
+        ltm = LTMManager()
+        adrion_metrics = collector.collect(cvc_mgr=cvc, ltm_mgr=ltm)
 
         lines = [
             "# HELP adrion_requests_total Total requests processed per endpoint",
@@ -144,7 +201,11 @@ def create_app() -> Flask:
             f"adrion_uptime_seconds {uptime:.2f}",
             "",
         ]
-
+        
+        # Add ADRION 369 subsystem metrics
+        adrion_metrics_text = adrion_metrics.to_prometheus_text()
+        lines.append(adrion_metrics_text)
+        
         from flask import Response
         return Response(
             "\n".join(lines),
