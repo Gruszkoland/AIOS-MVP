@@ -37,6 +37,15 @@ class K8sWatcher:
         self.event_queue: queue.Queue = queue.Queue()
         self.stop_flag = False
 
+    @property
+    def is_watching(self) -> bool:
+        """True when watch_thread is alive and stop_flag is not set."""
+        return (
+            self.watch_thread is not None
+            and self.watch_thread.is_alive()
+            and not self.stop_flag
+        )
+
     def _find_kubectl(self) -> Optional[str]:
         """Find kubectl executable"""
         try:
@@ -68,13 +77,13 @@ class K8sWatcher:
     def subscribe(self, event_type: str, callback: Callable):
         """Subscribe to event type with callback"""
         self.subscribers[event_type].append(callback)
-        logger.info(f"Subscribed to {event_type}: {callback.__name__}")
+        logger.info(f"Subscribed to {event_type}: {getattr(callback, '__name__', repr(callback))}")
 
     def unsubscribe(self, event_type: str, callback: Callable):
         """Unsubscribe from event type"""
         if callback in self.subscribers[event_type]:
             self.subscribers[event_type].remove(callback)
-            logger.info(f"Unsubscribed from {event_type}: {callback.__name__}")
+            logger.info(f"Unsubscribed from {event_type}: {getattr(callback, '__name__', repr(callback))}")
 
     def _notify_subscribers(self, event_type: str, data: Dict):
         """Notify all subscribers of event type"""

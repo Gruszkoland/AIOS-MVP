@@ -67,6 +67,7 @@ class Subscription:
     created_at: str
     expires_at: Optional[str]
     bids_used_today: int = 0
+    last_bid_date: Optional[str] = None
 
 
 # ── SQLite-backed subscription store (dev / single-node prod) ─────────────
