@@ -1,0 +1,295 @@
+# Phase 5B Prometheus Alert Rules
+# Monitoring and alerting for Guardian G4 Enhanced deployment
+
+groups:
+  - name: phase5b_g4_enhanced
+    interval: 30s
+    rules:
+      # ======================================================================
+      # ERROR RATE ALERTS
+      # ======================================================================
+
+      - alert: G4_HighErrorRate
+        expr: rate(g4_errors_total[5m]) > 0.001
+        for: 2m
+        labels:
+          severity: critical
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - High Error Rate"
+          description: "Error rate {{ $value | humanizePercentage }} exceeds threshold (0.1%)"
+          runbook: "https://wiki.example.com/phase5b-troubleshooting#high-error-rate"
+
+      - alert: G4_SuddenErrorSpike
+        expr: increase(g4_errors_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Error Spike Detected"
+          description: "Detected {{ $value }} errors in last 5 minutes"
+          action: "Consider immediate rollback if spike persists"
+
+      # ======================================================================
+      # LATENCY ALERTS
+      # ======================================================================
+
+      - alert: G4_HighP95Latency
+        expr: histogram_quantile(0.95, g4_latency_ms) > 2000
+        for: 3m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - High P95 Latency"
+          description: "P95 latency {{ $value | humanizeDuration }}ms exceeds target (2000ms)"
+          investigation: "Check Perplexity API latency, circuit breaker state, cache hit rate"
+
+      - alert: G4_P99LatencySLOBreach
+        expr: histogram_quantile(0.99, g4_latency_ms) > 3000
+        for: 2m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - P99 Latency SLO Breach"
+          description: "P99 latency {{ $value | humanizeDuration }}ms exceeds SLO (3000ms)"
+
+      # ======================================================================
+      # CACHE PERFORMANCE ALERTS
+      # ======================================================================
+
+      - alert: G4_LowCacheHitRate
+        expr: (g4_cache_hits / (g4_cache_hits + g4_cache_misses)) < 0.60
+        for: 5m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Low Cache Hit Rate"
+          description: "Cache hit rate {{ $value | humanizePercentage }} below target (60%)"
+          possible_causes: "Redis connection issue, cache TTL too short, many unique claims"
+
+      # ======================================================================
+      # CIRCUIT BREAKER ALERTS
+      # ======================================================================
+
+      - alert: G4_CircuitBreakerOpen
+        expr: g4_circuit_breaker_state == 1
+        for: 1m
+        labels:
+          severity: critical
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Circuit Breaker OPEN"
+          description: "Perplexity API circuit breaker is OPEN (failure protection)"
+          action: "Check Perplexity API status, investigate API failures"
+          resolution: "Wait 5 minutes for half-open retry, or manually reset"
+
+      - alert: G4_CircuitBreakerHalfOpen
+        expr: g4_circuit_breaker_state == 2
+        for: 3m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Circuit Breaker HALF_OPEN"
+          description: "Circuit breaker recovering from failures - limited retry attempts"
+
+      # ======================================================================
+      # PII DETECTION ALERTS
+      # ======================================================================
+
+      - alert: G4_PiiDetectedInClaims
+        expr: increase(g4_pii_detected_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - PII Detected in Claims"
+          description: "Detected {{ $value }} instances of PII in fact-check claims"
+          action: "Verify PII redaction is working, check claim sources"
+
+      - alert: G4_HighPiiRedactionRate
+        expr: (g4_pii_detected_total / g4_fact_checks_total) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Abnormal PII Redaction Rate"
+          description: "{{ $value | humanizePercentage }} of claims contain PII"
+          investigation: "Check if attack or legitimate use case"
+
+      # ======================================================================
+      # GENESIS RECORD ALERTS
+      # ======================================================================
+
+      - alert: G4_GenesisRecordErrors
+        expr: increase(g4_genesis_write_errors_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Genesis Record Write Failures"
+          description: "Failed to write {{ $value }} Genesis records"
+          action: "Check Genesis database connection, disk space"
+
+      - alert: G4_GenesisRecordBacklog
+        expr: g4_genesis_pending_writes > 100
+        for: 2m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Genesis Write Backlog"
+          description: "{{ $value }} Genesis records pending write"
+          investigation: "Check database throughput, consider scaling"
+
+      # ======================================================================
+      # DEPLOYMENT HEALTH ALERTS
+      # ======================================================================
+
+      - alert: G4_InstanceDown
+        expr: up{job="adrion-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Instance Down"
+          description: "Instance {{ $labels.instance }} is not responding"
+          action: "Check instance health, logs, resource usage"
+
+      - alert: G4_HighMemoryUsage
+        expr: process_resident_memory_bytes{job="adrion-api"} > 1073741824
+        for: 5m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - High Memory Usage"
+          description: "Memory usage {{ $value | humanize }}B (> 1GB)"
+          investigation: "Check for memory leaks, PII redaction overhead"
+
+      - alert: G4_HighCpuUsage
+        expr: rate(process_cpu_seconds_total{job="adrion-api"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - High CPU Usage"
+          description: "CPU usage {{ $value | humanizePercentage }} (> 80%)"
+          investigation: "Check for CPU-intensive operations, scaling needed?"
+
+      # ======================================================================
+      # SLO COMPOSITE ALERTS
+      # ======================================================================
+
+      - alert: G4_MultipleSloBreach
+        expr: (g4_errors_total > 0.001) and (histogram_quantile(0.95, g4_latency_ms) > 2000)
+        for: 2m
+        labels:
+          severity: critical
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Multiple SLO Breaches"
+          description: "Both error rate and latency SLOs are breached"
+          action: "Immediate investigation and possible rollback recommended"
+
+      # ======================================================================
+      # CANARY DEPLOYMENT ALERTS
+      # ======================================================================
+
+      - alert: G4_CanaryErrorRateHigherThanBlue
+        expr: (g4_errors_total{version="v12"} / rate(g4_requests_total{version="v12"}[5m])) > (g4_errors_total{version="v11"} / rate(g4_requests_total{version="v11"}[5m])) * 1.5
+        for: 2m
+        labels:
+          severity: critical
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Canary Error Rate Anomaly"
+          description: "v12 (canary) error rate is {{ $value | humanizePercentage }} higher than v11 (blue)"
+          action: "Stop rollout, investigate v12 issues, consider rollback"
+
+      - alert: G4_CanaryLatencyRegression
+        expr: histogram_quantile(0.95, g4_latency_ms{version="v12"}) > histogram_quantile(0.95, g4_latency_ms{version="v11"}) * 1.3
+        for: 3m
+        labels:
+          severity: warning
+          phase: 5b
+        annotations:
+          summary: "Guardian G4 Enhanced - Canary Latency Regression"
+          description: "v12 P95 latency is {{ $value | humanizePercentage }} higher than v11"
+          investigation: "Check Perplexity API integration, overhead analysis"
+
+  # ============================================================================
+  # AGGREGATION RULES
+  # ============================================================================
+
+  - name: phase5b_aggregation
+    interval: 30s
+    rules:
+      - record: g4:error_rate:5m
+        expr: rate(g4_errors_total[5m])
+
+      - record: g4:latency:p95:5m
+        expr: histogram_quantile(0.95, g4_latency_ms)
+
+      - record: g4:latency:p99:5m
+        expr: histogram_quantile(0.99, g4_latency_ms)
+
+      - record: g4:cache:hit_rate:5m
+        expr: rate(g4_cache_hits[5m]) / (rate(g4_cache_hits[5m]) + rate(g4_cache_misses[5m]))
+
+      - record: g4:slo:status
+        expr: |
+          (g4:error_rate:5m < 0.001) and
+          (g4:latency:p95:5m < 2000) and
+          (g4:cache:hit_rate:5m > 0.60) and
+          (g4_circuit_breaker_state == 0)
+
+# ============================================================================
+# ALERT ROUTING CONFIGURATION (for Alertmanager)
+# ============================================================================
+#
+# Route configuration in alertmanager.yml:
+#
+# route:
+#   receiver: 'phase5b-team'
+#   group_by: ['alertname', 'cluster']
+#   group_wait: 30s
+#   group_interval: 5m
+#   repeat_interval: 4h
+#   routes:
+#     - match:
+#         phase: '5b'
+#         severity: 'critical'
+#       receiver: 'phase5b-critical'
+#       group_wait: 0s
+#       repeat_interval: 1h
+#
+#     - match:
+#         phase: '5b'
+#         severity: 'warning'
+#       receiver: 'phase5b-warnings'
+#       group_wait: 5m
+#
+# receivers:
+#   - name: 'phase5b-team'
+#     slack_configs:
+#       - channel: '#phase5b-alerts'
+#         api_url: 'https://hooks.slack.com/services/...'
+#
+#   - name: 'phase5b-critical'
+#     slack_configs:
+#       - channel: '#phase5b-critical'
+#         api_url: 'https://hooks.slack.com/services/...'
+#     pagerduty_configs:
+#       - routing_key: 'YOUR_ROUTING_KEY'
+#
+# ============================================================================
