@@ -1,0 +1,213 @@
+{
+  "dashboard": {
+    "title": "ADRION 369 Observability",
+    "description": "Real-time monitoring of ADRION 369 subsystems: CVC, Guardian Laws, Genesis Record, TSPA",
+    "tags": ["adrion", "observability", "prometheus"],
+    "timezone": "UTC",
+    "panels": [
+      {
+        "title": "CVC State Timeline",
+        "type": "timeseries",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "cvc_state_value",
+            "legendFormat": "CVC State",
+            "refId": "A"
+          },
+          {
+            "expr": "cvc_counter",
+            "legendFormat": "CVC Counter",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "lineWidth": 2,
+              "pointSize": 5
+            }
+          }
+        }
+      },
+      {
+        "title": "CVC Status Gauge",
+        "type": "gauge",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "cvc_counter",
+            "legendFormat": "Current CVC",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 3
+              },
+              {
+                "color": "orange",
+                "value": 6
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        }
+      },
+      {
+        "title": "Guardian Law Violations Heatmap",
+        "type": "heatmap",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 18,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "guardian_violations_total",
+            "legendFormat": "{{law}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Genesis Record Throughput",
+        "type": "graph",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(genesis_records_total[5m])",
+            "legendFormat": "Records/min",
+            "refId": "A"
+          },
+          {
+            "expr": "genesis_records_by_type",
+            "legendFormat": "{{action_type}}",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "title": "TSPA Score Distribution",
+        "type": "bargauge",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "targets": [
+          {
+            "expr": "tspa_score_by_agent",
+            "legendFormat": "{{agent}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0.60
+              },
+              {
+                "color": "yellow",
+                "value": 0.75
+              },
+              {
+                "color": "green",
+                "value": 0.85
+              }
+            ]
+          },
+          "showValue": "auto"
+        }
+      },
+      {
+        "title": "LTM Session Activity",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        },
+        "targets": [
+          {
+            "expr": "ltm_session_count",
+            "legendFormat": "Sessions",
+            "refId": "A"
+          },
+          {
+            "expr": "ltm_cold_start",
+            "legendFormat": "Cold Start",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "title": "Critical Violations Alert",
+        "type": "alert",
+        "gridPos": {
+          "h": 4,
+          "w": 24,
+          "x": 0,
+          "y": 24
+        },
+        "alert": {
+          "name": "Guardian Critical Violations",
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [5],
+                "type": "gt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": ["guardian_critical_violations_total", "5m"]
+              },
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "for": "5m",
+          "frequency": "1m",
+          "handler": 1,
+          "message": "CRITICAL: More than 5 Guardian critical violations in 5 minutes",
+          "noDataState": "no_data"
+        }
+      }
+    ],
+    "version": 1
+  }
+}
