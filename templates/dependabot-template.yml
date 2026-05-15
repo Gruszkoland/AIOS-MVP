@@ -1,0 +1,65 @@
+version: 2
+updates:
+  # Python (pip)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+      timezone: "Europe/Warsaw"
+    auto-merge:
+      enabled: true
+      method: "squash"
+      strategy: "auto"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      # Exclude Python RC versions
+      - dependency-name: "python"
+        versions: ["*-rc*", "*-alpha*", "*-beta*"]
+    reviewers:
+      - "Gruszkoland"
+    assignees:
+      - "Gruszkoland"
+    commit-message:
+      prefix: "deps(pip):"
+      prefix-development: "deps(pip-dev):"
+
+  # Go modules
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "02:30"
+      timezone: "Europe/Warsaw"
+    auto-merge:
+      enabled: true
+      method: "squash"
+      strategy: "auto"
+
+  # Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "Europe/Warsaw"
+    auto-merge:
+      enabled: true
+      method: "squash"
+      strategy: "auto"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "03:30"
+      timezone: "Europe/Warsaw"
+    auto-merge:
+      enabled: true
+      method: "squash"
+      strategy: "auto"

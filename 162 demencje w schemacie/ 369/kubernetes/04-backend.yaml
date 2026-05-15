@@ -1,0 +1,229 @@
+---
+# ADRION 369 — UAP Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uap-backend
+  namespace: adrion
+  labels:
+    app: uap-backend
+    component: api
+spec:
+  replicas: 3  # 3 pods dla high availability
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0  # Zero downtime deployment
+
+  selector:
+    matchLabels:
+      app: uap-backend
+
+  template:
+    metadata:
+      labels:
+        app: uap-backend
+        component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8002"
+        prometheus.io/path: "/metrics"
+
+    spec:
+      # Service account
+      serviceAccountName: uap-backend-sa
+
+      # Security context
+      securityContext:
+        runAsUser: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
+
+      # Init container — wait for PostgreSQL
+      initContainers:
+      - name: wait-for-postgres
+        image: busybox:1.35
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for PostgreSQL..."
+          while ! nc -z postgres.adrion.svc.cluster.local 5432; do
+            echo "PostgreSQL not ready, waiting..."
+            sleep 2
+          done
+          echo "PostgreSQL is ready"
+        env:
+        - name: NC_PATH
+          value: "ncat"
+
+      containers:
+      - name: uap-backend
+        image: uap-backend:latest  # Build locally or from registry
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - name: http
+          containerPort: 8002
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090  # Prometheus metrics (if exposed)
+          protocol: TCP
+
+        # Environment
+        envFrom:
+        - configMapRef:
+            name: adrion-config
+        - secretRef:
+            name: adrion-secrets
+
+        env:
+        - name: PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: adrion-secrets
+              key: PG_PASSWORD
+        - name: UAP_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: adrion-secrets
+              key: UAP_API_KEY
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: adrion-secrets
+              key: JWT_SECRET
+        - name: DRM_HMAC_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: adrion-secrets
+              key: DRM_HMAC_SECRET
+
+        # Resources
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+
+        # Liveness probe (restart if not responding)
+        livenessProbe:
+          httpGet:
+            path: /mapi/v1/status
+            port: 8002
+            httpHeaders:
+            - name: X-API-Key
+              value: "local-dev-key-123"  # Must match UAP_API_KEY in ConfigMap
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        # Readiness probe (ready to receive traffic)
+        readinessProbe:
+          httpGet:
+            path: /mapi/v1/status
+            port: 8002
+            httpHeaders:
+            - name: X-API-Key
+              value: "local-dev-key-123"
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+
+        # Security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+
+      # Affinity
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - uap-backend
+              topologyKey: kubernetes.io/hostname
+
+      # Tolerations
+      tolerations:
+      - key: "app"
+        operator: "Equal"
+        value: "backend"
+        effect: "NoSchedule"
+
+      terminationGracePeriodSeconds: 30
+
+---
+# Service Account dla Backend
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: uap-backend-sa
+  namespace: adrion
+
+---
+# Role dla Backend (minimal permissions)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: uap-backend-role
+  namespace: adrion
+rules:
+- apiGroups: [""]
+  resources: ["secrets", "configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["endpoints"]
+  verbs: ["get", "list"]
+
+---
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: uap-backend-rolebinding
+  namespace: adrion
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: uap-backend-role
+subjects:
+- kind: ServiceAccount
+  name: uap-backend-sa
+  namespace: adrion
+
+---
+# Service Backend
+apiVersion: v1
+kind: Service
+metadata:
+  name: uap-backend
+  namespace: adrion
+  labels:
+    app: uap-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: uap-backend
+  ports:
+  - name: http
+    port: 8002
+    targetPort: 8002
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
