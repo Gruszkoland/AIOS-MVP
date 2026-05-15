@@ -1,0 +1,81 @@
+{
+    "name": "ADRION Development Environment",
+    "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bullseye",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "lts"
+        },
+        "ghcr.io/devcontainers/features/go:1": {
+            "version": "latest"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-docker.docker",
+                "ms-kubernetes.vscode-kubernetes-tools",
+                "eamodio.gitlens",
+                "ms-vscode.makefile-tools",
+                "golang.go",
+                "hashicorp.terraform",
+                "ms-azuretools.vscode-docker",
+                "ms-vscode-remote.remote-containers"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "ms-python.python",
+                "[python]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "ms-python.python"
+                }
+            }
+        }
+    },
+    "containerEnv": {
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONIOENCODING": "utf-8"
+    },
+    "postCreateCommand": "bash scripts/devcontainer-setup.sh || echo 'Setup script not found'",
+    "remoteUser": "vscode",
+    "onCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt 2>/dev/null || echo 'No Python requirements found'",
+    "forwardPorts": [
+        8000,
+        8001,
+        8888,
+        5000,
+        3000,
+        9090,
+        6379
+    ],
+    "portsAttributes": {
+        "8000": {
+            "label": "Django/API Server",
+            "onAutoForward": "notify"
+        },
+        "5000": {
+            "label": "Flask Server",
+            "onAutoForward": "notify"
+        },
+        "3000": {
+            "label": "Frontend Dev",
+            "onAutoForward": "notify"
+        },
+        "9090": {
+            "label": "Prometheus",
+            "onAutoForward": "notify"
+        },
+        "6379": {
+            "label": "Redis",
+            "onAutoForward": "notify"
+        }
+    }
+}

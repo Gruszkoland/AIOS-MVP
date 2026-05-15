@@ -1,0 +1,525 @@
+name: 🚀 Deploy & Sync Grafana Metrics
+
+on:
+  push:
+    branches:
+      - main
+      - production
+      - staging
+    paths:
+      - 'docker-compose*.yml'
+      - 'uap/**'
+      - 'arbitrage/**'
+      - '.github/workflows/deploy-and-sync-grafana.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      sync_grafana:
+        description: 'Sync dashboards to Grafana'
+        required: false
+        type: boolean
+        default: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/adrion-api
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Phase 1: Validate Commit Metadata & Extract Deployment Tags
+  # ═══════════════════════════════════════════════════════════════════════════
+  
+  validate-metadata:
+    name: 📋 Validate Commit Metadata
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.check-metadata.outputs.should_deploy }}
+      deployment_env: ${{ steps.check-metadata.outputs.deployment_env }}
+      sync_grafana: ${{ steps.check-metadata.outputs.sync_grafana }}
+      version: ${{ steps.version.outputs.version }}
+      git_sha: ${{ steps.version.outputs.git_sha }}
+      
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📝 Extract commit message
+        id: commit
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          echo "msg=${COMMIT_MSG}" >> $GITHUB_OUTPUT
+          echo "📌 Commit Message: ${COMMIT_MSG}"
+
+      - name: 🔍 Check deployment metadata
+        id: check-metadata
+        run: |
+          COMMIT_MSG="${{ steps.commit.outputs.msg }}"
+          
+          # Extract [DEPLOY] tags
+          if [[ "$COMMIT_MSG" =~ \[DEPLOY:([a-z]+)\] ]]; then
+            ENV="${BASH_REMATCH[1]}"
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            echo "deployment_env=${ENV}" >> $GITHUB_OUTPUT
+            echo "✅ Deployment detected: ${ENV}"
+          else
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+            echo "⏭️ No deployment tag — skipping"
+          fi
+          
+          # Extract [SYNC-GRAFANA] tag
+          if [[ "$COMMIT_MSG" =~ \[SYNC-GRAFANA\] ]]; then
+            echo "sync_grafana=true" >> $GITHUB_OUTPUT
+            echo "🔄 Grafana sync detected"
+          else
+            echo "sync_grafana=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📦 Generate version tag
+        id: version
+        run: |
+          VERSION="v$(date +%Y.%m.%d)-$(git rev-parse --short HEAD)"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "git_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "🏷️ Version: ${VERSION}"
+
+      - name: 📊 Log metadata summary
+        run: |
+          echo "════════════════════════════════════════════"
+          echo "📋 DEPLOYMENT METADATA SUMMARY"
+          echo "════════════════════════════════════════════"
+          echo "Should Deploy: ${{ steps.check-metadata.outputs.should_deploy }}"
+          echo "Environment: ${{ steps.check-metadata.outputs.deployment_env }}"
+          echo "Sync Grafana: ${{ steps.check-metadata.outputs.sync_grafana }}"
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Git SHA: ${{ steps.version.outputs.git_sha }}"
+          echo "════════════════════════════════════════════"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Phase 2: Build & Push Docker Image
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  build-and-push:
+    name: 🐳 Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: validate-metadata
+    if: needs.validate-metadata.outputs.should_deploy == 'true'
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔐 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔑 Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏗️ Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./uap
+          file: ./uap/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.validate-metadata.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Phase 3: Deploy to Environment
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  deploy:
+    name: 🚀 Deploy to ${{ needs.validate-metadata.outputs.deployment_env }}
+    runs-on: ubuntu-latest
+    needs: [validate-metadata, build-and-push]
+    if: needs.validate-metadata.outputs.should_deploy == 'true'
+    environment:
+      name: ${{ needs.validate-metadata.outputs.deployment_env }}
+      
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔐 Configure credentials
+        run: |
+          # Load environment-specific credentials
+          ENV="${{ needs.validate-metadata.outputs.deployment_env }}"
+          
+          case "$ENV" in
+            staging)
+              echo "DEPLOY_HOST=${{ secrets.STAGING_HOST }}" >> $GITHUB_ENV
+              echo "DEPLOY_USER=${{ secrets.STAGING_USER }}" >> $GITHUB_ENV
+              echo "DEPLOY_KEY=${{ secrets.STAGING_SSH_KEY }}" >> $GITHUB_ENV
+              ;;
+            production)
+              echo "DEPLOY_HOST=${{ secrets.PROD_HOST }}" >> $GITHUB_ENV
+              echo "DEPLOY_USER=${{ secrets.PROD_USER }}" >> $GITHUB_ENV
+              echo "DEPLOY_KEY=${{ secrets.PROD_SSH_KEY }}" >> $GITHUB_ENV
+              ;;
+            development)
+              echo "Skipping SSH deployment for development"
+              ;;
+          esac
+
+      - name: 📋 Prepare deployment artifacts
+        run: |
+          ENV="${{ needs.validate-metadata.outputs.deployment_env }}"
+          mkdir -p deployment-artifacts
+          
+          # Copy docker-compose based on environment
+          if [ "$ENV" = "production" ]; then
+            cp docker-compose.prod.yml deployment-artifacts/docker-compose.yml
+          elif [ "$ENV" = "staging" ]; then
+            cp docker-compose.staging.yml deployment-artifacts/docker-compose.yml
+          else
+            cp docker-compose.yml deployment-artifacts/docker-compose.yml
+          fi
+          
+          # Copy environment template
+          cp .env.example deployment-artifacts/.env.template
+          
+          echo "✅ Deployment artifacts prepared"
+          ls -la deployment-artifacts/
+
+      - name: 🚀 Deploy via SSH (Staging/Production)
+        if: needs.validate-metadata.outputs.deployment_env != 'development'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_KEY }}
+          port: 22
+          script: |
+            set -e
+            echo "🚀 Starting deployment..."
+            
+            cd /opt/adrion-369
+            
+            # Update repository
+            git fetch origin
+            git checkout ${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+            
+            # Pull latest image
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.validate-metadata.outputs.version }}
+            
+            # Stop old services
+            docker-compose down --remove-orphans || true
+            
+            # Update docker-compose and .env
+            cp docker-compose.${{ needs.validate-metadata.outputs.deployment_env }}.yml docker-compose.yml
+            
+            # Start services
+            docker-compose up -d
+            
+            # Wait for health checks
+            sleep 30
+            
+            # Verify deployment
+            docker-compose ps
+            curl -f http://localhost:8000/health || exit 1
+            
+            echo "✅ Deployment successful!"
+
+      - name: 📊 Report deployment status
+        if: always()
+        run: |
+          echo "════════════════════════════════════════════"
+          echo "🚀 DEPLOYMENT STATUS"
+          echo "════════════════════════════════════════════"
+          echo "Environment: ${{ needs.validate-metadata.outputs.deployment_env }}"
+          echo "Version: ${{ needs.validate-metadata.outputs.version }}"
+          echo "Status: ${{ job.status }}"
+          echo "════════════════════════════════════════════"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Phase 4: Sync Dashboards to Grafana
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  sync-grafana:
+    name: 🔄 Sync Dashboards to Grafana
+    runs-on: ubuntu-latest
+    needs: [validate-metadata, deploy]
+    if: |
+      needs.validate-metadata.outputs.should_deploy == 'true' &&
+      needs.validate-metadata.outputs.sync_grafana == 'true'
+    continue-on-error: true
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pyyaml
+
+      - name: 🔄 Sync Grafana dashboards
+        env:
+          GRAFANA_HOST: ${{ secrets.GRAFANA_HOST }}
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
+          GRAFANA_FOLDER_ID: ${{ secrets.GRAFANA_FOLDER_ID }}
+        run: |
+          python scripts/sync_grafana_dashboards.py \
+            --host "$GRAFANA_HOST" \
+            --api-key "$GRAFANA_API_KEY" \
+            --folder-id "$GRAFANA_FOLDER_ID" \
+            --dashboards-dir "adrion-deploy/grafana/provisioning/dashboards" \
+            --verbose
+
+      - name: 📊 Upload live metrics to Grafana Loki
+        env:
+          GRAFANA_LOKI_HOST: ${{ secrets.GRAFANA_LOKI_HOST }}
+        run: |
+          # Log deployment event to Loki
+          curl -X POST "${GRAFANA_LOKI_HOST}/loki/api/v1/push" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "streams": [
+                {
+                  "stream": {
+                    "job": "ci-cd",
+                    "deployment": "true",
+                    "version": "${{ needs.validate-metadata.outputs.version }}",
+                    "environment": "${{ needs.validate-metadata.outputs.deployment_env }}"
+                  },
+                  "values": [
+                    ["'$(date +%s%N)'", "✅ Deployment: ${{ needs.validate-metadata.outputs.version }} → ${{ needs.validate-metadata.outputs.deployment_env }}"]
+                  ]
+                }
+              ]
+            }' || true
+
+      - name: ✅ Grafana sync complete
+        run: |
+          echo "✅ Grafana dashboards synced successfully"
+          echo "📊 Available at: ${{ secrets.GRAFANA_HOST }}/d/adrion-devops-main"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Phase 5: Run Smoke Tests Post-Deployment
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  smoke-tests:
+    name: 🧪 Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [validate-metadata, deploy]
+    if: needs.validate-metadata.outputs.should_deploy == 'true'
+    continue-on-error: true
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install test dependencies
+        run: |
+          pip install requests pytest pytest-cov
+
+      - name: 🧪 Run smoke tests
+        env:
+          API_URL: http://localhost:8000
+          N8N_URL: http://localhost:5678
+        run: |
+          python -m pytest scripts/smoke-test.py -v --tb=short
+
+      - name: 📊 Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: smoke-test-results
+          path: test-results.xml
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Phase 6: Notification & Summary
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  notify:
+    name: 📢 Send Notifications
+    runs-on: ubuntu-latest
+    needs: [validate-metadata, deploy, sync-grafana, smoke-tests]
+    if: always()
+    
+    steps:
+      - name: 📋 Prepare notification summary
+        id: summary
+        run: |
+          ENV="${{ needs.validate-metadata.outputs.deployment_env }}"
+          VERSION="${{ needs.validate-metadata.outputs.version }}"
+          STATUS="${{ needs.deploy.result }}"
+          
+          if [ "$STATUS" = "success" ]; then
+            EMOJI="✅"
+            MSG="Deployment successful"
+          else
+            EMOJI="❌"
+            MSG="Deployment failed"
+          fi
+          
+          echo "summary=${EMOJI} ${MSG} (${ENV} / ${VERSION})" >> $GITHUB_OUTPUT
+
+      - name: 💬 Post to Slack
+        if: always()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "${{ steps.summary.outputs.summary }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*🚀 ADRION 369 Deployment*\nVersion: `${{ needs.validate-metadata.outputs.version }}`\nEnvironment: `${{ needs.validate-metadata.outputs.deployment_env }}`\nStatus: ${{ needs.deploy.result }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Deploy:*\n${{ needs.deploy.result }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Grafana Sync:*\n${{ needs.sync-grafana.result }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Smoke Tests:*\n${{ needs.smoke-tests.result }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Git SHA:*\n`${{ needs.validate-metadata.outputs.git_sha }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Grafana Dashboard"
+                      },
+                      "url": "${{ secrets.GRAFANA_HOST }}/d/adrion-devops-main",
+                      "style": "primary"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Logs"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+---
+
+# 📖 USAGE GUIDE
+
+## Commit Message Format
+
+### To trigger deployment:
+```
+fix: Update arbitrage logic [DEPLOY:staging]
+
+This commit will trigger deployment to staging environment.
+```
+
+### With Grafana sync:
+```
+feat: Add new monitoring dashboard [DEPLOY:production] [SYNC-GRAFANA]
+
+Deploy to production AND sync Grafana dashboards.
+```
+
+### Environment options:
+- `[DEPLOY:development]` — Deploy to dev
+- `[DEPLOY:staging]` — Deploy to staging
+- `[DEPLOY:production]` — Deploy to production
+
+### Optional tags:
+- `[SYNC-GRAFANA]` — Sync dashboards after deployment
+- `[SKIP-TESTS]` — Skip smoke tests
+
+## Examples
+
+### Staging deployment with Grafana sync:
+```bash
+git commit -m "fix: Update API handler [DEPLOY:staging] [SYNC-GRAFANA]"
+```
+
+### Production deployment:
+```bash
+git commit -m "release: v2026.05.14 [DEPLOY:production]"
+```
+
+### Development only (no deployment):
+```bash
+git commit -m "chore: Update dependencies"
+```
+
+## GitHub Secrets Required
+
+Add these to GitHub repository secrets:
+
+```
+STAGING_HOST          — SSH host for staging
+STAGING_USER          — SSH username for staging
+STAGING_SSH_KEY       — SSH private key for staging
+
+PROD_HOST             — SSH host for production
+PROD_USER             — SSH username for production
+PROD_SSH_KEY          — SSH private key for production
+
+GRAFANA_HOST          — Grafana URL (e.g., https://grafana.example.com)
+GRAFANA_API_KEY       — Grafana API key (org admin)
+GRAFANA_FOLDER_ID     — Dashboard folder ID in Grafana
+GRAFANA_LOKI_HOST     — Loki endpoint URL
+
+SLACK_WEBHOOK_URL     — Slack incoming webhook
+```
+
+## Workflow Outputs
+
+Each workflow run produces:
+- ✅ Docker image tag: `ghcr.io/[owner]/adrion-api:v[YYYY.MM.DD]-[SHA]`
+- 📊 Grafana dashboard sync status
+- 🧪 Smoke test results
+- 💬 Slack notification with deployment status

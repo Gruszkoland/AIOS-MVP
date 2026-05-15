@@ -1,0 +1,153 @@
+---
+# ADRION 369 — UAP Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uap-frontend
+  namespace: adrion
+  labels:
+    app: uap-frontend
+    component: ui
+spec:
+  replicas: 2  # 2 replicas dla HA
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  selector:
+    matchLabels:
+      app: uap-frontend
+
+  template:
+    metadata:
+      labels:
+        app: uap-frontend
+        component: ui
+
+    spec:
+      # Security context
+      securityContext:
+        runAsUser: 1000
+        runAsNonRoot: true
+
+      # Init container — wait for Backend
+      initContainers:
+      - name: wait-for-backend
+        image: busybox:1.35
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for UAP Backend..."
+          while ! nc -z uap-backend.adrion.svc.cluster.local 8002; do
+            echo "Backend not ready, waiting..."
+            sleep 2
+          done
+          echo "Backend is ready"
+
+      containers:
+      - name: uap-frontend
+        image: python:3.11-slim
+        imagePullPolicy: IfNotPresent
+
+        command:
+        - python
+        - -m
+        - http.server
+        - "8003"
+        - --directory
+        - /app/uap/frontend
+
+        ports:
+        - name: http
+          containerPort: 8003
+          protocol: TCP
+
+        # Environment
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+
+        # Volume mount
+        volumeMounts:
+        - name: frontend-code
+          mountPath: /app/uap/frontend
+          readOnly: true
+
+        # Resources
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+
+        # Liveness probe
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8003
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        # Readiness probe
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8003
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 2
+
+        # Security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+
+      # Volumes (code from ConfigMap or mounted)
+      volumes:
+      - name: frontend-code
+        emptyDir: {}
+
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - uap-frontend
+              topologyKey: kubernetes.io/hostname
+
+      terminationGracePeriodSeconds: 10
+
+---
+# Service Frontend
+apiVersion: v1
+kind: Service
+metadata:
+  name: uap-frontend
+  namespace: adrion
+  labels:
+    app: uap-frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: uap-frontend
+  ports:
+  - name: http
+    port: 8003
+    targetPort: 8003
+    protocol: TCP

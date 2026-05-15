@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADRION 369 — Kompleksowy Ekosystem (33 Agentów + DevOps)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid rgba(156, 39, 176, 0.3);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #9c27b0, #2196f3, #00bcd4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #b0bec5;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #9c27b0;
+            border-radius: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #90caf9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 5px;
+        }
+
+        .diagram-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            overflow-x: auto;
+            min-height: 800px;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border-left: 4px solid #fff;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .legend-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .legend-description {
+            font-size: 0.9em;
+            color: #b0bec5;
+            line-height: 1.4;
+        }
+
+        .color-green {
+            background-color: #4caf50;
+        }
+
+        .color-orange {
+            background-color: #ff9800;
+        }
+
+        .color-red-orange {
+            background-color: #ff5722;
+        }
+
+        .color-red {
+            background-color: #d32f2f;
+        }
+
+        .color-blue {
+            background-color: #2196f3;
+        }
+
+        .color-purple {
+            background-color: #9c27b0;
+        }
+
+        .color-pink {
+            background-color: #f06292;
+        }
+
+        .color-yellow {
+            background-color: #fbc02d;
+        }
+
+        .export-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .export-button {
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .export-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(156, 39, 176, 0.4);
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 0.9em;
+            color: #90caf9;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .info-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .info-card h3 {
+            color: #90caf9;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .info-card p {
+            color: #b0bec5;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .info-card ul {
+            color: #b0bec5;
+            margin-left: 20px;
+            font-size: 0.95em;
+        }
+
+        .info-card li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🔱 ADRION 369 — Kompleksowy Ekosystem</h1>
+            <p class="subtitle">33 Agentów + DevOps Pipeline + Monitoring</p>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-label">Całkowite Agenty</div>
+                    <div class="stat-value">33</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Gems (Domain Specialists)</div>
+                    <div class="stat-value">32</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Meta-Guardian</div>
+                    <div class="stat-value">1</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">ROPE 2.0 Gaps</div>
+                    <div class="stat-value">28/32</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Guardian Laws</div>
+                    <div class="stat-value">11</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Prometheus Metrics</div>
+                    <div class="stat-value">13</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="diagram-container">
+            <div class="mermaid">
+                graph TB
+                subgraph META["🔱 META-LAYER (Chronos #33 — Strażnik)"]
+                CHR["Chronos<br />Synthesis, Integrity<br />EXEMPT from ROPE 2.0"]
+                style CHR fill:#9c27b0,stroke:#fff,color:#fff,font-weight:bold
+                end
+
+                subgraph GEMS["32 GEMS — Domain Specialists"]
+                subgraph TIER1["🟢 CRITICAL (OUTPUT_SPEC ✓)"]
+                MPG["MPG<br />Marketing<br />Production"]
+                CVA["CVA<br />Customer<br />Validation"]
+                LCA["LCA<br />Lifecycle<br />Analysis"]
+                end
+
+                subgraph TIER2["🟡 HIGH (OUTPUT_SPEC ✗)"]
+                SEO["SEO<br />Search Opt"]
+                EDU["EDU<br />Education"]
+                VAP["VAP<br />Value<br />Prop"]
+                end
+
+                subgraph TIER3["🟠 MEDIUM (Gaps: 28/32)"]
+                CRM["CRM<br />Relations"]
+                KMS["KMS<br />Knowledge"]
+                HRR["HRR<br />Resources"]
+                PMO["PMO<br />Project Mgmt"]
+                end
+
+                subgraph TIER4["🔴 STUBS (3/32)"]
+                PWB["PWB<br />Web Builder<br />⚠️ TODO"]
+                CEC["CEC<br />Content"]
+                UXD["UXD<br />UX Design"]
+                end
+
+                style TIER1 fill:#4caf50,stroke:#2e7d32,color:#fff
+                style TIER2 fill:#ff9800,stroke:#e65100,color:#fff
+                style TIER3 fill:#ff5722,stroke:#d84315,color:#fff
+                style TIER4 fill:#d32f2f,stroke:#b71c1c,color:#fff
+                end
+
+                subgraph GAPS["🚨 ROPE 2.0 GAPS (32 Gems Only)"]
+                INPUT["❌ INPUT_SCHEMA<br />28/32 missing"]
+                OUTPUT["❌ OUTPUT_SPEC<br />21/32 missing"]
+                INVOKE["❌ INVOKE_WHEN<br />28/32 missing"]
+                ESCAL["❌ ESCALATION<br />28/32 missing"]
+
+                style INPUT fill:#d32f2f,stroke:#fff,color:#fff
+                style OUTPUT fill:#d32f2f,stroke:#fff,color:#fff
+                style INVOKE fill:#d32f2f,stroke:#fff,color:#fff
+                style ESCAL fill:#d32f2f,stroke:#fff,color:#fff
+                end
+
+                subgraph INFRA["🏗️ INFRASTRUCTURE"]
+                API["ADRION API<br />FastAPI<br />port 8000"]
+                N8N["n8n Orchestrator<br />Workflow Engine<br />port 5678"]
+                DB["PostgreSQL<br />Genesis Records<br />port 5432"]
+                REDIS["Redis Cache<br />LTM Layer<br />port 6379"]
+                PROM["Prometheus<br />Metrics<br />port 9090"]
+                GRAF["Grafana<br />Dashboards<br />port 3000"]
+
+                style API fill:#2196f3,stroke:#1565c0,color:#fff
+                style N8N fill:#ff6f00,stroke:#e65100,color:#fff
+                style DB fill:#00bcd4,stroke:#00838f,color:#fff
+                style REDIS fill:#9c27b0,stroke:#6a1b9a,color:#fff
+                style PROM fill:#fbc02d,stroke:#f57f17,color:#000
+                style GRAF fill:#f06292,stroke:#880e4f,color:#fff
+                end
+
+                subgraph SERVICES["🔧 SERVICES & MIDDLEWARE"]
+                CVC["CVC Manager<br />Cumulative Violations<br />4-state machine"]
+                LTM["LTM Restoration<br />Long-Term Memory<br />K0 Pipeline"]
+                GUARDIAN["Guardian Laws v11<br />11 compliance rules<br />Threshold: 4"]
+                HARMONIA["HARMONIA Gateway<br />MCP Routing<br />Flag System"]
+
+                style CVC fill:#4caf50,stroke:#2e7d32,color:#fff
+                style LTM fill:#4caf50,stroke:#2e7d32,color:#fff
+                style GUARDIAN fill:#ffc107,stroke:#f57f17,color:#000
+                style HARMONIA fill:#2196f3,stroke:#1565c0,color:#fff
+                end
+
+                subgraph METRICS["📊 METRICS & MONITORING"]
+                EXPORT["Live Metrics Export<br />/api/metrics/export<br />JSON endpoint"]
+                SYNC["Grafana Sync Script<br />Dashboard upload<br />CLI tool"]
+                CICD["GitHub Actions<br />CI/CD Pipeline<br />auto-deploy"]
+
+                style EXPORT fill:#673ab7,stroke:#512da8,color:#fff
+                style SYNC fill:#673ab7,stroke:#512da8,color:#fff
+                style CICD fill:#673ab7,stroke:#512da8,color:#fff
+                end
+
+                CHR -->|coordinates| MPG
+                CHR -->|monitors| GUARDIAN
+                CHR -->|observes| GAPS
+
+                MPG --> INPUT
+                CVA --> OUTPUT
+                LCA --> INVOKE
+
+                API --> N8N
+                N8N --> DB
+                API --> REDIS
+                REDIS --> LTM
+
+                API --> PROM
+                PROM --> GRAF
+
+                CVC -->|state transitions| API
+                LTM -->|restores| API
+                GUARDIAN -->|evaluates| API
+                HARMONIA -->|routes| N8N
+
+                API --> EXPORT
+                EXPORT --> SYNC
+                CICD -->|triggers| API
+                CICD -->|syncs| SYNC
+
+                GRAF -->|visualizes| PROM
+                N8N -->|logs| DB
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>🔱 Chronos #33 (Meta-Guardian)</h3>
+                <p><strong>Status:</strong> ✅ OPERATIONAL</p>
+                <p><strong>Rola:</strong> Strażnik Pól Pierwotnej Informacji</p>
+                <p><strong>Funkcje:</strong></p>
+                <ul>
+                    <li>Synthesis & integration</li>
+                    <li>Integrity monitoring</li>
+                    <li>Archetypal guidance</li>
+                    <li>EXEMPT from ROPE 2.0 audit</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3>🟢 32 Gems (Domain Specialists)</h3>
+                <p><strong>Tiered by Readiness:</strong></p>
+                <ul>
+                    <li>🟢 3 gems — OUTPUT_SPEC complete</li>
+                    <li>🟡 ~10 gems — High priority fixes</li>
+                    <li>🟠 ~15 gems — Medium priority</li>
+                    <li>🔴 3 gems — Stubs (TODO)</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3>🚨 ROPE 2.0 Critical Gaps</h3>
+                <p><strong>Affecting 32 Gems Only:</strong></p>
+                <ul>
+                    <li>28/32 missing INPUT_SCHEMA</li>
+                    <li>21/32 missing OUTPUT_SPEC</li>
+                    <li>28/32 missing INVOKE_WHEN</li>
+                    <li>28/32 missing ESCALATION paths</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3>🏗️ Infrastructure Stack</h3>
+                <p><strong>6 Core Services:</strong></p>
+                <ul>
+                    <li>ADRION API (FastAPI, 8000)</li>
+                    <li>n8n (Orchestration, 5678)</li>
+                    <li>PostgreSQL (Genesis, 5432)</li>
+                    <li>Redis (LTM Cache, 6379)</li>
+                    <li>Prometheus (Metrics, 9090)</li>
+                    <li>Grafana (Dashboards, 3000)</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3>🔧 Services & Middleware</h3>
+                <p><strong>Compliance Engine:</strong></p>
+                <ul>
+                    <li>CVC Manager (4-state violations)</li>
+                    <li>LTM Restoration (K0 pipeline)</li>
+                    <li>Guardian Laws v11 (11 rules)</li>
+                    <li>HARMONIA Gateway (MCP routing)</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3>📊 Monitoring & DevOps</h3>
+                <p><strong>3 New Capabilities:</strong></p>
+                <ul>
+                    <li>Live Metrics Export (/api/metrics)</li>
+                    <li>Grafana Sync Script (CLI tool)</li>
+                    <li>GitHub Actions CI/CD (auto-deploy)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color color-purple"></span>Meta-Layer
+                </div>
+                <div class="legend-description">Chronos #33 — Synthesis & integrity monitoring</div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color color-green"></span>Green (✓ Ready)
+                </div>
+                <div class="legend-description">OUTPUT_SPEC defined, production-ready</div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color color-orange"></span>Orange (⚠️ High)
+                </div>
+                <div class="legend-description">OUTPUT_SPEC missing, needs attention</div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color color-red-orange"></span>Red-Orange (🟠 Medium)
+                </div>
+                <div class="legend-description">Multiple ROPE 2.0 gaps, remediation needed</div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color color-red"></span>Red (🔴 Critical)
+                </div>
+                <div class="legend-description">Placeholder stubs, incomplete implementations</div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color color-blue"></span>Blue (Infrastructure)
+                </div>
+                <div class="legend-description">Core APIs, orchestration, databases</div>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <h3>📥 Opcje Eksportu</h3>
+            <p>Plik HTML zawiera interaktywny Mermaid diagram. Możesz go:</p>
+            <ul style="margin: 15px 0; list-style: none;">
+                <li>✅ Przeglądać w przeglądarce (interaktywny zoom/pan)</li>
+                <li>✅ Pobrać jako stronę HTML</li>
+                <li>✅ Wydrukować do PDF (Ctrl+P)</li>
+                <li>✅ Edytować kod Mermaid wewnątrz HTML</li>
+            </ul>
+            <button class="export-button" onclick="window.print()">🖨️ Drukuj / Eksportuj PDF</button>
+            <button class="export-button" onclick="downloadHTML()">📥 Pobierz HTML</button>
+        </div>
+
+        <footer>
+            <p>ADRION 369 Architecture Diagram — Generated 2026-05-14</p>
+            <p>33-Agent Ecosystem: 32 Gems + 1 Meta-Guardian (Chronos)</p>
+            <p>Status: ✅ OPERATIONAL | ROPE 2.0 Audit: 🔴 CRITICAL (28/32 gaps)</p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+        function downloadHTML() {
+            const element = document.documentElement;
+            const opt = {
+                margin: 10,
+                filename: 'ADRION-369-Architecture.html',
+                image: { type: 'png', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+            };
+
+            // Save current page as HTML file
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'ADRION-369-Architecture-Diagram.html';
+            link.click();
+        }
+    </script>
+</body>
+
+</html>
