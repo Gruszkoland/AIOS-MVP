@@ -98,3 +98,4 @@ frontend/harmonia-dashboard/behavior_log.json
 frontend/harmonia-dashboard/judge_log.json
 frontend/harmonia-dashboard/vera_scores.json
 monitoring/llm_kpi_events.jsonl
+.claude.json
