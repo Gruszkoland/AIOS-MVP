@@ -1,0 +1,101 @@
+---
+description: Rejestr 33 person AI + pliki orkiestracji—ścieżki źródeł i przełączanie ról w Cursorze
+alwaysApply: true
+---
+
+# Rejestr person AI (źródło zewnętrzne)
+
+## Ścieżka bazowa (tylko odczyt — kanon treści)
+
+`C:\Users\adiha\Desktop\Dokumentacja\03_OSOBOWOSCI_AI\Gemy Gemini\Gotowe i skoczone PERSONY`
+
+- **Główny katalog numerowanych person (01–33):** powyższa ścieżka + `\33 Persony AI\`
+- **Prompty orkiestracji / master:** `\MASTER ORKIESTRACJA\` (np. `ADRION_369_MASTER_PROMPT_v5.0.md`, warianty KIMI / DeepSeek / Gemini / Grok)
+- **Uzupełniające (korzeń folderu PERSONY):** m.in. `MATRIX_REGISTRY_2.1.md`, `ADRION_369_Instructions_v5_1.md`, `IMPLEMENTER_AI_PROMPT.md`, `Harmonia-Gateway.md`, `Główny Architekt UX-UI & Web Developer.md`, plik AWA `# [02-AWA] — Agent Wdrożeniowo-Automatyzujący.md`, opcjonalnie `AUDIT_REPORT_v1.md`, `Naprawa Cloude.md`
+- **Walidacja zbioru:** `33 Persony AI\validation_report_v3.md`
+
+## Inwentaryzacja (stan katalogu źródłowego)
+
+| Lokalizacja względem `PERSONY` | Zawartość |
+|--------------------------------|-----------|
+| `33 Persony AI\` | **33** persony (`01`–`33`, każda w osobnym `.md`) + `validation_report_v3.md` |
+| `MASTER ORKIESTRACJA\` | **8** plików `.md` (poniżej) |
+| Korzeń `PERSONY` | m.in. duplikat **01 MPG**, **AWA**, `MATRIX_REGISTRY_2.1.md`, `ADRION_369_Instructions_v5_1.md`, `Harmonia-Gateway.md`, `IMPLEMENTER_AI_PROMPT.md`, raporty |
+
+**Wzorzec nazwy w `33 Persony AI`:** `NN - Opis [(KOD)] - … .md` — wyjątki: **02** (bez akronimu w nawiasie), **06** (marka **BoosterLever** zamiast trzyliterowego kodu), **10** (tytuł „Echo Archetypów” bez `(KOD)` w nagłówku pliku).
+
+**`MASTER ORKIESTRACJA\` — pliki:**
+
+- `ADRION_369_MASTER_PROMPT_v5.0.md`
+- `KIMI MERGED - MASTER_ORCHESTRATOR_ADRION_369_v4.2_.md`
+- `KIMI - Ulepszony MASTER_ORCHESTRATOR_ADRION_369_v4.1_SHORT.md`
+- `deepseek - Ulepszony Master Orkiestrator.md`
+- `deepseek ewolucja orkiestratora.md`
+- `gemini połączony z pamięcią - Orkiestrator.md`
+- `gemini-meta-prompt systemowy.md`
+- `Grock UNITED - Orkiestracja.md`
+
+**Nie integrować jako reguły Cursor:** skrypty `.py`, archiwa `.rar`, pomocnicze `.txt` (można uruchamiać lokalnie poza agentem).
+
+Pełne instrukcje person są w plikach `.md` w powyższej lokalizacji — **nie powielaj ich tutaj**; przy pracy przyjmuj tożsamość wg struktury z załączonego pliku (nagłówek `[NN-KOD]`, sekcje CONTEXT / CONSTRAINTS / OUTPUT_FORMAT itd.).
+
+---
+
+## Jak używać person w Cursorze
+
+1. **Załącz plik persony (`@`):** w czacie Composer / Agent wskaż dokładny `.md` — najczęściej z `...\33 Persony AI\` (np. `16 - … (UXD)… .md`). Jeśli plików z Pulpitu nie widać w pickerze, dodaj folder `PERSONY` do workspace (**File → Add Folder to Workspace…**) albo wklej ścieżkę do pliku w polu `@`.
+2. **Jawne polecenie roli:** np. „Działaj jako **16-UXD** zgodnie z załączonym plikiem” / „persona **QTE**” — obowiązuje dopiero z załączonym źródłem `.md` lub gdy użytkownik wskaże konkretną wersję pliku.
+3. **Orkiestracja wieloagentowa:** najpierw `@` na wybrany plik z `MASTER ORKIESTRACJA\` lub `MATRIX_REGISTRY_2.1.md`, potem persony specjalistyczne (**AOR**, **ARB**, itd.).
+4. **Persona 02 — dwie ścieżki:** numer **02** w zestawie 33 to `02 - PROGRAMATOR WEBOWY - … .md` w `33 Persony AI\`. Osobny prompt wdrożeniowy **AWA** leży w korzeniu: `# [02-AWA] — Agent Wdrożeniowo-Automatyzujący.md` — wybierz jeden plik zgodnie z zadaniem.
+5. **Workspace:** zadania wyłącznie **n8n** — nadal `.github/agents/n8n-architect.agent.md` i `AGENTS.md`; persony ADRION nie zastępują n8n, chyba że użytkownik też załączy pliki person lub tak każe.
+
+---
+
+## Tabela 33 person — numer, akronim, plik (wzór nazwy)
+
+| Nr | Kod | Tematyka (z nazwy pliku) |
+|----|-----|---------------------------|
+| 01 | MPG | Prompt engineering, audyt instrukcji AI |
+| 02 | — | PROGRAMATOR WEBOWY, full-stack / SaaS (Next.js, Supabase, Stripe); alternatywa: **AWA** w korzeniu PERSONY |
+| 03 | CVA | AI art, generatywne UI, prompty DALL·E / Midjourney |
+| 04 | QPA | Analiza techniczna rynków, Wyckoff / Smart Money |
+| 05 | SAP | Planowanie strategiczne, roadmapy |
+| 06 | — | **BoosterLever** — growth hacking, dźwignie marketingowe |
+| 07 | ARB | Arbitraż decyzji, konflikty multi-agent |
+| 08 | EGO | Bezpieczeństwo AI, TEE / enclave |
+| 09 | CTG | Archetypy, warstwa „duchowa” / interpretacja |
+| 10 | — | Echo archetypów, meta-persona (dynamiczne wcielanie archetypów) |
+| 11 | CEC | Copywriting, content marketing |
+| 12 | ROA | Research, OSINT |
+| 13 | AOR | Orkiestracja agentów, routing workflow |
+| 14 | LCA | Prawo cyfrowe, RODO / GDPR |
+| 15 | DBI | Analityka danych, BI |
+| 16 | UXD | UX research, UI, design system, dostępność |
+| 17 | DCA | DevOps, chmura (AWS/GCP/Azure), CI/CD |
+| 18 | SNE | Sprzedaż B2B/B2C, negocjacje |
+| 19 | QTE | QA, automatyzacja testów (Playwright/Cypress/Pytest) |
+| 20 | SEO | SEO techniczne, on-page |
+| 21 | EDU | E-learning, pedagogika |
+| 22 | PCH | Rozwój osobisty, nawyki |
+| 23 | VAP | Wideo / audio, skrypty YouTube |
+| 24 | SMM | Social media, kalendarz treści |
+| 25 | TLO | Tłumaczenia PL/EN/DE, lokalizacja |
+| 26 | CRM | CRM, customer success, retencja |
+| 27 | PFT | Finanse osobiste, podatki, budżet |
+| 28 | CSO | Cyberbezpieczeństwo (ofensywa / defensywa) |
+| 29 | KMS | Zarządzanie wiedzą, bazy wiedzy |
+| 30 | HRR | HR, rekrutacja IT |
+| 31 | PMO | Produkt, backlog, strategia produktu |
+| 32 | TWR | Technical writing, dokumentacja API |
+| 33 | EVA | EvalOps, obserwowalność ekosystemu agentów |
+
+Nazwy plików mają format: `NN - Opis (KOD) - … .md` w folderze `33 Persony AI`, z wyjątkami opisanymi w sekcji inwentaryzacji.
+
+**Skills / agenci w repo (bez kopiowania promptów):** reguła niniejsza; agent `.github/agents/ai-personas.agent.md`; fallback skill `.agents/skills/ai-personas/SKILL.md`.
+
+---
+
+## Skrót: co jest poza „33 Persony AI”
+
+- **`MASTER ORKIESTRACJA\`:** zintegrowane / krótsze warianty Master Orchestrator ADRION 369 (KIMI, DeepSeek, Gemini, Grok itd.).
+- **Duplikat / sibling:** `01 - Master Prompt Generator …` występuje także w korzeniu `PERSONY` — treść może być zbliżona do persony 01 w podfolderze; stosuj wersję załączoną przez użytkownika.

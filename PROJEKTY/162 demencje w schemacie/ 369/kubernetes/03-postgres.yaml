@@ -1,0 +1,165 @@
+---
+# ADRION 369 — PostgreSQL StatefulSet
+# StatefulSet (nie Deployment) bo potrzeba stałej tożsamości i storage
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: adrion
+  labels:
+    app: postgres
+    version: 15
+spec:
+  serviceName: postgres  # Headless Service (musi istnieć)
+  replicas: 1  # PostgreSQL w active-passive (multi-replica = read replicas tylko)
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        version: 15
+    spec:
+      securityContext:
+        fsGroup: 999  # PostgreSQL user UID
+        runAsUser: 999
+        runAsNonRoot: true
+
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - name: postgresql
+          containerPort: 5432
+          protocol: TCP
+
+        # Environment variables z Secrets + ConfigMaps
+        envFrom:
+        - secretRef:
+            name: adrion-secrets
+        - configMapRef:
+            name: adrion-config
+
+        # Dodatkowe env (ConfigMap nie przytrzymuje Secrets)
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: adrion-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: adrion-secrets
+              key: POSTGRES_USER
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: adrion-secrets
+              key: POSTGRES_DB
+
+        # Persistent Volume
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+          subPath: postgres
+        - name: postgres-backup
+          mountPath: /var/lib/postgresql/backup
+          readOnly: true
+
+        # Resource limits
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+
+        # Health checks
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - pg_isready -U $POSTGRES_USER
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - pg_isready -U $POSTGRES_USER
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        # Security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+
+      # Affinity rules
+      affinity:
+        # Nie uruchamiaj PostgreSQL na Windows nodes
+        nodeSelector:
+          kubernetes.io/os: linux
+
+      # Tolerations (jeśli masz taints na nodes)
+      tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "database"
+        effect: "NoSchedule"
+
+      # Terminate gracefully (wait for connections to close)
+      terminationGracePeriodSeconds: 300
+
+  # Volumes
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: fast
+      resources:
+        requests:
+          storage: 50Gi
+
+  # Additional volumes (backup)
+  template:
+    spec:
+      volumes:
+      - name: postgres-backup
+        emptyDir: {}
+
+---
+# Headless Service dla PostgreSQL (StatefulSet)
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: adrion
+  labels:
+    app: postgres
+spec:
+  clusterIP: None  # Headless (required for StatefulSet)
+  selector:
+    app: postgres
+  ports:
+  - name: postgresql
+    port: 5432
+    targetPort: 5432
+    protocol: TCP
+  type: ClusterIP
