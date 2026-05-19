@@ -1,0 +1,36 @@
+RUN=2026-04-02 22:42:50
+CSV=C:\Users\adiha\162 demencje w schemacie 369\Genesis Record\10_RAPORTY_DZIALANIA_SYSTEMU\REPORTS\Dry_Run_Reorganizacji_Obrazy_02-04-2026.csv
+ROWS=23
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Awatary i zdjęcia
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\DCIM
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\drive-download-20260401T061135Z-3-001
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Kuzynka Kuzynka
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Love U Babe
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Łysa Góra
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Marta i Adi
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\MIX
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Mix zdjec i awatarow
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Naprawde stare zdjecia
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Naprawde Stare zdjęcia
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Naprawde stare zdjęcia cz 2
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Od Belgii Po przez Afryke az do Miedzynarodowki
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Pozostałe
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\samojebki
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\ScreenShot
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Studniówka Adriana 9.02.2006
+SKIP|missing_source|C:\\Users\\adiha\\Pictures\Studniówka Marty
+MERGE_DIR|C:\\Users\\adiha\\Pictures\Studniówka Marty 6.01.2007|C:\Users\adiha\Pictures\03_WYDARZENIA\Studniowka_Marty_06-01-2007
+RENAME_ON_COLLISION|C:\Users\adiha\Pictures\Studniówka Marty 6.01.2007\P1060157.JPG|C:\Users\adiha\Pictures\03_WYDARZENIA\Studniowka_Marty_06-01-2007\P1060157__from_Studni_wka_Marty_6_01_2007_20260402224250_1.JPG
+MOVE_ITEM|C:\Users\adiha\Pictures\Studniówka Marty 6.01.2007\P1060157.JPG|C:\Users\adiha\Pictures\03_WYDARZENIA\Studniowka_Marty_06-01-2007\P1060157__from_Studni_wka_Marty_6_01_2007_20260402224250_1.JPG
+RENAME_ON_COLLISION|C:\Users\adiha\Pictures\Studniówka Marty 6.01.2007\P1060204.JPG|C:\Users\adiha\Pictures\03_WYDARZENIA\Studniowka_Marty_06-01-2007\P1060204__from_Studni_wka_Marty_6_01_2007_20260402224250_1.JPG
+MOVE_ITEM|C:\Users\adiha\Pictures\Studniówka Marty 6.01.2007\P1060204.JPG|C:\Users\adiha\Pictures\03_WYDARZENIA\Studniowka_Marty_06-01-2007\P1060204__from_Studni_wka_Marty_6_01_2007_20260402224250_1.JPG
+RENAME_ON_COLLISION|C:\Users\adiha\Pictures\Studniówka Marty 6.01.2007\P1070206.MOV|C:\Users\adiha\Pictures\03_WYDARZENIA\Studniowka_Marty_06-01-2007\P1070206__from_Studni_wka_Marty_6_01_2007_20260402224250_1.MOV
+MOVE_ITEM|C:\Users\adiha\Pictures\Studniówka Marty 6.01.2007\P1070206.MOV|C:\Users\adiha\Pictures\03_WYDARZENIA\Studniowka_Marty_06-01-2007\P1070206__from_Studni_wka_Marty_6_01_2007_20260402224250_1.MOV
+RENAME_ON_COLLISION|C:\Users\adiha\Pictures\Studniówka Marty 6.01.2007\P1070255.JPG|C:\Users\adiha\Pictures\03_WYDARZENIA\Studniowka_Marty_06-01-2007\P1070255__from_Studni_wka_Marty_6_01_2007_20260402224250_1.JPG
+MOVE_ITEM|C:\Users\adiha\Pictures\Studniówka Marty 6.01.2007\P1070255.JPG|C:\Users\adiha\Pictures\03_WYDARZENIA\Studniowka_Marty_06-01-2007\P1070255__from_Studni_wka_Marty_6_01_2007_20260402224250_1.JPG
+RMDIR_EMPTY|C:\\Users\\adiha\\Pictures\Studniówka Marty 6.01.2007
+MOVE_DIR|C:\\Users\\adiha\\Pictures\Sylwester 2006-2007|C:\Users\adiha\Pictures\03_WYDARZENIA\Sylwester_2006-2007
+MOVE_DIR|C:\\Users\\adiha\\Pictures\Tajne od Marty|C:\Users\adiha\Pictures\04_OSOBY_I_RELACJE\Tajne_Od_Marty
+MOVE_DIR|C:\\Users\\adiha\\Pictures\U Bebe w Domu|C:\Users\adiha\Pictures\03_WYDARZENIA\U_Bebe_W_Domu
+MOVE_DIR|C:\\Users\\adiha\\Pictures\Zapasowe RAR|C:\Users\adiha\Pictures\01_IMPORTY_ZRODLOWE\Zapasowe_RAR
+DONE=2026-04-02 22:42:50

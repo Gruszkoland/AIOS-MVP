@@ -1,0 +1,414 @@
+{
+  "project": {
+    "name": "ADRION-369",
+    "description": "Multi-Agent Swarm Orchestrator - Master Control System with 162D Decision Space",
+    "version": "4.0.1",
+    "type": "multi-stack",
+    "languages": ["python", "go", "powershell", "typescript", "dockerfile"],
+    "rootPath": ".",
+    "createdDate": "2026-04-08"
+  },
+
+  "filePatterns": {
+    "include": [
+      "**/*.py",
+      "**/*.go",
+      "**/*.ps1",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.md",
+      "**/Dockerfile*",
+      "**/.env*",
+      "**/docker-compose*.yml",
+      "kubernetes/**/*.yaml",
+      "config/**/*.json",
+      "scripts/**/*",
+      "mcp_servers/**/*"
+    ],
+    "exclude": [
+      "node_modules/",
+      ".venv/",
+      "__pycache__/",
+      ".pytest_cache/",
+      ".ruff_cache/",
+      ".git/",
+      ".aider/",
+      "*.pyc",
+      "*.pyo",
+      "*.egg-info/",
+      "htmlcov/",
+      "coverage/",
+      "dist/",
+      "build/",
+      "temp_*/",
+      "backups/",
+      "legacy/",
+      ".runtime/",
+      ".aider.chat.history.md"
+    ]
+  },
+
+  "codeAnalysis": {
+    "enableSyntaxCheck": true,
+    "enableLintsIntegration": true,
+    "linters": {
+      "python": {
+        "enabled": true,
+        "tools": ["ruff", "pylint", "mypy"],
+        "config": {
+          "ruffConfig": "pyproject.toml",
+          "pythonVersion": "3.11",
+          "lineLength": 100
+        }
+      },
+      "go": {
+        "enabled": true,
+        "tools": ["golangci-lint", "go vet"],
+        "config": {
+          "version": "1.22",
+          "strict": true
+        }
+      },
+      "powershell": {
+        "enabled": true,
+        "tools": ["PSScriptAnalyzer"],
+        "config": {
+          "rules": "PSDefault"
+        }
+      },
+      "dockerfile": {
+        "enabled": true,
+        "tools": ["hadolint"],
+        "config": {
+          "strictMode": true
+        }
+      }
+    },
+    "enableTypeChecking": true,
+    "enableSecurityScans": true,
+    "enableComplexityMetrics": true
+  },
+
+  "testing": {
+    "enabled": true,
+    "framework": "pytest",
+    "testPaths": [
+      "tests/",
+      "tests/uat/",
+      "tests/integration/",
+      "arbitrage_server.py",
+      "test_*.py"
+    ],
+    "coverageConfig": {
+      "enabled": true,
+      "minCoverage": 80,
+      "source": ["arbitrage", "scripts", "mcp_servers"],
+      "omit": ["*/tests/*", "*/__pycache__/*"],
+      "reportPath": "htmlcov/"
+    },
+    "testRunner": {
+      "type": "pytest",
+      "command": ".venv/Scripts/python.exe -m pytest",
+      "args": ["-v", "--tb=short", "--color=yes"]
+    }
+  },
+
+  "architecture": {
+    "layers": [
+      {
+        "name": "Orchestration",
+        "paths": ["adrion-swarm/", "persona-agents/"],
+        "description": "Master MoE routing and agent coordination"
+      },
+      {
+        "name": "MCP Services",
+        "paths": ["mcp_servers/", "mcp_*.py"],
+        "description": "Model Context Protocol server implementations"
+      },
+      {
+        "name": "Core Services",
+        "paths": ["scripts/", "arbitrage/"],
+        "description": "Business logic and data processing"
+      },
+      {
+        "name": "Infrastructure",
+        "paths": ["kubernetes/", "docker-compose*.yml", "Dockerfile*"],
+        "description": "Container orchestration and deployment"
+      },
+      {
+        "name": "API Layer",
+        "paths": ["cmd/", "internal/", "server.py"],
+        "description": "HTTP endpoints and interfaces"
+      },
+      {
+        "name": "Database",
+        "paths": ["scripts/db/", "scripts/db_migrations/"],
+        "description": "Database schemas and migrations"
+      },
+      {
+        "name": "Documentation",
+        "paths": ["docs/", "README.md"],
+        "description": "User and API documentation"
+      }
+    ]
+  },
+
+  "dependencies": {
+    "python": {
+      "pythonVersion": "3.11",
+      "requirementsFile": "requirements*.txt",
+      "envFile": ".env.template",
+      "venvPath": ".venv",
+      "vulnerabilityScan": true
+    },
+    "go": {
+      "version": "1.22",
+      "modsRequired": ["github.com/labstack/echo/v4"],
+      "vendorDirectory": "vendor/",
+      "updateCheck": true
+    },
+    "external": {
+      "docker": "latest",
+      "postgres": "15-alpine",
+      "ollama": "latest"
+    }
+  },
+
+  "codeQuality": {
+    "complexity": {
+      "maxCyclomaticComplexity": 10,
+      "maxNestingLevel": 4,
+      "reportPath": "reports/complexity.json"
+    },
+    "documentation": {
+      "requireDocstrings": true,
+      "requireTypeHints": true,
+      "minDocstringLength": 20
+    },
+    "security": {
+      "enableSAST": true,
+      "scanSecrets": true,
+      "reportPath": "reports/security_scan.json"
+    }
+  },
+
+  "deployment": {
+    "environments": [
+      {
+        "name": "local",
+        "description": "Local development environment",
+        "composeFile": "docker-compose.yml",
+        "services": ["postgres", "ollama", "api", "mcp-services"]
+      },
+      {
+        "name": "kubernetes",
+        "description": "Kubernetes production cluster",
+        "manifestPath": "kubernetes/",
+        "requiredSecrets": ["DB_PASSWORD", "API_KEY", "JWT_SECRET"]
+      },
+      {
+        "name": "cloud",
+        "description": "Cloud production deployment",
+        "composeFile": "docker-compose.cloud.yml",
+        "requiredEnvVars": [
+          "OPENROUTER_API_KEY",
+          "DATABASE_URL",
+          "KUBERNETES_CONFIG"
+        ]
+      }
+    ]
+  },
+
+  "workspace": {
+    "folders": {
+      "scripts": {
+        "path": "scripts/",
+        "description": "Utility scripts and automation"
+      },
+      "docs": {
+        "path": "docs/",
+        "description": "API and project documentation"
+      },
+      "tests": {
+        "path": "tests/",
+        "description": "Unit, integration, and UAT tests"
+      },
+      "mcp": {
+        "path": "mcp_servers/",
+        "description": "Model Context Protocol implementations"
+      },
+      "config": {
+        "path": "config/",
+        "description": "Configuration files"
+      },
+      "kubernetes": {
+        "path": "kubernetes/",
+        "description": "Kubernetes manifests"
+      },
+      "arbitrage": {
+        "path": "arbitrage-core/",
+        "description": "Lead arbitrage engine"
+      }
+    }
+  },
+
+  "codeNavigation": {
+    "enableSymbolIndexing": true,
+    "enableCrossReferencing": true,
+    "includeExternalDeps": false,
+    "indexTimeout": 60000
+  },
+
+  "performance": {
+    "analysisTimeout": 30000,
+    "maxFileSize": 5242880,
+    "enableParallelAnalysis": true,
+    "cacheEnabled": true,
+    "cachePath": ".roo_cache/"
+  },
+
+  "commands": {
+    "build": {
+      "label": "Build All Services",
+      "command": "docker-compose build",
+      "description": "Build Docker containers"
+    },
+    "test": {
+      "label": "Run All Tests",
+      "command": ".venv/Scripts/python.exe -m pytest -v",
+      "description": "Execute pytest suite"
+    },
+    "lint": {
+      "label": "Lint Code",
+      "command": ".venv/Scripts/ruff check . && gofmt -w .",
+      "description": "Run linters on all code"
+    },
+    "deploy": {
+      "label": "Deploy to Production",
+      "command": "kubectl apply -f kubernetes/",
+      "description": "Deploy to Kubernetes"
+    },
+    "clean": {
+      "label": "Clean Build Artifacts",
+      "command": "Remove-Item -Recurse -Force htmlcov, dist, build, .pytest_cache, __pycache__",
+      "description": "Remove temporary files"
+    }
+  },
+
+  "problemMatchers": {
+    "python": {
+      "fileLocation": ["relative", "${workspaceFolder}"],
+      "pattern": {
+        "regexp": "^(?:.*\\/)?(.*?):(\\d+):(\\d+): (\\w+): (.*)$",
+        "file": 1,
+        "line": 2,
+        "column": 3,
+        "severity": 4,
+        "message": 5
+      }
+    },
+    "go": {
+      "fileLocation": ["relative", "${workspaceFolder}"],
+      "pattern": {
+        "regexp": "^(.*?):(\\d+):(\\d+): (.*)$",
+        "file": 1,
+        "line": 2,
+        "column": 3,
+        "message": 4
+      }
+    }
+  },
+
+  "searchPatterns": {
+    "endpoints": {
+      "pattern": "@(app|router|server)\\.(get|post|put|delete|patch)\\(.*\\)",
+      "language": "python"
+    },
+    "sqlQueries": {
+      "pattern": "execute\\(.*?\\)|query\\(.*?\\)",
+      "language": "python"
+    },
+    "configValues": {
+      "pattern": "os\\.getenv\\(.*?\\)|config\\[.*?\\]",
+      "language": ["python", "go"]
+    },
+    "errors": {
+      "pattern": "raise|throw|exception|error",
+      "language": "python"
+    }
+  },
+
+  "integrations": {
+    "git": {
+      "enabled": true,
+      "showBranchInfo": true,
+      "showCommitHistory": true,
+      "diffContext": 3
+    },
+    "docker": {
+      "enabled": true,
+      "showContainerInfo": true,
+      "imagePath": "Dockerfile*"
+    },
+    "kubernetes": {
+      "enabled": true,
+      "manifestPath": "kubernetes/",
+      "schemaValidation": true
+    }
+  },
+
+  "reporting": {
+    "generateOnSave": true,
+    "reportFormat": ["json", "html"],
+    "reportPath": "reports/",
+    "includeMetrics": [
+      "complexity",
+      "coverage",
+      "security",
+      "performance",
+      "diagnostics"
+    ]
+  },
+
+  "advancedFeatures": {
+    "enableAI": true,
+    "enableRefactoringSuggestions": true,
+    "enablePerformanceOptimizations": true,
+    "enableSecurityAdvisories": true,
+    "enableArchitectureAnalysis": true
+  },
+
+  "guardrails": {
+    "enabled": true,
+    "enforceNamingConventions": true,
+    "enforceSecurityPolicies": true,
+    "enforceDocumentation": true,
+    "rules": [
+      {
+        "name": "NoHardcodedSecrets",
+        "enabled": true,
+        "severity": "error",
+        "pattern": "(password|api_key|secret|token)\\s*=\\s*['\\\"]"
+      },
+      {
+        "name": "NoSQLInjection",
+        "enabled": true,
+        "severity": "error",
+        "pattern": "execute\\(f\\\".*SELECT.*\\{|execute\\(string\\.Format.*SELECT"
+      },
+      {
+        "name": "ProperLogging",
+        "enabled": true,
+        "severity": "warning",
+        "pattern": "print\\(|console\\.log\\(|Log\\.Write"
+      }
+    ]
+  },
+
+  "metadata": {
+    "lastConfigured": "2026-04-08T00:00:00Z",
+    "configVersion": "1.0",
+    "maintainer": "ADRION-369 Master Orchestrator",
+    "notes": "Complete Roo Code configuration for ADRION 369 multi-stack project with comprehensive analysis, testing, and deployment integration"
+  }
+}

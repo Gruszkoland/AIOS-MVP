@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADRION 369 — Login</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-blue: #0078D4;
+            --primary-gradient: linear-gradient(135deg, #0078D4 0%, #0066CC 100%);
+            --secondary-dark: #1E3A5F;
+            --light-bg: #F5F5F5;
+            --white-bg: #FFFFFF;
+            --success-color: #27AE60;
+            --border-light: #D5D8DC;
+            --text-primary: #1E3A5F;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--white-bg);
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control {
+            background: #F8F9FA;
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: #FFFFFF;
+            border-color: var(--primary-blue);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #999;
+        }
+
+        .btn-login {
+            width: 100%;
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 120, 212, 0.3);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            background: #F8D7DA;
+            border: 1px solid #E74C3C;
+            color: #C0392B;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.visible {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .focus-ring {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+        }
+
+        .form-control:focus-visible {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <h1>ADRION 369</h1>
+                <p>Unified Admin Panel — Multi-Agent Orchestration</p>
+            </div>
+
+            <div id="alert" class="alert"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="org-id" class="form-label">Organization ID</label>
+                    <input
+                        type="text"
+                        id="org-id"
+                        class="form-control"
+                        placeholder="e.g., org-123"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-control"
+                        placeholder="user@example.com"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-control"
+                        placeholder="••••••••"
+                        required
+                    />
+                </div>
+
+                <button type="submit" class="btn-login" id="login-btn">
+                    <span id="btn-text">Sign In</span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>Phase 4 — Production Ready | v2.0.0-alpha</p>
+                <p style="margin-top: 10px; font-size: 0.75rem; color: #64748b;">For demo mode, use URL parameter: <code>?demo=1</code> (local dev only)</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="websocket_client.js"></script>
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const orgIdInput = document.getElementById('org-id');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const btnText = document.getElementById('btn-text');
+        const alertDiv = document.getElementById('alert');
+
+        const API_BASE_URL = 'http://localhost:8002/mapi/v1';
+
+        function showAlert(message, type = 'error') {
+            alertDiv.className = `alert visible alert-${type}`;
+            alertDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
+            setTimeout(() => alertDiv.classList.remove('visible'), 5000);
+        }
+
+        function setLoading(loading) {
+            loginBtn.disabled = loading;
+            if (loading) {
+                btnText.innerHTML = '<span class="loading-spinner"></span>Signing in...';
+            } else {
+                btnText.textContent = 'Sign In';
+            }
+        }
+
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const orgId = orgIdInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!orgId || !email || !password) {
+                showAlert('Please fill in all fields', 'error');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        org_id: orgId,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    showAlert(result.error || 'Login failed', 'error');
+                    setLoading(false);
+                    return;
+                }
+
+                // Success
+                showAlert('✅ Login successful! Redirecting...', 'success');
+
+                // PRIORITY 10 FIX: Store token securely
+                // Preferred: Backend should set HttpOnly cookie (immune to XSS)
+                // Fallback: Store non-sensitive data in localStorage (dev only)
+                // DON'T store JWT token in localStorage if possible (XSS vulnerability)
+
+                // For development: store token (in production, rely on HttpOnly cookies)
+                if (result.token && process.env.NODE_ENV !== 'production') {
+                    localStorage.setItem('token', result.token);  // Dev only: remove for production
+                }
+
+                // Store non-sensitive metadata
+                localStorage.setItem('org_id', orgId);
+                localStorage.setItem('email', email);
+                localStorage.setItem('role', result.role || 'operator');
+
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 1500);
+
+            } catch (err) {
+                console.error('Login error:', err);
+                showAlert('Network error. Is the API server running on port 8002?', 'error');
+                setLoading(false);
+            }
+        };
+
+        // Demo mode: pre-fill credentials on load
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('demo') === '1') {
+                orgIdInput.value = 'org-123';
+                emailInput.value = 'demo@example.com';
+                passwordInput.value = 'demo123';
+            }
+        });
+
+        // Allow Enter key in password field
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginForm.onsubmit(e);
+            }
+        });
+    </script>
+</body>
+</html>

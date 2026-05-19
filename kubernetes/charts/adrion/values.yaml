@@ -1,0 +1,100 @@
+# Default values for ADRION 369 Helm chart
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/adiha/adrion-vortex
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+api:
+  image:
+    repository: ghcr.io/adiha/adrion-vortex
+    tag: "latest"
+  port: 8003
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: "0.5"
+    requests:
+      memory: 256Mi
+      cpu: "0.25"
+
+uap:
+  enabled: true
+  port: 8002
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: "0.5"
+    requests:
+      memory: 256Mi
+      cpu: "0.25"
+
+vortex:
+  enabled: true
+  port: 1740
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: "0.25"
+    requests:
+      memory: 128Mi
+      cpu: "0.1"
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: adrion.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: adrion-tls
+      hosts:
+        - adrion.example.com
+
+persistence:
+  enabled: true
+  storageClass: ""
+  size: 1Gi
+
+env:
+  DB_ENGINE: sqlite
+  LLM_BACKEND: auto
+  CORS_ALLOWED_ORIGIN: "http://localhost:8003"
+
+secrets:
+  # Reference existing K8s secret
+  existingSecret: ""
+  # Or create from values (not recommended for production)
+  uapApiKey: ""
+  jwtSecret: ""
+
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+  grafana:
+    enabled: true
+    port: 3000
+    adminPassword: "CHANGE_ME_IN_PRODUCTION"
+  loki:
+    enabled: true
+    port: 3100
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80

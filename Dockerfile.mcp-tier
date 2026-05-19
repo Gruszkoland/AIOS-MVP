@@ -1,0 +1,72 @@
+# ============================================================
+# ADRION 369 — Unified MCP Tier Dockerfile
+#
+# Replaces 5 near-identical Dockerfiles:
+#   Dockerfile.genesis-mcp  → docker build --build-arg APP=mcp_genesis_app.py  --build-arg PORT=9004
+#   Dockerfile.guardian-mcp → docker build --build-arg APP=mcp_guardian_app.py --build-arg PORT=9002
+#   Dockerfile.healer-mcp   → docker build --build-arg APP=mcp_healer_app.py   --build-arg PORT=9005
+#   Dockerfile.mcp-router   → docker build --build-arg APP=mcp_router_app.py   --build-arg PORT=9000
+#   Dockerfile.oracle-mcp   → docker build --build-arg APP=mcp_oracle_app.py   --build-arg PORT=9003
+#   Dockerfile.vortex-mcp   → docker build --build-arg APP=mcp_vortex_app.py   --build-arg PORT=9001
+#
+# Usage:
+#   docker build -f Dockerfile.mcp-tier \
+#     --build-arg APP=mcp_guardian_app.py \
+#     --build-arg PORT=9002 \
+#     -t adrion-guardian-mcp .
+# ============================================================
+
+# Stage 1: Builder — install deps into isolated prefix
+FROM python:3.11-slim AS builder
+
+WORKDIR /build
+
+COPY requirements-mcp.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir --prefix=/install -r requirements-mcp.txt
+
+
+# Stage 2: Runtime — minimal image
+FROM python:3.11-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONUTF8=1
+
+# Mandatory build arguments
+ARG APP
+ARG PORT=9000
+
+ENV MCP_APP=${APP} \
+    MCP_PORT=${PORT}
+
+WORKDIR /app
+
+# Non-root user
+RUN groupadd --system adrion-mcp \
+    && useradd --system --gid adrion-mcp --no-create-home adrion-mcp
+
+# Install from builder
+COPY --from=builder /install /usr/local
+
+# Application code
+COPY mcp-servers/ ./mcp-servers/
+COPY ${APP} .
+
+# micro-saas: Alembic migrations + entrypoint
+COPY micro-saas/alembic.ini ./alembic.ini
+COPY micro-saas/migrations/ ./migrations/
+COPY micro-saas/entrypoint.sh ./entrypoint.sh
+
+RUN chmod +x ./entrypoint.sh \
+    && chown -R adrion-mcp:adrion-mcp /app
+
+USER adrion-mcp
+
+EXPOSE ${PORT}
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen(f'http://localhost:${MCP_PORT}/health')" || exit 1
+
+# Default: plain python runner (MCP servers). micro-saas overrides with entrypoint.sh
+CMD ["sh", "-c", "python ${MCP_APP}"]

@@ -1,0 +1,130 @@
+name: ADRION 162D Classification Gate
+
+on:
+  pull_request:
+    paths:
+      - "scripts/reporting/map_jednosc_to_162d.py"
+      - "scripts/reporting/merge_jednosc_decisions.py"
+      - "scripts/reporting/autofill_jednosc_pending.py"
+      - "scripts/reporting/check_utf8_artifacts.py"
+      - "scripts/reporting/generate_ci_gate_report.py"
+      - "scripts/reporting/validate_session_reports.py"
+      - "docs/JEDNOSC_162D_*.md"
+      - "docs/162D-DECISION-SPACE.md"
+      - "tests/test_jednosc_162d_final.py"
+      - "tests/test_utf8_artifacts_guard.py"
+      - ".github/workflows/jednosc-162d-gate.yml"
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "scripts/reporting/map_jednosc_to_162d.py"
+      - "scripts/reporting/merge_jednosc_decisions.py"
+      - "scripts/reporting/autofill_jednosc_pending.py"
+      - "scripts/reporting/check_utf8_artifacts.py"
+      - "scripts/reporting/generate_ci_gate_report.py"
+      - "scripts/reporting/validate_session_reports.py"
+      - "docs/JEDNOSC_162D_*.md"
+      - "docs/162D-DECISION-SPACE.md"
+      - "tests/test_jednosc_162d_final.py"
+      - "tests/test_utf8_artifacts_guard.py"
+      - ".github/workflows/jednosc-162d-gate.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  classification-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
+      - name: Smoke map generator and artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          CI_MAP="docs/JEDNOSC_162D_MAP.ci.md"
+          CI_APPROVED="docs/JEDNOSC_162D_APPROVED.ci.md"
+          CI_REVIEW="docs/JEDNOSC_162D_REVIEW_BACKLOG.ci.md"
+          CI_CHECKLIST="docs/JEDNOSC_162D_REVIEW_CHECKLIST.ci.md"
+          CI_PENDING="docs/JEDNOSC_162D_REVIEW_PENDING.ci.md"
+          python scripts/reporting/map_jednosc_to_162d.py \
+            --output "$CI_MAP" \
+            --approved-output "$CI_APPROVED" \
+            --review-output "$CI_REVIEW" \
+            --checklist-output "$CI_CHECKLIST" \
+            --pending-output "$CI_PENDING"
+          test -f "$CI_MAP"
+          test -f "$CI_APPROVED"
+          test -f "$CI_REVIEW"
+          test -f "$CI_CHECKLIST"
+          test -f "$CI_PENDING"
+          grep -q "## Tabela mapowania" "$CI_MAP"
+          grep -q "| # | Dokument | Perspektywa | Tryb | Prawo | Triada |" "$CI_MAP"
+          rm -f "$CI_MAP" "$CI_APPROVED" "$CI_REVIEW" "$CI_CHECKLIST" "$CI_PENDING"
+
+      - name: Smoke merge output and assert production state
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP_DIR="$(mktemp -d)"
+          python scripts/reporting/merge_jednosc_decisions.py \
+            --map docs/JEDNOSC_162D_MAP.md \
+            --checklist docs/JEDNOSC_162D_REVIEW_CHECKLIST.md \
+            --output "$TMP_DIR/JEDNOSC_162D_FINAL.md"
+          grep -q "Pozycji FINAL: 17 / 17" "$TMP_DIR/JEDNOSC_162D_FINAL.md"
+          grep -q "Pozycji PENDING: 0" "$TMP_DIR/JEDNOSC_162D_FINAL.md"
+
+      - name: Verify UTF-8 integrity for 162D artifacts
+        id: utf8
+        shell: bash
+        run: |
+          set -euo pipefail
+          LOG="$(mktemp)"
+          python scripts/reporting/check_utf8_artifacts.py | tee "$LOG"
+          UTF8_OK_FILES="$(grep '^UTF8_OK_FILES=' "$LOG" | tail -n1 | cut -d= -f2)"
+          echo "utf8_ok_files=${UTF8_OK_FILES}" >> "$GITHUB_OUTPUT"
+
+      - name: Run Jednosc regression tests
+        run: |
+          TMP_DIR="$(mktemp -d)"
+          python -m pytest tests/test_jednosc_162d_final.py tests/test_utf8_artifacts_guard.py -q --tb=no --junitxml "$TMP_DIR/jednosc-tests.xml"
+          cp "$TMP_DIR/jednosc-tests.xml" jednosc-tests.xml
+
+      - name: Validate session reports
+        run: python scripts/reporting/validate_session_reports.py
+
+      - name: Generate CI gate report markdown
+        run: |
+          python scripts/reporting/generate_ci_gate_report.py \
+            --workflow "ADRION 162D Classification Gate" \
+            --run-id "${{ github.run_id }}" \
+            --sha "${{ github.sha }}" \
+            --ref "${{ github.ref_name }}" \
+            --actor "${{ github.actor }}" \
+            --utf8-ok-files "${{ steps.utf8.outputs.utf8_ok_files }}" \
+            --pytest-xml "jednosc-tests.xml" \
+            --output "Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/CI_Gate_Jednosc_${{ github.run_id }}.md"
+
+      - name: Upload CI gate report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-gate-jednosc-report-${{ github.run_id }}
+          path: |
+            Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/CI_Gate_Jednosc_${{ github.run_id }}.md
+            jednosc-tests.xml

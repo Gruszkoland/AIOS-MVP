@@ -1,0 +1,208 @@
+# OpenRouter Deployment — Quick Reference Card (One Page)
+
+## 🚀 START HERE (3 linijki)
+
+```
+1. https://openrouter.ai → Sign up → Get API key (5 min)
+2. powershell -ExecutionPolicy Bypass -File scripts/deploy_openrouter.ps1
+3. Wklej API key, czekaj ~20 min, done! ✅
+```
+
+---
+
+## 📋 Kroki
+
+| # | Krok | Czas | Status |
+|---|------|------|--------|
+| 1 | Rejestracja OpenRouter | 5 min | 🟢 Manual |
+| 2 | .env config (auto) | 1 min | 🟢 Auto |
+| 3 | Python validation (auto) | 1 min | 🟢 Auto |
+| 4 | API test (auto) | 2 min | 🟢 Auto |
+| 5 | Docker build (auto) | 15 min | 🟢 Auto |
+| 6 | Health check (auto) | 5 min | 🟢 Auto |
+| 7 | Endpoint test (auto) | 2 min | 🟢 Auto |
+| **RAZEM** | | **~31 min** | **80% AUTO** |
+
+---
+
+## 🖥️ Commands
+
+### Windows (PowerShell)
+```powershell
+cd c:\Users\adiha\162\ demencje\ w\ schemacie\ 369
+powershell -ExecutionPolicy Bypass -File scripts/deploy_openrouter.ps1
+# Enter API Key when prompted
+```
+
+### Linux/Mac (Bash)
+```bash
+cd ~/projects/adrion
+bash scripts/deploy_openrouter.sh sk-or-v1-YOUR_KEY
+```
+
+### Manual (jeśli skrypt nie działa)
+```bash
+# 1. Edytuj .env
+LLM_BACKEND=openrouter
+OPENROUTER_API_KEY=sk-or-v1-...
+
+# 2. Rebuild + Restart
+docker-compose -f docker-compose.cloud.yml build --no-cache adrion-api
+docker-compose -f docker-compose.cloud.yml up -d adrion-api
+
+# 3. Test
+curl -X POST http://localhost:8001/api/arbitrage/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"job_title":"Test","budget_usd":200,"description":"Test"}'
+```
+
+---
+
+## ✅ Success Signs
+
+### Green Light (wszystko OK)
+```
+✅ "OpenRouter Migration Successful!"
+✅ Status: Running
+✅ Health: ✅ Healthy
+✅ Latency: 1234ms
+```
+
+### Red Light (coś źle)
+```
+❌ "Invalid API key format"
+❌ "Network error"
+❌ "Docker build failed"
+❌ "Service timeout"
+```
+
+---
+
+## 🆘 Troubleshooting (5 min fix)
+
+| Problem | Fix |
+|---------|-----|
+| Invalid API Key | Klucz musi zaczynać się od `sk-or-v1-` |
+| Build fails | `docker-compose build --no-cache` znowu |
+| Service down | `docker-compose logs -f adrion-api` → sprawdź logi |
+| Rate limit | Free tier: 20-50 req/min; upgrade jeśli potrzebujesz |
+| Timeout | Czekaj 30s, potem: `docker-compose restart adrion-api` |
+
+---
+
+## 🔄 Rollback (Powrót)
+
+```bash
+# Przywróć Ollama (< 5 min)
+copy .env.backup.openrouter .env
+# Edytuj: LLM_BACKEND=ollama
+docker-compose restart adrion-api
+```
+
+---
+
+## 📊 Dokumentacja
+
+| File | Purpose | Link |
+|------|---------|------|
+| OPENROUTER_DEPLOYMENT_SCHEMA.md | 📖 Pełny guide (7 faz, checklist, troubleshooting) | [File](./OPENROUTER_DEPLOYMENT_SCHEMA.md) |
+| OPENROUTER_QUICK_START.md | ⚡ TL;DR guide (3 kroki, FAQs, advanced) | [File](./OPENROUTER_QUICK_START.md) |
+| scripts/deploy_openrouter.ps1 | 🤖 Windows automation (10 faz) | [File](./scripts/deploy_openrouter.ps1) |
+| scripts/deploy_openrouter.sh | 🤖 Linux/Mac automation (10 faz) | [File](./scripts/deploy_openrouter.sh) |
+
+---
+
+## 🎯 What's Happening
+
+```
+Local (Current)          Cloud (Target)
+═══════════════          ══════════════
+
+arbitrage               arbitrage
+    ↓                        ↓
+chat() func            chat() func
+    ↓                        ↓
+LLM_BACKEND            LLM_BACKEND
+  =ollama        →      =openrouter
+    ↓                        ↓
+Local Ollama           OpenRouter API
+(16GB GPU)             (No GPU)
+    ↓                        ↓
+Response               Response
+(0.5-2s)               (1-3s)
+```
+
+---
+
+## 💰 Costs
+
+**Free Tier (Included):**
+- Llama 3.1 8B (default) = $0/month
+- 1000 requests/month = $0
+- Setup = $0
+
+**If you upgrade:**
+- Pro: $5-20/month for better models
+
+---
+
+## 🔐 Security
+
+✅ API key stored locally in `.env` only
+✅ Key not logged or exported
+✅ Backup `.env.backup.openrouter` for rollback
+✅ No credentials hardcoded in code
+
+---
+
+## 📱 Monitoring
+
+```bash
+# Logs
+docker-compose logs -f adrion-api
+
+# Status
+docker-compose ps
+
+# Stats
+docker stats
+
+# Usage (Visit)
+https://openrouter.ai/usage
+```
+
+---
+
+## 📞 Quick FAQ
+
+**Q: Jak długo to trwa?**
+A: ~30 min (większość auto)
+
+**Q: Czy mogę wrócić?**
+A: Tak, 1 plik backup czeka
+
+**Q: Czy to bezpieczne?**
+A: Tak, klucz w .env lokalnie
+
+**Q: Ile to kosztuje?**
+A: $0 za free tier!
+
+**Q: Co się zmienia?**
+A: Tylko .env (LLM_BACKEND + API Key)
+
+---
+
+## 🚀 YOU ARE HERE
+
+```
+Step 1: Setup Account ← YOU ARE HERE
+Step 2: Run Script
+Step 3: Verify
+Step 4: Done! 🎉
+```
+
+**Next:** https://openrouter.ai/
+
+---
+
+**Last Updated:** 2026-04-06 | **Version:** 1.0 | **Status:** ✅ READY

@@ -1,0 +1,36 @@
+name: Docker Build & Security Scan
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and test
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: adrion:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trivy security scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: adrion:latest
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: "1"

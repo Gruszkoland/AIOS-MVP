@@ -1,0 +1,66 @@
+name: Micro-SaaS Security Check
+
+on:
+  pull_request:
+    paths:
+      - "micro-saas/**"
+      - ".github/workflows/micro-saas-security-check.yml"
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "micro-saas/**"
+      - ".github/workflows/micro-saas-security-check.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-env-template:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: micro-saas
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate env template safety
+        run: node scripts/security/check-env-template.mjs
+
+  secret-hygiene-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Block committed local env files
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -E '(^|/)\.env\.local$' >/dev/null; then
+            echo "Found forbidden committed .env.local file(s)."
+            git ls-files | grep -E '(^|/)\.env\.local$' || true
+            exit 1
+          fi
+          echo "No committed .env.local files found."
+
+      - name: Scan tracked files for Stripe-like secret patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          MATCHES="$(git ls-files | xargs -r grep -nE '(sk_(live|test)_[A-Za-z0-9]{16,}|rk_live_[A-Za-z0-9]{16,}|whsec_[A-Za-z0-9]{16,})' || true)"
+          if [ -n "$MATCHES" ]; then
+            echo "Potential Stripe-like secrets detected in tracked files:"
+            echo "$MATCHES"
+            exit 1
+          fi
+          echo "No Stripe-like secret patterns detected in tracked files."

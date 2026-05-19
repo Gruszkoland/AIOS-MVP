@@ -1,0 +1,552 @@
+openapi: 3.0.3
+info:
+  title: ADRION 369 Arbitrage API
+  version: 1.0.0
+  description: |
+    ADRION 369 multi-agent arbitrage engine HTTP API.
+    Runs on port 8001. All responses are JSON.
+    Rate-limited endpoints return HTTP 429 with a `retry_after` field (seconds).
+  contact:
+    name: Genesis Record
+
+servers:
+  - url: http://localhost:8001
+    description: Local development server
+
+tags:
+  - name: status
+    description: Health and KPI endpoints
+  - name: jobs
+    description: Job / bid management
+  - name: cycle
+    description: Scout and analyze pipeline
+  - name: quantum
+    description: 3-6-9 Quantum decision engine
+  - name: oracle
+    description: Vortex Oracle predictions
+  - name: wholesale
+    description: B2B Wholesale Scout & Singularity Run
+  - name: mass-generate
+    description: Mass Product Manifest Generator
+  - name: payments
+    description: Stripe Checkout & Webhooks
+
+paths:
+  /api/arbitrage/status:
+    get:
+      tags: [status]
+      summary: System status overview
+      responses:
+        "200":
+          description: Current system state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  llm_backend:      { type: string, example: ollama }
+                  total_jobs:       { type: integer, example: 42 }
+                  bids_sent:        { type: integer, example: 7 }
+                  pending_bids:     { type: integer, example: 3 }
+                  daily_bid_limit:  { type: integer, example: 10 }
+                  timestamp:        { type: string, format: date-time }
+
+  /api/arbitrage/kpis:
+    get:
+      tags: [status]
+      summary: KPI totals from database
+      responses:
+        "200":
+          description: Aggregated KPIs
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/arbitrage/stats:
+    get:
+      tags: [status]
+      summary: XRP progress stats
+      responses:
+        "200":
+          description: XRP snapshot and progress towards target
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/arbitrage/jobs:
+    get:
+      tags: [jobs]
+      summary: List recent jobs (last 20)
+      responses:
+        "200":
+          description: Job list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobs:  { type: array, items: { $ref: "#/components/schemas/Job" } }
+                  count: { type: integer }
+
+  /api/arbitrage/bids/pending:
+    get:
+      tags: [jobs]
+      summary: List bids awaiting manual approval
+      responses:
+        "200":
+          description: Pending bid list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bids:  { type: array, items: { $ref: "#/components/schemas/Bid" } }
+                  count: { type: integer }
+
+  /api/arbitrage/bids/{bid_id}/approve:
+    post:
+      tags: [jobs]
+      summary: Approve or reject a bid
+      parameters:
+        - name: bid_id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approved: { type: boolean, default: true }
+      responses:
+        "200":
+          description: Approval result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:       { type: boolean }
+                  bid_id:   { type: integer }
+                  approved: { type: boolean }
+
+  /api/arbitrage/scout:
+    post:
+      tags: [cycle]
+      summary: Run Upwork/Fiverr job scraper (rate-limited 10/min per IP)
+      responses:
+        "200":
+          description: Scout results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/analyze-batch:
+    post:
+      tags: [cycle]
+      summary: Analyze new jobs and create bids
+      responses:
+        "200":
+          description: Batch analysis results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  analyzed:     { type: integer }
+                  bids_created: { type: integer }
+                  timestamp:    { type: string, format: date-time }
+
+  /api/arbitrage/cycle:
+    post:
+      tags: [cycle]
+      summary: Scout + analyze in background (rate-limited 5/min per IP)
+      responses:
+        "200":
+          description: Cycle started
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/quantum/decide:
+    post:
+      tags: [quantum]
+      summary: Quantum decision engine — 3-6-9 Vortex Math decision (rate-limited 30/min per IP)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuantumDecideRequest"
+      responses:
+        "200":
+          description: Decision result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuantumDecideResponse"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/quantum/status:
+    get:
+      tags: [quantum]
+      summary: Autopojeza (self-healing) tracker status
+      responses:
+        "200":
+          description: Current autopojeza status
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/arbitrage/quantum/scan:
+    post:
+      tags: [quantum]
+      summary: Quantum scan all configured channels (rate-limited 30/min per IP)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deals:
+                  type: object
+                  additionalProperties: true
+      responses:
+        "200":
+          description: Scan results per channel
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/oracle/predict:
+    post:
+      tags: [oracle]
+      summary: Single product prediction via Vortex Oracle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OraclePredictRequest"
+      responses:
+        "200":
+          description: Oracle prediction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OraclePredictResponse"
+
+  /api/arbitrage/oracle/scan:
+    post:
+      tags: [oracle]
+      summary: Batch product scan (rate-limited 20/min per IP)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items: { type: object, additionalProperties: true }
+                channel_id:
+                  type: string
+                  default: AUDIO_PREMIUM
+      responses:
+        "200":
+          description: Batch scan results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/wholesale/scout:
+    post:
+      tags: [wholesale]
+      summary: B2B Wholesale Scout Bridge
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WholesaleScoutRequest"
+      responses:
+        "200":
+          description: Scout results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/arbitrage/wholesale/cycle:
+    post:
+      tags: [wholesale]
+      summary: Full Singularity Run — scout + analyze + execute (rate-limited 5/min per IP)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WholesaleCycleRequest"
+      responses:
+        "200":
+          description: Cycle results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/wholesale/deals:
+    get:
+      tags: [wholesale]
+      summary: Query stored deals
+      parameters:
+        - name: channel_id
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { type: string, enum: [new, scouted, approved, rejected] }
+        - name: min_margin
+          in: query
+          schema: { type: number, format: float }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50 }
+      responses:
+        "200":
+          description: Deal list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deals: { type: array, items: { $ref: "#/components/schemas/Deal" } }
+                  count: { type: integer }
+
+  /api/arbitrage/mass-generate:
+    post:
+      tags: [mass-generate]
+      summary: Run Mass Generator pipeline (rate-limited 3/min per IP)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MassGenerateRequest"
+      responses:
+        "200":
+          description: Generation results with manifest
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/mass-generate/manifest:
+    get:
+      tags: [mass-generate]
+      summary: Get current product manifest
+      responses:
+        "200":
+          description: Current manifest
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "404":
+          description: No manifest generated yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/arbitrage/checkout:
+    post:
+      tags: [payments]
+      summary: Create a Stripe Checkout Session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: Checkout session URL
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/arbitrage/webhook:
+    post:
+      tags: [payments]
+      summary: Stripe webhook receiver (validates signature)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+components:
+  responses:
+    RateLimited:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:       { type: string, example: "Rate limit exceeded" }
+              retry_after: { type: integer, example: 60, description: Seconds until next allowed request }
+
+  schemas:
+    Job:
+      type: object
+      properties:
+        id:          { type: string }
+        platform:    { type: string, enum: [upwork, fiverr] }
+        title:       { type: string }
+        description: { type: string }
+        budget_min:  { type: number }
+        budget_max:  { type: number }
+        client:      { type: string }
+        url:         { type: string, format: uri }
+        keywords:    { type: string }
+        scouted_at:  { type: string, format: date-time }
+        status:      { type: string, enum: [new, analyzed, bid_sent, won, lost] }
+
+    Bid:
+      type: object
+      properties:
+        id:             { type: integer }
+        job_id:         { type: string }
+        cover_letter:   { type: string }
+        our_price:      { type: number }
+        est_profit_usd: { type: number }
+        analyzer_score: { type: integer, minimum: 0, maximum: 100 }
+        llm_backend:    { type: string }
+
+    Deal:
+      type: object
+      properties:
+        id:             { type: string }
+        channel:        { type: string }
+        status:         { type: string }
+        margin:         { type: number }
+        scouted_at:     { type: string, format: date-time }
+
+    QuantumDecideRequest:
+      type: object
+      properties:
+        price_wholesale:
+          type: number
+          description: Wholesale cost in USD
+          example: 100.0
+        price_retail:
+          type: number
+          description: Retail price in USD
+          example: 150.0
+        channel_id:
+          type: string
+          description: Trading channel identifier
+          example: AUDIO_PREMIUM
+
+    QuantumDecideResponse:
+      type: object
+      properties:
+        timestamp:    { type: string, format: date-time }
+        channel_id:   { type: string }
+        decision:     { type: string, enum: [AFFIRM, NEGATE, SUPERPOSITION] }
+        frequency_hz: { type: number, description: Solfeggio frequency (528/417/396/174 Hz) }
+        margin_pct:   { type: number }
+        vortex_root:  { type: integer, description: Digital root via 3-6-9 Vortex Math }
+        ebdi:
+          type: object
+          properties:
+            dominance: { type: number, minimum: 0, maximum: 1 }
+            arousal:   { type: number, minimum: 0, maximum: 1 }
+            pleasure:  { type: number, minimum: 0, maximum: 1 }
+
+    OraclePredictRequest:
+      type: object
+      properties:
+        wholesale_price: { type: number, example: 100.0 }
+        retail_price:    { type: number, example: 150.0 }
+        price_history:   { type: array, items: { type: number }, example: [90, 95, 100, 105] }
+        channel_id:      { type: string, default: AUDIO_PREMIUM }
+
+    OraclePredictResponse:
+      type: object
+      properties:
+        signal:      { type: string, enum: [BUY, HOLD, SELL, WAIT] }
+        confidence:  { type: number, minimum: 0, maximum: 1 }
+        reason:      { type: string }
+        channel_id:  { type: string }
+
+    WholesaleScoutRequest:
+      type: object
+      properties:
+        feed_data:     { type: object, nullable: true }
+        feed_format:   { type: string, default: json, enum: [json, csv, xml] }
+        channel_filter:{ type: string, nullable: true }
+        min_margin:    { type: number, default: 0.15 }
+        min_stock:     { type: integer, default: 1 }
+        use_mock:      { type: boolean }
+
+    WholesaleCycleRequest:
+      type: object
+      properties:
+        channel_filter: { type: string, nullable: true }
+        min_margin:     { type: number, default: 0.15 }
+        auto_execute:   { type: boolean, default: false }
+        use_mock:       { type: boolean, default: true }
+
+    MassGenerateRequest:
+      type: object
+      properties:
+        channel_filter: { type: string, nullable: true }
+        min_margin:     { type: number, default: 0.15 }
+        min_stock:      { type: integer, default: 5 }
+        revalidate:     { type: boolean, default: false }
+
+    ErrorResponse:
+      type: object
+      properties:
+        error: { type: string }

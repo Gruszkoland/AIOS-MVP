@@ -1,0 +1,52 @@
+name: ADRION 369 Go CI
+
+on:
+  push:
+    paths:
+      - "cmd/**"
+      - "internal/**"
+      - "go.mod"
+      - "go.sum"
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test with coverage
+        run: |
+          go test -v -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Enforce coverage threshold (80%)
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep ^total | awk '{print $3}' | tr -d '%')
+          echo "Total coverage: ${COVERAGE}%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "FAIL: Go coverage ${COVERAGE}% is below 80% threshold"
+            exit 1
+          fi
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: go-coverage
+          path: coverage.out

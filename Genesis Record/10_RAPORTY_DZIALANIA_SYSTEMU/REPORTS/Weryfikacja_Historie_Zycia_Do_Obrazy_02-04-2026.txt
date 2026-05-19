@@ -1,0 +1,133 @@
+SOURCE=C:\Users\adiha\Mój dysk\Historie Życia
+TARGET=C:\Users\adiha\Pictures
+MODE=hash
+SOURCE_FILES_ALL=1883
+SOURCE_FILES_EXCL_REVIEW=1883
+TARGET_FILES=2481
+SOURCE_UNIQUE_KEYS=1883
+TARGET_UNIQUE_KEYS=1843
+MISSING_HASH_GROUPS=188
+MISSING_FILE_INSTANCES=188
+STATUS=MISSING_DETECTED
+
+TOP_MISSING
+HASH=ee5a5192da6220094f3fd7976c6797afd626d257f95b79d309ce77cbd6b8bbe1|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20220722_193019.jpg
+HASH=19d3b5ab572f64958b13a0c124bf39344380eaafc6f5150917527037552fa507|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20220810_185034.jpg
+HASH=952b883d1db5413000669703b96278a30bde455e9609ed849f1dd6a25045af18|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20220810_185116.jpg
+HASH=3ddcbbc2d858c47cb142b8a7dd9f68c88d8808b8ea8ddeac8195cfe6e131df3c|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20220812_220710.jpg
+HASH=f660e54bb306a6ee5844cdf21ea19c2a39993e89b79421392500d15b88f260b7|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20220909_161436.jpg
+HASH=1e90f7cd67f3488f581ab4dcdd629d9076d17767633d31d7bf397ac3c5571fa5|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20221118_053745.jpg
+HASH=2f0ee47c8e8fc0887d0c4c8516623446437f46170f02a046700b588fea15af82|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230108_204135.jpg
+HASH=0af13ef80b5cce855688ec98ec275938899ee5f7047ded31566b558b7c7ae4ef|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230407_202156.jpg
+HASH=11676362cdf8c5d2de69e9723370fecf8167cd9504d1dbd12ccf517ca2d397cb|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230407_202205.jpg
+HASH=e9ac2e773df4c0f0e9d189d5dc49a79fc2cb4fc7eba81eb454c4e42ca8600fff|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230407_202213.jpg
+HASH=f7623179495bb6deca743c1ecadc4d31932f5b307ad9012d5859675b6fbe09d4|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230408_033200.jpg
+HASH=48cbcdde73466ce10d1171b458dbf2f02c13f285da91a54a1b9fee5885c2930f|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230408_033233.jpg
+HASH=a11308612990b20fbbd68c09825c4a8088155e5be6eac41eea8115ffea8d8d0a|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230408_033250.jpg
+HASH=8454ed42e4e78fa916475827d5b426bd156bd0706897d49ee80d9083c6be4383|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230408_033336.jpg
+HASH=91f5430c46312249bbd8495a6d21a6bac5986f1773949736c25c5f9806abc952|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230408_082651.jpg
+HASH=8eef8acc52dbce1c9730d48ebe121960c9cf82854cdc91ed87892506f7d11a4e|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230408_082749.jpg
+HASH=021577cd2ff7cd41a3561d239b083066d91957b30ec60e2bc081f22557641b34|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230408_082848.jpg
+HASH=8537c5bf2046fe4d4cb53699d45bc7b4f3fdbf6e1bbe3637d9ddcc4e02f7afdc|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230409_094112.jpg
+HASH=a4f1259d6305371696f39e53fa0ddd0e5ac06fd3bc03d571e5d2ffbf026d6085|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230409_133031.jpg
+HASH=7c965e8c67af63236d2115c1265d4ace1a5a6218da1aaecd58f5623060cc8c45|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230409_133035.jpg
+HASH=70bfd58b1589a795a9bb8fce15ec6aad9c228c466dc577f3e315671d60e8466e|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230409_133112.jpg
+HASH=84f0100c1bcb35b25f91dfd8a5ab25152ed8fdee3aea027c7f47fe5aff07338e|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230409_133117.jpg
+HASH=283ed0b4eb612e237f7c8c3d3782654edc40042c5bf2d27d0c75e4fa9b7d9a36|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230409_143926.jpg
+HASH=5b2224695e34d30a943f867f3a9b8ac4593e04c65e29d031c612523680c7756d|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230409_144456.jpg
+HASH=00ce4dba32586c7a1f7cd0739527e14689aae8683b4c618257838ceb5b4704d1|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230409_220456.jpg
+HASH=3fa0bdaed8a96422e79d48796019cd8f36788add30626f170fad8c431421554b|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230409_220500.jpg
+HASH=fa79308eceb78ac273ecfe8e9327fca67db58b0576b07a82b601afc2631ad4fe|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_163058.jpg
+HASH=9a5da8c7a936ab234677b776c08430fca2b9ec77afd6830c3be0678c911d268a|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_175208.jpg
+HASH=a3478f9559232d7909cc933d2f2b09a674f45410cbe2f6e72c274b541a131880|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_175303.jpg
+HASH=c0b9f4c35e5cfd18a3f5fa3113fb78c053955d0b232ac7399909ff149974f60f|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_175305.jpg
+HASH=66cf274d8a8d7612b69787b80c6194b7ab2703160a472615cb2e0e5a0c6616dd|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_175336.jpg
+HASH=f90b86ce85261cf75bcd43c0c5f605008c80dd1b8cf6bb2df38b6c68c0a1d6c7|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_181616.jpg
+HASH=112a242d47d41dea4ef8be48fc5b91ab237c6da1895ed7f07665dfe5cf36a2c6|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_184121.jpg
+HASH=0b9aa06691a64a925c83dc50312a09709dae165216f33ff307743a6812e8596e|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_184131.jpg
+HASH=8c9ae5916c06c55d1e123eb2d9cbaba37073260e14fe08e85aed05e659aa8174|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_201625.jpg
+HASH=fe0b4bd36e51d3a8d018f79a14cb6a2f55e9635b6c6ccdd50124c4ca8b78bd83|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_201644.jpg
+HASH=f6328db0dfaa214027f8494e75fecae7844369651d353668da0b0dec479e7fae|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_201859.jpg
+HASH=079871e1b39a5a20f371b30ff49547f5ef637a908eec928b7af3ec89b9ae6992|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230410_201920.jpg
+HASH=15d02a726e6871782557bfd65b710f79c7fc5ddc51adce2685164dbcc3a29e88|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230412_122534.jpg
+HASH=ff1908da58608b2294257451f0aefedc3ad5781efb14d20d1d7427591ccfffa4|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230412_152611.jpg
+HASH=ddb7bfa70fee2e7bb718d59d207a55d981697ae56fb1b0c36394f47ef0d81983|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230413_171951.jpg
+HASH=52a645984065d091001d7e7d20de5db526d85369c4df2379d5f70e4a59527b1a|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230413_172000.jpg
+HASH=9a6a7505774e5789496688fc717f70de38d08252066ce0d288f153d0849cde23|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230413_172422.jpg
+HASH=f639fb3c2b83a9fbd5f318e5e3649096ca655eed640b5b20b9999e29c0961cfd|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230413_172800.jpg
+HASH=d3a4b57be57ee9eaa02e4314f41ec1baedb47952bca323cf8d7592045e823462|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230414_153746.jpg
+HASH=2f8b5366f2cbf9426dbb82aa20417f10c6415a6fc69fddcd7c9a7e65d2d9566e|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230414_153751.jpg
+HASH=aefe105feb50c0e3d0402a34d368e1c5fc3069fd6ceff45b0bffd60868aa4ca0|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230414_153911.jpg
+HASH=a3dd2a1a63e002f1c07e6360915a6db2f7e86b2f9d0e85b4e6fc93d7b551e75f|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230414_162611.jpg
+HASH=11f03b1a4073e98ac5cd30f109587429bd5bc9c760c0cb8a1697f538b38f2e04|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230415_155135.jpg
+HASH=491b85d63dfbf3d58aab7f18b06ce23cfa7d558bed102df8f72da64a8ce53ee2|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230415_165342.jpg
+HASH=ed5af5e1e1519277bddb85a3e3dfe0a833e5c5afc2dd98e55745ecbb0ab99209|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230416_175240.jpg
+HASH=2f5ad1e81c17cb83560083787b1238152aeded2ed81b8a7901ab79088586695b|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230416_210434.jpg
+HASH=fa93a9df692a17d078455d7fcba98e70f893fa7c09c49f3df9a83320efda08fd|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230416_210444.jpg
+HASH=b115aeb00f8c3db124ad67b51b2851c0666d8f085696c36ae751c9cab8482b00|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230417_080546.jpg
+HASH=dfe00009667cfc72b17fa6d5d390ff853f372013e1abe6fed6923fbd0a013fbe|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230417_080551.jpg
+HASH=a69d9d4220983ddebfd8ac6233b856abbd153bd377b31b69c5e8362d2ef50406|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230418_072544.jpg
+HASH=03a9e245f7084dca95764687ed9bcd71af7111e601e3baf34c5565c38ca52d7b|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230418_072654.jpg
+HASH=c861735719522d121b561be2055032c29bdc02d3979eb811d2921494090253ef|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230418_074256.jpg
+HASH=e8a68cffa60b5a61a8f99f14999fa5cb9e27189ffb459b51cd6730d96d579c9c|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230418_074257.jpg
+HASH=6cedf55b0571d1a4c07385674b58c6876be8339491179d49b68ce2a814d0e3f9|need=1|have=0|missing=1
+  SRC=C:\Users\adiha\Mój dysk\Historie Życia\Od Belgii Po przez Afryke az do Miedzynarodowki\20230418_080757.jpg

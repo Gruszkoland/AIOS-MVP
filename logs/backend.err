@@ -1,0 +1,22 @@
+[SECURITY] PostgreSQL password is not set — using insecure default 'adrion_pass'. Set PG_PASSWORD env var before exposing this service on a network.
+2026-04-05 23:15:26,263 level=WARNING logger=adrion.uap.api \u26a0\ufe0f PostgreSQL connection failed: connection to server at "localhost" (::1), port 5432 failed: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+. Falling back to in-memory storage.
+2026-04-05 23:15:26,786 level=WARNING logger=adrion.uap.api \u26a0\ufe0f Phase 2 endpoints not registered: connection to server at "localhost" (::1), port 5432 failed: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+2026-04-05 23:15:27,237 level=WARNING logger=adrion.uap.auth [SECURITY] JWT_SECRET is not set — using insecure default. Set JWT_SECRET env var (min 32 chars) before exposing this service on a network.
+2026-04-05 23:15:27,742 level=WARNING logger=adrion.uap.api \u26a0\ufe0f Phase 3 auth endpoints not registered: connection to server at "localhost" (::1), port 5432 failed: server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+2026-04-05 23:15:27,742 level=INFO logger=adrion.uap.api event=uap_startup host=localhost port=8002 api_key=***
+2026-04-05 23:15:27,822 level=INFO logger=werkzeug [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:8002
+2026-04-05 23:15:27,824 level=INFO logger=werkzeug [33mPress CTRL+C to quit[0m
+2026-04-05 23:15:31,194 level=INFO logger=adrion.uap.api event=request method=GET path=/mapi/v1/health status=200 duration_ms=0 remote_addr=127.0.0.1
+2026-04-05 23:15:31,194 level=INFO logger=werkzeug 127.0.0.1 - - [05/Apr/2026 23:15:31] "GET /mapi/v1/health HTTP/1.1" 200 -
+2026-04-05 23:33:43,476 level=WARNING logger=adrion.uap.api event=request method=GET path=/favicon.ico status=404 duration_ms=1 remote_addr=127.0.0.1
+2026-04-05 23:33:43,478 level=INFO logger=werkzeug 127.0.0.1 - - [05/Apr/2026 23:33:43] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
