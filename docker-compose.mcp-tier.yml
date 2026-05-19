@@ -10,6 +10,7 @@ version: "3.9"
 #   - oracle-mcp        (9003) — 162D routing & pattern matching
 #   - genesis-mcp       (9004) — State management & RAG
 #   - healer-mcp        (9005) — Recovery & monitoring
+#   - recursive-mas     (8095) — Multi-Agent LLM inference (RecursiveMAS)
 
 services:
   # ════════════════════════════════════════════════════════════════════════════
@@ -34,6 +35,7 @@ services:
       - ORACLE_URL=http://oracle-mcp:9003
       - GENESIS_URL=http://genesis-mcp:9004
       - HEALER_URL=http://healer-mcp:9005
+      - RECURSIVE_MAS_URL=http://recursive-mas:8095
     volumes:
       - ./mcp-servers:/app/mcp-servers:ro
       - ./Genesis Record:/app/genesis-data
@@ -51,6 +53,7 @@ services:
       - oracle-mcp
       - genesis-mcp
       - healer-mcp
+      - recursive-mas
     restart: unless-stopped
     labels:
       tier: "06-mcp-servers"
@@ -217,6 +220,44 @@ services:
       component: "healer"
       domain: "recovery-monitoring"
 
+  # ════════════════════════════════════════════════════════════════════════════
+  # RECURSIVE-MAS — Port 8095 (Multi-Agent LLM Inference)
+  # Source: https://github.com/RecursiveMAS/RecursiveMAS
+  # Paper:  https://arxiv.org/abs/2604.25917
+  # Docs:   docs/recursive-mas.html
+  # ════════════════════════════════════════════════════════════════════════════
+  recursive-mas:
+    container_name: adrion-recursive-mas
+    build:
+      context: .
+      dockerfile: Dockerfile.recursive-mcp
+    image: adrion-recursive-mas:v1.0
+    ports:
+      - "8095:8095"
+    environment:
+      - RECURSIVE_MAS_STYLE=${RECURSIVE_MAS_STYLE:-sequential_light}
+      - RECURSIVE_MAS_DEVICE=${RECURSIVE_MAS_DEVICE:-cpu}
+      - RECURSIVE_MAS_PORT=8095
+      - HF_TOKEN=${HF_TOKEN:-}
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+      - LOG_LEVEL=INFO
+    volumes:
+      - recursive-mas-models:/root/.cache/huggingface
+    networks:
+      - adrion-mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8095/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    restart: unless-stopped
+    labels:
+      tier: "06-mcp-servers"
+      component: "recursive-mas"
+      domain: "multi-agent-inference"
+      source: "https://github.com/RecursiveMAS/RecursiveMAS"
+
 networks:
   adrion-mcp-network:
     driver: bridge
@@ -226,3 +267,4 @@ volumes:
   mcp-router-data:
   vortex-logs:
   genesis-record:
+  recursive-mas-models:
