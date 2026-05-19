@@ -6,7 +6,7 @@ updated: "2026-03-29"
 
 # 162-Wymiarowa Przestrzeń Decyzyjna
 
-> Każda decyzja autonomicznego agenta operuje w przestrzeni **162 wymienionych wymiarów:**
+> Każda decyzja autonomicznego agenta operuje w przestrzeni **162 stanów decyzyjnych** (iloczyn kartezjański 3 Perspektyw × 6 Trybów × 9 Praw — NIE 162 wymiarów matematycznych):
 >
 > - 3 Perspektywy (Material, Intellectual, Essential)
 > - 6 Trybów (Inventory, Empathy, Process, Debate, Healing, Action)
@@ -24,7 +24,7 @@ gdzie:
   tryb ∈ {Inventory, Empathy, Process, Debate, Healing, Action}    [6 opcji]
   prawo ∈ {G1, G2, ..., G9}                                         [9 opcji]
 
-Łączna liczba wymiarów: 3 × 6 × 9 = 162
+Łączna liczba stanów decyzyjnych: 3 × 6 × 9 = 162  (NIE 162 wymiarów — przestrzeń ma 18 parametrów / 3 osie)
 ```
 
 ### 1.1 Wymiary Materialnych
