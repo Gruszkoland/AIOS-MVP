@@ -1,0 +1,1 @@
+[2026-05-08 21:16:39] [SUCCESS] Synchronizacja i health-check OK (A->B: 2, B->A: 2, files=scanned:5000/5000 (truncated), sampleHash=06F7762B5E2E).

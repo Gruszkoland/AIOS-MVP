@@ -1,0 +1,19 @@
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[user]
+	name = Adrian Halicki
+	email = adi.halicki@gmail.com
+[diff]
+	algorithm = histogram
+	renameLimit = 0
+	renames = true
+[core]
+	bigFileThreshold = 2g
+	packedGitLimit = 1g
+[credential]
+	helper = manager
+[safe]
+	directory = C:/Users/adiha/.1_Projekty/PROJEKTY/162 demencje w schemacie 369/adrion-369-working

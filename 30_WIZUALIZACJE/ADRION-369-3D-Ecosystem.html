@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADRION 369 — 3D Ecosystem Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e, #0a0a15);
+            color: #e0e0e0;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+        
+        #canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(156, 39, 176, 0.5);
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 350px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        
+        .controls h2 {
+            color: #9c27b0;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+        
+        .control-group {
+            margin: 12px 0;
+            font-size: 0.9em;
+        }
+        
+        .control-label {
+            color: #90caf9;
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.4);
+        }
+        
+        .stats {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            font-size: 0.9em;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            color: #b0bec5;
+        }
+        
+        .stat-label {
+            color: #90caf9;
+        }
+        
+        .stat-value {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        .info-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .info-title {
+            color: #4caf50;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .info-text {
+            color: #b0bec5;
+            line-height: 1.4;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 152, 0, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 250px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            font-size: 0.85em;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(156, 39, 176, 0.5);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            z-index: 200;
+        }
+        
+        .loading h1 {
+            color: #9c27b0;
+            margin-bottom: 15px;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(156, 39, 176, 0.3);
+            border-top: 3px solid #9c27b0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div class="loading" id="loading">
+        <h1>🚀 Initializing 3D Ecosystem</h1>
+        <div class="spinner"></div>
+        <p>Loading workspace structure...</p>
+    </div>
+    
+    <div class="controls">
+        <h2>🎮 Controls</h2>
+        
+        <div class="control-group">
+            <label class="control-label">Rotation Speed</label>
+            <input type="range" id="rotationSpeed" min="0" max="5" value="1" step="0.1">
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Zoom</label>
+            <input type="range" id="zoom" min="100" max="500" value="200" step="10">
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Node Size</label>
+            <input type="range" id="nodeSize" min="0.5" max="3" value="1" step="0.1">
+        </div>
+        
+        <div class="button-group">
+            <button onclick="toggleAutoRotate()">⏸️ Pause</button>
+            <button onclick="resetView()">🔄 Reset</button>
+            <button onclick="toggleLabels()">🏷️ Labels</button>
+            <button onclick="toggleConnections()">🔗 Links</button>
+        </div>
+    </div>
+    
+    <div class="stats">
+        <div class="stat-row">
+            <span class="stat-label">Total Projects:</span>
+            <span class="stat-value" id="projectCount">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Total Files:</span>
+            <span class="stat-value" id="fileCount">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Agents (33):</span>
+            <span class="stat-value">✅ Ready</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Services (6):</span>
+            <span class="stat-value">🏗️ Active</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Metrics:</span>
+            <span class="stat-value">13/13 ✓</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">FPS:</span>
+            <span class="stat-value" id="fps">60</span>
+        </div>
+    </div>
+    
+    <div class="info-panel">
+        <div class="info-title" id="infoTitle">🌍 Workspace Overview</div>
+        <div class="info-text" id="infoText">
+            <strong>ADRION 369 Ecosystem</strong><br/>
+            • 33 AI Agents<br/>
+            • 6 Core Services<br/>
+            • 13 Prometheus Metrics<br/>
+            • 11 Guardian Laws<br/>
+            <br/>
+            <strong>Hover over nodes for details</strong>
+        </div>
+    </div>
+    
+    <div class="legend">
+        <div style="color: #9c27b0; font-weight: bold; margin-bottom: 10px;">Legend</div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #9c27b0;"></div>
+            <span>Meta-Layer (Chronos)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4caf50;"></div>
+            <span>Core Services</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #2196f3;"></div>
+            <span>Gems (Agents)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ff9800;"></div>
+            <span>Projects</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #f06292;"></div>
+            <span>Monitoring</span>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Three.js Setup
+        const canvas = document.getElementById('canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x0a0a15, 1);
+        camera.position.z = 200;
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const pointLight1 = new THREE.PointLight(0x9c27b0, 1);
+        pointLight1.position.set(100, 100, 100);
+        scene.add(pointLight1);
+        
+        const pointLight2 = new THREE.PointLight(0x2196f3, 0.8);
+        pointLight2.position.set(-100, -100, 100);
+        scene.add(pointLight2);
+        
+        // Data Structure
+        const ecosystemData = {
+            center: {
+                name: "ADRION 369",
+                type: "core",
+                color: 0x9c27b0,
+                size: 15,
+                position: { x: 0, y: 0, z: 0 },
+                info: "🔱 Meta-Guardian Ecosystem\n33 AI Agents + 6 Services"
+            },
+            layers: [
+                {
+                    radius: 50,
+                    count: 6,
+                    color: 0x4caf50,
+                    type: "service",
+                    names: ["ADRION API", "n8n", "PostgreSQL", "Redis", "Prometheus", "Grafana"],
+                    info: "🏗️ Core Infrastructure Services"
+                },
+                {
+                    radius: 100,
+                    count: 8,
+                    color: 0x2196f3,
+                    type: "agent",
+                    names: ["MPG", "CVA", "LCA", "SEO", "EDU", "VAP", "CRM", "KMS"],
+                    info: "🎯 Domain Specialist Agents"
+                },
+                {
+                    radius: 150,
+                    count: 12,
+                    color: 0xff9800,
+                    type: "project",
+                    names: ["ADRION Deploy", "n8n Workflows", "Arbitrage", "Quantum", "Oracle", "Wholesale", 
+                            "Payments", "MCP Servers", "Vortex", "Healer", "Router", "NVIDIA 3D"],
+                    info: "📦 Project Modules"
+                },
+                {
+                    radius: 200,
+                    count: 16,
+                    color: 0xf06292,
+                    type: "monitoring",
+                    names: ["Metrics Export", "Grafana Sync", "CI/CD Pipeline", "Health Check", 
+                            "CVC Manager", "LTM Restore", "Guardian Laws", "HARMONIA Gateway",
+                            "Genesis Record", "Event Logs", "Alert Rules", "Dashboards",
+                            "Webhooks", "API Docs", "Docker Compose", "Kubernetes"],
+                    info: "📊 Monitoring & DevOps"
+                }
+            ]
+        };
+        
+        // Create 3D Objects
+        const objects = [];
+        let labelsVisible = true;
+        let connectionsVisible = true;
+        let autoRotate = true;
+        
+        function createSphere(radius, color, position, scale = 1) {
+            const geometry = new THREE.SphereGeometry(radius * scale, 32, 32);
+            const material = new THREE.MeshPhongMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.3,
+                wireframe: false
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(position.x, position.y, position.z);
+            return mesh;
+        }
+        
+        function createLabel(text, position) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, 256, 64);
+            
+            ctx.fillStyle = '#9c27b0';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 128, 32);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.MeshBasicMaterial({ map: texture });
+            const geometry = new THREE.PlaneGeometry(40, 10);
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.copy(position);
+            mesh.position.z += 15;
+            
+            return mesh;
+        }
+        
+        function buildEcosystem() {
+            // Central node
+            const centerSphere = createSphere(ecosystemData.center.size, ecosystemData.center.color, 
+                                           ecosystemData.center.position, 1);
+            scene.add(centerSphere);
+            objects.push({
+                mesh: centerSphere,
+                data: ecosystemData.center,
+                label: null
+            });
+            
+            // Layers
+            ecosystemData.layers.forEach((layer, layerIndex) => {
+                for (let i = 0; i < layer.count; i++) {
+                    const angle = (i / layer.count) * Math.PI * 2;
+                    const x = Math.cos(angle) * layer.radius;
+                    const y = Math.sin(angle) * layer.radius;
+                    const z = Math.sin(angle * 0.5) * layer.radius * 0.5;
+                    
+                    const position = { x, y, z };
+                    const sphere = createSphere(8, layer.color, position);
+                    scene.add(sphere);
+                    
+                    // Add glow
+                    const glowGeometry = new THREE.SphereGeometry(10, 32, 32);
+                    const glowMaterial = new THREE.MeshBasicMaterial({
+                        color: layer.color,
+                        transparent: true,
+                        opacity: 0.1
+                    });
+                    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                    glow.position.copy(position);
+                    scene.add(glow);
+                    
+                    objects.push({
+                        mesh: sphere,
+                        glow: glow,
+                        data: {
+                            name: layer.names[i],
+                            type: layer.type,
+                            info: layer.info
+                        },
+                        label: null
+                    });
+                }
+            });
+            
+            // Create connections
+            if (connectionsVisible) {
+                const lineGeometry = new THREE.BufferGeometry();
+                const points = [];
+                
+                objects.forEach(obj => {
+                    if (obj.data.type !== 'core') {
+                        points.push(
+                            0, 0, 0,
+                            obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z
+                        );
+                    }
+                });
+                
+                lineGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
+                const lineMaterial = new THREE.LineBasicMaterial({
+                    color: 0x9c27b0,
+                    transparent: true,
+                    opacity: 0.2,
+                    linewidth: 1
+                });
+                const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+                scene.add(lines);
+            }
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('projectCount').textContent = ecosystemData.layers.length;
+            document.getElementById('fileCount').textContent = objects.length;
+        }
+        
+        // Animation Loop
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Calculate FPS
+            frameCount++;
+            const now = performance.now();
+            if (now - lastTime >= 1000) {
+                document.getElementById('fps').textContent = frameCount;
+                frameCount = 0;
+                lastTime = now;
+            }
+            
+            // Rotation
+            if (autoRotate) {
+                const rotationSpeedValue = parseFloat(document.getElementById('rotationSpeed').value);
+                scene.rotation.z += 0.001 * rotationSpeedValue;
+                scene.rotation.x += 0.0005 * rotationSpeedValue;
+            }
+            
+            // Update zoom
+            const zoomValue = parseFloat(document.getElementById('zoom').value);
+            camera.position.z = zoomValue;
+            
+            // Update node sizes
+            const nodeSizeValue = parseFloat(document.getElementById('nodeSize').value);
+            objects.forEach(obj => {
+                if (obj.mesh.geometry.type === 'SphereGeometry') {
+                    obj.mesh.scale.set(nodeSizeValue, nodeSizeValue, nodeSizeValue);
+                    if (obj.glow) {
+                        obj.glow.scale.set(nodeSizeValue, nodeSizeValue, nodeSizeValue);
+                    }
+                }
+            });
+            
+            // Pulsing effect
+            objects.forEach((obj, index) => {
+                if (obj.glow) {
+                    obj.glow.material.opacity = 0.1 + Math.sin(performance.now() * 0.003 + index) * 0.05;
+                }
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Control Functions
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+            event.target.textContent = autoRotate ? '⏸️ Pause' : '▶️ Play';
+        }
+        
+        function resetView() {
+            scene.rotation.set(0, 0, 0);
+            camera.position.z = 200;
+            document.getElementById('rotationSpeed').value = 1;
+            document.getElementById('zoom').value = 200;
+        }
+        
+        function toggleLabels() {
+            labelsVisible = !labelsVisible;
+            objects.forEach(obj => {
+                if (obj.label) {
+                    obj.label.visible = labelsVisible;
+                }
+            });
+        }
+        
+        function toggleConnections() {
+            connectionsVisible = !connectionsVisible;
+        }
+        
+        // Mouse interactions
+        let hoveredObject = null;
+        
+        function onMouseMove(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = (event.clientX - rect.left) / rect.width * 2 - 1;
+            const y = -(event.clientY - rect.top) / rect.height * 2 + 1;
+            
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+            
+            const spheres = objects.map(obj => obj.mesh);
+            const intersects = raycaster.intersectObjects(spheres);
+            
+            if (intersects.length > 0) {
+                const intersected = intersects[0].object;
+                const obj = objects.find(o => o.mesh === intersected);
+                
+                if (obj) {
+                    document.getElementById('infoTitle').textContent = `✨ ${obj.data.name}`;
+                    document.getElementById('infoText').textContent = obj.data.info;
+                    intersected.material.emissiveIntensity = 0.8;
+                } else if (hoveredObject) {
+                    hoveredObject.material.emissiveIntensity = 0.3;
+                }
+                
+                hoveredObject = intersected;
+            } else if (hoveredObject) {
+                hoveredObject.material.emissiveIntensity = 0.3;
+                hoveredObject = null;
+                document.getElementById('infoTitle').textContent = '🌍 Workspace Overview';
+                document.getElementById('infoText').textContent = 'ADRION 369 Ecosystem\n• 33 AI Agents\n• 6 Core Services\n• 13 Prometheus Metrics\n• 11 Guardian Laws\n\nHover over nodes for details';
+            }
+        }
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        canvas.addEventListener('mousemove', onMouseMove);
+        
+        // Start
+        buildEcosystem();
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+.vercel
+
+# Sekrety i zmienne lokalne — nie commituj
+.env
+.env.local
+.env*.local
+*.pem
