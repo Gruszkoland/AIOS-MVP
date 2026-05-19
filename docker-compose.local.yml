@@ -1,0 +1,118 @@
+version: "3.8"
+
+services:
+  # PostgreSQL for metrics and audit logging
+  postgres:
+    image: postgres:15-alpine
+    container_name: adrion-postgres
+    environment:
+      POSTGRES_DB: adrion_agents
+      POSTGRES_USER: adrion
+      POSTGRES_PASSWORD: adrion_local_dev_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adrion"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: adrion-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    depends_on:
+      - postgres
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: adrion-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for inter-agent communication (optional enhancement)
+  redis:
+    image: redis:7-alpine
+    container_name: adrion-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # micro-saas SaaS REST API (plans, subscriptions, quota, products)
+  micro-saas:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE: micro-saas
+    container_name: adrion-micro-saas
+    command: >
+      python -c "
+      import sys; sys.path.insert(0, '/app/micro-saas');
+      from api import create_saas_app;
+      app = create_saas_app();
+      app.run(host='0.0.0.0', port=8003)
+      "
+    environment:
+      UAP_API_KEY: ${UAP_API_KEY:-dev-local-key-change-in-prod}
+      SAAS_DB_PATH: /app/data/subscriptions.db
+      ENVIRONMENT: development
+      FLASK_ENV: development
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./micro-saas:/app/micro-saas:ro
+      - saas_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/saas/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+  redis_data:
+  saas_data:
+
+networks:
+  default:
+    name: adrion-network

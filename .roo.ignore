@@ -1,0 +1,274 @@
+# Roo Code Ignore File
+# Specifies patterns that Roo Code should exclude from analysis
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+.env.local
+.env.*.local
+
+# Python Build & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Testing & Coverage
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+.ruff_cache/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.fleet
+
+# Git
+.git/
+.gitignore
+.gitattributes
+.github/workflows/
+.github/ISSUE_TEMPLATE/
+
+# Docker & Kubernetes
+.docker/
+docker-compose.override.yml
+kubeconfig
+*.kubeconfig
+
+# Node/JavaScript
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Go Build
+vendor/
+go.sum
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.pgsql
+*.sql.gz
+postgresql_data/
+database_exports/
+
+# Logs
+logs/
+*.log
+*.log.*
+.debug-logs/
+
+# Temporary & Backups
+temp/
+tmp/
+backups/
+*.bak
+*.backup
+*.tmp
+*.temp
+*~.*
+
+# Build & Compile Artifacts
+*.o
+*.a
+*.dylib
+*.dll
+*.exe
+*.out
+
+# Large Files (optimize analysis)
+*.iso
+*.dmg
+*.tar.gz
+*.tar.bz2
+*.zip
+>100MB
+
+# AI & Model Files
+*.model
+*.pth
+*.nnx
+*.safetensors
+models/
+checkpoints/
+
+# Documentation Build Artifacts
+docs/_build/
+site/
+.docs.built
+
+# Performance & Profiling
+*.prof
+*.pprofile
+.profiler/
+
+# System Files
+Thumbs.db
+.AppleDouble
+.LSOverride
+*Icon?
+._*
+
+# Project Specific
+.aider/
+.aider.chat.history.md
+Genesis Record/Historia Serwera/**/*.log
+Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/**/*.tmp
+reports/temp/
+monitoring/cache/
+
+# Archives & Compressed
+*.rar
+*.7z
+*.tar
+*.gz
+*.bz2
+
+# Sensitive Data Patterns
+*credentials*
+*secret*
+*password*
+*.key
+*.pem
+*.pfx
+*.p12
+
+# CI/CD Artifacts
+.github/actions/*/node_modules/
+.gitlab-ci/cache/
+
+# Runtime Caches
+.roo_cache/
+.mypy_cache/
+.pytest_cache/
+.pylint.d/
+
+# External Dependencies
+lib/external/
+third_party/dependencies/
+vendor_backup/
+
+# Deployment & Release
+release_notes.bak
+VERSION.bak
+*.release
+*.staging
+.deployment_backup/
+
+# Media Files
+*.mp4
+*.mp3
+*.wav
+*.flv
+*.avi
+*.mov
+*.mkv
+*.webm
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+*.ico
+
+# Archive Logs
+archived_logs/
+old_backups/
+legacy/
+
+# Build System
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Makefile.bak
+gradle/.gradle/
+.gradle/
+
+# Heap Dumps & Memory
+*.hprof
+*.heapsnapshot
+heap-dump.hprof
+
+# Coverage Reports HTML
+coverage_html/
+cov_report/
+backups/
+.aider/
+.aider.chat.history.md
+
+# Build artifacts
+.ruff_cache/
+.runtime/
+_precommit_*
+
+# Large files
+*.db
+*.sqlite
+*.tar.gz
+coverage_main.json
+
+# Legacy and archived
+legacy/
+archived/
+old_*/
+deprecated/
+
+# Specific exclusions for ADRION 369
+htmlcov/
+Phase2_Distribution_Package_*/
+temp_deploy/
+_temp_extract/
+_a11_runtime_*
+_check_db.py
+
+# Docker build context
+docker_build_context/
+.dockerignore
+
+# Keep documentation
+!docs/
+!README.md
+!GETTING_STARTED.md

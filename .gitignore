@@ -1,7 +1,100 @@
-.vercel
-
-# Sekrety i zmienne lokalne — nie commituj
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 .env
+.env.*
+!.env.example
+.aider/logs/
+data/
+arbitrage.db
+arbitrage.db-shm
+arbitrage.db-wal
+.runtime/
+.venv/
+venv/
+.hypothesis/
+.roo/roo.profiles.json
+.roo/roo.rules.json
+node_modules/
+**/node_modules/
+**/.next/
+frontend/micro-saas/.env.local
 .env.local
-.env*.local
-*.pem
+
+.aider*
+
+# ── Temp / scratch files ─────────────────────────────────────────────────────
+temp_*.txt
+_temp_*/
+_temp_*
+temp_deploy/
+Phase*_Distribution_Package*/
+_temp_extract/
+
+# ── Runtime API logs (root level) ────────────────────────────────────────────
+_a11_runtime_api_stderr.log
+_a11_runtime_api_stdout.log
+_a11_runtime_launcher_stderr.log
+_a11_runtime_launcher_stdout.log
+_precommit_a11_api_stderr.log
+_precommit_a11_api_stdout.log
+*.log
+logs/
+
+# ── Build artifacts ────────────────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+coverage*.json
+cov_*.txt
+htmlcov/
+tests/results/
+deployment_health_report.json
+integration_test_results.json
+lmstudio_test_report.json
+TEST_RESULTS_*.json
+WORKSPACE_STRUCTURE_SCAN_*.json
+temp_vortex_content.txt
+compose.rendered.yml
+
+# ── TLS certs (never commit) ──────────────────────────────────────────────
+config/nginx/certs/
+
+# ── adrion-swarm secrets ──────────────────────────────────────────────────
+adrion-swarm/.env
+
+# ── Docker data volumes (NEVER track databases) ───────────────────────────
+adrion-swarm/postgres_data/
+adrion-swarm/n8n_data/
+adrion-swarm/ollama_data/
+frontend/harmonia-dashboard/chroma_db/
+frontend/harmonia-dashboard/.chromadb/
+
+# Runtime monitoring data
+monitoring/*.jsonl
+monitoring/*_history*.jsonl
+monitoring/*_test*.json
+.runtime/
+*.pid
+
+# ── Genesis Record clones (prevent accidental project snapshots) ─────────
+Genesis Record/**/Phase2_Reports/
+Genesis Record/**/Phase2_Implementation/
+Genesis Record/**/v1.0_Deployment/
+Genesis Record/**/v1.0_Backups/
+-e 
+# ── Runtime state — must not be committed ────────────────────────────────────
+backups/
+memories/
+monitoring/llm_rollout_state.json
+
+# ── Runtime logs / generated data (not source) ───────────────────────────────
+frontend/harmonia-dashboard/behavior_log.json
+frontend/harmonia-dashboard/judge_log.json
+frontend/harmonia-dashboard/vera_scores.json
+monitoring/llm_kpi_events.jsonl

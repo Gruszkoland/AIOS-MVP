@@ -1,0 +1,55 @@
+name: Feature Request
+description: Propose a new feature or enhancement
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or motivation
+      description: What problem does this feature solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How should this work?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you considered?
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Arbitrage Engine (Flask)
+        - Guardian Laws
+        - Trinity Score
+        - Go Vortex (EBDI)
+        - UAP Orchestrator
+        - MCP Layer
+        - CI/CD Pipeline
+        - Infrastructure / K8s
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: trinity-perspective
+    attributes:
+      label: Trinity perspective
+      description: Which perspective aligns most with this feature?
+      options:
+        - Material (practical value, ROI)
+        - Intellectual (correctness, architecture)
+        - Essential (ethics, sustainability)
+    validations:
+      required: true

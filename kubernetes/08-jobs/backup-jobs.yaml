@@ -1,0 +1,130 @@
+---
+# CronJob for PostgreSQL daily backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: adrion-369
+  labels:
+    app: backup
+    tier: automation
+spec:
+  schedule: "0 3 * * *" # Daily at 03:00 UTC
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: adrion-system
+          containers:
+            - name: postgres-backup
+              image: postgres:15-alpine
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  BACKUP_FILE="/backups/postgres_${HOSTNAME}_$(date +%Y%m%d_%H%M%S).sql.gz"
+                  mkdir -p /backups
+                  pg_dump -h postgres -U $POSTGRES_USER -d $POSTGRES_DB | gzip > $BACKUP_FILE
+                  echo "Backup completed: $BACKUP_FILE"
+                  # Keep only last 7 backups
+                  cd /backups && ls -t *.sql.gz | tail -n +8 | xargs rm -f
+              env:
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-credentials
+                      key: POSTGRES_USER
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-credentials
+                      key: POSTGRES_PASSWORD
+                - name: POSTGRES_DB
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-credentials
+                      key: POSTGRES_DB
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-credentials
+                      key: POSTGRES_PASSWORD
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+              resources:
+                requests:
+                  memory: "256Mi"
+                  cpu: "500m"
+                limits:
+                  memory: "512Mi"
+                  cpu: "1000m"
+          volumes:
+            - name: backup-storage
+              hostPath:
+                path: /data/backups
+                type: DirectoryOrCreate
+          restartPolicy: OnFailure
+
+---
+# CronJob for Alert Handler log rotation
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: alert-handler-cleanup
+  namespace: adrion-369
+spec:
+  schedule: "0 2 * * 0" # Weekly at 02:00 UTC
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: adrion-system
+          containers:
+            - name: cleanup
+              image: alpine:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Clean up old alert logs
+                  find /logs -type f -name "*.log" -mtime +30 -delete
+                  echo "Cleanup completed"
+          restartPolicy: OnFailure
+
+---
+# Service for backup storage (if using shared storage)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-backups
+  namespace: adrion-369
+  labels:
+    app: backup
+spec:
+  capacity:
+    storage: 200Gi
+  accessModes:
+    - ReadWriteMany # Multiple readers
+  hostPath:
+    path: /data/backups
+    type: DirectoryOrCreate
+
+---
+# PersistentVolumeClaim for backups
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backup-storage-pvc
+  namespace: adrion-369
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: local-storage
+  volumeName: pv-backups
+  resources:
+    requests:
+      storage: 200Gi

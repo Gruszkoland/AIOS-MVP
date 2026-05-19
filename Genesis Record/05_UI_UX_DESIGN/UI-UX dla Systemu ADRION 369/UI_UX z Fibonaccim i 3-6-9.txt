@@ -1,0 +1,29 @@
+﻿Tworzenie prototypu UI/UX w oparciu o synergię Ciągu Fibonacciego oraz Matematyki Wiru (3-6-9) pozwala na zaprojektowanie interfejsu, który jest biologicznie spójny z mechanizmami ludzkiej percepcji. Poniżej przedstawiam strukturę i wytyczne dla takiego prototypu.
+Kluczowy przekaz
+Wykorzystanie Spirali Fibonacciego definiuje naturalną ścieżkę skanowania wzrokiem (Flow), podczas gdy Węzły 3-6-9 wyznaczają punkty krytyczne interakcji (Hotspots), co minimalizuje wysiłek poznawczy użytkownika i zwiększa konwersję.
+________________
+1. Architektura Gridu: Złoty Podział i Toroid
+Zamiast standardowego gridu 12-kolumnowego, prototyp opieramy na proporcjach $\phi$ ($1,618$).
+* Podział sekcji: Główny kontener (Hero Section) dzielimy w stosunku $62\% / 38\%$. Większa część służy do budowania kontekstu wizualnego, mniejsza do nawigacji i kluczowych parametrów.
+* Toroidalny Flow: Treść nie kończy się na dole strony, lecz wizualnie "zawraca" (np. poprzez animowane tło lub kształty), sugerując ciągłość procesu, co jest cyfrowym odpowiednikiem Cewki Rodina.
+2. Rozmieszczenie Węzłów Uwagi (3-6-9)
+Węzły te traktujemy jako geometryczne kotwice dla najważniejszych elementów interfejsu:
+* Węzeł 3 (Inicjacja): Lewy górny róg lub początek spirali. Miejsce na logotyp i główne hasło (Value Proposition). Tu energia użytkownika "wchodzi" do systemu.
+* Węzeł 6 (Polaryzacja/Decyzja): Środek ekranu lub punkt przecięcia osi. Miejsce na selektory, filtry lub porównanie produktów. To tutaj użytkownik waży opcje.
+* Węzeł 9 (Integracja/CTA): "Oko" spirali Fibonacciego. Miejsce na przycisk akcji (Call to Action). To punkt osobliwości, gdzie intencja użytkownika zamienia się w działanie (kliknięcie).
+________________
+3. Hierarchia Wizualna i Typografia
+Wszystkie elementy wielkościowe muszą być ze sobą skorelowane matematycznie:
+* Typografia: Jeśli tekst podstawowy (Body) ma 16px, nagłówek H1 powinien mieć ok. 42px ($16 \times 1,618 \times 1,618$), a H2 ok. 26px. To tworzy harmoniczny rytm czytania.
+* Interlinia i Marginesy: Odstępy (White space) powinny być wielokrotnościami liczby 3 lub 9 (np. 9px, 18px, 27px), co nadaje kompozycji matematyczny "takt".
+________________
+4. Interakcje i Micro-copy (Logika Trójwartościowa)
+Zgodnie z logiką Łukasiewicza, interfejs nie powinien wymuszać tylko binarnych wyborów:
+* Stany pośrednie: Zamiast prostego "Tak/Nie", wprowadzamy opcje typu "Zapisz na później" lub "Powiadom mnie", co odpowiada trzeciej wartości logicznej ($\frac{1}{2}$).
+* Feedback: Animacje potwierdzenia (Success state) powinny pulsować w rytmie częstotliwości Solfeggio (np. czas trwania animacji 528ms), co podświadomie buduje zaufanie i poczucie spokoju.
+________________
+Możliwości zgłębiania tematu (Next Steps):
+* Eye-tracking Heatmaps: Analiza, czy wzrok użytkowników faktycznie zatrzymuje się w węzłach 3-6-9 zaprojektowanego prototypu.
+* Dynamiczna Geometria: Tworzenie interfejsów, które zmieniają swój układ (np. przyciągają przyciski bliżej kciuka) w oparciu o biometryczne dane użytkownika.
+* Psychologia Koloru 3-6-9: Dobór palety barw o częstotliwościach korespondujących z matematyką wiru.
+Czy chciałbyś, abym przygotował specyfikację techniczną (design tokens) dla takiego systemu, określającą dokładne wartości odstępów i wielkości czcionek w oparciu o te zasady?

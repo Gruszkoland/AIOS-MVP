@@ -1,0 +1,289 @@
+---
+# PersistentVolumeClaim for Loki
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: loki-data-pvc
+  namespace: adrion-369
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  volumeName: pv-loki-data
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+# PersistentVolumeClaim for Loki WAL
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: loki-wal-pvc
+  namespace: adrion-369
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  volumeName: pv-loki-wal
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+# Deployment for Loki
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki
+  namespace: adrion-369
+  labels:
+    app: loki
+    tier: logging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loki
+  template:
+    metadata:
+      labels:
+        app: loki
+        tier: logging
+    spec:
+      serviceAccountName: adrion-system
+      containers:
+        - name: loki
+          image: grafana/loki:3.1.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - -config.file=/etc/loki/local-config.yaml
+          ports:
+            - name: http
+              containerPort: 3100
+          volumeMounts:
+            - name: loki-config
+              mountPath: /etc/loki
+            - name: loki-data
+              mountPath: /loki
+            - name: loki-wal
+              mountPath: /wal
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 3100
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3100
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      volumes:
+        - name: loki-config
+          configMap:
+            name: loki-config
+        - name: loki-data
+          persistentVolumeClaim:
+            claimName: loki-data-pvc
+        - name: loki-wal
+          persistentVolumeClaim:
+            claimName: loki-wal-pvc
+
+---
+# Service for Loki
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki
+  namespace: adrion-369
+  labels:
+    app: loki
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3100
+      targetPort: 3100
+  selector:
+    app: loki
+
+---
+# Deployment for Promtail (Log shipper)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: promtail
+  namespace: adrion-369
+  labels:
+    app: promtail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: promtail
+  template:
+    metadata:
+      labels:
+        app: promtail
+    spec:
+      serviceAccountName: adrion-system
+      containers:
+        - name: promtail
+          image: grafana/promtail:3.1.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - -config.file=/etc/promtail/config.yaml
+          ports:
+            - name: http
+              containerPort: 3101
+          volumeMounts:
+            - name: promtail-config
+              mountPath: /etc/promtail
+            - name: promtail-positions
+              mountPath: /tmp/promtail
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+      volumes:
+        - name: promtail-config
+          configMap:
+            name: promtail-config
+        - name: promtail-positions
+          persistentVolumeClaim:
+            claimName: promtail-positions-pvc
+        - name: varlog
+          hostPath:
+            path: /var/log
+
+---
+# PersistentVolumeClaim for Promtail
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: promtail-positions-pvc
+  namespace: adrion-369
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  volumeName: pv-promtail-positions
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# Deployment for Ollama (LLM Engine)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: adrion-369
+  labels:
+    app: ollama
+    tier: ai-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+        tier: ai-engine
+    spec:
+      serviceAccountName: adrion-system
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 11434
+          env:
+            - name: OLLAMA_HOST
+              value: "0.0.0.0:11434"
+            - name: OLLAMA_NUM_PARALLEL
+              value: "4"
+            - name: OLLAMA_NUM_GPU
+              value: "0" # 0 = CPU only, 1 = GPU if available
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "2000m"
+            limits:
+              memory: "8Gi"
+              cpu: "4000m"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl -f http://localhost:11434/api/tags || exit 1
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl -f http://localhost:11434/api/tags || exit 1
+            initialDelaySeconds: 30
+            periodSeconds: 10
+      volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: ollama-pvc
+
+---
+# PersistentVolumeClaim for Ollama
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-pvc
+  namespace: adrion-369
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  volumeName: pv-ollama-data
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+# Service for Ollama
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: adrion-369
+  labels:
+    app: ollama
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 11434
+      targetPort: 11434
+  selector:
+    app: ollama

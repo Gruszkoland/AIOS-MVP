@@ -1,0 +1,222 @@
+╔════════════════════════════════════════════════════════════════════════════════════╗
+║           ADRION 369 — HIERARCHY & PRIORITY MATRIX DIAGRAM                          ║
+║              Fundamentalna Zasada: Multi-Agent Swarm w 162D Space                    ║
+╚════════════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    🎯 SYSTEM CORE PRINCIPLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    Wieloagentowa orkiestracja (Multi-Agent Swarm) operująca w 162-wymiarowej
+    przestrzeni decyzji, kierowana 9 Guardian Laws z Trust Score Per Agent (TSPA)
+    jako fundamentalnym mechanizmem veryfikacji compliance i bezpieczeństwa.
+
+    Formula: SYSTEM_HEALTH = Compliance ⊕ Orchestration ⊕ Operations
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                        📊 HIERARCHIA WAŻNOŚCI (3×3)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+    ┌────────────────────────────────────────────────────────────────────────────┐
+    │                    🔴 COMPLIANCE LAYER — 100/100                           │
+    │                       (NADRZĘDNA — Non-Negotiable)                         │
+    ├────────────────────────────────────────────────────────────────────────────┤
+    │                                                                            │
+    │  [1] 🛡️ GUARDIAN LAWS ENFORCEMENT                     SCORE: 100/100      │
+    │      └─ 9 praw fundamentalnych (Unity, Harmony, Rhythm, Causality,         │
+    │         Transparency, Authenticity, Privacy, Nonmaleficence, Sustainability)
+    │      └─ Hard veto na naruszenia — system blokuje się natychmiast           │
+    │      └─ Jeśli Guardian Law zostaje naruszony → System FAIL                 │
+    │                                                                            │
+    │  [2] 🔐 TRUST SCORE PER AGENT (TSPA)                  SCORE: 100/100      │
+    │      └─ Weryfikacja wiarygodności każdego agenta (0.0–1.0 scale)          │
+    │      └─ TS < 0.6 → AUTO-ESCALATION do Sentinel                           │
+    │      └─ Gatekeeper wszystkich delegacji — nic się nie wykonuje            │
+    │         bez pozytywnej weryfikacji TSPA                                   │
+    │                                                                            │
+    │  [3] 📋 COMPLIANCE GATE CHECKS                        SCORE: 100/100      │
+    │      └─ Walidacja każdej decyzji wobec Guardian Laws                      │
+    │      └─ Audit trail w Genesis Record (nieusuwalne logowanie)              │
+    │      └─ Automatyczny rollback przy naruszeniu                             │
+    │      └─ Każda operacja rejestrowana dla legalności                        │
+    │                                                                            │
+    └────────────────────────────────────────────────────────────────────────────┘
+                                    ↓ BLOCKS IF VIOLATED
+    ┌────────────────────────────────────────────────────────────────────────────┐
+    │                   🟠 ORCHESTRATION LAYER — 95/100                          │
+    │                       (KRYTYCZNA — Core Business)                          │
+    ├────────────────────────────────────────────────────────────────────────────┤
+    │                                                                            │
+    │  [1] ⚡ ROUTER + VORTEX ORCHESTRATION (174Hz)         SCORE: 95/100      │
+    │      └─ Serce systemu — central point wieloagentowej koordynacji          │
+    │      └─ Wysokoczęstotliwościowa orkiestracja (174 Hz updates/sec)         │
+    │      └─ Dynamiczny routing do GUARDIAN, ORACLE, GENESIS, HEALER           │
+    │      └─ Jeśli VORTEX upada → system umiera (non-functional)               │
+    │                                                                            │
+    │  [2] 🧭 162D DECISION SPACE ROUTING (ORACLE)          SCORE: 95/100      │
+    │      └─ Mózg systemu — mapowanie intencji w decyzje                       │
+    │      └─ 162-wymiarowa przestrzeń (3 perspektywy × 6 agentów × 9 praw)    │
+    │      └─ Optymalizacja ścieżki routingu metodą UCT (Monte Carlo Tree Search)
+    │      └─ Jeśli ORACLE zawiedzie → decyzje są czarne (no routing)           │
+    │                                                                            │
+    │  [3] 💾 GENESIS STATE PERSISTENCE                     SCORE: 90/100      │
+    │      └─ Pamięć systemu — zarządzanie stanem sesji                         │
+    │      └─ Checkpoint system + Genesis Record (ciągłe backupowanie)           │
+    │      └─ Rekonstrukcja z Genesis Record w razie crash                      │
+    │      └─ Czasem wolny pod ciężkim obciążeniem (ale zawsze poprawny)        │
+    │                                                                            │
+    └────────────────────────────────────────────────────────────────────────────┘
+                              ↓ USES AS CONSTRAINT
+    ┌────────────────────────────────────────────────────────────────────────────┐
+    │                   🟡 OPERATIONS LAYER — 85/100                             │
+    │                       (WSPIERAJĄCA — Best Effort)                          │
+    ├────────────────────────────────────────────────────────────────────────────┤
+    │                                                                            │
+    │  [1] ❤️ HEALER HEALTH MONITORING & AUTO-RECOVERY      SCORE: 85/100      │
+    │      └─ Monitorowanie zdrowia 6 serwerów w real-time                      │
+    │      └─ Detekcja anomalii (latency spike, error rate, CPU)                │
+    │      └─ Triggering self-healing procedur (restart, failover)              │
+    │      └─ Czasem opóźnione przy kryzysie (reactive, nie proactive)          │
+    │                                                                            │
+    │  [2] 🔧 PERFORMANCE OPTIMIZATION & LOAD BALANCING     SCORE: 85/100      │
+    │      └─ Dynamiczne skalowanie Waitress threads                            │
+    │      └─ Queue management + circuit breaker patterns                       │
+    │      └─ Buforowanie przy przeciążeniu, drop traffic w ostateczności       │
+    │      └─ Efektywne przy normalnym obciążeniu, limitowane przy piku         │
+    │                                                                            │
+    │  [3] 📊 INCIDENT RESPONSE & POST-MORTEM ANALYSIS      SCORE: 80/100      │
+    │      └─ Automatyczne tworzenie raportów z incydentów                      │
+    │      └─ Root cause analysis + logi walidacji                              │
+    │      └─ Rekomendacje napraw dla zespołu operacyjnego                      │
+    │      └─ Pasywne (wymaga interpretacji ludzkiej, nie auto-run)              │
+    │                                                                            │
+    └────────────────────────────────────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    📈 OCENY W SKALI 1-100 (SUMMARY TABLE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─────────────────┬─────────────────────────────────────┬───────┬──────────────┐
+│ Kategoria       │ Wymiar                              │ Ocena │ Status       │
+├─────────────────┼─────────────────────────────────────┼───────┼──────────────┤
+│                 │ 🛡️ Guardian Laws Enforcement        │ 100   │ 🔴 NADRZĘDNY │
+│ COMPLIANCE      │ 🔐 Trust Score Per Agent (TSPA)      │ 100   │ 🔴 NADRZĘDNY │
+│ (COMPLIANCE)    │ 📋 Compliance Gate Checks            │ 100   │ 🔴 NADRZĘDNY │
+├─────────────────┼─────────────────────────────────────┼───────┼──────────────┤
+│                 │ ⚡ ROUTER + VORTEX (174Hz)           │  95   │ 🟠 KRYTYCZNY │
+│ ORCHESTRATION   │ 🧭 ORACLE 162D Decision Routing     │  95   │ 🟠 KRYTYCZNY │
+│ (CORE LOGIC)    │ 💾 GENESIS State Persistence        │  90   │ 🟠 KRYTYCZNY │
+├─────────────────┼─────────────────────────────────────┼───────┼──────────────┤
+│                 │ ❤️ HEALER Health Monitor             │  85   │ 🟡 WSPIERAJĄCY
+│ OPERATIONS      │ 🔧 Load Balancing & Optimization    │  85   │ 🟡 WSPIERAJĄCY
+│ (SUPPORT)       │ 📊 Incident Response & Analysis     │  80   │ 🟡 WSPIERAJĄCY
+└─────────────────┴─────────────────────────────────────┴───────┴──────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                        🎯 WEKTORY PRIORYTYZACJI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─ PRIORYTET 1: COMPLIANCE (Non-Negotiable)
+│
+│  IF naruszenie_guardian_law() THEN:
+│    → Natychmiastowy HARD VETO
+│    → Bezpośrednia eskalacja do Sentinel
+│    → Zapis w Genesis Record (NIEUSUWALNE)
+│    → Wyzwolenie Identity Reset dla agenta
+│    → AUTO-ROLLBACK wszystkich zmian
+│    → System się zatrzymuje (zawsze preferujesz zatrzymanie zamiast naruszenia)
+│
+│  ZASADA: Compliance > Performance (zawsze)
+
+
+┌─ PRIORYTET 2: ORCHESTRATION (Core Business)
+│
+│  IF routing_failure() THEN:
+│    → Przesunięcie do backup route (fallback path)
+│    → Notify Router dla load rebalancing
+│    → Timeout 5 sekund max, potem failover
+│    → Log do REPORTS/ dla post-mortem analysis
+│    → System żyje ale degraded (z funkcjonalnością)
+│
+│  ZASADA: Jeśli routing upada → system non-functional
+
+
+┌─ PRIORYTET 3: OPERATIONS (Best Effort)
+│
+│  IF health_check_fails() THEN:
+│    → Alert zespołowi (non-blocking)
+│    → Attempt auto-recovery (Healer spróbuje)
+│    → Monitor dalej, zwyczajnie kontynuuj operacje
+│    → Generuj raport po normalizacji
+│    → System żyje cały czas (operations nigdy nie blokuje)
+│
+│  ZASADA: Monitorowanie i recovery są optatywne ("best effort")
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    🏗️ STRUKTURA BEZPIECZEŃSTWA (Defense in Depth)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    ┌────────────────────────────────────────────┐
+    │ LAYER 1: GUARDIAN LAWS ENFORCEMENT (100)   │ ← Najwyższy poziom blokady
+    │ ────────────────────────────────────────── │   Non-negotiable, hard stop
+    │ Weryfikacja wszystkich decyzji              │   (Compliance first)
+    └────────────────────────────────────────────┘
+                          ▼
+    ┌────────────────────────────────────────────┐
+    │ LAYER 2: TRUST SCORE GATE (100)            │ ← Gatekeeper agentów
+    │ ────────────────────────────────────────── │   TS < 0.6 = blokada
+    │ Walidacja wiarygodności agenta             │   (Access control)
+    └────────────────────────────────────────────┘
+                          ▼
+    ┌────────────────────────────────────────────┐
+    │ LAYER 3: ROUTER + ORACLE ROUTING (95)      │ ← Logika decyzji
+    │ ────────────────────────────────────────── │   174Hz VORTEX core
+    │ Koordynacja i routing                      │   (Orchestration)
+    └────────────────────────────────────────────┘
+                          ▼
+    ┌────────────────────────────────────────────┐
+    │ LAYER 4: GENESIS STATE PERSISTENCE (90)    │ ← Pamięć systemu
+    │ ────────────────────────────────────────── │   Checkpoints + Recovery
+    │ Zarządzanie stanem i sessionami             │   (State management)
+    └────────────────────────────────────────────┘
+                          ▼
+    ┌────────────────────────────────────────────┐
+    │ LAYER 5: HEALER HEALTH MONITORING (85)     │ ← Monitorowanie
+    │ ────────────────────────────────────────── │   Reactive recovery
+    │ Detekcja anomalii i recovery                │   (Operations)
+    └────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                            ✅ WNIOSEK KOŃCOWY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ADRION 369 jest systemem COMPLIANCE-FIRST z trzystopniową hierarchią:
+
+    🔴 COMPLIANCE (100/100) — Bezwzględnie obowiązkowa
+       ↓ blokuje wszystko jeśli naruszenie
+    🟠 ORCHESTRATION (95/100) — Rdzeń systemu
+       ↓ krytyczna dla operacji
+    🟡 OPERATIONS (85/100) — Wsparcie i monitoring
+       ↓ best effort, czasem opóźnione
+
+Każdy wymiar ma inny profil ryzyka:
+
+    • Compliance failure  → System jest NON-COMPLIANT (illegal state)
+    • Orchestration fail  → System jest NON-FUNCTIONAL (dead)
+    • Operations fail     → System jest DEGRADED (recoverable)
+
+Implikacja: System może działać bez Operations, może działać z Orchestration limited,
+ale NIE MOŻE działać bez Compliance pewności.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Document created: April 6, 2026
+Version: 1.0 (Final)
+Status: ✅ READY FOR PRESENTATION

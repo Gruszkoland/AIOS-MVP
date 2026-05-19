@@ -1,0 +1,494 @@
+# ADRION 369 -- Architecture & System Design
+
+**Version:** 4.0 | **Updated:** 2026-04-11
+
+---
+
+## 1. System Overview
+
+ADRION 369 is a multi-agent AI orchestration system built on the **Trinity-EBDI 162D
+decision framework**. Every autonomous decision is evaluated through three orthogonal
+axes:
+
+- **3 Perspectives** (LOGOS / ETHOS / EROS) -- mapped to Material / Intellectual / Essential
+- **6 Processing Stages** (Hexagon) -- Inventory, Empathy, Process, Debate, Healing, Action
+- **9 Guardian Laws** (Ethics) -- canonical definitions in `docs/GUARDIAN_LAWS_CANONICAL.json`
+
+**Result:** 3 x 6 x 9 = **162-dimensional decision space** (the "162D" in Trinity-EBDI 162D).
+
+The system comprises three independently deployable services and an optional MCP
+microservices layer:
+
+| Service            | Language    | Framework    | Port | Role                                    |
+|--------------------|-------------|--------------|------|-----------------------------------------|
+| Flask API          | Python 3.11 | Flask        | 8003 | Primary REST API, decision engine       |
+| UAP Orchestrator   | Python 3.11 | Flask        | 8002 | Admin panel, agent/task management      |
+| Go Vortex          | Go 1.22     | Echo v4      | 1740 | EBDI state machine, digital root oracle |
+| MCP Layer (6 svcs) | Python 3.11 | Various      | 9000-9005 | Specialized microservices          |
+
+---
+
+## 2. High-Level Architecture
+
+```
+                         Browser / External Client
+                                  |
+                           Nginx (TLS termination)
+                                  |
+            +---------------------+---------------------+
+            |                     |                     |
+   Flask App Factory        UAP Orchestrator        Go Vortex
+   (arbitrage/app.py)       (uap/backend/api.py)    (cmd/vortex-server/main.go)
+   Port 8003                Port 8002                Port 1740
+            |                     |                     |
+   +--------+--------+    +------+------+        +-----+-----+
+   | 5 Blueprints    |    | 6 AI        |        | EBDI      |
+   | Guardian Laws   |    |   Personas  |        | Digital   |
+   | Trinity Score   |    | Task CRUD   |        |   Root    |
+   | Hexagon Pipeline|    | Genesis     |        | 174Hz     |
+   | Circuit Breaker |    |   Record    |        |   Pulse   |
+   | Rate Limiter    |    | Trust Score |        | Sentinel  |
+   | LLM Canary      |    |   Heatmap   |        |   Scan    |
+   +-----------------+    +-------------+        +-----------+
+            |                     |                     |
+            +---------------------+---------------------+
+                                  |
+                     Data Persistence Layer
+                  SQLite (dev) / PostgreSQL (prod)
+```
+
+---
+
+## 3. Flask Application (Port 8003)
+
+**Entry point:** `wsgi.py` -> `arbitrage.app.create_app()`
+
+The app factory in `arbitrage/app.py` assembles the full middleware stack and
+registers five blueprints:
+
+```
+create_app()
+  |
+  +-- Load config: arbitrage.config.settings (Pydantic BaseSettings)
+  |
+  +-- Initialize CORS (restricted origins)
+  |
+  +-- CSRF origin check (before_request hook)
+  |
+  +-- Register Blueprints
+  |     +-- arbitrage_bp  (arbitrage/blueprints/arbitrage_bp.py)
+  |     |     Scout, Bid, Jobs, Cycle -- core arbitrage trading
+  |     +-- quantum_bp    (arbitrage/blueprints/quantum_bp.py)
+  |     |     Quantum decision, status, scan
+  |     +-- oracle_bp     (arbitrage/blueprints/oracle_bp.py)
+  |     |     Predict, scan
+  |     +-- wholesale_bp  (arbitrage/blueprints/wholesale_bp.py)
+  |     |     Bulk procurement scout, cycle, deals
+  |     +-- payments_bp   (arbitrage/blueprints/payments_bp.py)
+  |           Checkout, webhook, mass-gen, manifest
+  |
+  +-- /api/docs          Swagger UI (loads docs/openapi.yaml)
+  +-- /api/openapi.json  OpenAPI 3.1 spec as JSON
+  +-- /metrics           Prometheus text format (pool size, checkouts, uptime)
+  +-- /health            Cascade check (DB + Ollama)
+  +-- /health/live       Liveness probe (always 200)
+  +-- /health/ready      Readiness probe (503 if DB down)
+  |
+  +-- Graceful shutdown  (atexit + SIGTERM -> DB pool drain)
+  +-- Error handlers     (404, 500 -> JSON responses)
+```
+
+### Blueprint Input Validation
+
+All blueprints use `safe_float()` / `safe_int()` from `arbitrage.blueprints.__init__`
+instead of bare `float()` / `int()` to prevent unhandled conversion errors.
+
+---
+
+## 4. Decision Engine: Guardian -> Trinity -> Hexagon
+
+Every arbitrage decision passes through three sequential evaluation stages.
+
+### 4.1 Guardian Laws Validation (arbitrage/guardian.py)
+
+The Guardian Laws engine validates ethical compliance. A failing check can
+immediately deny a decision before any further processing.
+
+**Canonical source of truth:** `docs/GUARDIAN_LAWS_CANONICAL.json`
+
+| #  | Code | Canonical Name   | Severity | Veto Power | Description                                          |
+|----|------|------------------|----------|------------|------------------------------------------------------|
+| 1  | G1   | Unity            | MEDIUM   | No         | All actions must serve system coherence               |
+| 2  | G2   | Harmony          | HIGH     | No         | Balance between competing objectives                  |
+| 3  | G3   | Rhythm           | MEDIUM   | No         | Maintain consistent cadence and timing                |
+| 4  | G4   | Causality        | HIGH     | No         | Every action must have a traceable, justified cause   |
+| 5  | G5   | Transparency     | MEDIUM   | No         | All decisions and reasoning must be auditable         |
+| 6  | G6   | Authenticity     | HIGH     | No         | Outputs must be genuine and free from deception       |
+| 7  | G7   | Privacy          | CRITICAL | YES        | No external disclosure without consent                |
+| 8  | G8   | Nonmaleficence   | CRITICAL | YES        | Never cause harm to users, systems, or data           |
+| 9  | G9   | Sustainability   | HIGH     | No         | Operate within resource limits                        |
+
+**Decision logic:**
+
+```
+evaluate_guardians(job, analysis, context) -> GuardianEval
+
+  IF any CRITICAL law violated  -> instant DENY
+  IF 2+ laws violated (any)     -> DENY
+  ELSE                          -> APPROVE (continue to Trinity)
+```
+
+> **Note:** The implementation in `guardian.py` currently uses legacy names for some
+> laws (e.g., "Truth" instead of "Harmony", "Autonomy" instead of "Privacy").
+> The canonical JSON is the authoritative reference; a sync task (P1-5) is planned.
+
+### 4.2 Trinity Score Evaluation (arbitrage/trinity.py)
+
+Three perspectives scored independently on a 0.0-1.0 scale:
+
+```
+evaluate_trinity(job, analysis, system_resources) -> TrinityScore
+
+  Material (Physical Resources)
+    Inputs:   CPU usage, RAM availability (via psutil or injected dict)
+    Method:   harmonic_mean(cpu_avail, ram_avail)
+    Threshold: >= 0.30
+
+  Intellectual (Analysis Quality)
+    Inputs:   LLM score (0-10), reasoning length (fit + risks text)
+    Method:   harmonic_mean(score_norm, reasoning_norm)
+    Threshold: >= 0.50
+
+  Essential (Purpose + Profitability)
+    Inputs:   keyword match count, estimated profit
+    Method:   geometric_mean(purpose_match, profit_norm)
+    Threshold: >= 0.20
+
+  Combined = (Material + Intellectual + Essential) / 3
+    Threshold: >= 0.40
+
+  Approved = ALL four thresholds met
+```
+
+Harmonic mean makes each perspective fail-fast: a single zero component
+drives the whole score to zero.
+
+### 4.3 Hexagon 6-Stage Pipeline (arbitrage/hexagon.py)
+
+Six sequential processing stages refine the decision after Guardian and Trinity
+approval:
+
+1. **Inventory** -- current state assessment, market data, portfolio analysis
+2. **Empathy** -- stakeholder impact, team availability, market sentiment
+3. **Process** -- workflow validation, resource allocation
+4. **Debate** -- multi-perspective pros/cons, risk assessment
+5. **Healing** -- cost reduction, quality improvement, tech debt
+6. **Action** -- execution planning, timeline, success metrics
+
+Each stage produces `{stage_name, analysis, recommendations, confidence_score}`.
+
+---
+
+## 5. Request Flow: Arbitrage Cycle
+
+```
+POST /api/arbitrage/cycle
+  |
+  v
+Scout Agent
+  +-- Fetch job listings (Apify)
+  +-- Filter by criteria
+  +-- Rank by priority
+  |
+  v
+Parallel Analysis (1-N workers)
+  +-- Guardian Laws check (DENY -> skip)
+  +-- Trinity Score (< 0.4 combined -> skip)
+  +-- Hexagon 6-stage pipeline
+  |
+  v
+Bid Agent
+  +-- Calculate bid amount (85% value x worthiness modifier)
+  +-- Setup Stripe escrow
+  +-- Submit bid
+  |
+  v
+Track Agent
+  +-- Monitor XRP confirmations
+  +-- Check daily limits
+  +-- Emit Prometheus metrics
+  |
+  v
+Response: {summary, agent_metrics, health, timestamp}
+```
+
+---
+
+## 6. UAP Orchestrator (Port 8002)
+
+The Unified Admin Panel provides master orchestration for agents and tasks.
+
+**File:** `uap/backend/api.py` (currently a monolith; refactor planned as P0-3)
+
+```
+Endpoints under /mapi/v1/:
+
+  POST /task/delegate         Delegate work to 6 AI Personas
+  GET  /agents                List all agents
+  POST /agents                Create agent
+  PUT  /agents/<id>           Update agent (column allowlist enforced)
+  DELETE /agents/<id>         Soft delete agent
+  GET  /genesis/logs          Query genesis event log
+  GET  /agent/scores          Trust score heatmap (6 personas x EBDI state)
+  POST /crisis/activate       Activate crisis mode
+  POST /crisis/resolve        Conflict resolution
+```
+
+**Six pre-loaded AI Personas:**
+
+| Persona    | Trust Score | Role                  |
+|------------|-------------|-----------------------|
+| Librarian  | 0.95        | Context analysis      |
+| SAP        | 0.88        | Strategic planning    |
+| Auditor    | 0.87        | Quality validation    |
+| Sentinel   | 0.92        | Error monitoring      |
+| Architect  | 0.90        | Design authority      |
+| Healer     | 0.85        | Optimization          |
+
+---
+
+## 7. Go Vortex Engine (Port 1740)
+
+The Vortex engine is written in Go with the Echo v4 framework. It manages the
+EBDI emotional state machine and digital root oracle.
+
+**File:** `cmd/vortex-server/main.go`
+
+```
+Routes:
+  GET  /health              Health check (public)
+  POST /decide              EBDI decision endpoint (auth required)
+  GET  /status              Current EBDI state (auth required)
+  POST /sentinel/scan       Security scan (auth required)
+  GET  /sentinel/threats    Threat list (auth required)
+  POST /oracle/predict      Digital root prediction (auth required)
+
+Authentication: X-Vortex-Key header (HMAC comparison)
+               Empty key = dev mode (all requests pass through)
+```
+
+**EBDI State Machine:**
+
+- **Pleasure** (0.0-1.0) -- user satisfaction level
+- **Arousal** (0.0-1.0) -- system activity / stress level
+- **Dominance** (0.0-1.0) -- process control level
+- **Depth** (0.0-1.0) -- engagement intensity
+
+**174Hz Oscillation Tracker:** Background goroutine that monitors system resonance
+and health, logging periodic health snapshots.
+
+**Crisis trigger:** Arousal > 0.7 activates crisis mode (routes to Healer).
+
+---
+
+## 8. MCP Microservices Layer (Ports 9000-9005)
+
+Six specialized microservices defined in `docker-compose.mcp-tier.yml`:
+
+```
+MCPRouter (9000)  -- Central decision arbitration, load balancing
+     |
+     +-- Vortex-MCP  (9001)  -- Orchestration, 174Hz monitoring
+     +-- Guardian-MCP (9002)  -- Security, 9 Guardian Laws compliance
+     +-- Oracle-MCP   (9003)  -- 162D routing, pattern matching
+     +-- Genesis-MCP  (9004)  -- State management, RAG integration
+     +-- Healer-MCP   (9005)  -- Recovery, monitoring, optimization
+```
+
+Each MCP service exposes `/health`, runs in its own container, and communicates
+with others via HTTP over the `adrion-mcp-net` Docker network.
+
+---
+
+## 9. Support Systems
+
+### Circuit Breaker (arbitrage/circuit_breaker.py)
+
+Protects against cascading failures from external dependencies:
+- LLM (Ollama / OpenRouter)
+- Payment processor (Stripe)
+- Job source (Apify)
+- Blockchain (XRP)
+
+Opens after N consecutive failures, enters half-open state after timeout.
+
+### Rate Limiter (arbitrage/rate_limiter.py)
+
+Sliding window rate limiting per IP. All POST endpoints must call
+`is_allowed(client_ip)` before processing.
+
+### LLM Abstraction (arbitrage/llm.py)
+
+- **Primary:** Ollama (local inference)
+- **Fallback:** OpenRouter (cloud)
+- Prompt injection filter
+- Canary deployment: configurable percentage of traffic to new model
+
+### Configuration (arbitrage/config.py)
+
+All settings managed via Pydantic `BaseSettings`. Environment variables are typed
+and validated at startup. Application code uses `arbitrage.config.settings.*`,
+never raw `os.getenv()`.
+
+---
+
+## 10. Data Persistence
+
+### SQLite (Development)
+
+```
+arbitrage.db
+  +-- agents       (id, name, role, trust_score, capability_level, skills)
+  +-- tasks        (id, session_id, agent, status, progress, duration_seconds)
+  +-- jobs         (id, type, value, status, priority, processed_at)
+  +-- bids         (id, job_id, amount, status, created_at, expires_at)
+  +-- genesis_logs (id, timestamp, agent, action, details, session_id)
+```
+
+### PostgreSQL (Production)
+
+- Connection pooling (configurable pool size)
+- Graceful drain on shutdown (`arbitrage.database.graceful_drain()`)
+- Replication-ready for HA
+
+**Critical rule:** All SQL uses parameterized queries (`?` or `%s` placeholders).
+f-string SQL is forbidden.
+
+---
+
+## 11. Matryca 3-6-9: 162-Dimensional Decision Space
+
+```
+          LOGOS              ETHOS              EROS
+        (Material)       (Intellectual)      (Essential)
+            |                  |                  |
+     +------+------+   +------+------+   +------+------+
+     |  6 Hexagon  |   |  6 Hexagon  |   |  6 Hexagon  |
+     |   Stages    |   |   Stages    |   |   Stages    |
+     +------+------+   +------+------+   +------+------+
+            |                  |                  |
+     Each stage evaluated against 9 Guardian Laws
+            |                  |                  |
+     3  x   6   x   9   =   162 decision vectors
+```
+
+The Matryca ensures every decision is examined from three philosophical
+perspectives (truth, goodness, creation), through six processing stages,
+and validated against nine ethical laws. This produces 162 orthogonal
+evaluation vectors that collectively determine whether a decision is
+approved or denied.
+
+---
+
+## 12. Monitoring & Observability
+
+### Prometheus Metrics (/metrics endpoint)
+
+```
+adrion_db_pool_size              gauge    -- Total connections in pool
+adrion_db_pool_checked_out       gauge    -- Connections currently in use
+adrion_db_pool_checkouts_total   counter  -- Total DB connection checkouts
+adrion_db_pool_timeouts_total    counter  -- Total DB connection timeouts
+adrion_uptime_seconds            gauge    -- Seconds since server start
+```
+
+### Logging
+
+Structured JSON via `python-json-logger`, compatible with Loki/Grafana:
+
+```json
+{
+  "timestamp": "2026-04-11T14:32:00Z",
+  "level": "INFO",
+  "name": "adrion.guardian",
+  "message": "Guardian APPROVE: 9/9 laws passed"
+}
+```
+
+### Grafana Dashboards (Port 3000)
+
+- Agent performance (success rates, latency, trust scores)
+- Guardian Laws compliance heatmap
+- System health (CPU, memory, disk)
+
+---
+
+## 13. Infrastructure
+
+### Docker Compose Variants
+
+| File                             | Purpose      | Services | LLM Backend  |
+|----------------------------------|--------------|----------|--------------|
+| `docker-compose.yml`             | Development  | 5        | auto (local) |
+| `docker-compose.prod.yml`        | Production   | 10       | auto         |
+| `docker-compose.cloud.yml`       | Cloud deploy | 8        | OpenRouter   |
+| `docker-compose.mcp-tier.yml`    | MCP layer    | 6        | auto         |
+| `docker-compose.lmstudio.yml`    | LM Studio    | 2        | LM Studio    |
+
+### Kubernetes
+
+Manifests in `kubernetes/` with namespaced deployments, resource limits,
+and secrets managed via `kubectl create secret` (YAML contains
+`CHANGE_ME_IN_PRODUCTION` placeholders only).
+
+---
+
+## 14. Technology Stack
+
+| Component        | Technology                                  |
+|------------------|---------------------------------------------|
+| Primary language | Python 3.11+                                |
+| Secondary lang   | Go 1.22                                     |
+| Web framework    | Flask (Python), Echo v4 (Go)                |
+| Configuration    | Pydantic BaseSettings                       |
+| Database         | SQLite (dev), PostgreSQL (prod)             |
+| LLM inference    | Ollama (local), OpenRouter (cloud fallback) |
+| Payments         | Stripe                                      |
+| Job sourcing     | Apify                                       |
+| Blockchain       | XRP Ledger                                  |
+| Monitoring       | Prometheus + Grafana + Loki                 |
+| Containerization | Docker, Docker Compose                      |
+| Orchestration    | Kubernetes (optional)                       |
+| CI/CD            | GitHub Actions (10 workflows)               |
+| API docs         | OpenAPI 3.1 (docs/openapi.yaml)             |
+| Linting          | ruff (Python), go vet (Go)                  |
+| Type checking    | mypy (Python)                               |
+| Testing          | pytest (Python), go test (Go)               |
+
+---
+
+## 15. Key File Reference
+
+| File                                 | Role                                    |
+|--------------------------------------|-----------------------------------------|
+| `wsgi.py`                            | Production entry point                  |
+| `arbitrage/app.py`                   | Flask app factory                       |
+| `arbitrage/blueprints/`              | 5 route modules                         |
+| `arbitrage/guardian.py`              | 9 Guardian Laws engine                  |
+| `arbitrage/trinity.py`              | Trinity Score (M/I/E)                   |
+| `arbitrage/hexagon.py`              | 6-stage processing pipeline             |
+| `arbitrage/config.py`               | Pydantic BaseSettings                   |
+| `arbitrage/database.py`             | DB layer (SQLite + PostgreSQL pool)     |
+| `arbitrage/llm.py`                  | LLM abstraction (Ollama + OpenRouter)   |
+| `arbitrage/circuit_breaker.py`      | Circuit breaker for external deps       |
+| `arbitrage/rate_limiter.py`         | Sliding window rate limiter             |
+| `uap/backend/api.py`               | UAP orchestrator (port 8002)            |
+| `cmd/vortex-server/main.go`        | Go Vortex engine (port 1740)            |
+| `docs/GUARDIAN_LAWS_CANONICAL.json` | Guardian Laws canonical definitions     |
+| `docs/openapi.yaml`                | OpenAPI 3.1 specification               |
+
+---
+
+ADRION 369 -- Autonomous Decision-making with Real-time Integration & Orchestration Nexus
+
+Architecture Version 4.0 | 2026-04-11

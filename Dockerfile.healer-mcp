@@ -1,0 +1,23 @@
+# DEPRECATED — use Dockerfile.mcp-tier instead:
+#   docker build -f Dockerfile.mcp-tier --build-arg APP=mcp_healer_app.py --build-arg PORT=9005 -t adrion-Dockerfile.healer-mcp .
+# This file will be removed in v5.0.
+
+# HEALER-MCP Dockerfile
+# Automated Recovery, Health Monitoring & Alerts (Port 9005)
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements-mcp.txt .
+RUN pip install --no-cache-dir -r requirements-mcp.txt
+
+COPY mcp-servers/ ./mcp-servers/
+COPY mcp_healer_app.py .
+
+EXPOSE 9005
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:9005/health || exit 1
+
+CMD ["python", "mcp_healer_app.py"]

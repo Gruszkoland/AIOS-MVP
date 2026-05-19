@@ -1,0 +1,90 @@
+/* ═══════════════════════════════════════════════════════════════
+   ADRION 369 — Control Dashboard Theme
+   Glassmorphism + Neon Gradients (adapted from Grosk design system)
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --bg-primary: #0A0B1F;
+  --bg-secondary: #0F1029;
+  --surface: rgba(22, 25, 46, 0.85);
+  --surface-hover: rgba(30, 35, 60, 0.9);
+  --text-primary: #E0D4FF;
+  --text-secondary: #9CA3AF;
+  --accent-cyan: #00D4FF;
+  --accent-purple: #A020F0;
+  --accent-indigo: #6366F1;
+  --accent-gold: #FCD34D;
+  --accent-red: #FF4B4B;
+  --accent-green: #34D399;
+  --border-glow: rgba(103, 232, 249, 0.2);
+  --shadow-glow: rgba(0, 212, 255, 0.15);
+}
+
+/* Streamlit overrides */
+.stApp {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+header[data-testid="stHeader"] {
+  background: transparent !important;
+}
+
+section[data-testid="stSidebar"] {
+  background: var(--bg-secondary) !important;
+  border-right: 1px solid var(--border-glow) !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown {
+  color: var(--text-primary) !important;
+}
+
+/* Glassmorphism card */
+.card {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glow);
+  box-shadow: 0 0 20px var(--shadow-glow);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: box-shadow 0.3s ease;
+}
+.card:hover {
+  box-shadow: 0 0 35px var(--shadow-glow);
+}
+
+/* AI Orb */
+.ai-orb {
+  background: radial-gradient(circle at 30% 30%, #00D4FF, #A020F0, #6366F1);
+  box-shadow: 0 0 60px rgba(0, 212, 255, 0.5), 0 0 120px rgba(160, 32, 240, 0.2);
+  animation: orb-pulse 3s ease-in-out infinite;
+}
+
+@keyframes orb-pulse {
+  0%, 100% { box-shadow: 0 0 60px rgba(0,212,255,0.5), 0 0 120px rgba(160,32,240,0.2); }
+  50%      { box-shadow: 0 0 80px rgba(0,212,255,0.7), 0 0 160px rgba(160,32,240,0.4); }
+}
+
+/* Status indicators */
+.status-ok      { color: var(--accent-green); }
+.status-warn    { color: var(--accent-gold); }
+.status-alert   { color: var(--accent-red); }
+.status-live    { color: var(--accent-cyan); }
+
+/* Layer badges */
+.layer-personality   { border-left: 3px solid var(--accent-purple); }
+.layer-orchestration { border-left: 3px solid var(--accent-cyan); }
+.layer-decision      { border-left: 3px solid var(--accent-indigo); }
+.layer-realtime      { border-left: 3px solid var(--accent-gold); }
+
+/* Metric styling */
+[data-testid="stMetricValue"] {
+  color: var(--accent-cyan) !important;
+  font-weight: 700 !important;
+}
+[data-testid="stMetricDelta"] svg { display: none; }
+
+/* Plotly chart backgrounds */
+.js-plotly-plot .plotly .main-svg { background: transparent !important; }

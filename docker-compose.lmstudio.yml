@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  # ═══ LM STUDIO — Local LLM Server ═══
+  # Provides OpenAI-compatible API for local LLM inference
+  # Download models via LM Studio UI: https://lmstudio.ai/
+  lmstudio:
+    container_name: adrian-lmstudio
+    image: lmstudio:latest
+    # Note: You need to build this image separately—LM Studio is proprietary
+    # Alternative: Run LM Studio desktop app locally instead of Docker
+    ports:
+      - "1234:1234" # LM Studio API port
+    volumes:
+      - lmstudio-models:/root/.local/share/lmstudio/models
+    environment:
+      - DEBUG=0
+      - LMSTUDIO_PORT=1234
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1234/v1/models"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  # ═══ ARBITRAGE API — Uses LM Studio Backend ═══
+  arbitrage-api:
+    container_name: adrian-arbitrage-api
+    depends_on:
+      lmstudio:
+        condition: service_healthy
+    environment:
+      - LLM_BACKEND=lmstudio
+      - LMSTUDIO_URL=http://lmstudio:1234
+      - LMSTUDIO_MODEL=neural-chat
+      - DB_PATH=/app/arbitrage.db
+    # ... rest of arbitrage config
+
+  # ═══ OLLAMA — Fallback Local LLM Server ═══
+  # Alternative to LM Studio, fully containerized
+  ollama:
+    container_name: adrian-ollama
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  lmstudio-models:
+    driver: local
+  ollama-models:
+    driver: local

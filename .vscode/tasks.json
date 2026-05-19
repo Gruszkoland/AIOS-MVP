@@ -1,0 +1,672 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🚀 Start Ollama Server",
+      "type": "shell",
+      "command": "ollama",
+      "args": ["serve"],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Ollama.*",
+          "endsPattern": "^.*API.*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "🤖 Start Aider (Librarian Mode)",
+      "type": "shell",
+      "command": "aider",
+      "args": [
+        "--model",
+        "openai/deepseek-coder-v2:16b",
+        "--openai-api-base",
+        "http://localhost:11434/v1",
+        "--openai-api-key",
+        "ollama"
+      ],
+      "isBackground": false,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "📊 Show Ollama Models",
+      "type": "shell",
+      "command": "ollama",
+      "args": ["list"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "📥 Download DeepSeek Model (16B)",
+      "type": "shell",
+      "command": "ollama",
+      "args": ["pull", "deepseek-coder-v2:16b"],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📥 Download DeepSeek Model (Lite)",
+      "type": "shell",
+      "command": "ollama",
+      "args": ["pull", "deepseek-coder-v2:lite"],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "✅ Check System Status",
+      "type": "shell",
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoLogo",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host \"Checking Ollama...\"; curl http://localhost:11434/api/tags; Write-Host \"System OK\""
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: /audit - Audyt Bezpieczeństwa (Sentinel/Auditor)",
+      "type": "shell",
+      "command": "aider --model openai/deepseek-coder-v2:16b --openai-api-base http://localhost:11434/v1 --openai-api-key ollama --message '/audit check current workspace security'",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "new" }
+    },
+    {
+      "label": "ADRION: /boost - Dźwignie ROI (Booster)",
+      "type": "shell",
+      "command": "aider --model openai/deepseek-coder-v2:16b --openai-api-base http://localhost:11434/v1 --openai-api-key ollama --message '/boost analyze 3 levers'",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "ADRION: /heal - Samonaprawa (Healer)",
+      "type": "shell",
+      "command": "aider --model openai/deepseek-coder-v2:16b --openai-api-base http://localhost:11434/v1 --openai-api-key ollama --message '/heal fix latest errors'",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "new" }
+    },
+    {
+      "label": "ADRION: /sync - Synchronizacja Chronos (SAP)",
+      "type": "shell",
+      "command": "aider --model openai/deepseek-coder-v2:16b --openai-api-base http://localhost:11434/v1 --openai-api-key ollama --message '/sync update status'",
+      "presentation": { "reveal": "silent" }
+    },
+    {
+      "label": "📋 View Session Logs",
+      "type": "shell",
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoLogo",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (Test-Path \".aider/logs/session.log\") { Get-Content -Tail 50 .aider/logs/session.log } else { Write-Host \"No logs yet\" }"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Create Session Reports",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/create_session_reports.py",
+        "--topic",
+        "${input:sessionTopic}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Validate Session Reports",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": ["scripts/reporting/validate_session_reports.py"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Validate PowerShell Tasks",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": ["scripts/reporting/validate_powershell_tasks.py"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Validate Pre-Commit Hook",
+      "type": "shell",
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/security/validate-precommit-hook.ps1"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Start Arbitrage API Test Port",
+      "type": "shell",
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/testing/start_arbitrage_api_test_port.ps1",
+        "-Port",
+        "8011"
+      ],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*$",
+          "endsPattern": "^.*Arbitrage API running.*$"
+        }
+      },
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Predeploy A-11 Validation",
+      "type": "shell",
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/testing/invoke_a11_predeploy_validation.ps1",
+        "-Port",
+        "8011"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Local Release Gate (A-11 + Reports)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "ADRION: Start Arbitrage API Test Port",
+        "ADRION: Predeploy A-11 Validation",
+        "ADRION: Validate PowerShell Tasks",
+        "ADRION: Validate Pre-Commit Hook",
+        "ADRION: Validate Session Reports"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Check LLM KPI Gate",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/check_llm_kpi_gate.py",
+        "--window",
+        "200",
+        "--min-events",
+        "30",
+        "--rollback-on-fail"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Check LLM KPI Gate (Warmup)",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/check_llm_kpi_gate.py",
+        "--window",
+        "200",
+        "--min-events",
+        "30",
+        "--rollback-on-fail",
+        "--warmup-ok"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show LLM Rollout Status",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_rollout_status.py",
+        "--window",
+        "200",
+        "--min-events",
+        "30"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show LLM Rollout Settings",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": ["scripts/reporting/set_llm_rollout_state.py", "show"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show LLM Ops Dashboard",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_ops_dashboard.py",
+        "--window",
+        "200",
+        "--min-events",
+        "30",
+        "--tail",
+        "8"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show LLM Rollout Alert",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_rollout_alert.py",
+        "--alert-path",
+        "monitoring/llm_rollout_alert.json"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show LLM Rollout Alert History",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_rollout_alert_history.py",
+        "--history-path",
+        "monitoring/llm_rollout_alert_history.jsonl",
+        "--tail",
+        "20"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show Last Status Change",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_rollout_alert_history.py",
+        "--history-path",
+        "monitoring/llm_rollout_alert_history.jsonl",
+        "--allow-empty",
+        "--tail",
+        "1"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Last Gate Event",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_rollout_alert_history.py",
+        "--history-path",
+        "monitoring/llm_rollout_alert_history.jsonl",
+        "--allow-empty",
+        "--tail",
+        "1"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show READY Promotion History",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_rollout_alert_history.py",
+        "--history-path",
+        "monitoring/llm_rollout_alert_history.jsonl",
+        "--status",
+        "READY_FOR_PROMOTION",
+        "--tail",
+        "20"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Show BLOCKED Gate History",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/show_llm_rollout_alert_history.py",
+        "--history-path",
+        "monitoring/llm_rollout_alert_history.jsonl",
+        "--status",
+        "GATE_BLOCKED",
+        "--tail",
+        "20"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Promote LLM Canary 5%",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/set_llm_rollout_state.py",
+        "promote",
+        "--percent",
+        "5",
+        "--backend",
+        "openrouter",
+        "--reason",
+        "manual_promote_5"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Disable LLM Canary",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/set_llm_rollout_state.py",
+        "disable",
+        "--reason",
+        "manual_disable"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Reset LLM Rollout Override",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": ["scripts/reporting/set_llm_rollout_state.py", "reset"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Monitor LLM KPI Gate (15m)",
+      "type": "shell",
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoLogo",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/reporting/run_llm_kpi_guard_loop.ps1",
+        "-IntervalMinutes",
+        "15",
+        "-Window",
+        "200",
+        "-MinEvents",
+        "30",
+        "-RollbackOnFail",
+        "-WarmupOk",
+        "-PromoteOnPass",
+        "-PromotePercent",
+        "5",
+        "-PromoteBackend",
+        "openrouter",
+        "-AlertOnReady",
+        "-AlertPath",
+        "monitoring/llm_rollout_alert.json",
+        "-HistoryOnChange",
+        "-HistoryPath",
+        "monitoring/llm_rollout_alert_history.jsonl"
+      ],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "ADRION: KPI Guard Loop Smoke (1x)",
+      "type": "shell",
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoLogo",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/reporting/run_llm_kpi_guard_loop.ps1",
+        "-IntervalMinutes",
+        "0.1",
+        "-Window",
+        "50",
+        "-MinEvents",
+        "1",
+        "-RollbackOnFail",
+        "-WarmupOk",
+        "-PromoteOnPass",
+        "-PromotePercent",
+        "5",
+        "-PromoteBackend",
+        "openrouter",
+        "-AlertOnReady",
+        "-AlertPath",
+        "monitoring/llm_rollout_alert.json",
+        "-HistoryOnChange",
+        "-HistoryPath",
+        "monitoring/llm_rollout_alert_history.jsonl",
+        "-MaxIterations",
+        "1"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "ADRION: Verify Historie->Pictures (Info)",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/verify_historie_to_pictures_copy.py",
+        "--mode",
+        "filename",
+        "--top",
+        "40"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Verify Historie->Pictures (Strict)",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe",
+      "args": [
+        "scripts/reporting/verify_historie_to_pictures_copy.py",
+        "--mode",
+        "filename",
+        "--top",
+        "40",
+        "--fail-on-missing"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Verify Historie->Pictures (Info + Strict)",
+      "dependsOn": [
+        "ADRION: Verify Historie->Pictures (Info)",
+        "ADRION: Verify Historie->Pictures (Strict)"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    },
+    {
+      "label": "ADRION: Create + Validate Session Reports",
+      "dependsOn": [
+        "ADRION: Create Session Reports",
+        "ADRION: Validate Session Reports"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    },
+    {
+      "label": "ADRION: Security Gate",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "ADRION: Validate Pre-Commit Hook",
+        "ADRION: Validate Session Reports",
+        "ADRION: Check LLM KPI Gate (Warmup)"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "ADRION: Final Deployment Gate",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "ADRION: Security Gate",
+        "ADRION: Local Release Gate (A-11 + Reports)"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "📊 System Performance Monitor (Live)",
+      "type": "shell",
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoLogo",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/monitor_system.ps1",
+        "-RefreshInterval",
+        "5"
+      ],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "sessionTopic",
+      "type": "promptString",
+      "description": "Temat sesji — zostanie zamieniony na Tytuł_Tematu_DD-MM-YYYY.md",
+      "default": "Chat Session"
+    }
+  ]
+}

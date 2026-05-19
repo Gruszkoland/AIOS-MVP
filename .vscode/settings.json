@@ -1,3 +1,318 @@
 {
-      "apliarteAi.inlineCompletion": true
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.renderWhitespace": "selection",
+  "editor.rulers": [88, 120],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "editor.linkedEditing": true,
+  "editor.minimap.enabled": false,
+  "files.autoSave": "onFocusChange",
+  "files.exclude": {
+    "**/.aider": false,
+    "**/.git": false,
+    "**/node_modules": true,
+    "**/*.pyc": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  },
+  "search.exclude": {
+    ".aider": false,
+    "node_modules": true,
+    ".git": true,
+    "**/.venv": true,
+    "**/__pycache__": true,
+    "**/coverage": true,
+    "**/htmlcov": true,
+    "**/*.pyc": true
+  },
+  "search.useIgnoreFiles": true,
+  "search.smartCase": true,
+  "search.followSymlinks": false,
+  "files.watcherExclude": {
+    "**/.venv/**": true,
+    "**/__pycache__/**": true,
+    "**/node_modules/**": true,
+    "**/.git/objects/**": true,
+    "**/coverage/**": true,
+    "**/htmlcov/**": true,
+    "**/logs/**": true,
+    "**/*.log": true,
+    "**/htmlcov/**": true,
+    "**/.pytest_cache/**": true,
+    "**/.ruff_cache/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/.mypy_cache/**": true
+  },
+  "files.maxMemoryForLargeFilesMB": 512,
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": true,
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[yaml]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  "[go]": {
+    "editor.defaultFormatter": "golang.go",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  },
+  "workbench.colorTheme": "Visual Studio Dark",
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.fetchOnPull": true,
+  "git.pruneOnFetch": true,
+  "git.showFetchOutput": false,
+  "python.terminal.useEnvFile": true,
+  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.diagnosticMode": "all",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/arbitrage",
+    "${workspaceFolder}/persona-agents",
+    "${workspaceFolder}/scripts"
+  ],
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": [
+    "--disable=W0212,C0111",
+    "--max-line-length=120"
+  ],
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": ["--line-length=120"],
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "tests",
+    "--timeout=60",
+    "-v",
+    "--tb=short",
+    "-x"
+  ],
+  "python.debugging.logToFile": true,
+  "python.debugging.logDir": "${workspaceFolder}/.debug-logs",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.automationProfile.windows": {
+    "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "args": ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass"]
+  },
+  "terminal.integrated.env.windows": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONPATH": "${workspaceFolder}",
+    "ADRION_MODE": "development"
+  },
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.bufferSize": 5000,
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    }
+  },
+  "peacock.color": "#264653",
+  "files.associations": {
+    "**/config/personas.yml": "yaml",
+    "**/aider/config.yml": "yaml"
+  },
+  "diffEditor.maxComputationTime": 0,
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": ".github/adrion-protocol.md",
+      "explanation": "Zasady 9 Niepodważalnych Praw ADRION. Audytor musi zatwierdzić każdy kod."
+    }
+  ],
+  "github.copilot.chat.agentStyle": "concise",
+  "chat.viewSessions.enabled": true,
+  "chat.agent.sandbox.enabled": true,
+  "chat.agent.sandbox.fileSystem.allowed": [
+    "${workspaceFolder}/**/*.py",
+    "${workspaceFolder}/**/*.md",
+    "${workspaceFolder}/.venv/**",
+    "${workspaceFolder}/arbitrage/**",
+    "${workspaceFolder}/persona-agents/**",
+    "${workspaceFolder}/Genesis Record/**",
+    "${workspaceFolder}/scripts/**"
+  ],
+  "chat.agent.sandbox.network.allowedDomains": [
+    "github.com",
+    "pypi.org",
+    "openrouter.ai",
+    "localhost",
+    "127.0.0.1"
+  ],
+  "workbench.hover.enabled": false,
+  "workbench.editor.tabSizing": "shrink",
+  "workbench.editor.closeOnFileDelete": true,
+  "workbench.editor.enablePreview": false,
+  "workbench.startupEditor": "none",
+  "workbench.panel.defaultLocation": "bottom",
+  "workbench.sideBar.location": "left",
+  "workbench.tree.indent": 16,
+  "debug.console.wordWrap": false,
+  "debug.console.historySize": 100,
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-containers"
+  },
+  "[powershell]": {
+    "editor.defaultFormatter": "ms-vscode.powershell"
+  },
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.rulers": [88]
+  },
+  "pylance.analysis.typeCheckingMode": "strict",
+  "pylance.diagnosticMode": "workspace",
+  "roo.analysis.enabled": true,
+  "roo.analysis.complexity": true,
+  "roo.analysis.security": true,
+  "roo.analysis.performance": true,
+  "roo.analysis.typeChecking": true,
+  "roo.analysis.documentation": true,
+  "roo.codeNavigation.enableSymbolIndexing": true,
+  "roo.codeNavigation.enableCrossReferencing": true,
+  "roo.codeNavigation.includeExternalDeps": false,
+  "roo.testing.framework": "pytest",
+  "roo.testing.enabled": true,
+  "roo.testing.coverage.enabled": true,
+  "roo.testing.coverage.minRatio": 80,
+  "roo.deployment.environments": ["local", "kubernetes", "cloud"],
+  "roo.filePatterns.include": [
+    "**/*.py",
+    "**/*.go",
+    "**/*.ps1",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/Dockerfile*",
+    "scripts/**/*",
+    "mcp_servers/**/*"
+  ],
+  "roo.filePatterns.exclude": [
+    "node_modules/",
+    ".venv/",
+    "__pycache__/",
+    "**/.*",
+    "htmlcov/",
+    "dist/",
+    "build/",
+    "legacy/"
+  ],
+  "roo.linters.python.enabled": true,
+  "roo.linters.python.tools": ["ruff", "pylint"],
+  "roo.linters.go.enabled": true,
+  "roo.linters.go.tools": ["golangci-lint"],
+  "roo.linters.powershell.enabled": true,
+  "roo.performance.analysisTimeout": 30000,
+  "roo.performance.maxFileSize": 5242880,
+  "roo.performance.enableParallelAnalysis": true,
+  "roo.performance.cacheEnabled": true,
+  "roo.performance.cachePath": ".roo_cache/",
+  "roo.reporting.generateOnSave": true,
+  "roo.reporting.reportFormat": ["json", "html"],
+  "roo.reporting.reportPath": "reports/",
+  "roo.advancedFeatures.enableAI": true,
+  "roo.advancedFeatures.enableRefactoringSuggestions": true,
+  "roo.advancedFeatures.enablePerformanceOptimizations": true,
+  "roo.advancedFeatures.enableSecurityAdvisories": true,
+  "roo.ignoreFile": ".roo.ignore",
+  "roo.configFile": ".roo.json",
+  "roo.profilesFile": "roo.profiles.json",
+  "roo.rulesFile": "roo.rules.json",
+  "roo.rcFile": ".roorc",
+  "roo.mcp.configFile": ".roo/mcp.json",
+  "roo.guardrails.enabled": true,
+  "roo.guardrails.enforceNaming": true,
+  "roo.guardrails.enforceSecurity": true,
+  "roo.guardrails.enforceDocumentation": true,
+  "roo.ai.mode": "hybrid",
+  "roo.ai.localEndpoint": "http://localhost:11434",
+  "roo.ai.enableRefactoring": true,
+  "roo.ai.enableOptimization": true,
+  "roo.cache.enabled": true,
+  "roo.cache.path": ".roo_cache/",
+  "roo.cache.ttl": 86400,
+  "roo.notifications.showComplete": true,
+  "roo.notifications.showProblems": true,
+  "roo.notifications.desktopNotifications": false,
+  "roo.output.colorOutput": true,
+  "roo.output.verbosity": "info",
+  "roo.commands.onSave": true,
+  "roo.commands.onOpen": true,
+  "roo.integration.git.enabled": true,
+  "roo.integration.docker.enabled": true,
+  "roo.integration.kubernetes.enabled": true,
+  "roo.architectureAnalysis.enabled": true,
+  "roo.architectureAnalysis.detectPatterns": true,
+  "roo.architectureAnalysis.generateDiagrams": true,
+  "roo.qualityMetrics.trackComplexity": true,
+  "roo.qualityMetrics.trackCoverage": true,
+  "roo.qualityMetrics.trackSecurity": true,
+  "roo.qualityMetrics.trackPerformance": true,
+  "roo.security.oauthValidation": true,
+  "roo.security.checkScopeGranularity": true,
+  "roo.security.auditHiddenDataFolders": true,
+  "roo.security.validateTokenRotation": true,
+  "roo.security.enforceEncryptedTokenStorage": true,
+  "roo.security.requireScopeAuditLogging": true,
+  "roo.security.privacyCompliance": "G7-Privacy",
+  "roo.security.nonmaleficenceCheck": "G8-Nonmaleficence",
+  "roo.security.transparencyAudit": "G5-Transparency",
+  "roo.oauth.enableScopeValidation": true,
+  "roo.oauth.minimalScopeEnforcement": true,
+  "roo.oauth.tokenExpirationHours": 24,
+  "roo.oauth.refreshTokenRotation": true,
+  "roo.oauth.auditLoggingEnabled": true,
+  "roo.oauth.scopeDocumentation": "docs/oauth-scopes.md",
+  "roo.oauth.tokenStorageBackend": "encrypted-env",
+  "roo.encryption.atRest": true,
+  "roo.encryption.algorithm": "AES-256-GCM",
+  "roo.encryption.keyDerivation": "PBKDF2",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "-",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "try { $baseDir = 'Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU'; @('PLAN', 'PROGRESS', 'REPORTS') | ForEach-Object { $path = Join-Path $baseDir $_; if (-not (Test-Path $path)) { New-Item -ItemType Directory -Path $path -Force | Out-Null } }; $dateStr = (Get-Date -Format 'dd-MM-yyyy'); $sessionFile = Join-Path $baseDir 'PLAN' \"Chat_Session_$dateStr.md\"; if (-not (Test-Path $sessionFile)) { \"# Chat Session $dateStr`n`nStarting new session. Topic will be determined from first message.`n`n## Status: PENDING`n\" | Out-File -FilePath $sessionFile -Encoding UTF8 }; @(Join-Path $baseDir 'PROGRESS' \"Chat_Session_$dateStr.md\") | ForEach-Object { if (-not (Test-Path $_)) { \"# Progress Log $dateStr`n`n## Session Started\n- Timestamp: $(Get-Date -Format 'HH:mm:ss')`n- Status: waiting_for_first_message`n\" | Out-File -FilePath $_ -Encoding UTF8 } } } catch { }",
+            "timeout": 10,
+            "statusMessage": "Initializing progress tracking...",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "-",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "try { $payload = [Console]::In.ReadToEnd() | ConvertFrom-Json -ErrorAction SilentlyContinue; if ($payload.tool_input.message) { $msg = $payload.tool_input.message | Select-Object -First 100; $words = ($msg -split '\\s+' | Select-Object -First 4) -join '_'; $words = $words -replace '[^a-zA-Z0-9_]', '' | Select-Object -First 40; if ($words.Length -gt 0) { $baseDir = 'Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU'; $dateStr = (Get-Date -Format 'dd-MM-yyyy'); $oldPlanFile = Join-Path $baseDir 'PLAN' \"Chat_Session_$dateStr.md\"; $newPlanFile = Join-Path $baseDir 'PLAN' \"${words}_$dateStr.md\"; if ((Test-Path $oldPlanFile) -and $words -ne 'Chat_Session') { Rename-Item -Path $oldPlanFile -NewName (Split-Path $newPlanFile -Leaf) -Force -ErrorAction SilentlyContinue; $oldProgressFile = Join-Path $baseDir 'PROGRESS' \"Chat_Session_$dateStr.md\"; $newProgressFile = Join-Path $baseDir 'PROGRESS' \"${words}_$dateStr.md\"; Rename-Item -Path $oldProgressFile -NewName (Split-Path $newProgressFile -Leaf) -Force -ErrorAction SilentlyContinue } } } } catch { }",
+            "timeout": 5,
+            "statusMessage": "Recording chat topic...",
+            "async": true,
+            "once": false
+          }
+        ]
+      }
+    ]
+  }
 }

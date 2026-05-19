@@ -1,0 +1,2052 @@
+[
+  {
+    "interaction_id": "93d73599152fdf85",
+    "timestamp": "2026-03-30T21:54:39.170509+00:00",
+    "verifiable": 0.4,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.485,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3fcf366af7c1dcda",
+    "timestamp": "2026-03-30T21:54:46.213236+00:00",
+    "verifiable": 0.4,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.455,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3fcf366af7c1dcda_fb",
+    "timestamp": "2026-03-30T21:54:54.161225+00:00",
+    "verifiable": 0.4,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.575,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "57cee8acd05c2beb",
+    "timestamp": "2026-03-30T21:55:49.280034+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.525,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "15a9f71d74fe9ec2",
+    "timestamp": "2026-03-30T21:55:50.060853+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.525,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "deefc34768dca78a",
+    "timestamp": "2026-03-30T21:55:50.770896+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.505,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9906540a91efe756",
+    "timestamp": "2026-03-30T21:55:51.504891+00:00",
+    "verifiable": 0.55,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.515,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "90db9e73268eb4d7",
+    "timestamp": "2026-03-30T21:55:52.144599+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.505,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "57cee8acd05c2beb_fb",
+    "timestamp": "2026-03-30T21:55:52.758778+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.645,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "15a9f71d74fe9ec2_fb",
+    "timestamp": "2026-03-30T21:55:52.774808+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.645,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "deefc34768dca78a_fb",
+    "timestamp": "2026-03-30T21:55:52.790114+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.625,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9906540a91efe756_fb",
+    "timestamp": "2026-03-30T21:55:52.804905+00:00",
+    "verifiable": 0.55,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.635,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "90db9e73268eb4d7_fb",
+    "timestamp": "2026-03-30T21:55:52.818621+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.625,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e2ef1939e029173c",
+    "timestamp": "2026-03-30T21:55:58.246460+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.505,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b9d1d35b4300af07",
+    "timestamp": "2026-03-30T21:55:59.099040+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.525,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "76f5f2fb2e089d18",
+    "timestamp": "2026-03-30T21:55:59.888469+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.505,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e2ef1939e029173c_fb",
+    "timestamp": "2026-03-30T21:56:11.052840+00:00",
+    "verifiable": 0.5,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.625,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b9d1d35b4300af07_fb",
+    "timestamp": "2026-03-30T21:56:11.063489+00:00",
+    "verifiable": 0.6,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.9,
+    "total": 0.645,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e95391399ad2a9b9",
+    "timestamp": "2026-03-30T21:57:01.485786+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.465,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "2d9e05245eb4b1ea",
+    "timestamp": "2026-03-30T21:57:44.674897+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "59ff427dd79bd283",
+    "timestamp": "2026-03-30T21:57:52.155705+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b4ed9a62312dede5",
+    "timestamp": "2026-03-30T23:59:01.378372+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.533,
+    "aligned": 0.5,
+    "total": 0.517,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "666830a70c20f816",
+    "timestamp": "2026-03-31T13:36:00.113988+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b74303e76a8d2dc0",
+    "timestamp": "2026-03-31T14:05:44.993119+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "7155bc7249232eab",
+    "timestamp": "2026-03-31T14:11:10.976967+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a9b0868e75503f8b",
+    "timestamp": "2026-03-31T14:14:48.278896+00:00",
+    "verifiable": 0.3,
+    "efficient": 0.8,
+    "relevant": 0.3,
+    "aligned": 0.5,
+    "total": 0.435,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a0f0fa797897536e",
+    "timestamp": "2026-04-01T05:15:43.592714+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a0f0fa797897536e_fb",
+    "timestamp": "2026-04-01T05:15:44.082692+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9e6268446ecd8c27",
+    "timestamp": "2026-04-01T05:16:56.467268+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9e6268446ecd8c27_fb",
+    "timestamp": "2026-04-01T05:16:56.750931+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e116bb0a4b9c1bdc",
+    "timestamp": "2026-04-01T05:17:49.520032+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e116bb0a4b9c1bdc_fb",
+    "timestamp": "2026-04-01T05:17:49.793606+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6a9b77c4be3f5dc4",
+    "timestamp": "2026-04-01T05:19:48.378281+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6a9b77c4be3f5dc4_fb",
+    "timestamp": "2026-04-01T05:19:48.615563+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b86a23ae4314af54",
+    "timestamp": "2026-04-01T08:09:22.422052+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b86a23ae4314af54_fb",
+    "timestamp": "2026-04-01T08:09:22.752911+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "81526c5b8c57fd3c",
+    "timestamp": "2026-04-01T08:42:33.089102+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "81526c5b8c57fd3c_fb",
+    "timestamp": "2026-04-01T08:42:34.017640+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "dc0b2f1ba8139f51",
+    "timestamp": "2026-04-01T08:43:31.379658+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "dc0b2f1ba8139f51_fb",
+    "timestamp": "2026-04-01T08:43:31.753402+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "126f05c5139b94e8",
+    "timestamp": "2026-04-01T08:49:05.422404+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "126f05c5139b94e8_fb",
+    "timestamp": "2026-04-01T08:49:05.558404+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "84b6a087e2c88e83",
+    "timestamp": "2026-04-01T08:50:54.665383+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "84b6a087e2c88e83_fb",
+    "timestamp": "2026-04-01T08:51:22.846874+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "be5f739d6a54b72b",
+    "timestamp": "2026-04-01T08:59:04.747034+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "be5f739d6a54b72b_fb",
+    "timestamp": "2026-04-01T08:59:31.158517+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "8b4c14d4fbf870ad",
+    "timestamp": "2026-04-01T09:14:30.031820+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "8b4c14d4fbf870ad_fb",
+    "timestamp": "2026-04-01T09:14:46.087139+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a8ba9734e1d562b1",
+    "timestamp": "2026-04-01T09:15:13.299556+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a8ba9734e1d562b1_fb",
+    "timestamp": "2026-04-01T09:15:29.197050+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "27cb9e2646ef34d6",
+    "timestamp": "2026-04-01T09:15:47.384304+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "199eb4f3117f9a16",
+    "timestamp": "2026-04-01T09:17:02.944167+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "199eb4f3117f9a16_fb",
+    "timestamp": "2026-04-01T09:17:10.326995+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "87990d8a715ed8d6",
+    "timestamp": "2026-04-01T17:26:33.337590+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "87990d8a715ed8d6_fb",
+    "timestamp": "2026-04-01T17:26:40.004215+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ac2ea676eac34805",
+    "timestamp": "2026-04-01T17:27:32.200434+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ac2ea676eac34805_fb",
+    "timestamp": "2026-04-01T17:27:36.279167+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f93ca6c905c945d8",
+    "timestamp": "2026-04-01T17:27:50.328675+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f93ca6c905c945d8_fb",
+    "timestamp": "2026-04-01T17:27:51.945466+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "318b7334932dcf0f",
+    "timestamp": "2026-04-01T17:28:10.269477+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "20faed7762e88421",
+    "timestamp": "2026-04-01T17:28:11.007847+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "20faed7762e88421_fb",
+    "timestamp": "2026-04-01T17:28:13.625325+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "8f3e3515714d2217",
+    "timestamp": "2026-04-01T17:28:42.863325+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "07fb69c79f4cbbd3",
+    "timestamp": "2026-04-01T17:28:44.133690+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "07fb69c79f4cbbd3_fb",
+    "timestamp": "2026-04-01T17:28:46.430715+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ac5b7bb886941913",
+    "timestamp": "2026-04-01T17:29:17.172027+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ac5b7bb886941913_fb",
+    "timestamp": "2026-04-01T17:29:21.298041+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "2391abe944ffdbfe",
+    "timestamp": "2026-04-01T17:30:23.753657+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "2391abe944ffdbfe_fb",
+    "timestamp": "2026-04-01T17:30:25.426409+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "81075c9be957e341",
+    "timestamp": "2026-04-02T12:34:34.742612+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "81075c9be957e341_fb",
+    "timestamp": "2026-04-02T12:34:40.825550+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "1274fc20103871fa",
+    "timestamp": "2026-04-02T12:36:17.985850+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "1274fc20103871fa_fb",
+    "timestamp": "2026-04-02T12:36:19.674750+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6144f933b51ffa2b",
+    "timestamp": "2026-04-02T14:28:55.661937+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6144f933b51ffa2b_fb",
+    "timestamp": "2026-04-02T14:29:01.745228+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "8c80adb09213d73a",
+    "timestamp": "2026-04-02T14:31:08.937251+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "8c80adb09213d73a_fb",
+    "timestamp": "2026-04-02T14:31:12.251756+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "687f0a6393e55486",
+    "timestamp": "2026-04-02T15:03:25.822043+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "687f0a6393e55486_fb",
+    "timestamp": "2026-04-02T15:03:31.872282+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "31754d3010fab85b",
+    "timestamp": "2026-04-02T15:03:55.357339+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "31754d3010fab85b_fb",
+    "timestamp": "2026-04-02T15:03:56.859979+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "31471041dbb15aa2",
+    "timestamp": "2026-04-02T15:04:17.948777+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "31471041dbb15aa2_fb",
+    "timestamp": "2026-04-02T15:04:19.443377+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "c67f4b8b72ec1008",
+    "timestamp": "2026-04-02T15:05:02.453800+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "c67f4b8b72ec1008_fb",
+    "timestamp": "2026-04-02T15:05:04.238812+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "781ad3e9b5375df9",
+    "timestamp": "2026-04-02T16:02:03.010543+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "781ad3e9b5375df9_fb",
+    "timestamp": "2026-04-02T16:02:06.780697+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ae4bceb6c808effe",
+    "timestamp": "2026-04-02T17:12:22.051982+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ae4bceb6c808effe_fb",
+    "timestamp": "2026-04-02T17:12:25.181466+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "076c1ddfe910d25e",
+    "timestamp": "2026-04-02T17:14:07.889916+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "076c1ddfe910d25e_fb",
+    "timestamp": "2026-04-02T17:14:09.793214+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "10301087d6bd1b0b",
+    "timestamp": "2026-04-02T19:22:51.339979+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "10301087d6bd1b0b_fb",
+    "timestamp": "2026-04-02T19:22:57.818569+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f5dd8ca0c0d402a5",
+    "timestamp": "2026-04-02T19:23:31.757303+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f5dd8ca0c0d402a5_fb",
+    "timestamp": "2026-04-02T19:23:34.189515+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "630f8e6cf257dbc6",
+    "timestamp": "2026-04-02T19:58:11.375000+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "630f8e6cf257dbc6_fb",
+    "timestamp": "2026-04-02T19:58:14.173989+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "798609c926f721f2",
+    "timestamp": "2026-04-02T19:58:34.201351+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "798609c926f721f2_fb",
+    "timestamp": "2026-04-02T19:58:36.013502+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "595f7214069a9a01",
+    "timestamp": "2026-04-02T19:59:15.198976+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "595f7214069a9a01_fb",
+    "timestamp": "2026-04-02T19:59:16.539698+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "0cf464be1e9c928b",
+    "timestamp": "2026-04-02T20:03:40.300963+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "0cf464be1e9c928b_fb",
+    "timestamp": "2026-04-02T20:03:44.547394+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ccbcaf7af79e4dc7",
+    "timestamp": "2026-04-04T13:26:58.287691+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ccbcaf7af79e4dc7_fb",
+    "timestamp": "2026-04-04T13:26:58.306886+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "cc3e50165b4c2b18",
+    "timestamp": "2026-04-04T13:32:16.445138+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "cc3e50165b4c2b18_fb",
+    "timestamp": "2026-04-04T13:32:16.476379+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e8cd11b12bcf4d07",
+    "timestamp": "2026-04-04T13:33:50.692868+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e8cd11b12bcf4d07_fb",
+    "timestamp": "2026-04-04T13:33:50.708475+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "5540da0e3e5a40d1",
+    "timestamp": "2026-04-04T13:48:38.326603+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "5540da0e3e5a40d1_fb",
+    "timestamp": "2026-04-04T13:48:38.359905+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "0ec9eff25cf248ac",
+    "timestamp": "2026-04-04T13:52:39.475644+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "0ec9eff25cf248ac_fb",
+    "timestamp": "2026-04-04T13:52:39.551698+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "23afc01d1609e230",
+    "timestamp": "2026-04-04T13:53:40.686107+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "23afc01d1609e230_fb",
+    "timestamp": "2026-04-04T13:53:40.702811+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3625a6f4de51b6fd",
+    "timestamp": "2026-04-04T13:54:21.753967+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3625a6f4de51b6fd_fb",
+    "timestamp": "2026-04-04T13:54:21.771584+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e3d74cd2db447d0f",
+    "timestamp": "2026-04-04T13:55:07.154480+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e3d74cd2db447d0f_fb",
+    "timestamp": "2026-04-04T13:55:07.170692+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "822052c21c7a3e76",
+    "timestamp": "2026-04-04T13:55:42.547546+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "822052c21c7a3e76_fb",
+    "timestamp": "2026-04-04T13:55:42.563166+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "277b6bdd328d2dfa",
+    "timestamp": "2026-04-05T12:06:10.296767+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "277b6bdd328d2dfa_fb",
+    "timestamp": "2026-04-05T12:06:10.331444+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "2fec908f4fe343c8",
+    "timestamp": "2026-04-05T12:09:38.305215+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "2fec908f4fe343c8_fb",
+    "timestamp": "2026-04-05T12:09:38.315853+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "4e874656e65d93fa",
+    "timestamp": "2026-04-05T12:12:15.121369+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "4e874656e65d93fa_fb",
+    "timestamp": "2026-04-05T12:12:15.149250+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "7158753e95675a98",
+    "timestamp": "2026-04-05T12:18:04.101595+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "7158753e95675a98_fb",
+    "timestamp": "2026-04-05T12:18:04.124547+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "78a5ce60bd581a1a",
+    "timestamp": "2026-04-05T12:18:57.030376+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "78a5ce60bd581a1a_fb",
+    "timestamp": "2026-04-05T12:18:57.040976+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "2a5c5405e93d1d68",
+    "timestamp": "2026-04-05T12:33:36.713395+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "2a5c5405e93d1d68_fb",
+    "timestamp": "2026-04-05T12:33:36.734145+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "40d6e19eb2a08f21",
+    "timestamp": "2026-04-05T12:35:09.460269+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "40d6e19eb2a08f21_fb",
+    "timestamp": "2026-04-05T12:35:09.469990+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "4cae0cc3d3c34980",
+    "timestamp": "2026-04-05T12:35:40.068263+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "4cae0cc3d3c34980_fb",
+    "timestamp": "2026-04-05T12:35:40.085134+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "47b6bcc0b81ed53b",
+    "timestamp": "2026-04-05T12:38:00.208738+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "47b6bcc0b81ed53b_fb",
+    "timestamp": "2026-04-05T12:38:00.291745+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "8a392db524318c94",
+    "timestamp": "2026-04-05T12:41:20.403084+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "8a392db524318c94_fb",
+    "timestamp": "2026-04-05T12:41:20.462965+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a95dcd5dbd2360b0",
+    "timestamp": "2026-04-05T12:42:03.576716+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a95dcd5dbd2360b0_fb",
+    "timestamp": "2026-04-05T12:42:03.600576+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "495012e647a9033c",
+    "timestamp": "2026-04-05T14:08:11.854171+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "495012e647a9033c_fb",
+    "timestamp": "2026-04-05T14:08:11.917797+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6059b649ba17817a",
+    "timestamp": "2026-04-05T14:09:41.266873+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6059b649ba17817a_fb",
+    "timestamp": "2026-04-05T14:09:41.377404+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3e74a754e85d9cc5",
+    "timestamp": "2026-04-05T14:15:20.108109+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "3e74a754e85d9cc5_fb",
+    "timestamp": "2026-04-05T14:15:20.138285+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ed1292a321aa01be",
+    "timestamp": "2026-04-05T14:16:06.307252+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ed1292a321aa01be_fb",
+    "timestamp": "2026-04-05T14:16:06.337564+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e3323e315f81b289",
+    "timestamp": "2026-04-05T14:16:47.772414+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e3323e315f81b289_fb",
+    "timestamp": "2026-04-05T14:16:47.794669+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b697ff3f544cdc9b",
+    "timestamp": "2026-04-05T14:17:27.482869+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b697ff3f544cdc9b_fb",
+    "timestamp": "2026-04-05T14:17:27.507647+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "061b8e4f68bbbc9c",
+    "timestamp": "2026-04-05T14:18:03.678634+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "061b8e4f68bbbc9c_fb",
+    "timestamp": "2026-04-05T14:18:03.720142+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "1a6b078361faa71c",
+    "timestamp": "2026-04-05T14:21:09.455852+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "1a6b078361faa71c_fb",
+    "timestamp": "2026-04-05T14:21:09.577804+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "c3d5a41165d4b143",
+    "timestamp": "2026-04-05T14:21:57.093688+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "c3d5a41165d4b143_fb",
+    "timestamp": "2026-04-05T14:21:57.193366+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b1682e5406ad03ca",
+    "timestamp": "2026-04-05T14:22:51.477705+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "b1682e5406ad03ca_fb",
+    "timestamp": "2026-04-05T14:22:51.507015+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f96ef739bb46f273",
+    "timestamp": "2026-04-05T14:23:45.110801+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f96ef739bb46f273_fb",
+    "timestamp": "2026-04-05T14:23:45.216696+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "7981882f1cbefdb6",
+    "timestamp": "2026-04-05T14:24:50.702464+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "7981882f1cbefdb6_fb",
+    "timestamp": "2026-04-05T14:24:50.729472+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "49d72180a44cf1a1",
+    "timestamp": "2026-04-05T14:27:33.290671+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "49d72180a44cf1a1_fb",
+    "timestamp": "2026-04-05T14:27:40.099787+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6898bfaf14a8a8d1",
+    "timestamp": "2026-04-05T14:35:07.533025+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6898bfaf14a8a8d1_fb",
+    "timestamp": "2026-04-05T14:35:12.917873+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "395326462d969825",
+    "timestamp": "2026-04-05T14:49:11.359252+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "395326462d969825_fb",
+    "timestamp": "2026-04-05T14:49:15.859149+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "5fc67fb703bac7f9",
+    "timestamp": "2026-04-05T14:50:25.587596+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "5fc67fb703bac7f9_fb",
+    "timestamp": "2026-04-05T14:50:30.758621+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6385cae4c68bf783",
+    "timestamp": "2026-04-05T15:43:57.888752+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6385cae4c68bf783_fb",
+    "timestamp": "2026-04-05T15:43:57.941290+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6a6abd191539f04d",
+    "timestamp": "2026-04-05T15:45:45.200689+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "6a6abd191539f04d_fb",
+    "timestamp": "2026-04-05T15:45:45.221207+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9bc941a9ef4a14f1",
+    "timestamp": "2026-04-05T15:46:25.780753+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9bc941a9ef4a14f1_fb",
+    "timestamp": "2026-04-05T15:46:25.796424+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "38219c0faa537a47",
+    "timestamp": "2026-04-05T15:48:18.501565+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "38219c0faa537a47_fb",
+    "timestamp": "2026-04-05T15:48:18.521361+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "4dc5eba551ce59a0",
+    "timestamp": "2026-04-05T15:49:04.131973+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "4dc5eba551ce59a0_fb",
+    "timestamp": "2026-04-05T15:49:04.172677+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ef099b2a48a122c6",
+    "timestamp": "2026-04-05T16:44:54.038939+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "ef099b2a48a122c6_fb",
+    "timestamp": "2026-04-05T16:44:54.063041+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "034c4d7e761b1242",
+    "timestamp": "2026-04-05T16:45:33.834884+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "034c4d7e761b1242_fb",
+    "timestamp": "2026-04-05T16:45:33.851411+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f9269535a86838e9",
+    "timestamp": "2026-04-05T16:46:15.637788+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "f9269535a86838e9_fb",
+    "timestamp": "2026-04-05T16:46:15.657626+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "35f8cff11f6b1f86",
+    "timestamp": "2026-04-05T16:47:05.878181+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "35f8cff11f6b1f86_fb",
+    "timestamp": "2026-04-05T16:47:05.919267+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a1cf1f830685e2c3",
+    "timestamp": "2026-04-05T17:17:56.652298+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "a1cf1f830685e2c3_fb",
+    "timestamp": "2026-04-05T17:17:56.672571+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9f4b1a6a47426165",
+    "timestamp": "2026-04-05T17:29:18.383572+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "9f4b1a6a47426165_fb",
+    "timestamp": "2026-04-05T17:29:18.575341+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "718229a5f5a79178",
+    "timestamp": "2026-04-05T17:30:17.709649+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "718229a5f5a79178_fb",
+    "timestamp": "2026-04-05T17:30:17.807979+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "86e81ad946ed2a1f",
+    "timestamp": "2026-04-05T17:31:31.852589+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "86e81ad946ed2a1f_fb",
+    "timestamp": "2026-04-05T17:31:31.883360+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e6652bf15fa03481",
+    "timestamp": "2026-04-05T17:35:27.043787+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "e6652bf15fa03481_fb",
+    "timestamp": "2026-04-05T17:35:27.081651+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "77efd9aef608278b",
+    "timestamp": "2026-04-05T17:36:36.296984+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.5,
+    "total": 0.587,
+    "rag_used": false
+  },
+  {
+    "interaction_id": "77efd9aef608278b_fb",
+    "timestamp": "2026-04-05T17:36:36.378744+00:00",
+    "verifiable": 0.3,
+    "efficient": 1.0,
+    "relevant": 0.65,
+    "aligned": 0.9,
+    "total": 0.708,
+    "rag_used": false
+  }
+]

@@ -1,0 +1,263 @@
+{
+  "displayName": "ADRION 369 Guardian Checkpoint",
+  "name": "adrionGuardianCheckpoint",
+  "description": "Invoke ADRION 369 Guardian Laws validation checkpoint before executing critical operations",
+  "icon": "file:adrion_icon.svg",
+  "version": 1,
+  "group": [
+    "Automation",
+    "ADRION 369"
+  ],
+  "inputs": [
+    "main"
+  ],
+  "outputs": [
+    "main"
+  ],
+  "properties": [
+    {
+      "displayName": "ADRION API Configuration",
+      "name": "adrionConfig",
+      "type": "options",
+      "options": [
+        {
+          "name": "Local Development",
+          "value": "local"
+        },
+        {
+          "name": "Staging",
+          "value": "staging"
+        },
+        {
+          "name": "Production",
+          "value": "production"
+        }
+      ],
+      "default": "local",
+      "description": "Which ADRION 369 environment to connect to"
+    },
+    {
+      "displayName": "API Endpoint",
+      "name": "apiEndpoint",
+      "type": "string",
+      "default": "http://localhost:8000",
+      "placeholder": "https://api.adrion369.example.com",
+      "description": "Base URL of ADRION 369 API",
+      "required": true,
+      "displayOptions": {
+        "show": {
+          "adrionConfig": [
+            "local"
+          ]
+        }
+      }
+    },
+    {
+      "displayName": "Job Description",
+      "name": "jobDescription",
+      "type": "string",
+      "default": "User-initiated operation",
+      "placeholder": "Describe the operation being validated",
+      "description": "Human-readable description of the job being checked",
+      "required": true
+    },
+    {
+      "displayName": "Operation Type",
+      "name": "operationType",
+      "type": "options",
+      "options": [
+        {
+          "name": "Data Query",
+          "value": "query"
+        },
+        {
+          "name": "Data Modification",
+          "value": "mutation"
+        },
+        {
+          "name": "External API Call",
+          "value": "external"
+        },
+        {
+          "name": "Financial Transaction",
+          "value": "financial"
+        },
+        {
+          "name": "User Communication",
+          "value": "communication"
+        }
+      ],
+      "default": "query",
+      "description": "Type of operation to validate against Guardian Laws"
+    },
+    {
+      "displayName": "Analysis Context",
+      "name": "analysisContext",
+      "type": "json",
+      "default": "{}",
+      "placeholder": "{\"data_sensitivity\": \"medium\", \"scope\": \"api_call\"}",
+      "description": "Additional context for Guardian Law evaluation (G1-G11)"
+    },
+    {
+      "displayName": "Flags (Optional)",
+      "name": "flags",
+      "type": "string",
+      "default": "[SYS:ETH_A369][CMD:AGENT:SENTINEL]",
+      "placeholder": "[SYS:ETH_A369] [CMD:AGENT:SENTINEL] [FMT:SBAR]",
+      "description": "HARMONIA-GATEWAY flags for semantic compression and routing"
+    },
+    {
+      "displayName": "Require Sentinel Approval",
+      "name": "requireSentinelApproval",
+      "type": "boolean",
+      "default": false,
+      "description": "If true, blocks operation unless Sentinel explicitly approves"
+    }
+  ],
+  "requestDefaults": {
+    "baseURL": "={% if ($resolve('adrionConfig') === 'production') %}https://api.production.adrion369.io{% elseif ($resolve('adrionConfig') === 'staging') %}https://api.staging.adrion369.io{% else %}http://localhost:8000{% endif %}"
+  },
+  "credentials": [
+    {
+      "name": "adrionApiKey",
+      "required": false
+    }
+  ],
+  "webhooks": [],
+  "methods": {},
+  "execute": {
+    "resource": {
+      "method": "POST",
+      "url": "/api/mcp/guardian/checkpoint",
+      "body": {
+        "job": {
+          "id": "={{ $json.execution_id || 'n8n-' + Date.now() }}",
+          "description": "={{ $resolve('jobDescription') }}",
+          "operation_type": "={{ $resolve('operationType') }}",
+          "timestamp": "={{ new Date().toISOString() }}"
+        },
+        "analysis": {
+          "context": "={{ $resolve('analysisContext') }}",
+          "source": "n8n-workflow",
+          "risk_level": "medium"
+        },
+        "context": {
+          "user_id": "={{ $json.user_id || 'n8n-user' }}",
+          "workflow_id": "={{ $env.n8n_workflow_id || 'unknown' }}",
+          "execution_id": "={{ $json.execution_id || '' }}"
+        },
+        "flags": "={{ $resolve('flags') }}"
+      }
+    }
+  },
+  "returns": {
+    "description": "Guardian Laws validation result",
+    "properties": [
+      {
+        "name": "approved",
+        "type": "boolean",
+        "description": "Whether operation is approved by all Guardian Laws"
+      },
+      {
+        "name": "compliance",
+        "type": "number",
+        "description": "Compliance score (0-11 laws passing)"
+      },
+      {
+        "name": "laws",
+        "type": "array",
+        "description": "Detailed per-law evaluation results",
+        "children": [
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Guardian Law name (G1-G11)"
+          },
+          {
+            "name": "passed",
+            "type": "boolean",
+            "description": "Whether law passed"
+          },
+          {
+            "name": "reason",
+            "type": "string",
+            "description": "Explanation for pass/fail"
+          },
+          {
+            "name": "weight",
+            "type": "number",
+            "description": "Violation weight if failed (CRITICAL=10, HIGH=2, MEDIUM=1)"
+          }
+        ]
+      },
+      {
+        "name": "genesis_record",
+        "type": "object",
+        "description": "Genesis Record audit trail entry",
+        "children": [
+          {
+            "name": "genesis_id",
+            "type": "string",
+            "description": "Unique Genesis Record ID (GR-YYYYMMDD-HHMMSS-NNN)"
+          },
+          {
+            "name": "timestamp",
+            "type": "string",
+            "description": "ISO 8601 timestamp of decision"
+          },
+          {
+            "name": "entry_hash",
+            "type": "string",
+            "description": "SHA256 hash for chain integrity"
+          }
+        ]
+      },
+      {
+        "name": "cvc_state",
+        "type": "string",
+        "enum": [
+          "GREEN",
+          "YELLOW",
+          "ORANGE",
+          "RED"
+        ],
+        "description": "Current CVC (Cumulative Violation Counter) state"
+      },
+      {
+        "name": "tspa_scores",
+        "type": "object",
+        "description": "TSPA agent trust scores at time of checkpoint",
+        "children": [
+          {
+            "name": "SENTINEL",
+            "type": "number"
+          },
+          {
+            "name": "ARCHITECT",
+            "type": "number"
+          },
+          {
+            "name": "LIBRARIAN",
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  },
+  "errorDescription": {
+    "400": {
+      "message": "Bad Request - Invalid job/analysis/context format"
+    },
+    "403": {
+      "message": "Forbidden - Operation blocked by Guardian Laws (G6/G7/G8)"
+    },
+    "423": {
+      "message": "Locked - CVC state is RED, all operations blocked"
+    },
+    "500": {
+      "message": "Internal Server Error - Guardian evaluation failed"
+    }
+  },
+  "nodeDescription": "The ADRION 369 Guardian Checkpoint node invokes the Guardian Laws v11 evaluation engine to validate operations against 11 ethical principles (Unity, Harmony, Rhythm, Causality, Transparency, Authenticity, Privacy, Nonmaleficence, Sustainability, Evolution, RelationalCare). Returns detailed per-law results and routes operations through SENTINEL/ARCHITECT/LIBRARIAN agents based on approval status.",
+  "docURL": "https://github.com/adrion-ecosystem/n8n-nodes#adrion-guardian-checkpoint"
+}

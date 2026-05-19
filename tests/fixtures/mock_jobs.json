@@ -1,0 +1,42 @@
+[
+  {
+    "id": "job-001",
+    "platform": "upwork",
+    "title": "SEO Blog Writer for Tech Startup",
+    "budget_min": 100,
+    "budget_max": 300,
+    "description": "We need 5 SEO blog posts per week, 1000 words each, technical content.",
+    "keywords": ["SEO", "content writing", "blog post"],
+    "status": "new"
+  },
+  {
+    "id": "job-002",
+    "platform": "fiverr",
+    "title": "Copywriter for E-commerce Product Descriptions",
+    "budget_min": 50,
+    "budget_max": 150,
+    "description": "Write compelling product descriptions for 50 items in our store.",
+    "keywords": ["copywriting", "e-commerce", "product description"],
+    "status": "new"
+  },
+  {
+    "id": "job-003",
+    "platform": "upwork",
+    "title": "Ghost-Writer for AI Newsletter",
+    "budget_min": 200,
+    "budget_max": 500,
+    "description": "Weekly AI industry newsletter, 2000 words, research-backed writing.",
+    "keywords": ["ghostwriting", "AI", "newsletter"],
+    "status": "new"
+  },
+  {
+    "id": "job-004",
+    "platform": "upwork",
+    "title": "Freelance Python Developer",
+    "budget_min": 1000,
+    "budget_max": 5000,
+    "description": "Build a machine learning pipeline in Python. Not a content job.",
+    "keywords": ["python", "machine learning"],
+    "status": "new"
+  }
+]
