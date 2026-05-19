@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RecursiveMAS — adrion-369</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300..700&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{--bg:#f7f6f2;--surface:#f9f8f5;--surface-2:#fbfbf9;--border:#d4d1ca;--text:#28251d;--text-muted:#7a7974;--text-faint:#bab9b4;--primary:#01696f;--primary-hover:#0c4e54;--primary-hi:#cedcd8;--shadow:0 4px 16px oklch(0.2 0.01 80/0.08);--radius:0.75rem;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace}
+[data-theme="dark"]{--bg:#0f1117;--surface:#161b22;--surface-2:#21262d;--border:#30363d;--text:#e6edf3;--text-muted:#8b949e;--text-faint:#484f58;--primary:#4f98a3;--primary-hover:#227f8b;--primary-hi:#1c3a3b;--shadow:0 4px 16px oklch(0 0 0/0.4)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-height:1.6;font-size:1rem}
+a{color:var(--primary);text-decoration:none;transition:color .18s}
+a:hover{color:var(--primary-hover)}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav-brand{display:flex;align-items:center;gap:.625rem;font-weight:600;font-size:.9375rem}
+.nav-brand svg{color:var(--primary)}
+.nav-links{display:flex;gap:1.5rem;font-size:.875rem;color:var(--text-muted)}
+.nav-links a{color:var(--text-muted)}
+.nav-links a:hover{color:var(--primary)}
+.theme-btn{background:none;border:1px solid var(--border);border-radius:.5rem;padding:.375rem .625rem;cursor:pointer;color:var(--text-muted);font-size:.8125rem;transition:all .18s}
+.theme-btn:hover{color:var(--primary);border-color:var(--primary)}
+
+/* HERO */
+.hero{padding:5rem 1.5rem 4rem;max-width:900px;margin:0 auto}
+.badge{display:inline-flex;align-items:center;gap:.375rem;background:var(--primary-hi);color:var(--primary);border:1px solid color-mix(in oklch,var(--primary) 30%,transparent);border-radius:9999px;padding:.25rem .75rem;font-size:.75rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:700;line-height:1.1;letter-spacing:-.02em;margin-bottom:1rem}
+.hero h1 span{color:var(--primary)}
+.hero p{font-size:1.0625rem;color:var(--text-muted);max-width:60ch;margin-bottom:2rem}
+.hero-links{display:flex;flex-wrap:wrap;gap:.75rem}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.625rem 1.25rem;border-radius:.5rem;font-size:.875rem;font-weight:500;transition:all .18s;cursor:pointer;border:none}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);color:#fff}
+.btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--primary);border-color:var(--primary)}
+
+/* SECTIONS */
+.section{padding:3rem 1.5rem;max-width:900px;margin:0 auto}
+.section-label{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--primary);margin-bottom:.75rem}
+h2{font-size:clamp(1.375rem,3vw,2rem);font-weight:700;letter-spacing:-.01em;margin-bottom:.5rem}
+.subtitle{color:var(--text-muted);font-size:.9375rem;margin-bottom:2.5rem;max-width:60ch}
+
+/* CARDS GRID */
+.grid-2{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(380px,100%),1fr));gap:1rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:box-shadow .18s,border-color .18s}
+.card:hover{box-shadow:var(--shadow);border-color:color-mix(in oklch,var(--primary) 40%,var(--border))}
+.card-tag{font-size:.6875rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--primary);background:var(--primary-hi);padding:.2rem .6rem;border-radius:9999px;display:inline-block;margin-bottom:.875rem}
+.card h3{font-size:1rem;font-weight:600;margin-bottom:.375rem}
+.card p{font-size:.875rem;color:var(--text-muted)}
+
+/* STYLES TABLE */
+.styles-table{width:100%;border-collapse:collapse;font-size:.875rem;margin-top:1.5rem}
+.styles-table th{text-align:left;padding:.625rem 1rem;border-bottom:2px solid var(--border);color:var(--text-muted);font-size:.75rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.styles-table td{padding:.75rem 1rem;border-bottom:1px solid var(--border);vertical-align:top}
+.styles-table tr:last-child td{border-bottom:none}
+.styles-table tr:hover td{background:var(--surface)}
+.tag-light{color:#6daa45;background:color-mix(in oklch,#6daa45 12%,transparent);padding:.15rem .5rem;border-radius:9999px;font-size:.6875rem;font-weight:600}
+.tag-heavy{color:#fdab43;background:color-mix(in oklch,#fdab43 12%,transparent);padding:.15rem .5rem;border-radius:9999px;font-size:.6875rem;font-weight:600}
+
+/* CODE BLOCK */
+.code-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:1.5rem 0}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:.5rem 1rem;border-bottom:1px solid var(--border);font-size:.75rem;color:var(--text-muted)}
+.code-header span{display:flex;align-items:center;gap:.375rem}
+.copy-btn{background:none;border:1px solid var(--border);border-radius:.375rem;padding:.2rem .5rem;font-size:.6875rem;color:var(--text-muted);cursor:pointer;transition:all .18s;font-family:var(--font-mono)}
+.copy-btn:hover{color:var(--primary);border-color:var(--primary)}
+pre{padding:1.25rem 1rem;overflow-x:auto;font-family:var(--font-mono);font-size:.8125rem;line-height:1.7;color:var(--text)}
+.kw{color:#79c0ff}
+.str{color:#a5d6ff}
+.cm{color:var(--text-faint)}
+.fn{color:#d2a8ff}
+
+/* INTEGRATION DIAGRAM */
+.diagram{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem 1.5rem;margin:1.5rem 0}
+.diagram-row{display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;font-size:.875rem}
+.dia-box{background:var(--surface-2);border:1px solid var(--border);border-radius:.5rem;padding:.5rem 1rem;font-weight:500;text-align:center;min-width:120px}
+.dia-box.highlight{background:var(--primary-hi);border-color:var(--primary);color:var(--primary)}
+.dia-arrow{color:var(--text-faint);font-size:1.25rem}
+
+/* ALERT */
+.alert{display:flex;gap:.75rem;background:color-mix(in oklch,#fdab43 8%,var(--surface));border:1px solid color-mix(in oklch,#fdab43 30%,transparent);border-radius:var(--radius);padding:1rem 1.25rem;font-size:.875rem;margin:1.5rem 0}
+.alert-icon{color:#fdab43;flex-shrink:0;margin-top:.1rem}
+.alert strong{color:var(--text)}
+.alert p{color:var(--text-muted);margin-top:.2rem}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center;font-size:.8125rem;color:var(--text-faint);margin-top:4rem}
+footer a{color:var(--text-muted)}
+footer a:hover{color:var(--primary)}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .nav-links{display:none}
+  .hero{padding:3rem 1rem 2.5rem}
+  .section{padding:2rem 1rem}
+  .diagram-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2a10 10 0 0 1 0 20M12 2a10 10 0 0 0 0 20M2 12h20"/>
+    </svg>
+    adrion-369 / RecursiveMAS
+  </div>
+  <div class="nav-links">
+    <a href="#co-to">Czym jest</a>
+    <a href="#style">Style</a>
+    <a href="#integracja">Integracja</a>
+    <a href="#uruchomienie">Uruchomienie</a>
+  </div>
+  <button class="theme-btn" onclick="toggleTheme()" aria-label="Przełącz motyw">☀ / ☾</button>
+</nav>
+
+<section class="hero">
+  <div class="badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    arXiv 2604.25917 · MCP Extension
+  </div>
+  <h1>Rekurencja przestrzeni<br><span>latentnej agentów</span></h1>
+  <p>RecursiveMAS to framework multi-agentowy, który skaluje kolaborację LLM przez iteracyjną wymianę stanów latentnych — zintegrowany z adrion-369 jako serwis MCP.</p>
+  <div class="hero-links">
+    <a href="https://arxiv.org/abs/2604.25917" class="btn btn-primary" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+      Paper arXiv
+    </a>
+    <a href="https://github.com/RecursiveMAS/RecursiveMAS" class="btn btn-ghost" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+    <a href="https://huggingface.co/RecursiveMAS/collections" class="btn btn-ghost" target="_blank" rel="noopener">🤗 Modele HF</a>
+  </div>
+</section>
+
+<section class="section" id="co-to">
+  <div class="section-label">Architektura</div>
+  <h2>Czym jest RecursiveMAS?</h2>
+  <p class="subtitle">System multi-agentowy traktujący cały ekosystem LLM jako jedną rekurencyjną obliczeniowość.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <span class="card-tag">RecursiveLink</span>
+      <h3>Wymiana stanów latentnych</h3>
+      <p>Lekkie moduły łączące agentów — iteracyjna wymiana i ewolucja reprezentacji wewnętrznych między rundami rekurencji.</p>
+    </div>
+    <div class="card">
+      <span class="card-tag">Heterogeniczność</span>
+      <h3>Różne modele, jeden system</h3>
+      <p>Agenty oparte o różne rodziny LLM (Qwen, Llama, Gemma, DeepSeek) współpracują przez wspólny interfejs RecursiveLink.</p>
+    </div>
+    <div class="card">
+      <span class="card-tag">4 Style</span>
+      <h3>Sequential · Mixture · Distillation · Deliberation</h3>
+      <p>Każdy styl modeluje inny wzorzec kolaboracji — od sekwencyjnego wnioskowania po dynamiczne wywołania narzędzi.</p>
+    </div>
+    <div class="card">
+      <span class="card-tag">MCP Server</span>
+      <h3>Natywna integracja z adrion-369</h3>
+      <p>Uruchamiany jako kontener Docker w warstwie MCP — dostępny dla Oracle, Genesis i pozostałych agentów systemu.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="style">
+  <div class="section-label">Konfiguracja</div>
+  <h2>Style kolaboracji</h2>
+  <p class="subtitle">Dobierz styl do zadania — im cięższy, tym lepsze wyniki przy większym zapotrzebowaniu na VRAM.</p>
+
+  <table class="styles-table">
+    <thead>
+      <tr>
+        <th>Styl</th>
+        <th>Agenty</th>
+        <th>VRAM</th>
+        <th>Zastosowanie</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>sequential_light</code></td>
+        <td>Planner 1.7B · Critic 1B · Solver 1.5B</td>
+        <td><span class="tag-light">~8 GB</span></td>
+        <td>Szybkie pipeline, standardowe zadania</td>
+      </tr>
+      <tr>
+        <td><code>sequential_scaled</code></td>
+        <td>Planner 4B · Critic 3B · Solver 4B</td>
+        <td><span class="tag-heavy">~24 GB</span></td>
+        <td>Złożone rozumowanie, wysokiej jakości output</td>
+      </tr>
+      <tr>
+        <td><code>mixture</code></td>
+        <td>Domain agents + Summarizer 2B</td>
+        <td><span class="tag-heavy">~20 GB</span></td>
+        <td>Wielodomenowe analizy (math + code + science)</td>
+      </tr>
+      <tr>
+        <td><code>distillation</code></td>
+        <td>Expert 9B + Learner 4B</td>
+        <td><span class="tag-heavy">~28 GB</span></td>
+        <td>Optymalizacja inference, transfer wiedzy</td>
+      </tr>
+      <tr>
+        <td><code>deliberation</code></td>
+        <td>Reflector 4B + ToolCaller 4B</td>
+        <td><span class="tag-heavy">~16 GB</span></td>
+        <td>Integracja narzędzi (Tavily), refleksja</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="section" id="integracja">
+  <div class="section-label">adrion-369</div>
+  <h2>Jak to działa w systemie?</h2>
+  <p class="subtitle">RecursiveMAS działa jako niezależny kontener w warstwie MCP, dostępny przez HTTP dla wszystkich agentów.</p>
+
+  <div class="diagram">
+    <div class="diagram-row">
+      <div class="dia-box">Oracle MCP</div>
+      <span class="dia-arrow">→</span>
+      <div class="dia-box">MCP Router</div>
+      <span class="dia-arrow">→</span>
+      <div class="dia-box highlight">RecursiveMAS :8095</div>
+    </div>
+    <div style="text-align:center;margin-top:1rem;font-size:.8125rem;color:var(--text-muted)">
+      POST /tools/recursive_mas_infer · GET /tools/recursive_mas_styles · GET /tools/recursive_mas_status
+    </div>
+  </div>
+
+  <div class="alert">
+    <span class="alert-icon">⚡</span>
+    <div>
+      <strong>Wymagania Hetzner (GPU)</strong>
+      <p>Dla stylów ≥ sequential_scaled wymagany serwer z GPU NVIDIA (CUDA 12+). Dla sequential_light wystarczy CPU z 16GB RAM — wolniejsze, ale funkcjonalne.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="uruchomienie">
+  <div class="section-label">Setup</div>
+  <h2>Uruchomienie</h2>
+  <p class="subtitle">Trzy kroki od zera do działającego serwisu MCP.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>📄 .env (uzupełnij)</span>
+      <button class="copy-btn" onclick="copyCode(this)">kopiuj</button>
+    </div>
+    <pre><span class="cm"># Opcjonalne — dla prywatnych modeli HF</span>
+<span class="kw">HF_TOKEN</span>=hf_...
+
+<span class="cm"># Wymagane dla stylu deliberation</span>
+<span class="kw">TAVILY_API_KEY</span>=tvly-...
+
+<span class="cm"># Styl i urządzenie</span>
+<span class="kw">RECURSIVE_MAS_STYLE</span>=sequential_light
+<span class="kw">RECURSIVE_MAS_DEVICE</span>=cpu</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>🐳 docker compose</span>
+      <button class="copy-btn" onclick="copyCode(this)">kopiuj</button>
+    </div>
+    <pre><span class="fn">docker</span> compose -f docker-compose.mcp-tier.yml up <span class="str">recursive-mas</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>🔬 test inference</span>
+      <button class="copy-btn" onclick="copyCode(this)">kopiuj</button>
+    </div>
+    <pre><span class="fn">curl</span> -X POST http://localhost:8095/tools/recursive_mas_infer \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{"prompt": "Explain latent space recursion"}'</span></pre>
+  </div>
+</section>
+
+<footer>
+  <p>adrion-369 · RecursiveMAS integration · <a href="https://arxiv.org/abs/2604.25917" target="_blank">arXiv 2604.25917</a> · <a href="https://github.com/Gruszkoland/adrion-369" target="_blank">GitHub</a></p>
+</footer>
+
+<script>
+function toggleTheme(){const h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark')}
+function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{const orig=btn.textContent;btn.textContent='✓ skopiowano';setTimeout(()=>btn.textContent=orig,1800)})}
+</script>
+</body>
+</html>

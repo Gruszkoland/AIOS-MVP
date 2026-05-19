@@ -1,0 +1,1093 @@
+openapi: 3.1.0
+info:
+  title: ADRION 369 API
+  version: 4.0.0
+  description: |
+    ADRION 369 Arbitrage Engine API -- Multi-agent AI orchestration system
+    built on the Trinity-EBDI decision framework operating in a 162-dimensional
+    decision space.
+
+    The API is organised into six functional groups:
+
+    * **System** -- health probes and Prometheus metrics
+    * **Arbitrage** -- core lead-arbitrage pipeline (scout, analyze, bid, cycle)
+    * **Quantum** -- Kwantowy Modul Decyzyjny (quantum decision engine)
+    * **Oracle** -- Vortex Oracle price prediction
+    * **Wholesale** -- B2B wholesale scouting and deal management
+    * **Payments** -- Stripe checkout, webhooks, mass-generation pipeline
+
+    Rate limits are enforced per client IP using a sliding-window algorithm.
+    Exceeding the limit returns HTTP 429 with a `retry_after` hint.
+  contact:
+    name: Adrian Halicki
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8001
+    description: Development (Flask direct)
+  - url: http://localhost:8003
+    description: Development (behind proxy / dashboard)
+  - url: https://arbitrage.local
+    description: Production
+
+tags:
+  - name: System
+    description: Health checks and observability
+  - name: Arbitrage
+    description: Core lead-arbitrage pipeline
+  - name: Quantum
+    description: Kwantowy Modul Decyzyjny -- quantum decision engine
+  - name: Oracle
+    description: Vortex Oracle price predictions
+  - name: Wholesale
+    description: B2B wholesale scouting and deal management
+  - name: Payments
+    description: Stripe checkout, webhooks, and mass-generation
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Paths
+# ─────────────────────────────────────────────────────────────────────────────
+paths:
+  # ── System ────────────────────────────────────────────────────────────────
+
+  /health:
+    get:
+      operationId: getHealth
+      tags: [System]
+      summary: Cascade health check
+      description: |
+        Checks database connectivity and Ollama LLM reachability.
+        Returns 200 when all critical dependencies are healthy, 503 otherwise.
+      responses:
+        "200":
+          description: All systems healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthCheck"
+              example:
+                uptime: 3742.18
+                db: ok
+                ollama: ok
+                status: healthy
+        "503":
+          description: One or more critical dependencies are down
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthCheck"
+              example:
+                uptime: 3742.18
+                db: "error: connection refused"
+                ollama: unreachable
+                status: degraded
+
+  /health/live:
+    get:
+      operationId: getLiveness
+      tags: [System]
+      summary: Liveness probe
+      description: Returns 200 if the process is running. Suitable for Kubernetes liveness probes.
+      responses:
+        "200":
+          description: Process is alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: alive
+
+  /health/ready:
+    get:
+      operationId: getReadiness
+      tags: [System]
+      summary: Readiness probe
+      description: |
+        Returns 200 when all critical dependencies are healthy and the server
+        is ready to accept traffic. Returns 503 if degraded.
+      responses:
+        "200":
+          description: Ready to accept traffic
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthCheck"
+        "503":
+          description: Not ready
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthCheck"
+
+  /metrics:
+    get:
+      operationId: getMetrics
+      tags: [System]
+      summary: Prometheus metrics
+      description: |
+        Returns Prometheus text-format metrics including database connection pool
+        gauges, checkout counters, timeout counters, and server uptime.
+      responses:
+        "200":
+          description: Prometheus text exposition
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |
+                # HELP adrion_db_pool_size Total connections in pool
+                # TYPE adrion_db_pool_size gauge
+                adrion_db_pool_size 10
+                # HELP adrion_uptime_seconds Seconds since API server start
+                # TYPE adrion_uptime_seconds gauge
+                adrion_uptime_seconds 3742.18
+
+  # ── Arbitrage ─────────────────────────────────────────────────────────────
+
+  /api/arbitrage/status:
+    get:
+      operationId: getArbitrageStatus
+      tags: [Arbitrage]
+      summary: Pipeline status overview
+      description: Returns current LLM backend, job/bid totals, and daily bid limit.
+      responses:
+        "200":
+          description: Current pipeline status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArbitrageStatus"
+              example:
+                llm_backend: ollama
+                total_jobs: 142
+                bids_sent: 37
+                pending_bids: 5
+                daily_bid_limit: 20
+                timestamp: "2026-04-11T14:30:00"
+
+  /api/arbitrage/kpis:
+    get:
+      operationId: getArbitrageKpis
+      tags: [Arbitrage]
+      summary: Key performance indicators
+      description: Returns aggregated KPI totals from the database with a current timestamp.
+      responses:
+        "200":
+          description: KPI totals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KPIs"
+              example:
+                total_jobs: 142
+                bids_sent: 37
+                bids_won: 12
+                revenue: 4850.00
+                timestamp: "2026-04-11T14:30:00"
+
+  /api/arbitrage/stats:
+    get:
+      operationId: getArbitrageStats
+      tags: [Arbitrage]
+      summary: XRP progress statistics
+      description: Returns current progress data from the XRP tracking module.
+      responses:
+        "200":
+          description: XRP progress data
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/arbitrage/jobs:
+    get:
+      operationId: getArbitrageJobs
+      tags: [Arbitrage]
+      summary: List recent jobs
+      description: Returns the 20 most recent jobs from the database.
+      responses:
+        "200":
+          description: Job listing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobList"
+              example:
+                jobs:
+                  - id: 1
+                    title: "Audio mastering for podcast"
+                    platform: upwork
+                    status: new
+                    budget: 500
+                count: 1
+
+  /api/arbitrage/bids/pending:
+    get:
+      operationId: getPendingBids
+      tags: [Arbitrage]
+      summary: List pending bids
+      description: Returns all bids awaiting approval.
+      responses:
+        "200":
+          description: Pending bid listing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BidList"
+              example:
+                bids:
+                  - id: 7
+                    job_id: 42
+                    amount: 350
+                    status: pending
+                count: 1
+
+  /api/arbitrage/bids/{bid_id}/approve:
+    post:
+      operationId: approveBid
+      tags: [Arbitrage]
+      summary: Approve or reject a bid
+      description: Sets the approval status of a bid identified by its numeric ID.
+      parameters:
+        - name: bid_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Numeric bid identifier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approved:
+                  type: boolean
+                  default: true
+                  description: Set to false to reject the bid
+      responses:
+        "200":
+          description: Bid status updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  bid_id:
+                    type: integer
+                  approved:
+                    type: boolean
+              example:
+                ok: true
+                bid_id: 7
+                approved: true
+
+  /api/arbitrage/scout:
+    post:
+      operationId: runScout
+      tags: [Arbitrage]
+      summary: Run lead scout
+      description: |
+        Triggers the Apify-based lead scouting pipeline to discover new freelance
+        jobs from configured platforms. Rate limited to 10 requests per minute.
+      responses:
+        "200":
+          description: Scout results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/analyze-batch:
+    post:
+      operationId: analyzeBatch
+      tags: [Arbitrage]
+      summary: Batch-analyze new jobs
+      description: |
+        Fetches up to 50 jobs with status "new", runs LLM analysis on each,
+        and auto-creates bids for jobs that pass the filter. Rate limited to
+        3 requests per minute (mass-gen limiter).
+      responses:
+        "200":
+          description: Batch analysis results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyzeBatchResult"
+              example:
+                analyzed: 12
+                bids_created: 4
+                timestamp: "2026-04-11T14:30:00"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/cycle:
+    post:
+      operationId: runCycle
+      tags: [Arbitrage]
+      summary: Run full pipeline cycle (background)
+      description: |
+        Triggers a complete scout-then-analyze pipeline in a background thread
+        and returns immediately. Rate limited to 5 requests per minute.
+      responses:
+        "200":
+          description: Cycle started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string
+              example:
+                ok: true
+                message: Pipeline cycle started in background
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # ── Quantum ───────────────────────────────────────────────────────────────
+
+  /api/arbitrage/quantum/decide:
+    post:
+      operationId: quantumDecide
+      tags: [Quantum]
+      summary: Quantum decision for a price pair
+      description: |
+        Runs the Kwantowy Modul Decyzyjny on a source/target price pair for a
+        given channel. Returns a quantum-weighted buy/hold/sell decision.
+        Rate limited to 30 requests per minute.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuantumDecideRequest"
+            example:
+              price_source: 45.99
+              price_target: 89.99
+              channel_id: AUDIO_PREMIUM
+      responses:
+        "200":
+          description: Quantum decision result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuantumDecision"
+              example:
+                action: BUY
+                confidence: 0.87
+                margin: 0.489
+                channel_id: AUDIO_PREMIUM
+                resonance: 0.92
+        "400":
+          description: Invalid prices
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "price_source and price_target must be > 0"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/quantum/status:
+    get:
+      operationId: getQuantumStatus
+      tags: [Quantum]
+      summary: Autopojeza status
+      description: Returns the current state of the quantum autopoiesis subsystem.
+      responses:
+        "200":
+          description: Autopojeza status
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/arbitrage/quantum/scan:
+    post:
+      operationId: quantumScan
+      tags: [Quantum]
+      summary: Scan all channels
+      description: |
+        Runs the quantum scanner across all provided deal channels.
+        Rate limited to 30 requests per minute.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deals:
+                  type: object
+                  description: Map of channel_id to deal data arrays
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: object
+            example:
+              deals:
+                AUDIO_PREMIUM:
+                  - { wholesale: 25.0, retail: 59.99 }
+      responses:
+        "200":
+          description: Scan results per channel
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # ── Oracle ────────────────────────────────────────────────────────────────
+
+  /api/arbitrage/oracle/predict:
+    post:
+      operationId: oraclePredict
+      tags: [Oracle]
+      summary: Single price prediction
+      description: |
+        Runs the Vortex Oracle on a single product to predict profitability
+        given wholesale price, retail price, and optional price history.
+        Rate limited to 20 requests per minute.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OraclePredictRequest"
+            example:
+              wholesale_price: 25.00
+              retail_price: 59.99
+              price_history: [62.00, 58.50, 59.99]
+              channel_id: AUDIO_PREMIUM
+      responses:
+        "200":
+          description: Oracle prediction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OraclePrediction"
+              example:
+                action: BUY
+                predicted_margin: 0.583
+                confidence: 0.91
+                trend: rising
+                channel_id: AUDIO_PREMIUM
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/oracle/scan:
+    post:
+      operationId: oracleScan
+      tags: [Oracle]
+      summary: Batch product scan
+      description: |
+        Runs the Oracle across a batch of products for a given channel.
+        Rate limited to 20 requests per minute.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OracleScanRequest"
+            example:
+              products:
+                - { wholesale_price: 25.0, retail_price: 59.99 }
+                - { wholesale_price: 12.0, retail_price: 34.99 }
+              channel_id: AUDIO_PREMIUM
+      responses:
+        "200":
+          description: Batch scan results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # ── Wholesale ─────────────────────────────────────────────────────────────
+
+  /api/arbitrage/wholesale/scout:
+    post:
+      operationId: wholesaleScout
+      tags: [Wholesale]
+      summary: B2B wholesale scout
+      description: |
+        Runs the wholesale scouting bridge. Can operate on provided feed data
+        or fall back to mock data when no feed is supplied.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WholesaleScoutRequest"
+            example:
+              feed_format: json
+              channel_filter: AUDIO_PREMIUM
+              min_margin: 0.15
+              min_stock: 1
+              use_mock: true
+      responses:
+        "200":
+          description: Scout results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/arbitrage/wholesale/cycle:
+    post:
+      operationId: wholesaleCycle
+      tags: [Wholesale]
+      summary: Full Singularity Run pipeline
+      description: |
+        Executes the complete wholesale cycle: scout, analyze, and optionally
+        auto-execute deals. Rate limited to 5 requests per minute.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WholesaleCycleRequest"
+            example:
+              channel_filter: AUDIO_PREMIUM
+              min_margin: 0.15
+              auto_execute: false
+              use_mock: true
+      responses:
+        "200":
+          description: Cycle results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/wholesale/deals:
+    get:
+      operationId: getWholesaleDeals
+      tags: [Wholesale]
+      summary: Query stored deals
+      description: Returns stored wholesale deals with optional filtering.
+      parameters:
+        - name: channel_id
+          in: query
+          schema:
+            type: string
+          description: Filter by channel identifier
+        - name: status
+          in: query
+          schema:
+            type: string
+          description: Filter by deal status
+        - name: min_margin
+          in: query
+          schema:
+            type: number
+            format: float
+          description: Minimum margin threshold
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+          description: Maximum number of deals to return
+      responses:
+        "200":
+          description: Deal listing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DealList"
+              example:
+                deals:
+                  - id: 1
+                    channel_id: AUDIO_PREMIUM
+                    product: "Studio Monitors"
+                    wholesale_price: 120.00
+                    retail_price: 299.99
+                    margin: 0.60
+                    status: active
+                count: 1
+
+  # ── Payments ──────────────────────────────────────────────────────────────
+
+  /api/arbitrage/checkout:
+    post:
+      operationId: createCheckout
+      tags: [Payments]
+      summary: Create Stripe checkout session
+      description: Creates a Stripe Checkout Session for the specified pricing tier.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutRequest"
+            example:
+              tier: pilot
+              success_url: "http://localhost:9000"
+              cancel_url: "http://localhost:9000"
+      responses:
+        "200":
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    description: Stripe-hosted checkout URL
+              example:
+                url: "https://checkout.stripe.com/c/pay/cs_test_abc123"
+        "400":
+          description: Invalid request or Stripe error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/arbitrage/webhook/stripe:
+    post:
+      operationId: stripeWebhook
+      tags: [Payments]
+      summary: Stripe webhook receiver
+      description: |
+        Receives Stripe webhook events. Verifies the Stripe-Signature header
+        against the STRIPE_WEBHOOK_SECRET environment variable when configured.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid JSON payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Invalid JSON
+        "401":
+          description: Invalid Stripe signature
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Invalid signature
+
+  /api/arbitrage/mass-generate:
+    post:
+      operationId: massGenerate
+      tags: [Payments]
+      summary: Run mass-generation pipeline
+      description: |
+        Triggers the mass product generation pipeline with optional channel
+        filtering and revalidation. Rate limited to 3 requests per minute.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MassGenerateRequest"
+            example:
+              channel_filter: AUDIO_PREMIUM
+              min_margin: 0.15
+              min_stock: 5
+              revalidate: false
+      responses:
+        "200":
+          description: Generation results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/arbitrage/manifest:
+    get:
+      operationId: getManifest
+      tags: [Payments]
+      summary: Get current product manifest
+      description: |
+        Returns the most recently generated product manifest. Returns 404 if
+        the mass-generation pipeline has not been run yet.
+      responses:
+        "200":
+          description: Product manifest
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "404":
+          description: No manifest generated yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "No manifest generated yet. POST /api/arbitrage/mass-generate first."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Components
+# ─────────────────────────────────────────────────────────────────────────────
+components:
+  responses:
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Rate limit exceeded
+              retry_after:
+                type: integer
+                description: Seconds to wait before retrying
+                example: 60
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    HealthCheck:
+      type: object
+      properties:
+        uptime:
+          type: number
+          format: float
+          description: Seconds since server start
+        db:
+          type: string
+          description: '"ok" or error description'
+        ollama:
+          type: string
+          enum: [ok, degraded, unreachable]
+          description: Ollama LLM reachability
+        status:
+          type: string
+          enum: [healthy, degraded]
+
+    ArbitrageStatus:
+      type: object
+      properties:
+        llm_backend:
+          type: string
+          description: Active LLM backend name (e.g. "ollama", "openai")
+        total_jobs:
+          type: integer
+        bids_sent:
+          type: integer
+        pending_bids:
+          type: integer
+        daily_bid_limit:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    KPIs:
+      type: object
+      description: Aggregated key performance indicators. Shape depends on DB totals.
+      properties:
+        total_jobs:
+          type: integer
+        bids_sent:
+          type: integer
+        bids_won:
+          type: integer
+        revenue:
+          type: number
+          format: float
+        timestamp:
+          type: string
+          format: date-time
+      additionalProperties: true
+
+    Job:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        platform:
+          type: string
+        status:
+          type: string
+        budget:
+          type: number
+
+    JobList:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+        count:
+          type: integer
+
+    Bid:
+      type: object
+      properties:
+        id:
+          type: integer
+        job_id:
+          type: integer
+        amount:
+          type: number
+        status:
+          type: string
+
+    BidList:
+      type: object
+      properties:
+        bids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Bid"
+        count:
+          type: integer
+
+    AnalyzeBatchResult:
+      type: object
+      properties:
+        analyzed:
+          type: integer
+          description: Number of jobs analyzed
+        bids_created:
+          type: integer
+          description: Number of bids created from passing analyses
+        timestamp:
+          type: string
+          format: date-time
+
+    QuantumDecideRequest:
+      type: object
+      required: [price_source, price_target]
+      properties:
+        price_source:
+          type: number
+          format: float
+          description: Source (wholesale) price -- must be > 0
+        price_target:
+          type: number
+          format: float
+          description: Target (retail) price -- must be > 0
+        channel_id:
+          type: string
+          default: AUDIO_PREMIUM
+          description: Sales channel identifier
+
+    QuantumDecision:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [BUY, HOLD, SELL, SKIP]
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        margin:
+          type: number
+          format: float
+        channel_id:
+          type: string
+        resonance:
+          type: number
+          format: float
+
+    OraclePredictRequest:
+      type: object
+      required: [wholesale_price, retail_price]
+      properties:
+        wholesale_price:
+          type: number
+          format: float
+        retail_price:
+          type: number
+          format: float
+        price_history:
+          type: array
+          items:
+            type: number
+          description: Historical prices for trend analysis
+        channel_id:
+          type: string
+          default: AUDIO_PREMIUM
+
+    OraclePrediction:
+      type: object
+      properties:
+        action:
+          type: string
+        predicted_margin:
+          type: number
+          format: float
+        confidence:
+          type: number
+          format: float
+        trend:
+          type: string
+        channel_id:
+          type: string
+
+    OracleScanRequest:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              wholesale_price:
+                type: number
+              retail_price:
+                type: number
+          description: Array of products to scan
+        channel_id:
+          type: string
+          default: AUDIO_PREMIUM
+
+    WholesaleScoutRequest:
+      type: object
+      properties:
+        feed_data:
+          description: Raw feed data. If null, mock mode is used.
+        feed_format:
+          type: string
+          default: json
+          enum: [json, csv, xml]
+        channel_filter:
+          type: string
+          description: Optional channel to filter by
+        min_margin:
+          type: number
+          format: float
+          default: 0.15
+        min_stock:
+          type: integer
+          default: 1
+        use_mock:
+          type: boolean
+          description: Defaults to true when feed_data is null
+
+    WholesaleCycleRequest:
+      type: object
+      properties:
+        channel_filter:
+          type: string
+        min_margin:
+          type: number
+          format: float
+          default: 0.15
+        auto_execute:
+          type: boolean
+          default: false
+          description: Automatically execute approved deals
+        use_mock:
+          type: boolean
+          default: true
+
+    Deal:
+      type: object
+      properties:
+        id:
+          type: integer
+        channel_id:
+          type: string
+        product:
+          type: string
+        wholesale_price:
+          type: number
+        retail_price:
+          type: number
+        margin:
+          type: number
+          format: float
+        status:
+          type: string
+
+    DealList:
+      type: object
+      properties:
+        deals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Deal"
+        count:
+          type: integer
+
+    CheckoutRequest:
+      type: object
+      properties:
+        tier:
+          type: string
+          default: pilot
+          description: Pricing tier
+        success_url:
+          type: string
+          format: uri
+          default: "http://localhost:9000"
+        cancel_url:
+          type: string
+          format: uri
+          default: "http://localhost:9000"
+
+    MassGenerateRequest:
+      type: object
+      properties:
+        channel_filter:
+          type: string
+        min_margin:
+          type: number
+          format: float
+          default: 0.15
+        min_stock:
+          type: integer
+          default: 5
+        revalidate:
+          type: boolean
+          default: false
+          description: Re-validate existing entries before generating

@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"📋 Proces zatwierdzania planów aktywny:\\n\\n✅ ETAP 1: Zanim zaproponuję plan — będę pytać o cel (zamknięta forma z opcją Inne)\\n✅ ETAP 2: Po zaplanowaniu — będę czekać na zatwierdzenie (Tak/Nie/Zmień)\\n\\n⚡ Wyjątki: Trywialne zmiany (1-2 linie), hot-fix (pytam czy pominąć), background (informuję)\\n\\nDokładne instrukcje: ~/.claude/instructions.md\"}'",
+            "statusMessage": "Inicjalizacja ADRION 369 — Process Control"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -Command \"$timestamp = Get-Date -Format 'yyyy-MM-dd_HH-mm-ss'; $reportDir = 'c:\\Users\\adiha\\162 demencje w schemacie 369\\Genesis Record\\10_RAPORTY_DZIALANIA_SYSTEMU\\REPORTS'; $reportPath = \\\"$reportDir\\Session_Report_$timestamp.md\\\"; if (-not (Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force | Out-Null }; $report = @'\\n# 📋 Session Report — $timestamp\\n\\nZakończenie sesji: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')\\n\\nAutomatycznie zapisane w Genesis Record.\\n\\n**Status**: ✅ Raport sesji został pomyślnie zapisany.\\n\\n---\\n\\n**Lokalizacja**: $reportPath\\n\\n**Data wykonania**: $(Get-Date)\\n\\n'@; $report | Out-File -FilePath $reportPath -Encoding UTF8; echo \\\"{ \\\\\\\"systemMessage\\\\\\\": \\\\\\\"✅ Session report saved to Genesis Record\\\\\\\\nFile: Session_Report_$timestamp.md\\\\\\\"}\\\"\"",
+            "statusMessage": "Saving session report to Genesis Record...",
+            "timeout": 10,
+            "async": false
+          }
+        ]
+      }
+    ]
+  }
+}

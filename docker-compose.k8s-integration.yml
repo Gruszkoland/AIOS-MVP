@@ -1,0 +1,177 @@
+version: "3.9"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: adrion-postgres-k8s
+    environment:
+      POSTGRES_USER: adrion
+      POSTGRES_PASSWORD: adrion-secure-password
+      POSTGRES_DB: adrion_uap
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adrion"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adrion-k8s
+
+  # Prometheus (Metrics)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: adrion-prometheus-k8s
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9090/-/healthy",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adrion-k8s
+
+  # Grafana (Visualization)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: adrion-grafana-k8s
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - adrion-k8s
+
+  # Loki (Log aggregation)
+  loki:
+    image: grafana/loki:latest
+    container_name: adrion-loki-k8s
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./config/loki-config.yml:/etc/loki/local-config.yml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yml
+    networks:
+      - adrion-k8s
+
+  # UAP Backend API
+  uap-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.uap-backend
+    container_name: adrion-uap-backend-k8s
+    environment:
+      FLASK_ENV: development
+      MAPI_HOST: 0.0.0.0
+      MAPI_PORT: 8002
+      DB_ENGINE: postgresql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: adrion
+      DB_PASSWORD: adrion-secure-password
+      DB_NAME: adrion_uap
+      PROMETHEUS_URL: http://prometheus:9090
+      LOKI_URL: http://loki:3100
+      K8S_ENABLED: "true"
+      K8S_WATCHER_ENABLED: "true"
+      K8S_NAMESPACE: adrion-369
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./uap/backend:/app/backend
+      - ./scripts:/app/scripts
+    depends_on:
+      postgres:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/mapi/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adrion-k8s
+    command: python uap/backend/api.py
+
+  # UAP Frontend
+  uap-frontend:
+    image: clearlinux/python:latest
+    container_name: adrion-uap-frontend-k8s
+    working_dir: /app/frontend
+    volumes:
+      - ./uap/frontend:/app/frontend
+    ports:
+      - "8003:8003"
+    environment:
+      K8S_API_BASE: http://localhost:8002/mapi/v1/kubernetes
+      K8S_AUTO_REFRESH: "5000"
+    command: python -m http.server 8003
+    networks:
+      - adrion-k8s
+
+  # Redis (Caching/Session store)
+  redis:
+    image: redis:7-alpine
+    container_name: adrion-redis-k8s
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adrion-k8s
+
+  # Optional: K8s Dashboard Proxy (for local testing)
+  k8s-proxy:
+    image: curlimages/curl:latest
+    container_name: adrion-k8s-proxy
+    command: sleep 1000000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - adrion-k8s
+
+volumes:
+  postgres_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  loki_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  adrion-k8s:
+    driver: bridge

@@ -1,0 +1,301 @@
+{
+    "name": "Guardian-G4-Enhanced-Flow",
+    "nodes": [
+        {
+            "parameters": {},
+            "id": "1",
+            "name": "Trigger",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "guardian-g4-trigger"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:8000/api/mcp/guardian/g4-enhanced",
+                "authentication": "genericCredentialType",
+                "genericCredentials": "{{ $credentials.adrion_api }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "X-Guardian-Version",
+                            "value": "v12-enhanced"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "claim",
+                            "value": "={{ $node.Trigger.json.body.claim }}"
+                        },
+                        {
+                            "name": "context",
+                            "value": "={{ $node.Trigger.json.body.context || null }}"
+                        },
+                        {
+                            "name": "require_web_verification",
+                            "value": true
+                        }
+                    ]
+                }
+            },
+            "id": "2",
+            "name": "Guardian G4 Local Eval",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 2,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:8000/api/mcp/perplexity/fact-check",
+                "authentication": "genericCredentialType",
+                "genericCredentials": "{{ $credentials.adrion_api }}",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "claim",
+                            "value": "={{ $node['Guardian G4 Local Eval'].json.body.claim }}"
+                        }
+                    ]
+                }
+            },
+            "id": "3",
+            "name": "Perplexity Fact Check",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 2,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $node['Perplexity Fact Check'].json.body.verified }}",
+                            "operation": "equals",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "id": "4",
+            "name": "Verified?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                850,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "expression": "{{ Object.assign($node['Guardian G4 Local Eval'].json.body, $node['Perplexity Fact Check'].json.body, { final_decision: 'APPROVED', confidence_combined: (($node['Guardian G4 Local Eval'].json.body.confidence * 0.4) + ($node['Perplexity Fact Check'].json.body.confidence * 0.6)) }) }}"
+            },
+            "id": "5",
+            "name": "Combine Signals (APPROVED)",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 1,
+            "position": [
+                850,
+                150
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "expression": "{{ Object.assign($node['Guardian G4 Local Eval'].json.body, $node['Perplexity Fact Check'].json.body, { final_decision: 'DENIED', confidence_combined: (($node['Guardian G4 Local Eval'].json.body.confidence * 0.4) + ($node['Perplexity Fact Check'].json.body.confidence * 0.6)) }) }}"
+            },
+            "id": "6",
+            "name": "Combine Signals (DENIED)",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 1,
+            "position": [
+                850,
+                450
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:8000/api/genesis/record",
+                "authentication": "genericCredentialType",
+                "genericCredentials": "{{ $credentials.adrion_api }}",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "agent",
+                            "value": "GUARDIAN"
+                        },
+                        {
+                            "name": "law",
+                            "value": "G4_Truthfulness"
+                        },
+                        {
+                            "name": "version",
+                            "value": "v12-enhanced"
+                        },
+                        {
+                            "name": "claim",
+                            "value": "={{ $node.Trigger.json.body.claim }}"
+                        },
+                        {
+                            "name": "decision",
+                            "value": "={{ $node['Combine Signals (APPROVED)'].json.body.final_decision || $node['Combine Signals (DENIED)'].json.body.final_decision }}"
+                        },
+                        {
+                            "name": "confidence",
+                            "value": "={{ { local: ($node['Guardian G4 Local Eval'].json.body.confidence), web: ($node['Perplexity Fact Check'].json.body.confidence), combined: ($node['Combine Signals (APPROVED)'].json.body.confidence_combined || $node['Combine Signals (DENIED)'].json.body.confidence_combined) } }}"
+                        },
+                        {
+                            "name": "sources",
+                            "value": "={{ $node['Perplexity Fact Check'].json.body.sources || [] }}"
+                        }
+                    ]
+                }
+            },
+            "id": "7",
+            "name": "Log to Genesis",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 2,
+            "position": [
+                1050,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "statusCode": 200,
+                "responseData": "={{ { success: true, decision: $node['Log to Genesis'].json.body.decision, confidence: $node['Log to Genesis'].json.body.confidence.combined, genesis_id: $node['Log to Genesis'].json.body.id } }}"
+            },
+            "id": "8",
+            "name": "Return Result",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1250,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Guardian G4 Local Eval",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Guardian G4 Local Eval": {
+            "main": [
+                [
+                    {
+                        "node": "Perplexity Fact Check",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Perplexity Fact Check": {
+            "main": [
+                [
+                    {
+                        "node": "Verified?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Verified?": {
+            "main": [
+                [
+                    {
+                        "node": "Combine Signals (APPROVED)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Combine Signals (DENIED)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Combine Signals (APPROVED)": {
+            "main": [
+                [
+                    {
+                        "node": "Log to Genesis",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Combine Signals (DENIED)": {
+            "main": [
+                [
+                    {
+                        "node": "Log to Genesis",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Log to Genesis": {
+            "main": [
+                [
+                    {
+                        "node": "Return Result",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "saveManualExecutions": true,
+        "executionOrder": "v1"
+    },
+    "versionId": "1",
+    "meta": {
+        "version": 1,
+        "instanceId": "adrion-369-phase5b",
+        "lastModified": "2025-01-16T14:30:00Z"
+    },
+    "description": "Guardian G4_Truthfulness Enhanced Flow with Perplexity Web Verification\n\n**Workflow:**\n1. Accept claim via webhook\n2. Local Guardian G4 evaluation (40% weight)\n3. Perplexity fact-check (60% weight)\n4. Branch on verification result\n5. Combine signals (weighted average)\n6. Log to Genesis audit trail\n\n**Performance Target:** P95 latency < 2 seconds\n**Confidence Threshold:** 0.5 (50%)\n\n**Integration Points:**\n- ADRION API: /api/mcp/guardian/g4-enhanced, /api/mcp/perplexity/fact-check, /api/genesis/record\n- Genesis Record logging for audit trail\n- Prometheus metrics auto-collected\n\n**Expected Accuracy Improvement:** +15% over G4 v11 (baseline 78% → target 93%)",
+    "tags": [
+        "phase-5b",
+        "guardian-enhanced",
+        "perplexity",
+        "fact-checking",
+        "critical"
+    ]
+}

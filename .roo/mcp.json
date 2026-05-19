@@ -1,0 +1,200 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {
+        "DEFAULT_MINIMUM_TOKENS": ""
+      }
+    },
+    "MCP_MODE": "stdio",
+    "LOG_LEVEL": "error",
+    "DISABLE_CONSOLE_OUTPUT": "true",
+    "N8N_API_URL": "https://n8n.aitransformationagency.pl",
+    "N8N_BASE_URL": "https://n8n.aitransformationagency.pl",
+    "N8N_URL": "https://n8n.aitransformationagency.pl",
+    "N8N_API_KEY": "${env:N8N_API_KEY}""args": [
+      "-y",
+      "@modelcontextprotocol/server-filesystem",
+      "${workspaceFolder}"
+    ],
+    "env": {},
+    "disabled": false
+  },
+  "git": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-git",
+      "${workspaceFolder}"
+    ],
+    "env": {},
+    "disabled": false
+  },
+  "python": {
+    "command": "python",
+    "args": [
+      "-m",
+      "mcp.server.python"
+    ],
+    "env": {
+      "PYTHONPATH": "${workspaceFolder}",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "disabled": false
+  },
+  "docker": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-docker"
+    ],
+    "env": {
+      "DOCKER_HOST": "unix:///var/run/docker.sock"
+    },
+    "disabled": false
+  },
+  "postgres": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-postgres"
+    ],
+    "env": {
+      "DATABASE_URL": "postgresql://adrion:adrion_pass@localhost:5432/genesis_record"
+    },
+    "disabled": true
+  },
+  "brave-search": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-brave-search"
+    ],
+    "env": {
+      "BRAVE_API_KEY": "${env:BRAVE_API_KEY}"
+    },
+    "disabled": true
+  },
+  "debugging": {
+    "command": "python",
+    "args": [
+      "-m",
+      "mcp.server.debug"
+    ],
+    "env": {
+      "DEBUG_LEVEL": "info",
+      "PYTHONPATH": "${workspaceFolder}"
+    },
+    "disabled": false
+  },
+  "n8n": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "n8n-mcp"
+    ],
+    "env": {
+      "N8N_API_URL": "https://aitransformationagency.pl/api/v1",
+      "N8N_API_KEY": "${env:N8N_API_KEY}"
+    },
+    "disabled": false
+  }
+},
+"rooSettings": {
+  "project": {
+    "name": "ADRION-369",
+    "version": "4.0.1",
+    "description": "Multi-Agent Swarm Orchestrator with 162D Decision Space"
+  },
+  "analysis": {
+    "profiles": [
+      "production",
+      "development",
+      "ci-pipeline",
+      "security-audit"
+    ],
+    "defaultProfile": "development",
+    "enableAI": true,
+    "enableSecurityScan": true,
+    "enableComplexityAnalysis": true
+  },
+  "deployment": {
+    "environments": [
+      "local",
+      "kubernetes",
+      "cloud"
+    ],
+    "autoDeployOnMerge": false,
+    "requireApprovalBefore": true
+  },
+  "integration": {
+    "github": {
+      "enabled": true,
+      "checkBranchProtection": true
+    },
+    "docker": {
+      "enabled": true,
+      "registries": [
+        "docker.io"
+      ]
+    },
+    "slack": {
+      "enabled": false,
+      "channel": "#deployments"
+    }
+  },
+  "reporting": {
+    "formats": [
+      "json",
+      "html",
+      "markdown"
+    ],
+    "outputPath": "reports/",
+    "includeMetrics": [
+      "complexity",
+      "coverage",
+      "security",
+      "performance"
+    ]
+  }
+},
+"toolConfig": {
+  "ruff": {
+    "configFile": "pyproject.toml",
+    "pythonVersion": "3.11",
+    "lineLength": 100
+  },
+  "mypy": {
+    "configFile": "pyproject.toml",
+    "strictMode": true
+  },
+  "pytest": {
+    "configFile": "pytest.ini",
+    "pythonPath": "${workspaceFolder}",
+    "minCoverage": 80
+  },
+  "docker": {
+    "buildContext": ".",
+    "registry": "docker.io"
+  }
+},
+"pathMappings": {
+  "workspace": "${workspaceFolder}",
+  "config": "${workspaceFolder}/config",
+  "scripts": "${workspaceFolder}/scripts",
+  "tests": "${workspaceFolder}/tests",
+  "mcp": "${workspaceFolder}/mcp_servers",
+  "arbitrage": "${workspaceFolder}/arbitrage",
+  "docs": "${workspaceFolder}/docs"
+},
+"metadata": {
+  "configVersion": "1.0",
+  "createdAt": "2026-04-08",
+  "maintainer": "ADRION-369 Master Orchestrator",
+  "purpose": "Roo Code MCP configuration for ADRION 369"
+}
+}

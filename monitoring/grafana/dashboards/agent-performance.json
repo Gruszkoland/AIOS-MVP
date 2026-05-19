@@ -1,0 +1,299 @@
+{
+  "dashboard": {
+    "title": "ADRION 369 - Agent Performance Monitoring",
+    "tags": ["adrion", "agents", "performance"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Agent Status",
+        "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "agent_success_rate",
+            "legendFormat": "{{agent_id}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "custom": {},
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "red", "value": null },
+                { "color": "yellow", "value": 0.8 },
+                { "color": "green", "value": 0.95 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Agent Trust Scores",
+        "type": "gauge",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+        "targets": [
+          {
+            "expr": "agent_trust_score",
+            "legendFormat": "{{agent_id}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 1,
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "red", "value": 0, "name": "Blocked" },
+                { "color": "yellow", "value": 0.6, "name": "Low" },
+                { "color": "green", "value": 0.85, "name": "Good" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Agent Average Duration (ms)",
+        "type": "gauge",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "agent_avg_duration_ms",
+            "legendFormat": "{{agent_id}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": 0 },
+                { "color": "yellow", "value": 500 },
+                { "color": "red", "value": 1000 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Tasks Completed vs Failed",
+        "type": "graph",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "targets": [
+          {
+            "expr": "agent_tasks_completed",
+            "legendFormat": "{{agent_id}} - Completed"
+          },
+          {
+            "expr": "agent_tasks_failed",
+            "legendFormat": "{{agent_id}} - Failed"
+          }
+        ],
+        "yaxes": [{ "label": "Task Count", "format": "short" }]
+      },
+      {
+        "id": 5,
+        "title": "Session Duration (ms)",
+        "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
+        "targets": [
+          {
+            "expr": "session_duration_ms",
+            "legendFormat": "Duration"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "custom": {}
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Jobs Processing Pipeline",
+        "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 12 },
+        "targets": [
+          {
+            "expr": "session_jobs_processed",
+            "legendFormat": "Processed"
+          },
+          {
+            "expr": "session_jobs_worthy",
+            "legendFormat": "Worthy"
+          },
+          {
+            "expr": "session_bids_created",
+            "legendFormat": "Bids"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Parallelization Factor",
+        "type": "gauge",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 16 },
+        "targets": [
+          {
+            "expr": "session_parallel_factor",
+            "legendFormat": "Factor"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 1,
+            "max": 8,
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "red", "value": 1 },
+                { "color": "yellow", "value": 2 },
+                { "color": "green", "value": 3 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Throughput (jobs/sec)",
+        "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 16 },
+        "targets": [
+          {
+            "expr": "session_throughput_jobs_per_sec",
+            "legendFormat": "Throughput"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "specPerSec",
+            "custom": {}
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Agent Latency Trends",
+        "type": "graph",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+        "targets": [
+          {
+            "expr": "agent_avg_duration_ms",
+            "legendFormat": "{{agent_id}}"
+          }
+        ],
+        "yaxes": [{ "label": "Latency (ms)", "format": "ms" }]
+      },
+      {
+        "id": 10,
+        "title": "Recent Agent Actions",
+        "type": "table",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+        "targets": [
+          {
+            "format": "table",
+            "instant": true,
+            "expr": "agent_metrics_latest"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "agent_id": "Agent",
+                "timestamp": "Time",
+                "success_rate": "Success %",
+                "avg_duration_ms": "Avg Latency (ms)",
+                "tasks_completed": "Done",
+                "tasks_failed": "Failed"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Alerts & Bottlenecks",
+        "type": "table",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+        "targets": [
+          {
+            "format": "table",
+            "instant": true,
+            "expr": "ALERTS{severity!=\"\"}"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "renameByName": {
+                "agent_id": "Agent",
+                "type": "Alert Type",
+                "value": "Value",
+                "threshold": "Threshold",
+                "severity": "Severity"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "System Health",
+        "type": "stat",
+        "datasource": { "type": "prometheus", "uid": "prometheus-adrion" },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 28 },
+        "targets": [
+          {
+            "expr": "session_health_status",
+            "legendFormat": "Status"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "mappings": [
+              {
+                "type": "value",
+                "options": {
+                  "healthy": { "color": "green", "text": "Healthy" },
+                  "warning": { "color": "yellow", "text": "Warning" },
+                  "critical": { "color": "red", "text": "Critical" }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

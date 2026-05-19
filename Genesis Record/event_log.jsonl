@@ -1,0 +1,28 @@
+{"event_type": "TASK_COMPLETED", "entity_id": "agent_librarian", "data": {"status": "success", "task_id": "T001"}, "timestamp": "2026-04-08T00:21:23.781980", "event_id": "d53ead29-53df-43cb-9bc7-e017da5a24ad"}
+{"event_type": "TASK_COMPLETED", "entity_id": "agent_sentinel", "data": {"priority": 5, "task_id": "T0"}, "timestamp": "2026-04-08T00:21:23.787240", "event_id": "f3a584a2-8714-4db7-8907-cadda570d7c8"}
+{"event_type": "TASK_COMPLETED", "entity_id": "agent_sentinel", "data": {"priority": 6, "task_id": "T1"}, "timestamp": "2026-04-08T00:21:23.787240", "event_id": "5afa2bce-5ba6-4efa-ace4-649535af780e"}
+{"event_type": "TASK_COMPLETED", "entity_id": "agent_sentinel", "data": {"priority": 7, "task_id": "T2"}, "timestamp": "2026-04-08T00:21:23.787240", "event_id": "76f32ad9-a7e4-4190-8ff2-77c00e68a9f3"}
+{"event_type": "AGENT_INITIALIZED", "entity_id": "agent_auditor", "data": {"trust_score": 0.5}, "timestamp": "2026-04-08T00:21:23.812314", "event_id": "829394a2-ff4c-4077-ba53-f37bfd58b63d"}
+{"event_type": "TASK_COMPLETED", "entity_id": "agent_architect", "data": {"phase": 1}, "timestamp": "2026-04-08T00:21:23.824890", "event_id": "794b2261-62f8-4273-8144-4c8a1e2614d0"}
+{"event_type": "TASK_COMPLETED", "entity_id": "agent_architect", "data": {"phase": 2}, "timestamp": "2026-04-08T00:21:23.826895", "event_id": "0f7fd501-abd9-45ef-8c6c-1b641aa7e7f4"}
+{"event_type": "TASK_STARTED", "entity_id": "agent_1", "data": {}, "timestamp": "2026-04-08T00:21:23.836993", "event_id": "4889ea54-da9a-43d7-9750-4c66a290f094"}
+{"event_type": "TASK_STARTED", "entity_id": "agent_2", "data": {}, "timestamp": "2026-04-08T00:21:23.836993", "event_id": "26cd3e92-caf9-4223-8aa6-66d18744bacf"}
+{"event_type": "TASK_STARTED", "entity_id": "agent_3", "data": {}, "timestamp": "2026-04-08T00:21:23.836993", "event_id": "0bfaae5b-42dd-4539-9a39-65ec209337b2"}
+{"event_type": "TASK_COMPLETED", "entity_id": "agent_x", "data": {}, "timestamp": "2026-04-08T00:21:23.862979", "event_id": "a540873a-f36a-47ae-b016-42cc63123bfb"}
+{"event_type": "TASK_COMPLETED", "entity_id": "agent_x", "data": {}, "timestamp": "2026-04-08T00:21:23.866977", "event_id": "ed76ddc2-959e-4b31-91e9-37520911e4f7"}
+{"event_type": "TASK_FAILED", "entity_id": "agent_y", "data": {}, "timestamp": "2026-04-08T00:21:23.880270", "event_id": "0c3935af-a234-4620-b70b-d732dbce9368"}
+{"event_type": "TASK_FAILED", "entity_id": "agent_y", "data": {}, "timestamp": "2026-04-08T00:21:23.882273", "event_id": "e7714daf-8079-4962-b8f9-7fd4a8fab578"}
+{"event_type": "TASK_FAILED", "entity_id": "agent_y", "data": {}, "timestamp": "2026-04-08T00:21:23.887367", "event_id": "9e4d8737-5233-42aa-8a04-cd1089d0027d"}
+{"event_type": "OPERATION", "entity_id": "entity_0", "data": {}, "timestamp": "2026-04-08T00:21:23.887367", "event_id": "a412d584-6c42-4c32-9fb5-da501a5072a2"}
+{"event_type": "OPERATION", "entity_id": "entity_1", "data": {}, "timestamp": "2026-04-08T00:21:23.909356", "event_id": "87adad5b-bda2-41a8-bc59-734d69a34e7e"}
+{"event_type": "OPERATION", "entity_id": "entity_2", "data": {}, "timestamp": "2026-04-08T00:21:23.911356", "event_id": "124e1a38-9f19-46eb-963f-568ff5609634"}
+{"event_type": "OPERATION", "entity_id": "entity_3", "data": {}, "timestamp": "2026-04-08T00:21:23.915356", "event_id": "a0875b36-a40c-45ca-857f-5627cfa2cb7f"}
+{"event_type": "OPERATION", "entity_id": "entity_4", "data": {}, "timestamp": "2026-04-08T00:21:23.920965", "event_id": "178c80e9-88c2-4664-b422-d11302bcc025"}
+{"event_type": "COMPUTATION_STEP", "entity_id": "process_001", "data": {"result": "step_1_result", "step": 1}, "timestamp": "2026-04-08T00:21:23.938187", "event_id": "1b111031-dd69-4398-9f7d-87eb2ba330f3"}
+{"event_type": "COMPUTATION_STEP", "entity_id": "process_001", "data": {"result": "step_2_result", "step": 2}, "timestamp": "2026-04-08T00:21:23.938187", "event_id": "0651efc7-b80e-4a6a-9831-f289b5dddf79"}
+{"event_type": "COMPUTATION_STEP", "entity_id": "process_001", "data": {"result": "step_3_result", "step": 3}, "timestamp": "2026-04-08T00:21:23.938187", "event_id": "31ca7480-108c-4692-bded-e08a34e20235"}
+{"event_type": "DECISION_STARTED", "entity_id": "agent_1", "data": {"task": "classify_data"}, "timestamp": "2026-04-08T00:21:23.963296", "event_id": "a4c09338-d7df-4988-bb44-69d165e71074"}
+{"event_type": "DECISION_EVALUATED", "entity_id": "agent_1", "data": {"best": "option_2", "options": 3}, "timestamp": "2026-04-08T00:21:23.966297", "event_id": "abe02703-0974-4478-b8df-dc184200fee5"}
+{"event_type": "DECISION_EXECUTED", "entity_id": "agent_1", "data": {"action": "execute_option_2"}, "timestamp": "2026-04-08T00:21:23.970743", "event_id": "e9b61042-c719-4ebe-bca1-6cca99a86489"}
+{"event_type": "DECISION_VERIFIED", "entity_id": "agent_1", "data": {"confidence": 0.95, "status": "success"}, "timestamp": "2026-04-08T00:21:23.974749", "event_id": "60202014-057b-4d15-a484-4051dc2122d7"}
+{"event_type": "TEST_EVENT", "entity_id": "test_entity", "data": {"test": true}, "timestamp": "2026-04-08T00:21:23.987583", "event_id": "a5385feb-ac3a-4e33-8106-31a47ab5d66c"}

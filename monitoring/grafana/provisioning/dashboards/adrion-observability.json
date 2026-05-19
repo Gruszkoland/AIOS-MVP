@@ -1,0 +1,128 @@
+{
+  "annotations": {"list": [{"builtIn": 1, "datasource": {"type": "grafana", "uid": "-- Grafana --"}, "enable": true, "hide": true, "iconColor": "rgba(0, 211, 255, 1)", "name": "Annotations & Alerts", "type": "dashboard"}]},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-api\"} |= \"event=request\" |~ \"status=4..|status=5..\" [15m]))", "queryType": "range", "refId": "A"}],
+      "title": "API Errors 15m",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [{"options": {"0": {"color": "red", "index": 0, "text": "Offline"}}, "type": "value"}], "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "id": 2,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-api\"} |= \"path=/api/arbitrage/status\" |= \"status=200\" [5m]))", "queryType": "range", "refId": "A"}],
+      "title": "API Healthchecks 5m",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "id": 3,
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-api\"} |~ \"event=llm_analyze|event=llm_cover_letter\" [15m]))", "queryType": "range", "refId": "A"}],
+      "title": "LLM Calls 15m",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "id": 4,
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-dashboard\"} |= \"event=ollama_status\" |= \"status=offline\" [15m]))", "queryType": "range", "refId": "A"}],
+      "title": "LLM Offline Events 15m",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "id": 5,
+      "options": {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "single", "sort": "none"}},
+      "targets": [{"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum by (path) (count_over_time({compose_service=\"adrion-api\"} |= \"event=request\" |~ \"status=4..|status=5..\" [5m]))", "legendFormat": "{{path}}", "queryType": "range", "refId": "A"}],
+      "title": "API Errors by Path",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "id": 6,
+      "options": {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "single", "sort": "none"}},
+      "targets": [
+        {"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-api\"} |= \"path=/api/arbitrage/status\" |= \"status=200\" [5m]))", "legendFormat": "api healthy", "queryType": "range", "refId": "A"},
+        {"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-dashboard\"} |= \"path=/api/system/info\" |= \"status=200\" [5m]))", "legendFormat": "dashboard healthy", "queryType": "range", "refId": "B"}
+      ],
+      "title": "Healthcheck Traffic",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+      "id": 7,
+      "options": {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "single", "sort": "none"}},
+      "targets": [
+        {"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-api\"} |= \"event=llm_analyze\" |= \"mode=success\" [5m]))", "legendFormat": "analyze success", "queryType": "range", "refId": "A"},
+        {"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-api\"} |= \"event=llm_analyze\" |= \"mode=fallback\" [5m]))", "legendFormat": "analyze fallback", "queryType": "range", "refId": "B"},
+        {"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-api\"} |= \"event=llm_cover_letter\" |= \"mode=success\" [5m]))", "legendFormat": "cover success", "queryType": "range", "refId": "C"},
+        {"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-api\"} |= \"event=llm_cover_letter\" |= \"mode=fallback\" [5m]))", "legendFormat": "cover fallback", "queryType": "range", "refId": "D"}
+      ],
+      "title": "LLM Success vs Fallback",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+      "id": 8,
+      "options": {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "single", "sort": "none"}},
+      "targets": [
+        {"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-dashboard\"} |= \"event=ollama_status\" |= \"status=online\" [5m]))", "legendFormat": "ollama online", "queryType": "range", "refId": "A"},
+        {"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "sum(count_over_time({compose_service=\"adrion-dashboard\"} |= \"event=ollama_status\" |= \"status=offline\" [5m]))", "legendFormat": "ollama offline", "queryType": "range", "refId": "B"}
+      ],
+      "title": "LLM Reachability",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+      "id": 9,
+      "options": {"dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "targets": [{"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "{compose_service=\"adrion-api\"} |= \"event=request\" |~ \"status=4..|status=5..\"", "queryType": "range", "refId": "A"}],
+      "title": "Recent API Error Logs",
+      "type": "logs"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+      "id": 10,
+      "options": {"dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "targets": [{"datasource": {"type": "loki", "uid": "P8E80F9AEF21F6940"}, "editorMode": "code", "expr": "{compose_service=~\"adrion-api|adrion-dashboard\"} |~ \"event=llm_analyze|event=llm_cover_letter|event=ollama_status\"", "queryType": "range", "refId": "A"}],
+      "title": "Recent LLM Logs",
+      "type": "logs"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["adrion", "loki", "observability"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "ADRION Observability",
+  "uid": "adrion-observability",
+  "version": 1,
+  "weekStart": ""
+}

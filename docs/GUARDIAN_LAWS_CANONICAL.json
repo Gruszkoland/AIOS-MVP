@@ -1,0 +1,76 @@
+{
+  "version": "2.0",
+  "schema_note": "Canonical source of truth for all 9 Guardian Laws. Runtime module: arbitrage/guardian.py uses stable code-names (see 'runtime_name') for backward compatibility.",
+  "weight_map": {
+    "CRITICAL": 10,
+    "HIGH": 2,
+    "MEDIUM": 1
+  },
+  "deny_weighted_threshold": 4,
+  "laws": [
+    {
+      "id": "G1",
+      "runtime_name": "Unity",
+      "name": "Unity",
+      "severity": "MEDIUM",
+      "description": "All actions must serve system coherence"
+    },
+    {
+      "id": "G2",
+      "runtime_name": "Truth",
+      "name": "Harmony",
+      "severity": "HIGH",
+      "description": "Balance between competing objectives; analysis must be genuine and reasoned"
+    },
+    {
+      "id": "G3",
+      "runtime_name": "Rhythm",
+      "name": "Rhythm",
+      "severity": "MEDIUM",
+      "description": "Maintain consistent cadence and timing of operations"
+    },
+    {
+      "id": "G4",
+      "runtime_name": "Causality",
+      "name": "Causality",
+      "severity": "HIGH",
+      "description": "Every action must have a traceable, justified cause"
+    },
+    {
+      "id": "G5",
+      "runtime_name": "Transparency",
+      "name": "Transparency",
+      "severity": "MEDIUM",
+      "description": "All decisions and reasoning must be visible and auditable"
+    },
+    {
+      "id": "G6",
+      "runtime_name": "Nonmaleficence",
+      "name": "Authenticity",
+      "severity": "HIGH",
+      "description": "Outputs must be genuine and free from deception",
+      "runtime_note": "Runtime guardian.py implements '_law_nonmaleficence' at pipeline position 6 for architectural G8 (financial harm). G6 Authenticity is enforced implicitly via G2 Truth/Harmony (analysis must be genuine and reasoned). Explicit G6 implementation planned for v1.3."
+    },
+    {
+      "id": "G7",
+      "runtime_name": "Autonomy",
+      "name": "Privacy",
+      "severity": "CRITICAL",
+      "description": "All data remains local; no repeated unsolicited contact without consent"
+    },
+    {
+      "id": "G8",
+      "runtime_name": "Justice",
+      "name": "Nonmaleficence",
+      "severity": "CRITICAL",
+      "description": "Never cause harm: do not bid on jobs outside fair budget range"
+    },
+    {
+      "id": "G9",
+      "runtime_name": "Sustainability",
+      "name": "Sustainability",
+      "severity": "HIGH",
+      "description": "Operate within resource limits and preserve long-term system health"
+    }
+  ]
+}

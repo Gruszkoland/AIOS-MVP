@@ -1,0 +1,164 @@
+name: ADRION 369 Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  validate:
+    name: Pre-release validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements-arbitrage.txt
+          pip install pytest pytest-cov ruff
+
+      - name: Lint (ruff)
+        run: ruff check arbitrage/ tests/ --select=E,F,W --ignore=E501
+
+      - name: Run tests with coverage gate
+        run: |
+          python -m pytest tests/ \
+            --cov=arbitrage \
+            --cov-fail-under=80 \
+            --ignore=tests/security_simulation.py \
+            -m "not e2e and not runtime" \
+            -q
+
+      - name: Set up Go 1.22
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Go vet + build + test
+        run: |
+          go vet ./...
+          go build -v ./...
+          go test -v -coverprofile=go_coverage.out ./...
+
+      - name: Enforce Go coverage (80%)
+        run: |
+          COVERAGE=$(go tool cover -func=go_coverage.out | grep ^total | awk '{print $3}' | tr -d '%')
+          echo "Go coverage: ${COVERAGE}%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "FAIL: Go coverage ${COVERAGE}% < 80% threshold" && exit 1
+          fi
+
+  release:
+    name: Create GitHub Release
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: "ADRION 369 v${{ env.VERSION }}"
+          generate_release_notes: true
+          body: |
+            ## ADRION 369 v${{ env.VERSION }}
+
+            Multi-agent AI orchestration system with Trinity-EBDI framework and 162D decision space.
+
+            ### What's included
+            - Vortex Engine (Go): ${{ env.VERSION }}
+            - Arbitrage Engine (Python): ${{ env.VERSION }}
+            - API Schema: `docs/API_SCHEMA.yaml`
+            - Migration system: `db/migrations/`
+
+            ### Deployment
+            See [DEPLOYMENT_RUNBOOK.md](docs/DEPLOYMENT_RUNBOOK.md) for step-by-step instructions.
+
+  build-containers:
+    name: Build & push Docker images to GHCR
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Vortex image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.vortex
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/adrion-vortex:${{ github.ref_name }},ghcr.io/${{ github.repository_owner }}/adrion-vortex:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Healer image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.healer
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/adrion-healer:${{ github.ref_name }},ghcr.io/${{ github.repository_owner }}/adrion-healer:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  sign-containers:
+    name: Sign container images with cosign
+    needs: build-containers
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      id-token: write
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sign Vortex image
+        run: cosign sign --yes ghcr.io/${{ github.repository_owner }}/adrion-vortex:${{ github.ref_name }}
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+
+      - name: Sign Healer image
+        run: cosign sign --yes ghcr.io/${{ github.repository_owner }}/adrion-healer:${{ github.ref_name }}
+        env:
+          COSIGN_EXPERIMENTAL: "1"

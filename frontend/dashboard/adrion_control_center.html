@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ADRION 369 - Control Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* ═══════════════════════════════════════════════════════════════════
+           DESIGN TOKENS: Vortex-Phi (Fibonacci + 3-6-9)
+           ═══════════════════════════════════════════════════════════════════ */
+
+      :root {
+        /* Typography Scale (Phi-based: 1.618) */
+        --font-xs: 9px;
+        --font-sm: 12px;
+        --font-base: 15px;
+        --font-md: 24px;
+        --font-lg: 39px;
+        --font-xl: 63px;
+
+        /* Spacing (9-unit system) */
+        --space-xs: 9px;
+        --space-sm: 18px;
+        --space-md: 36px;
+        --space-lg: 72px;
+        --space-xl: 144px;
+
+        /* Border Radius (3-6-9) */
+        --radius-sm: 3px;
+        --radius-md: 6px;
+        --radius-lg: 9px;
+        --radius-phi: 1.618rem;
+
+        /* Shadows (9-27 vortex pattern) */
+        --shadow-sm: 0 3px 9px rgba(0, 0, 0, 0.09);
+        --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.12);
+        --shadow-vortex: 0 9px 27px rgba(0, 0, 0, 0.15);
+
+        /* Motion (Solfeggio frequencies in ms) */
+        --motion-fast: 174ms; /* 1+7+4=12→3 */
+        --motion-standard: 396ms; /* 3+9+6=18→9 */
+        --motion-emphasis: 528ms; /* 5+2+8=15→6 (DNA repair freq) */
+
+        /* Colors: Vortex Palette (Purple-Blue-Magenta) */
+        --color-primary: #9333ea; /* Purple-600 */
+        --color-secondary: #6366f1; /* Indigo-600 */
+        --color-accent: #ec4899; /* Pink-500 */
+        --color-success: #10b981; /* Green-500 */
+        --color-warning: #f59e0b; /* Amber-500 */
+        --color-error: #ef4444; /* Red-500 */
+
+        /* Dark Background */
+        --color-bg-dark: #0f172a; /* Slate-950 */
+        --color-bg-card: #1e293b; /* Slate-900 */
+        --color-bg-hover: #334155; /* Slate-700 */
+        --color-text-primary: #f1f5f9; /* Slate-100 */
+        --color-text-secondary: #cbd5e1; /* Slate-300 */
+      }
+
+      body {
+        background-color: var(--color-bg-dark);
+        color: var(--color-text-primary);
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        letter-spacing: -0.01em;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+           FIBONACCI GRID SYSTEM (62.18% / 38.2%)
+           ═══════════════════════════════════════════════════════════════════ */
+
+      .container-phi {
+        display: grid;
+        grid-template-columns: 1.618fr 1fr;
+        gap: var(--space-md);
+        height: 100vh;
+        padding: var(--space-md);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+           NODE 3 (INITIATION): Top-Left, Logo & Navigation
+           ═══════════════════════════════════════════════════════════════════ */
+
+      .node-3-hero {
+        grid-column: 1 / 2;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      .logo-banner {
+        background: linear-gradient(
+          135deg,
+          var(--color-primary),
+          var(--color-secondary)
+        );
+        padding: var(--space-md);
+        border-radius: var(--radius-phi);
+        box-shadow: var(--shadow-vortex);
+      }
+
+      .logo-banner h1 {
+        font-size: var(--font-lg);
+        font-weight: 700;
+        margin: 0;
+        color: #fff;
+      }
+
+      .logo-banner p {
+        font-size: var(--font-sm);
+        color: rgba(255, 255, 255, 0.8);
+        margin: var(--space-xs) 0 0 0;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+           NODE 6 (DECISION): Center, Agent Status Grid
+           ═══════════════════════════════════════════════════════════════════ */
+
+      .agents-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-sm);
+        margin: var(--space-md) 0;
+      }
+
+      .agent-card {
+        background-color: var(--color-bg-card);
+        border: 2px solid transparent;
+        border-radius: var(--radius-lg);
+        padding: var(--space-sm);
+        text-align: center;
+        cursor: pointer;
+        transition: all var(--motion-standard) ease-in-out;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .agent-card:hover {
+        border-color: var(--color-primary);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-vortex);
+      }
+
+      .agent-card.online {
+        border-color: var(--color-success);
+      }
+
+      .agent-card.offline {
+        border-color: var(--color-error);
+        opacity: 0.6;
+      }
+
+      .agent-status-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        margin: 0 auto var(--space-xs);
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      .agent-status-dot.online {
+        background-color: var(--color-success);
+      }
+
+      .agent-status-dot.offline {
+        background-color: var(--color-error);
+        animation: none;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .agent-name {
+        font-size: var(--font-base);
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .agent-port {
+        font-size: var(--font-xs);
+        color: var(--color-text-secondary);
+        margin: var(--space-xs) 0 0 0;
+      }
+
+      .agent-health {
+        font-size: var(--font-xs);
+        color: var(--color-success);
+        margin-top: var(--space-xs);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+           NODE 9 (INTEGRATION): Right Panel, CTA & Controls (Eye of Spiral)
+           ═══════════════════════════════════════════════════════════════════ */
+
+      .node-9-controls {
+        grid-column: 2 / 3;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      .control-panel {
+        background-color: var(--color-bg-card);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        box-shadow: var(--shadow-md);
+      }
+
+      .control-panel h3 {
+        font-size: var(--font-md);
+        margin: 0 0 var(--space-sm) 0;
+        color: var(--color-primary);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+           CTA SINGULARITY (Point 9 - Eye of Spiral)
+           Position: 61.8% from top, 38.2% from left
+           ═══════════════════════════════════════════════════════════════════ */
+
+      .cta-singularity {
+        background: linear-gradient(
+          135deg,
+          var(--color-primary),
+          var(--color-accent)
+        );
+        color: #fff;
+        border: none;
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-lg);
+        font-size: var(--font-base);
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: var(--shadow-vortex);
+        transition: all var(--motion-emphasis) ease-in-out;
+        width: 100%;
+      }
+
+      .cta-singularity:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 36px rgba(147, 51, 234, 0.4);
+      }
+
+      .cta-singularity:active {
+        transform: scale(0.98);
+      }
+
+      /* Test API Panel */
+      .api-tester {
+        background-color: var(--color-bg-card);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        box-shadow: var(--shadow-md);
+      }
+
+      .api-endpoint-input {
+        background-color: var(--color-bg-hover);
+        border: 2px solid transparent;
+        border-radius: var(--radius-md);
+        padding: var(--space-sm);
+        color: var(--color-text-primary);
+        font-size: var(--font-sm);
+        margin-bottom: var(--space-sm);
+        transition: border-color var(--motion-fast);
+      }
+
+      .api-endpoint-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+      }
+
+      .api-method-select {
+        background-color: var(--color-bg-hover);
+        border: 2px solid transparent;
+        border-radius: var(--radius-md);
+        padding: var(--space-xs) var(--space-sm);
+        color: var(--color-text-primary);
+        font-size: var(--font-sm);
+        margin-bottom: var(--space-sm);
+        cursor: pointer;
+      }
+
+      /* Console/Logs Panel */
+      .console-output {
+        background-color: #000;
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        font-family: "Courier New", monospace;
+        font-size: var(--font-xs);
+        color: #00ff00;
+        max-height: 300px;
+        overflow-y: auto;
+        line-height: 1.6;
+      }
+
+      .console-line {
+        margin: var(--space-xs) 0;
+      }
+
+      .console-timestamp {
+        color: #888;
+      }
+
+      .console-success {
+        color: #00ff00;
+      }
+
+      .console-error {
+        color: #ff4444;
+      }
+
+      .console-warning {
+        color: #ffaa00;
+      }
+
+      .console-info {
+        color: #00aaff;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+           METRICS & KPI Dashboard (Bottom Section)
+           ═══════════════════════════════════════════════════════════════════ */
+
+      .metrics-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-sm);
+        margin-top: var(--space-md);
+      }
+
+      .metric-card {
+        background-color: var(--color-bg-card);
+        border-radius: var(--radius-lg);
+        padding: var(--space-sm);
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .metric-value {
+        font-size: var(--font-lg);
+        font-weight: 700;
+        color: var(--color-primary);
+        margin: 0;
+      }
+
+      .metric-label {
+        font-size: var(--font-xs);
+        color: var(--color-text-secondary);
+        margin: var(--space-xs) 0 0 0;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+           RESPONSIVE & ANIMATIONS
+           ═══════════════════════════════════════════════════════════════════ */
+
+      @media (max-width: 1024px) {
+        .container-phi {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+
+        .node-3-hero,
+        .node-9-controls {
+          grid-column: 1 / -1;
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn var(--motion-standard) ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Toroidal flow (infinite scroll suggestion) */
+      .toroidal-bottom {
+        position: relative;
+        padding-top: var(--space-md);
+        border-top: 1px dashed rgba(147, 51, 234, 0.3);
+      }
+
+      .toroidal-bottom::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 9px;
+        height: 9px;
+        background-color: var(--color-primary);
+        border-radius: 50%;
+        animation: pulse var(--motion-standard) ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body class="fade-in">
+    <div class="container-phi">
+      <!-- ═══════════════════════════════════════════════════════════════════
+             NODE 3: INITIATION (Left Panel - Hero & Main Content)
+             ═══════════════════════════════════════════════════════════════════ -->
+      <div class="node-3-hero">
+        <!-- LOGO & HEADER -->
+        <div class="logo-banner">
+          <h1>ADRION 369</h1>
+          <p>Master Orchestrator Control Center | ETAP 2 Deployment Verified</p>
+        </div>
+
+        <!-- AGENTS MONITORING (NODE 6 Decision Point) -->
+        <div>
+          <h2
+            style="
+              font-size: var(--font-md);
+              margin: 0 0 var(--space-sm) 0;
+              color: var(--color-text-primary);
+            "
+          >
+            6 MCP Agents Status
+          </h2>
+          <div class="agents-grid">
+            <!-- Router -->
+            <div
+              class="agent-card online"
+              onclick="selectAgent('Router', 9001)"
+            >
+              <div class="agent-status-dot online"></div>
+              <p class="agent-name">Router</p>
+              <p class="agent-port">:9001</p>
+              <p class="agent-health">Orchestration</p>
+            </div>
+
+            <!-- Guardian -->
+            <div
+              class="agent-card online"
+              onclick="selectAgent('Guardian', 9002)"
+            >
+              <div class="agent-status-dot online"></div>
+              <p class="agent-name">Guardian</p>
+              <p class="agent-port">:9002</p>
+              <p class="agent-health">Security</p>
+            </div>
+
+            <!-- Healer -->
+            <div
+              class="agent-card online"
+              onclick="selectAgent('Healer', 9003)"
+            >
+              <div class="agent-status-dot online"></div>
+              <p class="agent-name">Healer</p>
+              <p class="agent-port">:9003</p>
+              <p class="agent-health">Recovery</p>
+            </div>
+
+            <!-- Genesis -->
+            <div
+              class="agent-card online"
+              onclick="selectAgent('Genesis', 9004)"
+            >
+              <div class="agent-status-dot online"></div>
+              <p class="agent-name">Genesis</p>
+              <p class="agent-port">:9004</p>
+              <p class="agent-health">State Mgmt</p>
+            </div>
+
+            <!-- Oracle -->
+            <div
+              class="agent-card online"
+              onclick="selectAgent('Oracle', 9005)"
+            >
+              <div class="agent-status-dot online"></div>
+              <p class="agent-name">Oracle</p>
+              <p class="agent-port">:9005</p>
+              <p class="agent-health">Analytics</p>
+            </div>
+
+            <!-- Vortex -->
+            <div
+              class="agent-card online"
+              onclick="selectAgent('Vortex', 9006)"
+            >
+              <div class="agent-status-dot online"></div>
+              <p class="agent-name">Vortex</p>
+              <p class="agent-port">:9006</p>
+              <p class="agent-health">Harmonic</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- METRICS KPI -->
+        <div class="metrics-row">
+          <div class="metric-card">
+            <p class="metric-value">6/6</p>
+            <p class="metric-label">Agents Online</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-value">100%</p>
+            <p class="metric-label">Uptime</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-value">46</p>
+            <p class="metric-label">API Tests</p>
+          </div>
+        </div>
+
+        <!-- TOROIDAL FLOW INDICATOR -->
+        <div class="toroidal-bottom" style="margin-top: var(--space-lg)"></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════════
+             NODE 9: INTEGRATION (Right Panel - CTA & Control Panel)
+             The "Eye of the Spiral" - Point of Singularity
+             ═══════════════════════════════════════════════════════════════════ -->
+      <div class="node-9-controls">
+        <!-- API TESTER -->
+        <div class="api-tester">
+          <h3>API Test Console</h3>
+          <div>
+            <select class="api-method-select" id="methodSelect">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+            <input
+              type="text"
+              class="api-endpoint-input"
+              id="endpointInput"
+              placeholder="http://localhost:9001/health"
+              value="http://localhost:9001/health"
+            />
+            <button class="cta-singularity" onclick="testAPI()">
+              Send Request
+            </button>
+          </div>
+        </div>
+
+        <!-- AGENT TOOLS CONFIGURATION -->
+        <div class="control-panel">
+          <h3>Active Agent Tools</h3>
+          <div
+            id="toolsList"
+            style="
+              font-size: var(--font-sm);
+              color: var(--color-text-secondary);
+              line-height: 1.8;
+            "
+          >
+            <div style="margin: var(--space-sm) 0">
+              <input type="checkbox" checked /> Read Files
+            </div>
+            <div style="margin: var(--space-sm) 0">
+              <input type="checkbox" checked /> Execute Code
+            </div>
+            <div style="margin: var(--space-sm) 0">
+              <input type="checkbox" /> Internet Access
+            </div>
+            <div style="margin: var(--space-sm) 0">
+              <input type="checkbox" checked /> Database Query
+            </div>
+          </div>
+        </div>
+
+        <!-- CONSOLE OUTPUT (Live Logs) -->
+        <div style="flex: 1; display: flex; flex-direction: column">
+          <h3
+            style="
+              font-size: var(--font-md);
+              margin: 0 0 var(--space-sm) 0;
+              color: var(--color-secondary);
+            "
+          >
+            Live Console
+          </h3>
+          <div class="console-output" id="consoleOutput">
+            <div class="console-line">
+              <span class="console-timestamp">[04:46:24]</span>
+              <span class="console-success">[OK] All 6 agents online</span>
+            </div>
+            <div class="console-line">
+              <span class="console-timestamp">[04:46:18]</span>
+              <span class="console-info"
+                >[INFO] ETAP 2 deployment complete</span
+              >
+            </div>
+            <div class="console-line">
+              <span class="console-timestamp">[04:46:10]</span>
+              <span class="console-success">[OK] Vortex (9006) RESPONDING</span>
+            </div>
+            <div class="console-line">
+              <span class="console-timestamp">[04:46:05]</span>
+              <span class="console-warning"
+                >[WARN] Router port fixed (9001)</span
+              >
+            </div>
+            <div class="console-line">
+              <span class="console-timestamp">[04:46:00]</span>
+              <span class="console-success"
+                >[OK] Credential rotation deployed</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         JAVASCRIPT: Real-time Updates & Interactions
+         ═══════════════════════════════════════════════════════════════════ -->
+    <script>
+      // Global state
+      let selectedAgent = { name: "Router", port: 9001 };
+
+      // Agent Selection Handler
+      function selectAgent(name, port) {
+        selectedAgent = { name, port };
+        addConsoleLog(`[SELECT] ${name} agent selected`, "info");
+        updateEndpointInput();
+      }
+
+      // Update endpoint input when agent selected
+      function updateEndpointInput() {
+        const input = document.getElementById("endpointInput");
+        const method = document.getElementById("methodSelect").value;
+        input.value = `http://localhost:${selectedAgent.port}/health`;
+      }
+
+      // API Testing Handler
+      async function testAPI() {
+        const endpoint = document.getElementById("endpointInput").value;
+        const method = document.getElementById("methodSelect").value;
+
+        addConsoleLog(`[REQUEST] ${method} ${endpoint}`, "info");
+
+        try {
+          const response = await fetch(endpoint, { method });
+          const data = await response.json();
+
+          if (response.ok) {
+            addConsoleLog(
+              `[${response.status}] ${selectedAgent.name} responding`,
+              "success",
+            );
+            addConsoleLog(
+              `[DATA] ${JSON.stringify(data).substring(0, 100)}...`,
+              "success",
+            );
+          } else {
+            addConsoleLog(
+              `[${response.status}] Error from ${selectedAgent.name}`,
+              "error",
+            );
+          }
+        } catch (error) {
+          addConsoleLog(`[ERROR] ${error.message}`, "error");
+        }
+      }
+
+      // Console Logging Function
+      function addConsoleLog(message, type = "info") {
+        const console = document.getElementById("consoleOutput");
+        const timestamp = new Date().toLocaleTimeString();
+        const line = document.createElement("div");
+        line.className = `console-line console-${type}`;
+        line.innerHTML = `<span class="console-timestamp">[${timestamp}]</span> <span>${message}</span>`;
+        console.appendChild(line);
+        console.scrollTop = console.scrollHeight; // Auto-scroll
+      }
+
+      // Real-time Agent Status Check (every 30s)
+      setInterval(async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:${selectedAgent.port}/health`,
+          );
+          if (response.ok) {
+            addConsoleLog(`[HEALTH] ${selectedAgent.name} OK`, "success");
+          }
+        } catch (e) {
+          addConsoleLog(`[HEALTH] ${selectedAgent.name} unreachable`, "error");
+        }
+      }, 30000);
+
+      // Initialize
+      addConsoleLog("[STARTUP] ADRION 369 Control Center loaded", "success");
+      addConsoleLog("[STATUS] Ready for API testing", "info");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,480 @@
+# Roo Code Runtime Configuration
+# Controls behavior and performance of Roo Code analysis engine
+
+# === CORE SETTINGS ===
+[core]
+# Profile to use by default (production, development, ci-pipeline, security-audit, performance-tuning, documentation)
+defaultProfile = development
+# Enable detailed logging
+verbose = true
+# Log file path
+logFile = .roo_cache/roo.log
+# Log level: trace, debug, info, warn, error
+logLevel = info
+
+# === ANALYSIS ENGINE ===
+[analysis]
+# Maximum analysis timeout in milliseconds
+timeout = 30000
+# Enable parallel analysis for better performance
+parallelAnalysis = true
+# Number of parallel workers (0 = auto-detect based on CPU cores)
+parallelWorkers = 0
+# Cache analysis results
+enableCache = true
+# Cache directory
+cacheDir = .roo_cache/
+# Cache TTL in seconds (24 hours)
+cacheTTL = 86400
+
+# === CODE ANALYSIS ===
+[codeAnalysis]
+# Enable syntax checking
+syntaxCheck = true
+# Enable type checking
+typeChecking = true
+# Enable complexity metrics
+complexityMetrics = true
+# Enable security scans
+securityScans = true
+# Enable performance analysis
+performanceAnalysis = true
+# Maximum cyclomatic complexity (0 = no limit)
+maxComplexity = 10
+# Maximum nesting level (0 = no limit)
+maxNesting = 4
+
+# === LINTERS & FORMATTERS ===
+[linters]
+# Enable Python linting
+pythonLinting = true
+# Python linter: ruff, pylint, both
+pythonLinter = ruff
+# Enable Go linting
+goLinting = true
+# Enable PowerShell linting
+powerShellLinting = true
+# Enable Dockerfile linting
+dockerfileLinting = true
+# Enable formatting checks
+formatChecks = true
+
+# === TESTING ===
+[testing]
+# Enable test discovery
+enableTests = true
+# Test framework
+framework = pytest
+# Run tests on save
+runOnSave = false
+# Coverage minimum threshold
+minCoverage = 80
+# Coverage fail if under threshold
+failOnLowCoverage = true
+
+# === SECURITY ===
+[security]
+# Enable SAST (Static Application Security Testing)
+enableSAST = true
+# Enable secret scanning
+secretScanning = true
+# Enable dependency vulnerability checks
+vulnerabilityScanning = true
+# Scan external dependencies
+scanExternalDeps = true
+# Report severity threshold: error, warning, info
+reportThreshold = warning
+# Generate security report on scan
+generateReport = true
+# Security report path
+reportPath = reports/security_scan.json
+
+# === PERFORMANCE ===
+[performance]
+# Max file size to analyze (in MB)
+maxFileSize = 5
+# Skip large files
+skipLargeFiles = true
+# Enable memory optimization
+memoryOptimization = true
+# Enable incremental analysis
+incrementalAnalysis = true
+# Index timeout in milliseconds
+indexTimeout = 60000
+
+# === REPORTING ===
+[reporting]
+# Generate reports automatically
+generateOnSave = true
+# Report formats: json, html, xml, markdown
+reportFormats = json,html
+# Report output directory
+reportPath = reports/
+# Include metrics in reports
+includeMetrics = complexity,coverage,security,performance,diagnostics
+# Archive old reports
+archiveOldReports = true
+# Archive after days
+archiveAfterDays = 30
+
+# === INTEGRATIONS ===
+[integrations]
+# Enable Git integration
+gitIntegration = true
+# Show branch info
+gitBranchInfo = true
+# Show commit history
+gitCommitHistory = true
+# Git diff context lines
+gitDiffContext = 3
+
+# Enable Docker integration
+dockerIntegration = true
+# Docker image path patterns
+dockerImagePath = Dockerfile*
+
+# Enable Kubernetes integration
+kubernetesIntegration = true
+# Kubernetes manifest path
+kubernetesManifestPath = kubernetes/
+# Validate Kubernetes schemas
+validateK8sSchemas = true
+
+# === LANGUAGE SPECIFIC ===
+[python]
+# Python version for analysis
+version = 3.11
+# Minimum Python version
+minVersion = 3.10
+# Enable type hints validation
+typeHints = true
+# Docstring style: google, numpy, sphinx
+docstringStyle = google
+# Require docstrings
+requireDocstrings = true
+
+[go]
+# Go version
+version = 1.22
+# Enable go vet
+enableVet = true
+# Enable go fmt
+enableFmt = true
+# Check for vendoring consistency
+checkVendoring = true
+
+[typescript]
+# TypeScript version
+version = latest
+# Strict mode
+strictMode = true
+# Enable unused variable detection
+unusedDetection = true
+
+# === WORKSPACE ===
+[workspace]
+# Root path (. = current directory)
+rootPath = .
+# Exclude patterns (comma-separated)
+excludePatterns = .venv,node_modules,.git,__pycache__,*.egg-info,build,dist
+# Include patterns for specific analysis
+includePatterns = arbitrage,persona-agents,scripts,mcp_servers,kubernetes
+# Add to Python path
+addPythonPath = arbitrage,persona-agents,scripts
+
+# === ENVIRONMENT ===
+[environment]
+# Environment file to load
+envFile = .env.template
+# Virtual environment path
+venvPath = .venv/
+# Python executable path
+pythonExecutable = .venv/Scripts/python.exe
+
+# === AI & ADVANCED FEATURES ===
+[ai]
+# Enable AI-powered suggestions
+enableAI = true
+# Enable refactoring suggestions
+refactoringSuggestions = true
+# Enable performance optimization suggestions
+performanceOptimizations = true
+# Enable security advisories
+securityAdvisories = true
+# Enable architecture analysis
+architectureAnalysis = true
+# Model to use (local, remote, hybrid)
+mode = hybrid
+# Local LLM endpoint (if hybrid/local)
+localEndpoint = http://localhost:11434
+
+# === GUARDRAILS ===
+[guardrails]
+# Enable guardrails
+enabled = true
+# Enforce naming conventions
+enforceNaming = true
+# Enforce security policies
+enforceSecurity = true
+# Enforce documentation
+enforceDocumentation = true
+# Severity for violations: error, warning
+violationSeverity = warning
+
+# === DEBUGGING ===
+[debug]
+# Enable debug mode
+enabled = false
+# Debug log file
+logFile = .debug-logs/roo-debug.log
+# Dump analysis AST
+dumpAST = false
+# Dump symbol tables
+dumpSymbols = false
+# Break on first error
+breakOnError = false
+
+# === EXPERIMENTAL FEATURES ===
+[experimental]
+# Enable experimental features
+enabled = false
+# Specific experimental features to enable (comma-separated)
+features = incremental_analysis,cross_language_analysis
+
+# === NOTIFICATIONS ===
+[notifications]
+# Show analysis complete notification
+showComplete = true
+# Show warnings count
+showWarnings = true
+# Show errors count
+showErrors = true
+# Notify on issues
+notifyOnIssues = true
+# Desktop notifications
+desktopNotifications = true
+
+# === CUSTOM RULES ===
+[customRules]
+# Enable custom rules
+enabled = true
+# Custom rules file
+rulesFile = roo.rules.json
+# Custom rules directory
+rulesDir = config/roo-rules/
+
+# === OUTPUT & DISPLAY ===
+[output]
+# Color output
+colorOutput = true
+# Use unicode symbols
+unicodeSymbols = true
+# Max output width (0 = terminal width)
+maxWidth = 0
+# Pagination (for large reports)
+pagination = true
+# Lines per page
+linesPerPage = 50
+
+# === METADATA ===
+[metadata]
+# Last configured date
+lastConfigured = 2026-04-08T00:00:00Z
+# Configuration version
+configVersion = 1.0
+# Maintainer
+maintainer = ADRION-369 Master Orchestrator
+# Notes
+notes = Runtime configuration for Roo Code ADRION 369 analysis engine
+
+[languages.powershell]
+# PowerShell configuration
+version = "5.1"
+linter = PSScriptAnalyzer
+rules = "PSDefault"
+enable_rule_severity = true
+
+[languages.typescript]
+# TypeScript configuration OPT
+version = "latest"
+linter = eslint
+formatter = prettier
+strict_mode = true
+
+[languages.dockerfile]
+# Dockerfile linting
+linter = hadolint
+strict_mode = true
+enable_best_practices = true
+
+[analysis]
+# Static analysis tools
+enable_sast = true
+enable_dast = false
+enable_secrets_scan = true
+enable_complexity_metrics = true
+enable_performance_profiling = false
+enable_dependency_check = true
+
+# Security scanning
+scan_for_hardcoded_secrets = true
+scan_for_sql_injection = true
+scan_for_xss = true
+scan_for_xxe = true
+secret_patterns = [
+    "password",
+    "api_key",
+    "api_secret",
+    "secret_key",
+    "auth_token",
+    "jwt_secret",
+    "db_password",
+    "connection_string"
+]
+
+# Code quality thresholds
+max_cyclomatic_complexity = 10
+max_nesting_depth = 4
+max_function_length = 200
+max_class_length = 500
+min_function_length = 3
+
+[testing]
+# Test configuration
+framework = pytest
+auto_discover = true
+test_timeout = 60s
+parallel_tests = true
+coverage_min = 80
+coverage_fail_under = 70
+
+# Test directories
+test_paths = [
+    "tests/",
+    "tests/uat/",
+    "tests/integration/"
+]
+
+[deployment]
+# Deployment environments
+environments = ["local", "kubernetes", "cloud"]
+validate_kubernetes_manifests = true
+validate_docker_images = true
+check_helm_charts = true
+
+[docker]
+# Docker configuration
+analyze_dockerfiles = true
+analyze_compose_files = true
+analyze_images = true
+check_best_practices = true
+report_vulnerabilities = true
+
+[kubernetes]
+# Kubernetes configuration
+validate_manifests = true
+check_security_policies = true
+check_resource_limits = true
+check_readiness_probes = true
+warn_on_deprecated_apis = true
+
+[reporting]
+# Report generation
+output_format = ["json", "html", "txt"]
+output_directory = reports/
+generate_on_save = true
+generate_on_close = true
+include_metrics = [
+    "complexity",
+    "coverage",
+    "security",
+    "performance",
+    "diagnostics"
+]
+
+# Report templates
+report_template = comprehensive
+include_recommendations = true
+include_examples = true
+
+[ignore_patterns]
+# Files and patterns to ignore
+directories = [
+    ".venv",
+    "node_modules",
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    ".ruff_cache",
+    "htmlcov",
+    "dist",
+    "build",
+    "legacy",
+    "backups",
+    ".aider"
+]
+
+files = [
+    "*.pyc",
+    "*.pyo",
+    "*.egg-info",
+    ".DS_Store",
+    "*.log"
+]
+
+[integration]
+# VS Code integration
+enable_inline_diagnostics = true
+enable_hover_information = true
+enable_go_to_definition = true
+enable_find_references = true
+show_performance_metrics = true
+show_complexity_score = true
+
+# Git integration
+show_branch_info = true
+show_commit_history = true
+diff_context = 3
+
+# Docker integration
+show_container_info = true
+show_image_info = true
+
+[preferences]
+# User preferences
+theme = dark
+font_size = 10
+show_line_numbers = true
+show_minimap = false
+
+# Notifications
+show_success_messages = false
+show_info_messages = true
+show_warning_messages = true
+show_error_messages = true
+
+[advanced]
+# Advanced features
+enable_ai_suggestions = true
+enable_refactoring_suggestions = true
+enable_performance_optimizations = true
+enable_security_advisories = true
+enable_architecture_analysis = true
+
+# Graph generation
+generate_dependency_graph = true
+generate_call_graph = false
+generate_architecture_diagram = true
+
+# Experimental features
+enable_ml_based_analysis = false
+enable_predictive_error_detection = false
+enable_code_duplication_detection = true
+
+[metadata]
+# Configuration metadata
+version = "1.0"
+created = "2026-04-08"
+project = "ADRION-369"
+description = "Master Orchestrator Multi-Stack Analysis Configuration"
+last_updated = "2026-04-08T08:00:00Z"

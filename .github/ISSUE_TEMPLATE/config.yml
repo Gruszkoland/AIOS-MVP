@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Disclosure (CRITICAL)
+    url: https://github.com/adiha/adrion-369/security/advisories/new
+    about: For CRITICAL security vulnerabilities (G7/G8), use GitHub Security Advisories for private reporting.

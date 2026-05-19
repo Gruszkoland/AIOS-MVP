@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Admin Panel (UAP) — ADRION 369 v4.0</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-blue: #0078D4;
+            --primary-gradient: linear-gradient(135deg, #0078D4 0%, #0066CC 100%);
+            --secondary-dark: #1E3A5F;
+            --tertiary-gray: #2C3E50;
+            --light-bg: #F5F5F5;
+            --white-bg: #FFFFFF;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+            --danger-color: #E74C3C;
+            --border-light: #D5D8DC;
+            --text-primary: #1E3A5F;
+            --text-secondary: #566573;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--light-bg);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--white-bg);
+            border-bottom: 2px solid var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .main-container {
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--white-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 16px rgba(0, 120, 212, 0.1);
+            border-color: var(--primary-blue);
+        }
+
+        .card-header {
+            border-bottom: 2px solid var(--primary-blue);
+            background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-online { background: #D4EDDA; color: var(--success-color); border: 1px solid var(--success-color); }
+        .status-offline { background: #F8D7DA; color: var(--danger-color); border: 1px solid var(--danger-color); }
+        .status-pending { background: #FFF3CD; color: #856404; border: 1px solid var(--warning-color); }
+
+        .score-display {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .heatmap-item {
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            margin: 5px;
+            font-weight: 600;
+            min-width: 100px;
+            background: var(--white-bg);
+            border: 1px solid var(--border-light);
+        }
+
+        .agent-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .agent-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .input-group input, .input-group textarea {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #e2e8f0;
+        }
+
+        .input-group input::placeholder, .input-group textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            font-weight: 600;
+            padding: 10px 24px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .tab-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 20px;
+        }
+
+        .nav-tabs .nav-link {
+            color: #94a3b8;
+            border-color: transparent;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #667eea;
+            border-color: #667eea;
+            background: transparent;
+        }
+
+        #realtime-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .loader {
+            border: 3px solid rgba(102, 126, 234, 0.2);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert-close {
+            cursor: pointer;
+        }
+
+        /* ──────────────────────────────────────────────────────────────── */
+        /* REAL-TIME DASHBOARD ANIMATIONS (Phase 4) */
+        /* ──────────────────────────────────────────────────────────────── */
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(102, 126, 234, 0.6);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes colorShift {
+            0% { border-color: rgba(102, 126, 234, 0.3); }
+            50% { border-color: rgba(102, 126, 234, 0.6); }
+            100% { border-color: rgba(102, 126, 234, 0.3); }
+        }
+
+        /* Live stat updates */
+        .stat-updating {
+            animation: glow 0.6s ease-in-out;
+        }
+
+        /* EBDI heatmap smooth color transition */
+        .heatmap-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Crisis highlighted agent */
+        .agent-crisis {
+            animation: pulse 0.5s ease-in-out infinite;
+            border-left: 4px solid #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Live connection indicator */
+        .connection-live {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        /* Real-time telemetry stream */
+        .telemetry-stream {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* EBDI PAD visualization grid */
+        .ebdi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .ebdi-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            animation: slideInLeft 0.4s ease-out;
+        }
+
+        .ebdi-card.updated {
+            animation: glow 0.6s ease-out;
+        }
+
+        .ebdi-label {
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .ebdi-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .ebdi-bar {
+            background: rgba(102, 126, 234, 0.2);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .ebdi-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 3px;
+        }
+
+        /* Trinity score display */
+        .trinity-display {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .trinity-item {
+            flex: 1;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .trinity-score {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 8px 0;
+        }
+
+        .trinity-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Arousal level indicator */
+        .arousal-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .arousal-bar {
+            flex: 1;
+            background: rgba(102, 126, 234, 0.2);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .arousal-bar-fill {
+            height: 100%;
+            transition: all 0.3s ease-out;
+        }
+
+        .arousal-bar-fill.low {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 33%;
+        }
+
+        .arousal-bar-fill.medium {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            width: 66%;
+        }
+
+        .arousal-bar-fill.high {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            width: 100%;
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        .arousal-value {
+            font-weight: 700;
+            min-width: 50px;
+        }
+
+        /* ──────────────────────────────────────────────────────────────── */
+        /* CHAT ORCHESTRATOR MAIN (NEW LAYOUT) */
+        /* ──────────────────────────────────────────────────────────────── */
+
+        .orchestrator-main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .chat-panel-main {
+            background: var(--white-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .chat-header-main {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .chat-header-main .header-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-header-main button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .chat-header-main button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-messages-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+            animation: slideInLeft 0.3s ease-out;
+        }
+
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+
+        .chat-message.orchestrator {
+            justify-content: flex-start;
+        }
+
+        .message-badge {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 70%;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .message-badge.user {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .message-badge.orchestrator {
+            background: #f0f0f0;
+            color: var(--text-primary);
+            border-radius: 12px 12px 12px 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .message-badge.system {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .chat-input-main {
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid var(--border-light);
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-main input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .chat-input-main button {
+            padding: 10px 24px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .chat-input-main button:hover {
+            opacity: 0.9;
+            box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
+        }
+
+        /* METRICS PANEL (RIGHT 50%) */
+        .metrics-panel-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* TASKS PANEL (RIGHT 50% - NEW) */
+        .tasks-panel-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .metrics-card {
+            background: var(--white-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .metrics-card-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .metric-item {
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            border: 1px solid var(--border-light);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* TASK ITEM STYLING */
+        .task-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            animation: slideInLeft 0.3s ease-out;
+        }
+
+        .task-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .task-item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .task-item-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .task-item-status.pending {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .task-item-status.running {
+            background: #E7F3FF;
+            color: #0078D4;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        .task-item-status.completed {
+            background: #D4EDDA;
+            color: #27AE60;
+        }
+
+        .task-item-status.failed {
+            background: #F8D7DA;
+            color: #E74C3C;
+        }
+
+        .task-progress-container {
+            margin-bottom: 6px;
+        }
+
+        .task-progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .task-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0078D4 0%, #0066CC 100%);
+            transition: width 0.4s ease-out;
+            border-radius: 3px;
+        }
+
+        .task-progress-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .task-item-meta {
+            display: flex;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .task-item-agent {
+            display: inline-block;
+            background: rgba(0, 120, 212, 0.1);
+            padding: 3px 6px;
+            border-radius: 3px;
+            color: #0078D4;
+        }
+
+        /* MINIMALIZOWANA BUBLECZKA CHATU */
+        .chat-bubble {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            background: var(--white-bg);
+            border: 2px solid var(--primary-blue);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 120, 212, 0.25);
+            z-index: 1000;
+            animation: slideInRight 0.4s ease-out;
+            display: none;
+            flex-direction: column;
+            max-height: 400px;
+        }
+
+        .bubble-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 10px 10px 0 0;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .bubble-header .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .bubble-header .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .bubble-preview {
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-bottom: 1px solid var(--border-light);
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .bubble-action {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 0 0 10px 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .bubble-action button {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-light);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .bubble-action button:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .bubble-action button.primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+        }
+
+        .bubble-action button.primary:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 1200px) {
+            .orchestrator-main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* AGENT CARDS STYLING */
+        .agent-card {
+            border-left: 4px solid #0078D4;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 120, 212, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .agent-card.inactive {
+            border-left-color: #999;
+            opacity: 0.7;
+        }
+
+        .agent-skill-badge {
+            display: inline-block;
+            background: #E8F4F8;
+            color: #0078D4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="fas fa-cog"></i> UAP — Master Orchestrator
+            </span>
+            <div class="ms-auto">
+                <span id="connection-status" class="status-badge status-offline me-3">
+                    <i class="fas fa-circle me-2"></i>Connecting...
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container container-fluid" style="margin-top: 80px;">
+
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="control-hq-tab" data-bs-toggle="tab" data-bs-target="#control-hq" type="button" role="tab">
+                    <i class="fas fa-comments me-2"></i>Chat (Home)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="delegator-tab" data-bs-toggle="tab" data-bs-target="#delegator" type="button" role="tab">
+                    <i class="fas fa-paper-plane me-2"></i>Agent Delegator
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="agents-tab" data-bs-toggle="tab" data-bs-target="#agents" type="button" role="tab">
+                    <i class="fas fa-robot me-2"></i>Agent Manager
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="genesis-tab" data-bs-toggle="tab" data-bs-target="#genesis" type="button" role="tab">
+                    <i class="fas fa-book me-2"></i>Genesis Viewer
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="orchestrator-tab" data-bs-toggle="tab" data-bs-target="#orchestrator" type="button" role="tab">
+                    <i class="fas fa-sitemap me-2"></i>Orchestrator Console
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="healer-tab" data-bs-toggle="tab" data-bs-target="#healer" type="button" role="tab">
+                    <i class="fas fa-heart-pulse me-2"></i>Self-Healing
+                </button>
+            </li>
+        </ul>
+
+        <!-- TAB CONTENT -->
+        <div class="tab-content">
+
+            <!-- 1. CONTROL HQ — CHAT ORCHESTRATOR (NEW HOME) -->
+            <div class="tab-pane fade show active" id="control-hq" role="tabpanel">
+                <div class="orchestrator-main-container">
+
+                    <!-- LEFT PANEL: CHAT ORCHESTRATOR (50%) -->
+                    <div class="chat-panel-main">
+                        <div class="chat-header-main">
+                            <span><i class="fas fa-comments me-2"></i>Master Orchestrator Chat</span>
+                            <div class="header-buttons">
+                                <button id="minimize-chat-btn" title="Minimize to bubble">−</button>
+                            </div>
+                        </div>
+                        <div class="chat-messages-main" id="chat-messages-main">
+                            <div style="text-align: center; color: var(--text-secondary); padding: 40px 20px;">
+                                <i class="fas fa-comments fa-3x mb-3" style="opacity: 0.3;"></i>
+                                <p>Start a conversation with the AI Orchestrator</p>
+                            </div>
+                        </div>
+                        <div class="chat-input-main">
+                            <input type="text" id="chat-input-main" placeholder="Ask the Master Orchestrator... e.g., 'Deploy backend' or 'Check system status'">
+                            <button id="chat-send-btn-main" onclick="sendChatMessageMain()">
+                                <i class="fas fa-paper-plane me-1"></i>Send
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT PANEL: ACTIVE TASKS (50%) -->
+                    <div class="tasks-panel-main">
+                        <div class="metrics-card">
+                            <div class="metrics-card-title">
+                                <i class="fas fa-tasks me-2" style="color: var(--primary-blue);"></i>Bieżące Zadania
+                            </div>
+                            <div id="active-tasks-list" style="font-size: 0.9rem;">
+                                <p class="text-muted" style="text-align: center; padding: 20px 0;">Brak aktywnych zadań</p>
+                            </div>
+                        </div>
+
+                        <!-- Task Stats -->
+                        <div class="metrics-card">
+                            <div class="metrics-card-title">
+                                <i class="fas fa-chart-pie me-2" style="color: var(--success-color);"></i>Statystyka
+                            </div>
+                            <div class="metrics-grid">
+                                <div class="metric-item">
+                                    <div class="metric-value" id="stat-completed-tasks">0</div>
+                                    <div class="metric-label">Ukończone</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value" id="stat-pending-tasks">0</div>
+                                    <div class="metric-label">W Toku</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value" id="stat-failed-tasks">0</div>
+                                    <div class="metric-label">Błędy</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 2. AGENT MANAGER (NEW) -->
+            <div class="tab-pane fade" id="agents" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <button class="btn btn-primary" id="create-agent-btn" onclick="openCreateAgentModal()">
+                            <i class="fas fa-plus me-2"></i>Utwórz Nowego Agenta
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-robot me-2"></i>Lista Agentów</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="agents-list-container" class="row">
+                                    <p class="text-muted text-center" style="padding: 40px 0;">Ładowanie listy agentów...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. AGENT DELEGATOR -->
+            <div class="tab-pane fade" id="delegator" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-paper-plane me-2"></i>Delegate Task to Agent</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="task-description" class="form-label">Task Description</label>
+                            <textarea class="form-control" id="task-description" rows="4" placeholder="e.g., Scout XRP opportunities under $5 with Scout agent..."></textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="agent-hint" class="form-label">Agent Hint (Optional)</label>
+                                <select class="form-select" id="agent-hint">
+                                    <option value="">Auto-route</option>
+                                    <option value="Librarian">Librarian</option>
+                                    <option value="SAP">SAP</option>
+                                    <option value="Auditor">Auditor</option>
+                                    <option value="Sentinel">Sentinel</option>
+                                    <option value="Architect">Architect</option>
+                                    <option value="Healer">Healer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="budget-max" class="form-label">Budget Max ($)</label>
+                                <input type="number" class="form-control" id="budget-max" value="1000" min="0">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="dry-run-check">
+                                <label class="form-check-label" for="dry-run-check">
+                                    Dry Run Mode (Preview without execution)
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg w-100" id="submit-task-btn">
+                            <i class="fas fa-rocket me-2"></i>Submit Task
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history me-2"></i>Task Execution Log</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="task-log" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
+                            <p class="text-muted">No tasks submitted yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. GENESIS VIEWER -->
+            <div class="tab-pane fade" id="genesis" role="tabpanel">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-filter me-2"></i>Advanced Search & Filter</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label small">Full-Text Search</label>
+                                <input type="text" class="form-control" id="genesis-search" placeholder="Search logs...">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Agent</label>
+                                <select class="form-select" id="genesis-agent-filter">
+                                    <option value="">All Agents</option>
+                                    <option value="Librarian">Librarian</option>
+                                    <option value="SAP">SAP</option>
+                                    <option value="Auditor">Auditor</option>
+                                    <option value="Sentinel">Sentinel</option>
+                                    <option value="Architect">Architect</option>
+                                    <option value="Healer">Healer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Time Range</label>
+                                <select class="form-select" id="genesis-time-filter">
+                                    <option value="1h">Last Hour</option>
+                                    <option value="24h">Last 24h</option>
+                                    <option value="7d">Last 7 Days</option>
+                                    <option value="30d">Last 30 Days</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Status</label>
+                                <select class="form-select" id="genesis-status-filter">
+                                    <option value="">All Status</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="failed">Failed</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end gap-2">
+                                <button class="btn btn-primary flex-grow-1" id="genesis-search-btn">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                                <button class="btn btn-outline-secondary" id="genesis-export-btn" title="Export as JSON">
+                                    <i class="fas fa-download me-2"></i>Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-scroll me-2"></i>Audit Trail</h5>
+                        <small class="text-muted d-block mt-2">Immutable Genesis Record with 9 Guardian Law compliance</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="genesis-logs-list" style="max-height: 600px; overflow-y: auto;">
+                            <p class="text-muted">Loading logs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ORCHESTRATOR CONSOLE -->
+            <div class="tab-pane fade" id="orchestrator" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-exclamation-circle me-2"></i>Crisis Mode Control</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-3">
+                                    <strong>System Arousal:</strong> <span id="orchestrator-arousal" class="badge bg-warning">0.50</span>
+                                    <small class="text-muted d-block mt-2">Crisis triggered at > 0.70</small>
+                                </p>
+                                <div id="crisis-status-badge" class="alert alert-info mb-3" role="alert">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Normal operation. Sentinel on standby.
+                                </div>
+                                <button class="btn btn-danger btn-lg w-100" id="crisis-activate-btn">
+                                    <i class="fas fa-bomb me-2"></i>Activate Crisis Mode
+                                </button>
+                                <small class="text-muted d-block mt-2">Requires operator approval. Bypasses rate limits.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-balance-scale me-2"></i>Conflict Resolution (Voting)</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">When 2+ agents propose conflicting actions...</p>
+                                <div id="conflict-proposals" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
+                                    <p class="text-muted small">No active conflicts</p>
+                                </div>
+                                <button class="btn btn-info w-100" id="conflict-resolver-btn">
+                                    <i class="fas fa-gavel me-2"></i>Resolve Conflicts
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-save me-2"></i>Rollback Checkpoints (RBC) — State Snapshots</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-sm btn-secondary mb-3" id="create-checkpoint-btn">
+                            <i class="fas fa-camera me-2"></i>Create Checkpoint
+                        </button>
+                        <div id="checkpoints-list" style="max-height: 400px; overflow-y: auto;">
+                            <p class="text-muted">No checkpoints created yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. SELF-HEALING DASHBOARD -->
+            <div class="tab-pane fade" id="healer" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-heart-pulse me-2"></i>Healer Suggestions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="healer-suggestions-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-bar me-2"></i>Performance Heatmap</h5>
+                            </div>
+                            <div class="card-body">
+                                <p id="perf-cpu">CPU: <strong>--</strong>%</p>
+                                <p id="perf-ram">RAM: <strong>--</strong>%</p>
+                                <p id="perf-db">DB Queries: <strong>--</strong>/min</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-history me-2"></i>Last 24h Fixes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="healer-history-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MINIMALIZOWANA BUBLECZKA CHATU (Hidden by default) -->
+    <div class="chat-bubble" id="chat-bubble">
+        <div class="bubble-header" onclick="expandChatBubble()">
+            <span><i class="fas fa-comments me-2"></i>Chat</span>
+            <button class="close-btn" onclick="closeChatBubble(event)">×</button>
+        </div>
+        <div class="bubble-preview" id="bubble-preview">Click to expand chat...</div>
+        <div class="bubble-action">
+            <button onclick="expandChatBubble()">Open Chat</button>
+            <button class="primary" onclick="focusChatInput()">Message</button>
+        </div>
+    </div>
+
+    <!-- MODAL: CREATE/EDIT AGENT -->
+    <div class="modal fade" id="agentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agentModalTitle">Utwórz Nowego Agenta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agentForm">
+                        <div class="mb-3">
+                            <label for="agent-name" class="form-label">Nazwa Agenta</label>
+                            <input type="text" class="form-control" id="agent-name" placeholder="np. Librarian, Architect..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="agent-role" class="form-label">Rola/Specjalizacja</label>
+                            <input type="text" class="form-control" id="agent-role" placeholder="np. Knowledge Management, System Architecture..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="agent-personality" class="form-label">Osobowość / Charakterystyka</label>
+                            <textarea class="form-control" id="agent-personality" rows="3" placeholder="Opisz osobowość agenta, jego style decyzyjny..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="agent-description" class="form-label">Opis Pełny</label>
+                            <textarea class="form-control" id="agent-description" rows="3" placeholder="Szczegółowy opis funkcji, zdolności, zakresu..." required></textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="agent-trust-score" class="form-label">Początkowy Trust Score (0-1)</label>
+                                <input type="number" class="form-control" id="agent-trust-score" min="0" max="1" step="0.1" value="0.8" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="agent-capability-level" class="form-label">Poziom Możliwości</label>
+                                <select class="form-select" id="agent-capability-level" required>
+                                    <option value="basic">Podstawowy</option>
+                                    <option value="intermediate">Zaawansowany</option>
+                                    <option value="expert">Ekspert</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="agent-skills" class="form-label">Umiejętności (oddzielone przecinkami)</label>
+                            <input type="text" class="form-control" id="agent-skills" placeholder="np. audit, risk-assessment, threat-detection" required>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="agent-active" checked>
+                            <label class="form-check-label" for="agent-active">
+                                Aktywny / Dostępny
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAgent()">Zapisz Agenta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- WebSocket Real-Time Client -->
+    <script src="websocket_client.js"></script>
+
+    <!-- Main App -->
+    <script src="app.js"></script>
+</body>
+</html>

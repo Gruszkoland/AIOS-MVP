@@ -1,0 +1,21 @@
+{
+  "checks": [
+    {
+      "name": "ADRION-systray ZIP (29 MB)",
+      "status": "FAIL"
+    },
+    {
+      "name": "uap_systray.exe (30.7 MB)",
+      "status": "FAIL"
+    },
+    {
+      "name": "uap_launcher.ps1",
+      "status": "FAIL"
+    }
+  ],
+  "overall_status": "UNHEALTHY",
+  "passed": 3,
+  "failed": 6,
+  "warnings": 0,
+  "timestamp": "2026-04-06 15:07:27"
+}

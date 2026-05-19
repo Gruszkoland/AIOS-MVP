@@ -1,0 +1,136 @@
+# Multi-stage Dockerfile for ADRION 369 Ecosystem
+# Consolidated from 11+ individual Dockerfiles into single source of truth
+# Supports: genesis-mcp, guardian-mcp, healer-mcp, vortex-mcp, oracle-mcp, etc.
+# Usage: docker build --target guardian-mcp -t adrion-guardian:latest .
+
+# Stage 0: Base image (pinned, security-hardened)
+FROM python:3.11-slim as base
+LABEL maintainer="Gruszkoland <adi.halicki@gmail.com>"
+LABEL version="5.7.0-consolidated"
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Stage 1: Dependencies builder
+FROM base as builder
+COPY requirements*.txt ./
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install -r requirements-mcp.txt && \
+    pip install openai>=2.0.0 pydantic>=2.0.0 python-docx>=1.2.0
+
+# Stage 2: Core (shared base)
+FROM base as core
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY requirements*.txt ./
+RUN pip install -r requirements-mcp.txt
+
+# Security: Create non-root user
+RUN groupadd -r adrion && useradd -r -g adrion adrion
+USER adrion
+
+COPY --chown=adrion:adrion . .
+
+# Health check template
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${SERVICE_PORT:-8000}/health || exit 1
+
+# Stage 3: Genesis MCP
+FROM core as genesis-mcp
+ENV SERVICE_NAME=genesis-mcp \
+    SERVICE_PORT=9100 \
+    MCP_ROLE=genesis
+EXPOSE 9100
+CMD ["python", "-m", "mcp_servers.genesis_mcp.server"]
+
+# Stage 4: Guardian MCP
+FROM core as guardian-mcp
+ENV SERVICE_NAME=guardian-mcp \
+    SERVICE_PORT=9101 \
+    MCP_ROLE=guardian
+EXPOSE 9101
+CMD ["python", "-m", "mcp_servers.guardian_mcp.server"]
+
+# Stage 5: Healer MCP
+FROM core as healer-mcp
+ENV SERVICE_NAME=healer-mcp \
+    SERVICE_PORT=9102 \
+    MCP_ROLE=healer
+EXPOSE 9102
+CMD ["python", "-m", "mcp_servers.healer_mcp.server"]
+
+# Stage 6: Vortex (Go service base - requires separate Go builder)
+FROM golang:1.22-alpine as vortex-builder
+WORKDIR /app
+COPY cmd/vortex-server ./
+RUN go build -o vortex-server .
+
+FROM alpine:latest as vortex-mcp
+COPY --from=vortex-builder /app/vortex-server /usr/local/bin/
+ENV SERVICE_NAME=vortex-mcp \
+    SERVICE_PORT=1740
+EXPOSE 1740
+ENTRYPOINT ["vortex-server"]
+
+# Stage 7: Oracle MCP
+FROM core as oracle-mcp
+ENV SERVICE_NAME=oracle-mcp \
+    SERVICE_PORT=9103 \
+    MCP_ROLE=oracle
+EXPOSE 9103
+CMD ["python", "-m", "mcp_servers.oracle_mcp.server"]
+
+# Stage 8: MCP Router (central orchestrator)
+FROM core as mcp-router
+ENV SERVICE_NAME=mcp-router \
+    SERVICE_PORT=9000 \
+    MCP_ROLE=router
+EXPOSE 9000 9100 9101 9102 9103
+CMD ["python", "-m", "mcp_servers.router.main"]
+
+# Stage 9: MCP Tier (multi-agent coordination)
+FROM core as mcp-tier
+ENV SERVICE_NAME=mcp-tier \
+    SERVICE_PORT=8002
+EXPOSE 8002
+CMD ["python", "-m", "uap.backend.app"]
+
+# Stage 10: Alert Handler (monitoring)
+FROM core as alert-handler
+ENV SERVICE_NAME=alert-handler \
+    SERVICE_PORT=8004
+EXPOSE 8004
+CMD ["python", "-m", "monitoring.alert_handler"]
+
+# Stage 11: Backup Service
+FROM core as backup
+ENV SERVICE_NAME=backup \
+    SERVICE_PORT=8005
+EXPOSE 8005
+VOLUME ["/backups"]
+CMD ["python", "-m", "tools.backup_service"]
+
+# Stage 12: Development environment
+FROM core as dev
+RUN pip install pytest pytest-cov pytest-asyncio black flake8 mypy
+ENV PYTHONPATH=/app
+CMD ["/bin/bash"]
+
+# Stage 13: Test runner
+FROM dev as test
+COPY . .
+RUN pytest tests/ -v --cov=. --cov-report=term-missing
+
+# Default stage (Genesis MCP if no --target specified)
+FROM genesis-mcp

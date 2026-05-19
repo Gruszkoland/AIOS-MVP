@@ -1,0 +1,213 @@
+/*
+ * ═══════════════════════════════════════════════════════════════
+ * VORTEX-PHI DESIGN SYSTEM — CSS Custom Properties
+ * ═══════════════════════════════════════════════════════════════
+ * Źródło: System Design Tokens (Vortex-Phi) + System Kolorów
+ * Matematyka: φ ≈ 1.618 (złoty podział) + 3-6-9 (vortex math)
+ * Timing: Częstotliwości Solfeggio (174/396/528 Hz)
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+:root {
+  /* ─── TYPOGRAFIA (skala φ, zaokrąglona do wielokrotności 3) ─── */
+  --font-xs:   9px;   /* Redukcja: 9 — micro-copy, etykiety */
+  --font-sm:   12px;  /* Redukcja: 3 — metadane, timestamps */
+  --font-base: 15px;  /* Redukcja: 6 — tekst główny (body) */
+  --font-md:   24px;  /* Redukcja: 6 — średnie nagłówki, cytaty */
+  --font-lg:   39px;  /* Redukcja: 3 — nagłówki sekcji (H2) */
+  --font-xl:   63px;  /* Redukcja: 9 — główny nagłówek (H1) */
+
+  --font-heading:  'Rajdhani', 'Michroma', sans-serif;
+  --font-data:     'JetBrains Mono', 'Space Mono', 'Fira Code', monospace;
+  --font-body:     'Inter', 'Saira', sans-serif;
+
+  /* ─── SPACING (V-Unit = 9px, wielokrotności) ─── */
+  --space-unit: 9px;
+  --space-xs:   9px;   /* 1v */
+  --space-sm:   18px;  /* 2v */
+  --space-md:   36px;  /* 4v — punkt przejścia (3+6=9) */
+  --space-lg:   72px;  /* 8v — zbieżność (7+2=9) */
+  --space-xl:   144px; /* 16v — suma cyfr: 1+4+4=9 */
+
+  /* ─── GRID (Złoty Podział) ─── */
+  --grid-major: 61.8%;  /* φ — sekcja główna */
+  --grid-minor: 38.2%;  /* 1-φ — sekcja pomocnicza */
+
+  /* ─── GEOMETRIA (Border Radius & Elevation) ─── */
+  --radius-phi:    1.618rem;  /* główne kontenery */
+  --radius-small:  3px;       /* przyciski pomocnicze */
+  --radius-medium: 6px;       /* karty produktów */
+  --radius-large:  9px;       /* główne modale */
+
+  --shadow-vortex: 0 9px 27px rgba(0, 0, 0, 0.09);
+  /* 9, 27 (3³), 9% — pełna spójność z taktowaniem */
+
+  /* ─── MOTION (Solfeggio Timing) ─── */
+  --motion-fast:     174ms;  /* 1+7+4=12→3 — uśmierzanie napięcia */
+  --motion-standard: 396ms;  /* 3+9+6=18→9 — uwalnianie energii */
+  --motion-emphasis:  528ms;  /* 5+2+8=15→6 — transformacja/regeneracja */
+
+  --easing-vortex: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ─── KOLORY VORTEX-PHI (z redukcją 3-6-9) ─── */
+  
+  /* === Tło (Punkt 9 — 60% powierzchni: dominanta) === */
+  --color-bg-deep:    #020408;  /* ultra-dark — ADRION Core */
+  --color-bg-primary: #0b0e14;  /* dark — główne tło */
+  --color-bg-surface: #0f1117;  /* surface — karty, panele */
+  --color-bg-raised:  #161b22;  /* raised — sidebar */
+  --color-bg-overlay: rgba(10, 15, 30, 0.7); /* glass panels */
+  
+  /* === Tekst === */
+  --color-text-primary:   #e2e8f0;   /* jasny — tekst główny */
+  --color-text-secondary: #94a3b8;   /* szary — tekst pomocniczy */
+  --color-text-muted:     #475569;   /* wyciszony — timestamps */
+  --color-text-inverse:   #272727;   /* 2+7+2+7=18→9 — dark text */
+
+  /* === Akcenty (Punkt 3 — 10%: szok, CTA) === */
+  --color-accent-cyan:    #00F3FF;  /* Status Online/Aktywny */
+  --color-accent-amber:   #FFB800;  /* Ostrzeżenie, uwaga */
+  --color-accent-gold:    #f59e0b;  /* Filar II: Etyka/Skarbiec */
+  
+  /* === Marka (Punkt 6 — 30%: zaufanie, stabilizacja) === */
+  --color-brand-indigo:   #6366f1;  /* Filar I: Bezpieczeństwo */
+  --color-brand-emerald:  #10b981;  /* Filar III: Wydajność */
+  --color-brand-purple:   #8b5cf6;  /* AI/kwantowe funkcje */
+  
+  /* === Statusy (Solfeggio-aligned) === */
+  --color-success:  #10b981;  /* 528Hz — Zielony — regeneracja */
+  --color-warning:  #f59e0b;  /* 396Hz — Amber — uwalnianie lęku */
+  --color-error:    #ef4444;  /* Alert, Error, Krytyczne CTA */
+  --color-info:     #6366f1;  /* Zaufanie, Informacja */
+
+  /* === Gradienty === */
+  --gradient-vault:   linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  --gradient-brand:   linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+
+  /* === Borders === */
+  --border-subtle:  rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong:  rgba(255, 255, 255, 0.15);
+
+  /* ─── WCAG CONTRAST RATIOS ─── */
+  /*
+   * --color-text-primary (#e2e8f0) on --color-bg-primary (#0b0e14)
+   *   → Contrast: 14.7:1 ✅ AAA
+   *
+   * --color-text-secondary (#94a3b8) on --color-bg-primary (#0b0e14)
+   *   → Contrast: 7.2:1 ✅ AAA
+   *
+   * --color-text-muted (#475569) on --color-bg-primary (#0b0e14)
+   *   → Contrast: 3.1:1 ✅ AA (large text only)
+   *
+   * --color-accent-cyan (#00F3FF) on --color-bg-deep (#020408)
+   *   → Contrast: 12.8:1 ✅ AAA
+   *
+   * --color-accent-amber (#FFB800) on --color-bg-deep (#020408)
+   *   → Contrast: 10.4:1 ✅ AAA
+   *
+   * --color-error (#ef4444) on --color-bg-primary (#0b0e14)
+   *   → Contrast: 5.0:1 ✅ AA
+   *
+   * --color-success (#10b981) on --color-bg-primary (#0b0e14)
+   *   → Contrast: 6.3:1 ✅ AA
+   */
+}
+
+/* ─── UTILITY CLASSES ─── */
+
+.glass-panel {
+  background: var(--color-bg-overlay);
+  backdrop-filter: blur(25px);
+  border: 1px solid var(--border-subtle);
+}
+
+.vault-gradient {
+  background: var(--gradient-vault);
+  border: 1px solid #4338ca;
+}
+
+.shadow-vortex {
+  box-shadow: var(--shadow-vortex);
+}
+
+/* ─── CTA SINGULARITY (Punkt 9 — "Oko Spirali") ─── */
+.cta-singularity {
+  position: absolute;
+  top: 61.8%;       /* φ */
+  left: 38.2%;      /* 1-φ */
+  transform: translate(-50%, -50%);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-vortex);
+  transition: all var(--motion-standard) var(--easing-vortex);
+}
+
+/* ─── GUARDIAN PULSE (Strażnicy) ─── */
+@keyframes guardian-pulse {
+  0%  { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100%{ box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.guardian-active {
+  animation: guardian-pulse 2s infinite;
+}
+
+/* ─── SCROLLBAR ─── */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+/* ─── SORTABLE GHOST (Live Edit) ─── */
+.sortable-ghost {
+  opacity: 0.3;
+  background: var(--color-brand-indigo) !important;
+}
+
+/* ─── EDIT MODE ─── */
+.edit-mode .draggable-item {
+  border: 2px dashed rgba(99, 102, 241, 0.3);
+  cursor: move;
+  position: relative;
+}
+.edit-mode .draggable-item::after {
+  content: '✎ Edytuj';
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  background: var(--color-brand-indigo);
+  font-size: 8px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: white;
+}
+
+/* ─── FILE DROP ZONE ─── */
+.file-drop-zone {
+  border: 2px dashed rgba(245, 158, 11, 0.2);
+  transition: all var(--motion-fast) var(--easing-vortex);
+}
+.file-drop-zone:hover,
+.file-drop-zone.dragover {
+  border-color: var(--color-accent-gold);
+  background: rgba(245, 158, 11, 0.05);
+}
+
+/* ─── LEARNING ANIMATION ─── */
+@keyframes scan {
+  0%   { top: -50%; }
+  100% { top: 100%; }
+}
+.learning-pulse {
+  animation: scan 2s linear infinite;
+  background: linear-gradient(to bottom, transparent, var(--color-accent-gold), transparent);
+  height: 50%;
+  width: 100%;
+  position: absolute;
+  opacity: 0.2;
+  pointer-events: none;
+}

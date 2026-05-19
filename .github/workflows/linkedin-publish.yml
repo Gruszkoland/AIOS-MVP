@@ -1,0 +1,285 @@
+name: LinkedIn Publisher (AMPLIFIER)
+
+# Trigger: When PR merged to main OR new release published
+on:
+  pull_request:
+    types: [closed]
+    branches: [main, master]
+
+  release:
+    types: [published]
+
+  workflow_dispatch:
+    inputs:
+      achievement_title:
+        description: "Achievement to publish"
+        required: false
+      trinity_score:
+        description: "Expected Trinity Score (0.0-1.0)"
+        required: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze-achievement:
+    runs-on: ubuntu-latest
+    name: AMPLIFIER Analysis
+
+    # Only run if PR was merged (not closed without merge)
+    if: github.event.pull_request.merged == true || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      # Checkout repository for git history analysis
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          ref: ${{ github.event.pull_request.base.ref || github.ref }}
+
+      # Extract PR/release metadata
+      - name: Extract metadata
+        id: metadata
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "type=pr" >> $GITHUB_OUTPUT
+            echo "title=${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
+            echo "body=${{ github.event.pull_request.body }}" >> $GITHUB_OUTPUT
+            echo "author=${{ github.event.pull_request.user.login }}" >> $GITHUB_OUTPUT
+            echo "url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
+            echo "number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "release" ]; then
+            echo "type=release" >> $GITHUB_OUTPUT
+            echo "title=${{ github.event.release.name }}" >> $GITHUB_OUTPUT
+            echo "body=${{ github.event.release.body }}" >> $GITHUB_OUTPUT
+            echo "author=${{ github.event.release.author.login }}" >> $GITHUB_OUTPUT
+            echo "url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
+          else
+            echo "type=manual" >> $GITHUB_OUTPUT
+            echo "title=${{ inputs.achievement_title }}" >> $GITHUB_OUTPUT
+          fi
+
+      # Analyze git changes for metrics
+      - name: Analyze changes
+        id: analyze
+        run: |
+          # Extract git metrics
+          COMMITS=$(git rev-list --count HEAD~1..HEAD)
+          LINES_ADDED=$(git diff HEAD~1 HEAD --stat | tail -1 | awk '{print $4}')
+          FILES_CHANGED=$(git diff HEAD~1 HEAD --stat | wc -l)
+
+          echo "commits=$COMMITS" >> $GITHUB_OUTPUT
+          echo "lines_added=$LINES_ADDED" >> $GITHUB_OUTPUT
+          echo "files_changed=$FILES_CHANGED" >> $GITHUB_OUTPUT
+
+          echo "✅ Changed files: $FILES_CHANGED"
+          echo "✅ Lines added: $LINES_ADDED"
+          echo "✅ Commits: $COMMITS"
+
+      # Extract trinity scores from commit history
+      - name: Extract Trinity scores
+        id: trinity
+        run: |
+          # Look for Trinity_Score in commit messages or PR description
+          TRINITY_SCORE=$(git log HEAD~1..HEAD --format=%B | grep -oP "Trinity_Score[:\s]*\K[0-9.]*" | head -1)
+          MATERIAL=$(git log HEAD~1..HEAD --format=%B | grep -oP "Material[:\s]*\K[0-9.]*" | head -1)
+          INTELLECTUAL=$(git log HEAD~1..HEAD --format=%B | grep -oP "Intellectual[:\s]*\K[0-9.]*" | head -1)
+          ESSENTIAL=$(git log HEAD~1..HEAD --format=%B | grep -oP "Essential[:\s]*\K[0-9.]*" | head -1)
+
+          # Fallback: estimate from changes
+          if [ -z "$TRINITY_SCORE" ]; then
+            # Simple heuristic: lines added / 100, capped at 0.9
+            TRINITY_SCORE=$(echo "scale=2; $(($LINES_ADDED / 100))" | bc)
+            if (( $(echo "$TRINITY_SCORE > 0.9" | bc -l) )); then
+              TRINITY_SCORE="0.9"
+            fi
+          fi
+
+          echo "trinity_score=${TRINITY_SCORE}" >> $GITHUB_OUTPUT
+          echo "material=${MATERIAL:-0.4}" >> $GITHUB_OUTPUT
+          echo "intellectual=${INTELLECTUAL:-0.5}" >> $GITHUB_OUTPUT
+          echo "essential=${ESSENTIAL:-0.5}" >> $GITHUB_OUTPUT
+
+          echo "📊 Trinity Score: $TRINITY_SCORE"
+          echo "  Material: ${MATERIAL:-0.4}, Intellectual: ${INTELLECTUAL:-0.5}, Essential: ${ESSENTIAL:-0.5}"
+
+      # Setup Python for AMPLIFIER analysis
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      # Run AMPLIFIER analysis (mock if no API token)
+      - name: Run AMPLIFIER Analysis
+        id: amplifier
+        env:
+          LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
+          LINKEDIN_ACCOUNT_ID: ${{ secrets.LINKEDIN_ACCOUNT_ID }}
+          ACHIEVEMENT_TYPE: ${{ steps.metadata.outputs.type }}
+          ACHIEVEMENT_TITLE: ${{ steps.metadata.outputs.title }}
+          TRINITY_SCORE: ${{ steps.trinity.outputs.trinity_score }}
+          FILES_CHANGED: ${{ steps.analyze.outputs.files_changed }}
+          LINES_ADDED: ${{ steps.analyze.outputs.lines_added }}
+        run: |
+          python3 << 'EOF'
+          import os
+          import json
+
+          # Simulated AMPLIFIER analysis (replace with actual API call)
+          trinity_score = float(os.environ.get('TRINITY_SCORE', 0.6))
+
+          print(f"🔍 AMPLIFIER Analyzing Achievement...")
+          print(f"   Type: {os.environ.get('ACHIEVEMENT_TYPE')}")
+          print(f"   Title: {os.environ.get('ACHIEVEMENT_TITLE')}")
+          print(f"   Trinity Score: {trinity_score}")
+
+          # Determine publishing decision
+          if trinity_score >= 0.75:
+            decision = "AUTO-PUBLISH"
+            authenticity = 0.88
+            print("✅ Trinity Score ≥ 0.75: AUTO-PUBLISH approved")
+          elif trinity_score >= 0.65:
+            decision = "REVIEW-QUEUE"
+            authenticity = 0.75
+            print("⚠️  Trinity Score 0.65-0.75: Queued for human review")
+          else:
+            decision = "REJECT"
+            authenticity = 0.55
+            print("❌ Trinity Score < 0.65: Rejected (below threshold)")
+
+          # Privacy check (mock)
+          privacy_check = "PASS" if "secret" not in os.environ.get('ACHIEVEMENT_TITLE', '').lower() else "FAIL"
+          print(f"   Privacy Check: {privacy_check}")
+
+          # EBDI tone (mock)
+          ebdi_tone = {"pleasure": 0.5, "arousal": 0.3, "dominance": 0.6}
+
+          analysis = {
+            "trinity_score": trinity_score,
+            "authenticity_score": authenticity,
+            "privacy_check": privacy_check,
+            "ebdi_tone": ebdi_tone,
+            "decision": decision,
+            "reason": f"Trinity {trinity_score:.2f}, Authenticity {authenticity:.2f}, Privacy {privacy_check}"
+          }
+
+          with open('/tmp/amplifier_analysis.json', 'w') as f:
+            json.dump(analysis, f)
+
+          # Set outputs
+          print(f"\n::set-output name=decision::{decision}")
+          print(f"::set-output name=authenticity::{authenticity}")
+          print(f"::set-output name=privacy::{privacy_check}")
+          EOF
+
+      # Post to Slack (review queue or auto-publish notification)
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK || '' }}
+          payload: |
+            {
+              "text": "📱 AMPLIFIER Achievement Analysis",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*AMPLIFIER Achievement Analysis*\n${{ steps.metadata.outputs.type }}: ${{ steps.metadata.outputs.title }}\n\n*Trinity Score:* ${{ steps.trinity.outputs.trinity_score }}\n*Authenticity:* ${{ steps.amplifier.outputs.authenticity }}\n*Decision:* ${{ steps.amplifier.outputs.decision }}"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {"type": "plain_text", "text": "View PR"},
+                      "url": "${{ steps.metadata.outputs.url }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {"type": "plain_text", "text": "Review"},
+                      "value": "review",
+                      "style": "primary"
+                    }
+                  ]
+                }
+              ]
+            }
+
+      # If decision is AUTO-PUBLISH: Post to LinkedIn (mock implementation)
+      - name: Publish to LinkedIn
+        if: steps.amplifier.outputs.decision == 'AUTO-PUBLISH'
+        env:
+          LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
+          LINKEDIN_ACCOUNT_ID: ${{ secrets.LINKEDIN_ACCOUNT_ID }}
+        run: |
+          if [ -z "$LINKEDIN_TOKEN" ]; then
+            echo "⚠️  LINKEDIN_TOKEN not configured (set in GitHub Secrets)"
+            echo "   Mock publish mode: Would post to LinkedIn"
+            exit 0
+          fi
+
+          echo "🚀 Publishing to LinkedIn..."
+          # Replace with actual API call
+          echo "   Title: ${{ steps.metadata.outputs.title }}"
+          echo "   URL: ${{ steps.metadata.outputs.url }}"
+          echo "   Trinity Score: ${{ steps.trinity.outputs.trinity_score }}"
+
+      # Log to Genesis Record
+      - name: Log to Genesis Record
+        run: |
+          mkdir -p .aider/logs
+          cat >> .aider/logs/linkedin_publish.log << EOF
+          [$(date -u +'%Y-%m-%dT%H:%M:%SZ')] AMPLIFIER Analysis
+          Type: ${{ steps.metadata.outputs.type }}
+          Title: ${{ steps.metadata.outputs.title }}
+          Trinity Score: ${{ steps.trinity.outputs.trinity_score }}
+          Authenticity: ${{ steps.amplifier.outputs.authenticity }}
+          Privacy Check: ${{ steps.amplifier.outputs.privacy }}
+          Decision: ${{ steps.amplifier.outputs.decision }}
+          URL: ${{ steps.metadata.outputs.url }}
+          ---
+          EOF
+
+      # Upload logs as artifact
+      - name: Upload analysis log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: amplifier-analysis-log
+          path: .aider/logs/linkedin_publish.log
+
+  # Optional: Manual workflow for testing
+  manual-test:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    name: Manual Test
+
+    steps:
+      - name: Echo test
+        run: |
+          echo "🧪 Manual AMPLIFIER test triggered"
+          echo "   Achievement: ${{ inputs.achievement_title }}"
+          echo "   Trinity Score: ${{ inputs.trinity_score }}"
+
+---
+# Configuration for GitHub Actions Integration
+# Add to secrets in GitHub repository:
+# - LINKEDIN_TOKEN: OAuth token from LinkedIn (required for publishing)
+# - LINKEDIN_ACCOUNT_ID: Your LinkedIn account URN (required for publishing)
+# - SLACK_WEBHOOK: Slack webhook for notifications (optional)
+
+# Usage:
+# 1. Merge PR → Workflow triggers automatically
+# 2. Publish release → Workflow triggers automatically
+# 3. Manual trigger → Use 'workflow_dispatch' with achievement details
+
+# Monitors:
+# - Trinity Score extraction from commits/PRs
+# - Authenticity verification (basic heuristics)
+# - Privacy checks (mock implementation)
+# - EBDI tone analysis (mock implementation)
+# - Slack notifications for review queue or auto-publish

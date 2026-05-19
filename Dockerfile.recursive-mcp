@@ -1,0 +1,52 @@
+# Dockerfile.recursive-mcp
+# RecursiveMAS — Multi-Agent System inference server
+# Based on: https://arxiv.org/abs/2604.25917
+# Integrates with adrion-369 MCP tier
+
+FROM python:3.10-slim
+
+# System dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Clone RecursiveMAS source
+RUN git clone https://github.com/RecursiveMAS/RecursiveMAS.git .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir \
+    torch==2.9.0 \
+    transformers==5.3.0 \
+    datasets==4.4.2 \
+    huggingface-hub==1.7.1 \
+    tokenizers==0.22.2 \
+    safetensors==0.7.0 \
+    sentencepiece==0.2.1 \
+    accelerate==1.12.0 \
+    tqdm==4.67.1 \
+    numpy==2.2.6 \
+    PyYAML==6.0.3 \
+    requests==2.32.5 \
+    packaging==26.0 \
+    filelock==3.20.3 \
+    fastapi==0.115.0 \
+    uvicorn==0.30.0 \
+    mcp==1.0.0
+
+# MCP server wrapper
+COPY mcp_servers/recursive-mas/server.py /app/mcp_server.py
+
+EXPOSE 8095
+
+ENV RECURSIVE_MAS_STYLE=sequential_light
+ENV RECURSIVE_MAS_DEVICE=cpu
+ENV RECURSIVE_MAS_PORT=8095
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:${RECURSIVE_MAS_PORT}/health || exit 1
+
+CMD ["python", "mcp_server.py"]

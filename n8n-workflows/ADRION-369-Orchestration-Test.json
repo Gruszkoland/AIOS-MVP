@@ -1,0 +1,190 @@
+{
+  "name": "ADRION 369 Orchestration Test",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "condition": "default"
+        }
+      },
+      "id": "trigger-node",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "adrion-trigger",
+      "webhookUrl": "http://n8n:5678/webhook/adrion-trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://adrion-api:5000/api/mcp/guardian/checkpoint",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json",
+          "X-User-ID": "={{ $json.user_id || 'n8n-workflow' }}"
+        },
+        "body": {
+          "job": {
+            "id": "{{ $json.execution_id || 'n8n-' + Date.now() }}",
+            "description": "={{ $json.job_description || 'n8n workflow operation' }}",
+            "operation_type": "={{ $json.operation_type || 'automation' }}",
+            "timestamp": "={{ new Date().toISOString() }}"
+          },
+          "analysis": {
+            "context": "={{ $json.context || {} }}",
+            "source": "n8n-workflow"
+          },
+          "context": {
+            "workflow_id": "adrion-orchestration-test",
+            "execution_id": "={{ $json.execution_id || '' }}"
+          },
+          "flags": "[SYS:ETH_A369][CMD:AGENT:SENTINEL]"
+        }
+      },
+      "id": "http-request-node",
+      "name": "Invoke Guardian Checkpoint",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.0,
+      "position": [500, 300],
+      "continueOnFail": false
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "fields": {
+          "checkpointResult": "={{ $json }}",
+          "approved": "={{ $json.approved }}",
+          "cvcState": "={{ $json.cvc_state }}",
+          "complianceScore": "={{ $json.compliance }}",
+          "genesisId": "={{ $json.genesis_record?.genesis_id || 'NO_RECORD' }}"
+        }
+      },
+      "id": "parse-response-node",
+      "name": "Parse Guardian Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.0,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "rules": [
+          {
+            "condition": "={{ $json.approved == true }}",
+            "output": 0
+          },
+          {
+            "condition": "={{ $json.approved == false }}",
+            "output": 1
+          }
+        ],
+        "fallbackOutput": 2
+      },
+      "id": "route-node",
+      "name": "Route by Approval Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1.0,
+      "position": [1000, 300],
+      "outputs": [
+        "main",
+        "main",
+        "main"
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://adrion-api:5000/api/mcp/genesis/verify",
+        "method": "GET"
+      },
+      "id": "log-genesis-approved",
+      "name": "Log: Operation Approved",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.0,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://adrion-api:5000/api/mcp/genesis/verify",
+        "method": "GET"
+      },
+      "id": "log-genesis-denied",
+      "name": "Log: Operation Denied (Genesis)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.0,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "url": "http://adrion-api:5000/health",
+        "method": "GET"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.0,
+      "position": [1250, 600]
+    }
+  ],
+  "connections": {
+    "trigger-node": {
+      "main": [
+        [
+          {
+            "node": "http-request-node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http-request-node": {
+      "main": [
+        [
+          {
+            "node": "parse-response-node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse-response-node": {
+      "main": [
+        [
+          {
+            "node": "route-node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "route-node": {
+      "main": [
+        [
+          {
+            "node": "log-genesis-approved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "log-genesis-denied",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error-handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}

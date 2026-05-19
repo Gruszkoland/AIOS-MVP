@@ -1,0 +1,48 @@
+#!/usr/bin/env sh
+set -eu
+
+staged_diff="$(git diff --cached --unified=0 --no-color)"
+
+# Block committing local env files
+if git diff --cached --name-only | grep -E '(^|/)\.env\.local$' >/dev/null 2>&1; then
+  echo "ERROR: Attempted to commit .env.local file. Remove it from staging."
+  git diff --cached --name-only | grep -E '(^|/)\.env\.local$' || true
+  exit 1
+fi
+
+# Scan staged content for Stripe-like secret patterns
+if printf '%s\n' "$staged_diff" | grep -nE '^\+[^+].*(sk_(live|test)_[A-Za-z0-9]{16,}|rk_live_[A-Za-z0-9]{16,}|whsec_[A-Za-z0-9]{16,})' >/dev/null 2>&1; then
+  echo "ERROR: Potential Stripe-like secret detected in staged changes."
+  echo "Remove secrets and use local .env/.env.local instead."
+  exit 1
+fi
+
+# Block plain-text Stripe credentials in staged additions unless clearly redacted/placeholder.
+if printf '%s\n' "$staged_diff" \
+  | grep -nE '^\+\s*STRIPE_(LOGIN_PASSWORD|BACKUP_CODE|SECRET_KEY|WEBHOOK_SECRET)\s*=\s*[^[:space:]`#\[]+' \
+  | grep -vE '(PLACEHOLDER|REDACTED|YOUR_|CHANGE_THIS|REVOKED|USER TO FILL|^\+\+\+ )' \
+  >/dev/null 2>&1; then
+  echo "ERROR: Potential plain-text Stripe credential detected in staged changes."
+  echo "Use placeholders in docs and keep real values only in local .env/.env.local."
+  exit 1
+fi
+
+# Run full deployment gate before every commit unless explicitly skipped.
+if [ "${ADRION_ENABLE_FINAL_GATE:-1}" = "1" ] && [ "${ADRION_SKIP_FINAL_GATE:-0}" != "1" ]; then
+  echo "INFO: Running ADRION Final Deployment Gate..."
+  if command -v powershell.exe &>/dev/null; then
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "scripts/security/run-final-deployment-gate.ps1"
+  elif command -v pwsh &>/dev/null; then
+    pwsh -NoProfile -ExecutionPolicy Bypass -File "scripts/security/run-final-deployment-gate.ps1"
+  else
+    echo "Warning: PowerShell not available, skipping Windows-specific check"
+    exit 0
+  fi
+  gate_exit=$?
+  if [ "$gate_exit" -ne 0 ]; then
+    echo "ERROR: ADRION Final Deployment Gate failed. Commit blocked."
+    exit "$gate_exit"
+  fi
+fi
+
+exit 0
