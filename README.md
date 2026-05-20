@@ -1,49 +1,57 @@
-# ADRION 369 — Architecture & Security
+# AIOS-MVP
 
-[![CI](https://github.com/Gruszkoland/adrion-369-architecture/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Gruszkoland/adrion-369-architecture/actions/workflows/ci.yml)
+MVP-first repository dla projektu **AIOS** — eksperymentalnego systemu operacyjnego opartego na agentach AI.
 
-Security-hardened architecture, core Python pipeline, and Ecosystem v2.0 for the **ADRION 369** autonomous decision system.
+## Założenia MVP
 
-## Structure
+- AI działa wyłącznie jako **asynchroniczny advisory plane**.
+- Kernel pozostaje **deterministyczny** i nie czeka na LLM.
+- Najpierw walidujemy PoC na Linuxie, dopiero potem inwestujemy w kernel.
+- Startujemy od wariantu **headless / TUI-first**.
+
+## Struktura workspace
 
 ```
-arbitrage/        # HexagonProcessor — 6-stage decision pipeline (Ecosystem v2.0 hooks)
-core/             # TrinityEngine · SecurityHardeningEngine · Protocol333 orchestrator
-ecosystem/        # Gardener · Antifragility · AttentionEconomy · PlayfulExploration
-tests/            # 204 green tests (core + ecosystem + protocol333)
-docs/             # Security hardening docs (v5.1–v5.6)
+AIOS-MVP/
+├── Cargo.toml
+├── README.md
+├── LICENSE
+├── kernel/
+├── agents/
+├── ipc/
+├── poc/
+├── docs/
+├── scripts/
+├── .github/
+└── .devcontainer/
 ```
 
-## Tests
+## Sprint 1
 
-```bash
-pip install pytest pytest-cov
-PYTHONPATH=. pytest tests/ -v --tb=short
-```
+1. Setup monorepo i struktury katalogów
+2. Konfiguracja narzędzi developerskich
+3. RFC #1: `CognitiveAgent`
+4. CI/CD GitHub Actions
+5. Spike: model size + runtime feasibility
+6. PoC: scheduler manager w user-space
+7. Definicja kryteriów GO/NO-GO
 
-**204 tests — all green:**
+## Zasady architektoniczne
 
-- 99/99 core (trinity + security_hardening + penetration)
-- 88/88 ecosystem (antifragility + attention + gardener)
-- 17/17 protocol333 (Trinity→Hexagon→Security pipeline)
+- **AI advisory only** — żadnego LLM w hard real-time path
+- **Shared memory / ring buffer** zamiast RPC na ścieżce krytycznej
+- **MVP-first** — bez GUI jako wymagania startowego
+- **Safety first** — capability model, review dla `unsafe`, benchmarki i fuzzing jako część DoD
 
-## Architecture
+## Definition of Done
 
-- **Protocol333** — full pipeline orchestrator: Trinity → Hexagon (6 stages) → Security Hardening, with Gardener hooks at every stage
-- **HexagonProcessor** — 6-stage sequential decision engine (Inventory → Empathy → Process → Debate → Healing → Action) with Ecosystem v2.0 Gardener repair hooks
-- **TrinityEngine** — 3-zone scoring (Material / Intellectual / Essential)
-- **SecurityHardeningEngine** — HMAC auth, rate limiting, circuit breaker, CVC
+Każdy ticket uznajemy za zamknięty gdy:
+- przechodzi build i testy
+- ma aktualną dokumentację
+- ma review (dla `unsafe`: obowiązkowo 2-osobowe)
+- nie wprowadza regresji benchmarków
+- spełnia acceptance criteria
 
-## Versions
+## Licencja
 
-| Tag | What changed |
-|-----|-------------|
-| B10 | `arbitrage/__init__.py` — formal Python package |
-| B9  | `arbitrage/hexagon.py` — Gardener hooks stages 1-6 |
-| B8  | `core/protocol333.py` — Protocol333 orchestrator |
-| B7  | Ecosystem v2.0 (antifragility / attention / gardener) |
-| v5.6 | Final hardening, 99/99 tests green |
-
-## License
-
-MIT — Gruszkoland/ADRION 369
+MPL-2.0
