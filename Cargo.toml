@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = [
+  "kernel",
+  "agents",
+  "ipc",
+  "poc/scheduler-mgr",
+]
+
+[workspace.package]
+edition = "2021"
+license = "MPL-2.0"
+authors = ["Adrian Halicki"]
