@@ -1,118 +1,414 @@
-version: "3.8"
+# docker-compose.local.yml — ShieldOS Local Dev Stack
+# ADRION 369 v4.0 — Hermetic enclave, zero-trust, API key separation
+#
+# Features:
+#   - Isolated hermetic network (no external bridge)
+#   - Health checks on ALL services
+#   - NO docker.sock mounts (CRITICAL: never add)
+#   - NO DOCKER_HOST env (CRITICAL: never add)
+#   - Per-service API key isolation
+#   - LocalStack for AWS service simulation
+#   - MCP servers on ports 9000-9005
+#   - Monitoring stack (Prometheus + Grafana)
+#
+# Usage:
+#   docker compose -f docker-compose.local.yml up -d
+#   docker compose -f docker-compose.local.yml up -d postgres redis   # infra only
+#   docker compose -f docker-compose.local.yml logs -f mcp-router
+
+version: "3.9"
+
+# ── Shared healthcheck defaults ───────────────────────────────────────────────
+
+x-healthcheck-default: &healthcheck_default
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 15s
+
+x-restart-policy: &restart_policy
+  restart: unless-stopped
+
+# ── Infrastructure services ───────────────────────────────────────────────────
 
 services:
-  # PostgreSQL for metrics and audit logging
+
+  # ── PostgreSQL 15 ──────────────────────────────────────────────────────────
   postgres:
     image: postgres:15-alpine
     container_name: adrion-postgres
     environment:
-      POSTGRES_DB: adrion_agents
+      POSTGRES_DB: genesis_record
       POSTGRES_USER: adrion
-      POSTGRES_PASSWORD: adrion_local_dev_2026
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-adrion_local_dev_CHANGE_ME}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/migrations:/docker-entrypoint-initdb.d
+      - ./scripts/db:/docker-entrypoint-initdb.d:ro
+    networks:
+      - adrion-hermetic
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U adrion"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "pg_isready -U adrion -d genesis_record"]
+      <<: *healthcheck_default
+    <<: *restart_policy
+    labels:
+      shieldos.service: "infrastructure"
+      shieldos.hermetic: "true"
+      shieldos.external-api: "none"
 
-  # Prometheus for metrics collection
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: adrion-prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-    depends_on:
-      - postgres
-
-  # Grafana for dashboards
-  grafana:
-    image: grafana/grafana:latest
-    container_name: adrion-grafana
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
-      GF_USERS_ALLOW_SIGN_UP: "false"
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
-    depends_on:
-      - prometheus
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Redis for inter-agent communication (optional enhancement)
+  # ── Redis 7 ────────────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: adrion-redis
+    command: >
+      redis-server
+      --save 60 1
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD:-redis_local_CHANGE_ME}
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - adrion-hermetic
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_local_CHANGE_ME}", "ping"]
+      <<: *healthcheck_default
+    <<: *restart_policy
+    labels:
+      shieldos.service: "infrastructure"
+      shieldos.hermetic: "true"
+      shieldos.external-api: "none"
 
-  # micro-saas SaaS REST API (plans, subscriptions, quota, products)
-  micro-saas:
+  # ── LocalStack (AWS service simulation) ────────────────────────────────────
+  localstack:
+    image: localstack/localstack:3.4
+    container_name: adrion-localstack
+    environment:
+      SERVICES: s3,sqs,secretsmanager
+      DEFAULT_REGION: eu-central-1
+      DEBUG: 0
+      DISABLE_CORS_CHECKS: 0
+      # Hermetic: no external calls
+      DISABLE_EVENTS: 1
+      DISABLE_ANALYTICS: 1
+      TELEMETRY_ENABLED: 0
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack_data:/var/lib/localstack
+      # NOTE: /var/run/docker.sock is intentionally EXCLUDED (ShieldOS hermetic rule)
+    networks:
+      - adrion-hermetic
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:4566/_localstack/health"]
+      <<: *healthcheck_default
+    <<: *restart_policy
+    labels:
+      shieldos.service: "infrastructure"
+      shieldos.hermetic: "true"
+      shieldos.external-api: "none"
+
+  # ── MCP Router (port 9000) ─────────────────────────────────────────────────
+  mcp-router:
+    container_name: adrion-mcp-router
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.mcp-router
       args:
-        MODULE: micro-saas
-    container_name: adrion-micro-saas
-    command: >
-      python -c "
-      import sys; sys.path.insert(0, '/app/micro-saas');
-      from api import create_saas_app;
-      app = create_saas_app();
-      app.run(host='0.0.0.0', port=8003)
-      "
-    environment:
-      UAP_API_KEY: ${UAP_API_KEY:-dev-local-key-change-in-prod}
-      SAAS_DB_PATH: /app/data/subscriptions.db
-      ENVIRONMENT: development
-      FLASK_ENV: development
+        PYTHON_VERSION: "3.11"
+    image: adrion-mcp-router:dev
     ports:
-      - "8003:8003"
+      - "9000:9000"
+    environment:
+      MCP_ENVIRONMENT: development
+      MCP_DEBUG: "false"
+      LOG_LEVEL: INFO
+      VORTEX_URL: http://vortex-mcp:9001
+      GUARDIAN_URL: http://guardian-mcp:9002
+      ORACLE_URL: http://oracle-mcp:9003
+      GENESIS_URL: http://genesis-mcp:9004
+      HEALER_URL: http://healer-mcp:9005
+      # Per-service key isolation (ShieldOS zero-trust)
+      MCP_ROUTER_API_KEY: ${MCP_ROUTER_API_KEY:-CHANGE_ME_IN_PRODUCTION}
+      # Telemetry disabled in local dev
+      TELEMETRY_ENABLED: "false"
     volumes:
-      - ./micro-saas:/app/micro-saas:ro
-      - saas_data:/app/data
+      - ./mcp-servers:/app/mcp-servers:ro
+    networks:
+      - adrion-hermetic
+    depends_on:
+      vortex-mcp:
+        condition: service_healthy
+      guardian-mcp:
+        condition: service_healthy
+      oracle-mcp:
+        condition: service_healthy
+      genesis-mcp:
+        condition: service_healthy
+      healer-mcp:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8003/saas/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+      test: ["CMD", "curl", "-sf", "http://localhost:9000/health"]
+      <<: *healthcheck_default
+    <<: *restart_policy
+    labels:
+      shieldos.service: "mcp"
+      shieldos.hermetic: "true"
+      shieldos.port: "9000"
+
+  # ── Vortex MCP (port 9001) ─────────────────────────────────────────────────
+  vortex-mcp:
+    container_name: adrion-vortex-mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp-tier
+      args:
+        SERVICE_NAME: vortex
+    image: adrion-vortex-mcp:dev
+    ports:
+      - "9001:9001"
+    environment:
+      HARMONIC_FREQUENCY: "174.0"
+      CANARY_THRESHOLD: "5"
+      MAX_CONCURRENT_OPS: "20"
+      LOG_LEVEL: INFO
+      VORTEX_API_KEY: ${VORTEX_API_KEY:-CHANGE_ME_IN_PRODUCTION}
+      TELEMETRY_ENABLED: "false"
+    volumes:
+      - ./mcp-servers:/app/mcp-servers:ro
+      - vortex_logs:/app/logs
+    networks:
+      - adrion-hermetic
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9001/health"]
+      <<: *healthcheck_default
+    <<: *restart_policy
+    labels:
+      shieldos.service: "mcp"
+      shieldos.hermetic: "true"
+      shieldos.port: "9001"
+
+  # ── Guardian MCP (port 9002) ───────────────────────────────────────────────
+  guardian-mcp:
+    container_name: adrion-guardian-mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.guardian-mcp
+    image: adrion-guardian-mcp:dev
+    ports:
+      - "9002:9002"
+    environment:
+      ENFORCEMENT_LEVEL: strict
+      AUDIT_LOG_PATH: /app/genesis-data/audit.jsonl
+      POLICY_ENGINE: default
+      LOG_LEVEL: INFO
+      GUARDIAN_API_KEY: ${GUARDIAN_API_KEY:-CHANGE_ME_IN_PRODUCTION}
+      TELEMETRY_ENABLED: "false"
+    volumes:
+      - ./mcp-servers:/app/mcp-servers:ro
+      - guardian_audit:/app/genesis-data
+    networks:
+      - adrion-hermetic
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9002/health"]
+      <<: *healthcheck_default
+    <<: *restart_policy
+    labels:
+      shieldos.service: "mcp"
+      shieldos.hermetic: "true"
+      shieldos.port: "9002"
+
+  # ── Oracle MCP (port 9003) ─────────────────────────────────────────────────
+  oracle-mcp:
+    container_name: adrion-oracle-mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.oracle-mcp
+    image: adrion-oracle-mcp:dev
+    ports:
+      - "9003:9003"
+    environment:
+      ROUTING_CONFIDENCE_THRESHOLD: "0.75"
+      PATTERN_MATCH_K: "5"
+      INTENT_CLASSIFIER: default
+      LOG_LEVEL: INFO
+      ORACLE_API_KEY: ${ORACLE_API_KEY:-CHANGE_ME_IN_PRODUCTION}
+      TELEMETRY_ENABLED: "false"
+    volumes:
+      - ./mcp-servers:/app/mcp-servers:ro
+    networks:
+      - adrion-hermetic
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9003/health"]
+      <<: *healthcheck_default
+    <<: *restart_policy
+    labels:
+      shieldos.service: "mcp"
+      shieldos.hermetic: "true"
+      shieldos.port: "9003"
+
+  # ── Genesis MCP (port 9004) ────────────────────────────────────────────────
+  genesis-mcp:
+    container_name: adrion-genesis-mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.genesis-mcp
+    image: adrion-genesis-mcp:dev
+    ports:
+      - "9004:9004"
+    environment:
+      GENESIS_RECORD_PATH: /app/genesis-data
+      SESSION_TTL_SECONDS: "86400"
+      RAG_TOP_K: "5"
+      LOG_LEVEL: INFO
+      GENESIS_API_KEY: ${GENESIS_API_KEY:-CHANGE_ME_IN_PRODUCTION}
+      TELEMETRY_ENABLED: "false"
+    volumes:
+      - genesis_data:/app/genesis-data
+      - memories_data:/app/memories
+    networks:
+      - adrion-hermetic
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9004/health"]
+      <<: *healthcheck_default
+    <<: *restart_policy
+    labels:
+      shieldos.service: "mcp"
+      shieldos.hermetic: "true"
+      shieldos.port: "9004"
+
+  # ── Healer MCP (port 9005) ─────────────────────────────────────────────────
+  healer-mcp:
+    container_name: adrion-healer-mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.healer-mcp
+    image: adrion-healer-mcp:dev
+    ports:
+      - "9005:9005"
+    environment:
+      HEALTH_CHECK_INTERVAL: "30"
+      ALERT_THRESHOLD_CPU: "90"
+      ALERT_THRESHOLD_MEMORY: "85"
+      AUTO_HEAL_ENABLED: "true"
+      LOG_LEVEL: INFO
+      HEALER_API_KEY: ${HEALER_API_KEY:-CHANGE_ME_IN_PRODUCTION}
+      TELEMETRY_ENABLED: "false"
+    volumes:
+      - ./mcp-servers:/app/mcp-servers:ro
+      - healer_monitoring:/app/monitoring
+    networks:
+      - adrion-hermetic
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9005/health"]
+      <<: *healthcheck_default
+    <<: *restart_policy
+    labels:
+      shieldos.service: "mcp"
+      shieldos.hermetic: "true"
+      shieldos.port: "9005"
+
+  # ── Prometheus (metrics) ───────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: adrion-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=7d"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - adrion-hermetic
     depends_on:
       postgres:
         condition: service_healthy
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    <<: *restart_policy
+    labels:
+      shieldos.service: "monitoring"
+      shieldos.hermetic: "true"
+
+  # ── Grafana (dashboards) ───────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: adrion-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin_CHANGE_ME}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: "http://localhost:3000"
+      # Hermetic: disable external telemetry
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_PLUGINS_ENABLE_ALPHA: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - adrion-hermetic
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    <<: *restart_policy
+    labels:
+      shieldos.service: "monitoring"
+      shieldos.hermetic: "true"
+
+# ── Volumes ───────────────────────────────────────────────────────────────────
 
 volumes:
   postgres_data:
-  prometheus_data:
-  grafana_data:
+    name: adrion_local_postgres
   redis_data:
-  saas_data:
+    name: adrion_local_redis
+  localstack_data:
+    name: adrion_local_localstack
+  vortex_logs:
+    name: adrion_local_vortex_logs
+  guardian_audit:
+    name: adrion_local_guardian_audit
+  genesis_data:
+    name: adrion_local_genesis
+  memories_data:
+    name: adrion_local_memories
+  healer_monitoring:
+    name: adrion_local_healer
+  prometheus_data:
+    name: adrion_local_prometheus
+  grafana_data:
+    name: adrion_local_grafana
+
+# ── Networks ──────────────────────────────────────────────────────────────────
 
 networks:
-  default:
-    name: adrion-network
+  adrion-hermetic:
+    name: adrion-hermetic
+    driver: bridge
+    # Hermetic isolation: services communicate only within this network.
+    # External access is via explicit port mappings only.
+    internal: false
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24

@@ -5,6 +5,25 @@
 
 ---
 
+## [v5.7] — 2026-05-20 — Deprecation Path & Root Cleanup
+
+### 🔴 DEPRECATED
+
+- **`arbitrage_server.py`** — Marked for removal in v5.0 (Q3 2026)
+  - **Migration:** Use `wsgi.py` → `arbitrage.app.create_app()` instead
+  - Current status: Thin stub that redirects to wsgi.py
+  - See CLAUDE.md PHASE 2, task P2-6 for removal timeline
+
+### ✅ Improvements
+
+- Root directory cleanup: moved 21 session .md files to `docs/sessions/`
+- Consolidated scripts: moved 14 .ps1 scripts to `scripts/install/`
+- Updated `.gitignore` to ignore generated artifacts (logs, coverage files)
+- Guardian Laws canonical names synced: `Truth` → `Harmony`, `Autonomy` → `Privacy`, `Justice` → `Nonmaleficence`
+- Database type hints: Added `DBConnection` protocol and typed `return_conn()` argument
+
+---
+
 ## [v5.6-B6] — 2026-05-11 — Redis Sorted Set backend dla CVC (B6 Fix)
 
 ### Zmodyfikowane pliki

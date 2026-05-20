@@ -6,13 +6,13 @@
 
 **Date:** [DATE]
 
-**To:** ADRION 369 Development Team  
+**To:** ADRION 369 Development Team
 [Address]
 
-**From:** [COMPANY NAME]  
-[Prospect Contact]  
-[Title]  
-[Email]  
+**From:** [COMPANY NAME]
+[Prospect Contact]
+[Title]
+[Email]
 [Phone]
 
 ---
@@ -31,10 +31,10 @@ This Letter of Intent expresses our preliminary interest in:
 
 ## 2. Organization Overview
 
-**Company:** [COMPANY NAME]  
-**Sector:** [FinTech / Healthcare / Robotics / Government / Other]  
-**Size:** [Employees]  
-**Headquarters:** [Location]  
+**Company:** [COMPANY NAME]
+**Sector:** [FinTech / Healthcare / Robotics / Government / Other]
+**Size:** [Employees]
+**Headquarters:** [Location]
 **Website:** [URL]
 
 **Executive Sponsor:**
@@ -60,10 +60,10 @@ Why is deterministic safety (vs. reactive filtering) important for your use case
 
 ### 3.3 Technical Requirements
 
-**Decision Volume:** [X decisions/sec]  
-**Latency Budget:** [Xms P99]  
-**Availability:** [99.X%]  
-**Data Residency:** [Region / On-premises]  
+**Decision Volume:** [X decisions/sec]
+**Latency Budget:** [Xms P99]
+**Availability:** [99.X%]
+**Data Residency:** [Region / On-premises]
 **Regulatory:** [GDPR / HIPAA / AI Act / Other]
 
 **Integration Points:**
@@ -89,7 +89,7 @@ Why is deterministic safety (vs. reactive filtering) important for your use case
 - Infrastructure: [NAME]
 - Legal/Compliance: [NAME]
 
-**Anticipated Budget:** [$X]  
+**Anticipated Budget:** [$X]
 **Budget Authority:** [NAME]
 
 ### 4.3 Success Metrics
@@ -200,14 +200,14 @@ This LoI is:
 
 **For [COMPANY NAME]:**
 
-_____________________________  
-[NAME], [TITLE]  
+_____________________________
+[NAME], [TITLE]
 Date: [DATE]
 
 **For ADRION 369 Development Team:**
 
-_____________________________  
-[AIOS MVP Representative]  
+_____________________________
+[AIOS MVP Representative]
 Date: [DATE]
 
 ---

@@ -65,7 +65,7 @@ class AdrionSettings(BaseSettings):
     ugc_events_daily_cap: int = Field(4, alias="UGC_EVENTS_DAILY_CAP")
     resale_events_daily_cap: int = Field(4, alias="RESALE_EVENTS_DAILY_CAP")
 
-    # ═══ G7 Autonomy — External Service Allowlist ═══
+    # ═══ G7 Privacy — External Service Allowlist ═══
     allowed_external_services: str = Field(
         "openrouter,openai,anthropic,apify,lmstudio,ollama",
         alias="ALLOWED_EXTERNAL_SERVICES",

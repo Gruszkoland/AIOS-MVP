@@ -282,6 +282,62 @@
   "roo.encryption.atRest": true,
   "roo.encryption.algorithm": "AES-256-GCM",
   "roo.encryption.keyDerivation": "PBKDF2",
+  "claude.mcpServers": {
+    "adrion-router": {
+      "command": "python",
+      "args": ["${workspaceFolder}/mcp-servers/router/server.py"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "adrion-vortex": {
+      "command": "python",
+      "args": ["${workspaceFolder}/mcp-servers/vortex/server.py"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "adrion-guardian": {
+      "command": "python",
+      "args": ["${workspaceFolder}/mcp-servers/guardian/server.py"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "adrion-oracle": {
+      "command": "python",
+      "args": ["${workspaceFolder}/mcp-servers/oracle/server.py"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "adrion-genesis": {
+      "command": "python",
+      "args": ["${workspaceFolder}/mcp-servers/genesis/server.py"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "adrion-healer": {
+      "command": "python",
+      "args": ["${workspaceFolder}/mcp-servers/healer/server.py"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  },
   "hooks": {
     "SessionStart": [
       {
