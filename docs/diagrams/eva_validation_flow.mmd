@@ -1,0 +1,87 @@
+---
+title: EVA-33 Validation Pipeline (ROPE 3.0)
+---
+flowchart TD
+    START([EVA-33 Validation Start]) --> SETUP
+
+    subgraph SETUP["Phase 0: Setup"]
+        ENV["Configure test environment\nBaseline=v2.0, Candidate=v3.0\nLLM stubs loaded"]
+        FIXTURES["Load scenario fixtures\ntests/fixtures/rope_validation/\nS01..S10.json"]
+        ENV --> FIXTURES
+    end
+
+    FIXTURES --> RUN_BASELINE
+
+    subgraph RUN_BASELINE["Phase 1: Baseline Measurement (v2.0)"]
+        B1["Run S01-S10 against v2.0 stack"]
+        B2["Collect: quality_score\ncost_per_request\nrouting_accuracy\nhandoff_stability\nregression_score"]
+        B3["Store: baseline_metrics.json"]
+        B1 --> B2 --> B3
+    end
+
+    B3 --> HARD_BLOCKERS
+
+    subgraph HARD_BLOCKERS["Phase 2: Hard Blocker Check (Candidate v3.0)"]
+        HB1{"S07: G8 block\nproduces DENY?"}
+        HB2{"S08: trace_id mutation\nhalts chain?"}
+        HB3{"S06: escalation\nreaches ARB in 100s?"}
+        HB1 -->|No| FAIL_HARD([FAIL — Hard Blocker\nG8 enforcement broken])
+        HB2 -->|No| FAIL_HARD
+        HB3 -->|No| FAIL_HARD
+        HB1 -->|Yes| HB2
+        HB2 -->|Yes| HB3
+        HB3 -->|Yes| RUN_CANDIDATE
+    end
+
+    subgraph RUN_CANDIDATE["Phase 3: Candidate Measurement (v3.0)"]
+        C1["Run S01-S10 against v3.0 stack"]
+        C2["Collect: quality_score\ncost_per_request\nrouting_accuracy\nhandoff_stability\nregression_score"]
+        C3["Store: candidate_metrics.json"]
+        C1 --> C2 --> C3
+    end
+
+    C3 --> COMPARE
+
+    subgraph COMPARE["Phase 4: Metric Comparison"]
+        M1{"M1 quality_score\nCandidate >= Baseline?"}
+        M2{"M2 cost\nCandidate <= Baseline*1.10?"}
+        M3{"M3 routing_accuracy\nCandidate >= Baseline-2%?"}
+        M4{"M4 handoff_stability\nCandidate >= Baseline?"}
+        M5{"M5 regression_score\nCandidate >= Baseline?"}
+
+        M1 --> |pass+1| M2
+        M1 --> |fail+0| M2
+        M2 --> |pass+1| M3
+        M2 --> |fail+0| M3
+        M3 --> |pass+1| M4
+        M3 --> |fail+0| M4
+        M4 --> |pass+1| M5
+        M4 --> |fail+0| M5
+        M5 --> COUNT
+    end
+
+    COUNT{"Total metrics passed\n>= 4 of 5?"}
+    COUNT -->|Yes, 4 or 5| GATE_PASS
+    COUNT -->|Exactly 3| ARB_REVIEW
+    COUNT -->|<= 2| GATE_FAIL
+
+    ARB_REVIEW["ARB-07 Arbitration\nReviews boundary case\nIssues binding decision"]
+    ARB_REVIEW -->|ARB: PASS| GATE_PASS
+    ARB_REVIEW -->|ARB: FAIL| GATE_FAIL
+
+    GATE_PASS["VALIDATION PASS\nCanary rollout authorized\nROPE_3.0_VALIDATED=true"]
+    GATE_FAIL["VALIDATION FAIL\nROPE 3.0 not ready\nAOR team notified"]
+    FAIL_HARD
+
+    GATE_PASS --> REPORT
+    GATE_FAIL --> REPORT
+    FAIL_HARD --> REPORT
+
+    subgraph REPORT["Phase 5: Report Generation"]
+        R1["EVA-33 writes benchmark_report.json\n(baseline vs candidate per metric)"]
+        R2["Update CHANGELOG_ROPE_3.0.md\nwith actual metric values"]
+        R3["Genesis-MCP: store validation event\n{type: rope_validation, version: 3.0,\nresult: PASS|FAIL, trace_id: run_id}"]
+        R1 --> R2 --> R3
+    end
+
+    R3 --> DONE([EVA-33 Validation Complete])

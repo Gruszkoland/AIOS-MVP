@@ -1,0 +1,177 @@
+name: Release Preparation
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v0.1-alpha, v0.2-beta)'
+        required: true
+        type: string
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - alpha
+          - beta
+          - rc
+          - release
+      create_github_release:
+        description: 'Create GitHub release?'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9]+)?$ ]]; then
+            echo "❌ Invalid version format: $VERSION"
+            echo "Expected format: v0.1, v0.1-alpha, v0.1-beta, etc."
+            exit 1
+          fi
+          echo "✓ Version format valid: $VERSION"
+
+      - name: Generate changelog
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          RELEASE_TYPE="${{ github.event.inputs.release_type }}"
+          CURRENT_DATE=$(date -u '+%Y-%m-%d')
+
+          # Create changelog entry
+          CHANGELOG_ENTRY="## [$VERSION] - $CURRENT_DATE
+
+          ### Added
+          - [TODO: List new features]
+
+          ### Changed
+          - [TODO: List changes]
+
+          ### Fixed
+          - [TODO: List bug fixes]
+
+          ### Security
+          - [TODO: Security-related changes]
+
+          ### Notes
+          - Release type: $RELEASE_TYPE
+          - Status: ${{ job.status }}
+          "
+
+          # Prepend to CHANGELOG.md
+          if [ -f CHANGELOG.md ]; then
+            {
+              echo "$CHANGELOG_ENTRY"
+              echo ""
+              cat CHANGELOG.md
+            } > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
+          else
+            echo "$CHANGELOG_ENTRY" > CHANGELOG.md
+          fi
+
+          echo "📝 Changelog updated for version $VERSION"
+          head -30 CHANGELOG.md
+
+      - name: Update version in files
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          VERSION_NUM=$(echo "$VERSION" | sed 's/^v//')
+
+          # Update Cargo.toml if exists
+          if [ -f Cargo.toml ]; then
+            sed -i "s/^version = .*/version = \"$VERSION_NUM\"/" Cargo.toml
+            echo "✓ Updated Cargo.toml"
+          fi
+
+          # Update pyproject.toml if exists
+          if [ -f pyproject.toml ]; then
+            sed -i "s/^version = .*/version = \"$VERSION_NUM\"/" pyproject.toml
+            echo "✓ Updated pyproject.toml"
+          fi
+
+          # Update package.json if exists
+          if [ -f package.json ]; then
+            npm version "$VERSION_NUM" --no-git-tag-version
+            echo "✓ Updated package.json"
+          fi
+
+          # Update README version references
+          if [ -f README.md ]; then
+            sed -i "s/v[0-9]\+\.[0-9]\+\([.-][a-zA-Z0-9]\+\)\?/$VERSION/g" README.md
+            echo "✓ Updated README.md version references"
+          fi
+
+      - name: Create git tag
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          RELEASE_TYPE="${{ github.event.inputs.release_type }}"
+
+          # Configure git
+          git config user.name "ADRION 369 Release Bot"
+          git config user.email "release@adrion369.dev"
+
+          # Stage changes
+          git add CHANGELOG.md Cargo.toml pyproject.toml package.json package-lock.json README.md 2>/dev/null || true
+          git status
+
+          # Create commit
+          COMMIT_MSG="chore: Release $VERSION ($RELEASE_TYPE)"
+          git commit -m "$COMMIT_MSG" || echo "ℹ No changes to commit"
+
+          # Create annotated tag
+          TAG_MSG="Release $VERSION\n\nRelease Type: $RELEASE_TYPE\nDate: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          git tag -a "$VERSION" -m "$TAG_MSG" || echo "⚠ Tag may already exist"
+
+          # Push changes and tags
+          git push origin HEAD:main || echo "ℹ No commits to push"
+          git push origin "$VERSION" || echo "⚠ Tag already exists on remote"
+
+      - name: Create GitHub release
+        if: github.event.inputs.create_github_release == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: ${{ github.event.inputs.version }}
+          body_path: CHANGELOG_RELEASE.md
+          draft: false
+          prerelease: ${{ github.event.inputs.release_type != 'release' }}
+
+      - name: Generate release notes
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          echo "## Release Summary: $VERSION"
+          echo ""
+          echo "### Files Changed"
+          git diff HEAD~1 HEAD --name-only 2>/dev/null || echo "First release"
+          echo ""
+          echo "### Commit Messages"
+          git log --oneline -5 2>/dev/null || echo "No commits"
+          echo ""
+          echo "✅ Release preparation complete!"
+          echo "Next steps:"
+          echo "1. Review changes: git log --oneline HEAD~5..HEAD"
+          echo "2. Verify tag: git tag -l '$VERSION'"
+          echo "3. Check GitHub: https://github.com/Gruszkoland/AIOS-MVP/releases/tag/$VERSION"
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-${{ github.event.inputs.version }}
+          path: |
+            CHANGELOG.md
+            README.md
+          if-no-files-found: warn

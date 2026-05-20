@@ -1,0 +1,68 @@
+name: Documentation Build & Validation
+
+on:
+  push:
+    branches: [main, master]
+    paths: ['docs/**', 'README.md', '*.md']
+  pull_request:
+    branches: [main, master]
+    paths: ['docs/**', 'README.md', '*.md']
+
+jobs:
+  doc-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install spell checker
+        run: sudo apt-get update && sudo apt-get install -y aspell aspell-en
+
+      - name: Check spelling
+        run: |
+          find docs/ README.md -name "*.md" -type f | while read file; do
+            echo "Checking: $file"
+            aspell -c -l en "$file" --dont-suggest --ignore-case || true
+          done
+
+      - name: Install markdown-link-check
+        run: npm install -g markdown-link-check
+
+      - name: Check external links
+        run: |
+          for file in $(find docs/ -name "*.md" -type f); do
+            echo "Link checking: $file"
+            markdown-link-check "$file" -c .mlc.config.json || true
+          done
+
+      - name: Install mdBook
+        uses: taiki-e/install-action@mdbook
+
+      - name: Build documentation
+        run: |
+          if [ -f docs/book.toml ]; then
+            mdbook build docs/
+          else
+            echo "No book.toml found, creating default..."
+            mkdir -p docs/src
+            mdbook init docs/ --force
+            mdbook build docs/
+          fi
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: documentation
+          path: docs/book/
+
+      - name: Check diagrams render
+        run: |
+          # Validate Mermaid diagram syntax
+          find docs/diagrams -name "*.mermaid" -type f | while read file; do
+            echo "Validating diagram: $file"
+            # Basic mermaid syntax check - ensure valid structure
+            if grep -q "^graph\|^flowchart\|^sequenceDiagram\|^classDiagram\|^stateDiagram" "$file"; then
+              echo "✓ Diagram structure valid"
+            else
+              echo "⚠ Warning: Diagram format unclear"
+            fi
+          done

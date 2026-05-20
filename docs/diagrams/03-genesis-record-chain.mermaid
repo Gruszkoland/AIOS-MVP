@@ -1,0 +1,28 @@
+graph LR
+    subgraph Chain ["📜 Genesis Record — Immutable Hash Chain"]
+        B0["Block #0<br/>—────<br/>timestamp: 0<br/>hash: 0x0000<br/>prev: null<br/>🔐"]
+        B1["Block #1<br/>—────<br/>timestamp: 1234<br/>intent: [9D vector]<br/>votes: [9×1]<br/>decision: APPROVE<br/>agents: [L,S,A,Sn,Ar,H]<br/>hash: 0xA1B2<br/>prev: 0x0000<br/>🔐"]
+        B2["Block #2<br/>—────<br/>timestamp: 5678<br/>intent: [9D vector]<br/>votes: [8×1,1×0]<br/>decision: DENY<br/>reason: Sentinel veto<br/>hash: 0xC3D4<br/>prev: 0xA1B2<br/>🔐"]
+        B3["Block #N<br/>—────<br/>timestamp: …<br/>...<br/>hash: 0xXXYY<br/>prev: 0xC3D4<br/>🔐"]
+    end
+
+    Regulator["👮 Regulator / Auditor"]
+    EnterpriseCust["🏢 Enterprise Customer"]
+
+    B0 --> B1
+    B1 --> B2
+    B2 --> B3
+
+    Regulator -->|"Query: Prove<br/>decision #42<br/>was ethical"| B1
+    B1 -->|"✅ Proof: <br/>- Intent vector<br/>- 9 votes logged<br/>- Hash chain<br/>- Immutable"| Regulator
+
+    EnterpriseCust -->|"Audit report:<br/>Last 1000<br/>decisions"| Chain
+    Chain -->|"Export JSON:<br/>100% traceable"| EnterpriseCust
+
+    style B0 fill:#f5f5f5,stroke:#999,stroke-width:2px
+    style B1 fill:#c8e6c9,stroke:#2e7d32,stroke-width:3px
+    style B2 fill:#ffcdd2,stroke:#c62828,stroke-width:3px
+    style B3 fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    style Chain fill:#fafafa,stroke:#333,stroke-width:2px
+    style Regulator fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px
+    style EnterpriseCust fill:#fff3e0,stroke:#e65100,stroke-width:2px
