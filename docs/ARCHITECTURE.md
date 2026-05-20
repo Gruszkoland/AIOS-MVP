@@ -247,6 +247,65 @@ Response: {summary, agent_metrics, health, timestamp}
 
 ---
 
+## 5a. Complete Data Flow Diagram
+
+```
+┌─────────────┐
+│   Browser   │  (User / External Client)
+└──────┬──────┘
+       │ HTTP/TLS
+       v
+┌──────────────────────────────────────┐
+│   Nginx (reverse proxy + TLS)         │
+└──────┬──────────────────────────────┬─┘
+       │                              │
+       │ :8003                        │ :8002       :1740
+       v                              v             v
+  ┌─────────────┐  ┌──────────────┐  ┌────────────┐
+  │  Flask API  │  │   UAP Panel  │  │   Vortex   │
+  │  (:8003)    │  │   (:8002)    │  │   (:1740)  │
+  │             │  │              │  │            │
+  │ Guardian ──┼┐ │ 6 Personas ──┼┐ │  EBDI SM   │
+  │ Trinity    │├─┼─ Task CRUD  ─┼┼─┼─ 174Hz    │
+  │ Hexagon    │└─┼─ Genesis ────┼┼─┼─ Sentinel │
+  │ Circuit Br.│  │ TrustScore   │└─┤ Oracle    │
+  │ RateLimit  │  │              │  │            │
+  └──┬────┬────┘  └───────┬──────┘  └────┬───────┘
+     │    │               │              │
+     │    └───────────────┼──────────────┘
+     │                    │
+     v                    v
+  ┌────────────────────────────────────┐
+  │   Shared Data Layer                │
+  │  ┌───────────────────────────────┐ │
+  │  │ PostgreSQL (prod) / SQLite    │ │
+  │  │  • agents  • tasks  • jobs   │ │
+  │  │  • bids    • genesis_logs    │ │
+  │  └───────────────────────────────┘ │
+  │  ┌───────────────────────────────┐ │
+  │  │ Cache: Redis (optional)        │ │
+  │  │  • Circuit breaker state       │ │
+  │  │  • Rate limit counters         │ │
+  │  └───────────────────────────────┘ │
+  └────────────────────────────────────┘
+     │
+     ├─────────────────────────────────────────┐
+     │                                         │
+     v                                         v
+  ┌───────────────────┐            ┌──────────────────┐
+  │ External Services │            │ MCP Layer        │
+  │  • Ollama/OpenAI  │            │  (Ports 9000-9005)
+  │  • Stripe         │            │  • Router        │
+  │  • Apify          │            │  • Vortex-MCP    │
+  │  • XRP Ledger     │            │  • Guardian-MCP  │
+  └───────────────────┘            │  • Oracle-MCP    │
+                                    │  • Genesis-MCP   │
+                                    │  • Healer-MCP    │
+                                    └──────────────────┘
+```
+
+---
+
 ## 6. UAP Orchestrator (Port 8002)
 
 The Unified Admin Panel provides master orchestration for agents and tasks.
@@ -330,6 +389,66 @@ MCPRouter (9000)  -- Central decision arbitration, load balancing
 
 Each MCP service exposes `/health`, runs in its own container, and communicates
 with others via HTTP over the `adrion-mcp-net` Docker network.
+
+---
+
+## 8a. Configuration & Environment Variables
+
+All application configuration is managed through **Pydantic `BaseSettings`**
+in `arbitrage/config.py`. Variables are typed, validated, and accessible via
+`arbitrage.config.settings.*` throughout the application.
+
+**Development startup:**
+```bash
+export OLLAMA_HOST=http://localhost:11434
+export DB_URL=sqlite:///./arbitrage.db
+export STRIPE_SECRET_KEY=sk_test_...
+export STRIPE_PUBLISHABLE_KEY=pk_test_...
+python wsgi.py  # http://localhost:8003
+```
+
+**Production startup (with .env file):**
+```bash
+export DB_URL=postgresql://user:pass@postgres-prod:5432/adrion
+export LLM_PROVIDER=openrouter
+export OPENROUTER_API_KEY=sk-or-...
+waitress-serve --port=8003 wsgi:app
+```
+
+**Key environment variables:**
+- `OLLAMA_HOST` — Ollama endpoint (fallback: OpenRouter if not set)
+- `DB_URL` — Database connection string (SQLite or PostgreSQL)
+- `LLM_PROVIDER` — `local` (Ollama) or `openrouter` (cloud)
+- `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` — Payment processing
+- `APIFY_API_KEY` — Job sourcing
+- `XRP_NETWORK` — `test` or `main` for XRP Ledger
+- `VORTEX_AUTH_KEY` — HMAC key for Go Vortex (empty = dev mode)
+- `PROMETHEUS_REGISTRY_PREFIX` — Metric namespace (default: `adrion_`)
+
+---
+
+## 8b. Startup and Graceful Shutdown
+
+**On startup (`create_app()`):**
+1. Load config from environment (Pydantic validation)
+2. Initialize logging (JSON formatter for Loki/Grafana)
+3. Create database connection pool (SQLite or PostgreSQL)
+4. Initialize circuit breakers for external dependencies
+5. Register all blueprints
+6. Setup error handlers (404, 500 → JSON)
+7. Register health check cascade
+8. Emit startup log
+
+**On shutdown (SIGTERM):**
+1. Graceful drain of DB pool (`arbitrage.database.graceful_drain()`)
+   - Wait up to 30s for in-flight queries to complete
+   - Reject new connections
+   - Close remaining connections
+2. Flush logs to Loki (if configured)
+3. Exit with status 0
+
+**Example:** Kubernetes TERM signal → Flask SIGTERM handler → graceful_drain() →
+Pod termination in ~30s (respects `terminationGracePeriodSeconds: 30`).
 
 ---
 
@@ -512,6 +631,60 @@ and secrets managed via `kubectl create secret` (YAML contains
 
 ---
 
-ADRION 369 -- Autonomous Decision-making with Real-time Integration & Orchestration Nexus
+## 16. Testing Strategy
 
-Architecture Version 4.0 | 2026-04-11
+### Coverage Requirements
+
+- **Python:** 80%+ coverage (enforced in CI via `pytest --cov-fail-under=80`)
+- **Go:** 80%+ coverage (enforced via `go test -coverprofile=coverage.out`)
+- **CI gate:** All tests must pass before merge to main
+
+### Test Markers (pytest)
+
+```python
+@pytest.mark.tier0          # Critical path only (< 2min)
+@pytest.mark.tier1          # Core features (< 10min)
+@pytest.mark.tier2          # Integration tests (< 30min)
+@pytest.mark.slow           # > 30s, conditional run
+@pytest.mark.requires_db    # Needs database fixture
+@pytest.mark.requires_ollama # Needs Ollama endpoint
+```
+
+**CI runs:** `pytest -m "tier0 or tier1"` (gates on PRs) + `pytest` (gates on main)
+
+### Key Test Files
+
+- `tests/test_guardian_*.py` — Guardian Laws validation
+- `tests/test_trinity_*.py` — Trinity Score evaluation
+- `tests/test_hexagon_*.py` — Hexagon 6-stage pipeline
+- `tests/test_circuit_breaker.py` — External dependency protection
+- `tests/test_rate_limiter.py` — Rate limit enforcement
+- `uap/tests/test_api.py` — UAP orchestrator endpoints
+- `mcp-servers/tests/test_*.py` — MCP microservices
+
+### Property-Based Testing (Future: P2-2)
+
+- **Hypothesis** library for fuzz testing
+- Guardian Laws: any CRITICAL → DENY, any 2+ → DENY (invariants)
+- Trinity Score: all scores ∈ [0.0, 1.0] range (invariants)
+
+---
+
+## 17. CI/CD Pipelines (GitHub Actions)
+
+| Workflow                | Trigger    | Gates                            |
+|-------------------------|------------|----------------------------------|
+| `python-ci.yml`         | push/PR    | ruff + mypy + pytest 80% + TIER-0 |
+| `go-ci.yml`             | push/PR    | go vet + test 80%                |
+| `docker-ci.yml`         | push/PR    | docker build (no push)           |
+| `security-ci.yml`       | push/PR    | bandit + safety + trivy          |
+| `release.yml`           | tag v*.*  | validate → GHCR push            |
+| `tier0-gate.yml`        | push/PR    | critical path tests only         |
+
+**Release process:**
+1. Tag: `git tag -a v4.2-p1 -m "Phase 1: security hardening"`
+2. Push: `git push origin v4.2-p1`
+3. GitHub Actions: validate → build → push to GHCR → create release
+
+---
+
