@@ -1,0 +1,30 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^https://github.com/Gruszkoland/AIOS-MVP",
+      "comment": "Internal repository links - skipped in CI"
+    },
+    {
+      "pattern": "^https://github.com/Gruszkoland/adrion-369",
+      "comment": "Internal repository links - skipped in CI"
+    },
+    {
+      "pattern": "localhost",
+      "comment": "Localhost links - development only"
+    },
+    {
+      "pattern": "127.0.0.1",
+      "comment": "Loopback links - development only"
+    }
+  ],
+  "timeout": "10s",
+  "retryOn": [408, 429, 500, 502, 503, 504],
+  "retryCount": 2,
+  "fallbackRetryDelay": "30s",
+  "aliveStatusCodes": [200, 206, 301, 302, 304, 307, 308],
+  "headers": {
+    "User-Agent": "markdown-link-check/aios-mvp-bot"
+  },
+  "fileExtensions": [".md"],
+  "concurrency": 8
+}
