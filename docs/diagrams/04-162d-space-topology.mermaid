@@ -1,0 +1,51 @@
+graph LR
+    subgraph Perspectives ["3 Perspectives (LOGOS / ETHOS / EROS)"]
+        P1["🧠 LOGOS<br/>(Truth)"]
+        P2["❤️ ETHOS<br/>(Good)"]
+        P3["🌱 EROS<br/>(Creation)"]
+    end
+
+    subgraph Modes ["6 Modes (Hierarchy Aspects)"]
+        M1["🏛️ Institutional"]
+        M2["🤝 Social"]
+        M3["🧬 Individual"]
+        M4["📚 Knowledge"]
+        M5["💼 Commerce"]
+        M6["🌍 Natural"]
+    end
+
+    subgraph Laws ["9 Guardian Laws"]
+        G1["1. Unity"]
+        G2["2. Harmony"]
+        G3["3. Rhythm"]
+        G4["4. Causality"]
+        G5["5. Transparency"]
+        G6["6. Authenticity"]
+        G7["7. Privacy ⚠️"]
+        G8["8. Nonmaleficence ⚠️"]
+        G9["9. Sustainability"]
+    end
+
+    SafeSpace["✅ SAFE DECISION<br/>SUBSPACE<br/>(deterministic)"]
+    DangerZone["🚫 UNSAFE ZONES<br/>(blocked by topology)"]
+
+    P1 ---|"evaluated by"| M1
+    P2 ---|"evaluated by"| M2
+    P3 ---|"evaluated by"| M3
+    M1 ---|"constrained by"| G1
+    M2 ---|"constrained by"| G2
+    M3 ---|"constrained by"| G3
+    M4 ---|"constrained by"| G4
+    M5 ---|"constrained by"| G5
+    M6 ---|"constrained by"| G6
+
+    G7 ---|"VETO if"| DangerZone
+    G8 ---|"VETO if"| DangerZone
+
+    SafeSpace ---|"Topology = 3 × 6 × 9"| Laws
+
+    style Perspectives fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px
+    style Modes fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style Laws fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style SafeSpace fill:#c8e6c9,stroke:#2e7d32,stroke-width:3px,color:#fff
+    style DangerZone fill:#ffcdd2,stroke:#c62828,stroke-width:3px,color:#fff

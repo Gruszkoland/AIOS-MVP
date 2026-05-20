@@ -1,19 +1,79 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [master]
+    branches: [master, main, develop]
   pull_request:
-    branches: [master]
+    branches: [master, main, develop]
+  schedule:
+    - cron: '0 2 * * MON'
+
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
 
 jobs:
-  test:
-    name: pytest (Python 3.11)
+  # Tier-0: Critical path (fast feedback)
+  tier0-critical:
     runs-on: ubuntu-latest
-
+    name: "Tier 0: Critical Path"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+
+      - name: Python quick tests
+        run: pytest tests/ -v --tb=short -x
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+  # Tier-1: Code quality
+  code-quality:
+    runs-on: ubuntu-latest
+    name: "Code Quality & Linting"
+    needs: tier0-critical
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install linting tools
+        run: |
+          python -m pip install ruff mypy bandit
+
+      - name: Ruff linting
+        run: ruff check arbitrage/ tests/ --config pyproject.toml
+        continue-on-error: true
+
+      - name: Type checking
+        run: mypy arbitrage/ --strict
+        continue-on-error: true
+
+      - name: Security scan (bandit)
+        run: bandit -r arbitrage/ -ll
+        continue-on-error: true
+
+  # Tier-2: Comprehensive testing
+  testing:
+    runs-on: ubuntu-latest
+    name: "Unit & Integration Tests"
+    needs: tier0-critical
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -26,15 +86,76 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest pytest-cov
 
-      - name: Run tests
-        run: pytest tests/ -v --tb=short --cov=. --cov-report=term-missing
+      - name: Run full test suite
+        run: pytest tests/ -v --tb=short --cov=arbitrage --cov-report=term-missing --cov-report=html
         env:
           PYTHONPATH: ${{ github.workspace }}
+
+      - name: Check coverage threshold
+        run: |
+          coverage report --fail-under=80
+        continue-on-error: true
 
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: .coverage
+          path: htmlcov/
           retention-days: 7
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: .coverage
+          fail_ci_if_error: false
+
+  # Tier-3: Security scanning
+  security:
+    runs-on: ubuntu-latest
+    name: "Security Scanning"
+    needs: tier0-critical
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install safety
+        run: pip install safety
+
+      - name: Check dependencies for vulnerabilities
+        run: safety check -r requirements-arbitrage.txt
+        continue-on-error: true
+
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+        continue-on-error: true
+
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Final check: summary
+  ci-status:
+    runs-on: ubuntu-latest
+    name: "CI Status Summary"
+    needs: [tier0-critical, code-quality, testing, security]
+    if: always()
+    steps:
+      - name: Check critical path passed
+        run: |
+          if [ "${{ needs.tier0-critical.result }}" != "success" ]; then
+            echo "❌ Tier 0 (Critical) failed - CI cannot pass"
+            exit 1
+          fi
+          echo "✅ CI/CD pipeline complete"

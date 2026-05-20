@@ -1,0 +1,83 @@
+name: Diagram Validation
+
+on:
+  push:
+    branches: [main, master]
+    paths: ['docs/diagrams/**', '**/*.mermaid', 'README.md']
+  pull_request:
+    branches: [main, master]
+    paths: ['docs/diagrams/**', '**/*.mermaid', 'README.md']
+
+jobs:
+  validate-diagrams:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mermaid-cli
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Validate Mermaid diagram syntax
+        run: |
+          echo "Validating Mermaid diagrams..."
+          FAIL=0
+
+          for file in $(find . -name "*.mermaid" -o -name "*diagram*.md"); do
+            if [ -f "$file" ]; then
+              echo "Checking: $file"
+
+              # Extract mermaid code blocks and validate
+              if grep -A 50 "^\\`\\`\\`mermaid" "$file" | grep -E "^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|gantt)" > /dev/null; then
+                echo "✓ Valid Mermaid block in $file"
+              elif [ "${file##*.}" = "mermaid" ]; then
+                # Pure mermaid file - check structure
+                if head -1 "$file" | grep -E "^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|gantt)" > /dev/null; then
+                  echo "✓ Valid Mermaid file: $file"
+                else
+                  echo "✗ Invalid Mermaid structure: $file"
+                  FAIL=1
+                fi
+              fi
+            fi
+          done
+
+          if [ $FAIL -eq 1 ]; then
+            echo "❌ Diagram validation failed"
+            exit 1
+          else
+            echo "✅ All diagrams valid"
+          fi
+
+      - name: Render diagrams as PNG
+        continue-on-error: true
+        run: |
+          mkdir -p docs/diagrams/rendered
+
+          for file in docs/diagrams/*.mermaid; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file" .mermaid)
+              echo "Rendering: $filename"
+              mmdc -i "$file" -o "docs/diagrams/rendered/${filename}.png" -w 1200 -H 800 || true
+            fi
+          done
+
+      - name: Upload rendered diagrams
+        uses: actions/upload-artifact@v3
+        with:
+          name: rendered-diagrams
+          path: docs/diagrams/rendered/
+
+      - name: Check GitHub markdown diagram rendering
+        run: |
+          echo "Verifying diagram blocks are GitHub-compatible..."
+
+          # Ensure diagrams use ```mermaid blocks (GitHub native)
+          for file in docs/*.md; do
+            if grep -q "graph\|flowchart\|sequenceDiagram" "$file"; then
+              if grep -q "^\`\`\`mermaid" "$file"; then
+                echo "✓ $file uses proper mermaid blocks"
+              else
+                echo "⚠ Warning: $file has diagram content but missing ```mermaid markers"
+              fi
+            fi
+          done
