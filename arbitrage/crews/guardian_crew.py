@@ -1,8 +1,8 @@
 """
 ADRION 369 — Guardian CrewAI Agents & Crew
 
-9 parallel agents for Guardian Laws validation (Unity, Truth, Rhythm, Causality,
-Transparency, Nonmaleficence, Autonomy, Justice, Sustainability).
+9 parallel agents for Guardian Laws validation (Unity, Harmony, Rhythm, Causality,
+Transparency, Authenticity, Privacy, Nonmaleficence, Sustainability).
 
 Wraps guardian.py logic into CrewAI agent structure.
 """
@@ -19,13 +19,13 @@ class GuardianCrew:
 
     Laws (can validate in parallel):
       1. Unity (MEDIUM)
-      2. Truth (HIGH)
+      2. Harmony (HIGH)
       3. Rhythm (MEDIUM)
       4. Causality (HIGH)
       5. Transparency (MEDIUM)
-      6. Nonmaleficence (CRITICAL)
-      7. Autonomy (HIGH)
-      8. Justice (MEDIUM)
+      6. Authenticity (HIGH)
+      7. Privacy (CRITICAL)
+      8. Nonmaleficence (CRITICAL)
       9. Sustainability (HIGH)
 
     This is a mock implementation wrapping guardian.py.

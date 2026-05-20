@@ -4,5 +4,17 @@
 .DS_Store
 Thumbs.db
 .env
+.env*
 *.log
+_*.log
 coverage/
+cov_*.txt
+temp_*.txt
+test_output.txt
+_*_stderr.log
+_*_stdout.log
+.pytest_cache/
+*.pyc
+__pycache__/
+logs/
+.claude.json
