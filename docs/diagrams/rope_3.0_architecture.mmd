@@ -1,0 +1,63 @@
+---
+title: ROPE 3.0 System Architecture
+---
+graph TB
+    subgraph CLIENT["Client Layer"]
+        EXT["External Client / API Caller"]
+    end
+
+    subgraph ENTRY["Entry Point"]
+        NGINX["Nginx (TLS termination)"]
+        FLASK["Flask API - port 8003"]
+    end
+
+    subgraph ROUTER["Router-MCP - port 9000"]
+        RT["route_request()"]
+        TI["trace_id injection\n(uuid4 if absent)"]
+        AR["agent_registry\n(33 agents)"]
+    end
+
+    subgraph MCP["MCP Layer"]
+        VORTEX["Vortex-MCP\nport 9001\n174Hz pulse"]
+        GUARDIAN["Guardian-MCP\nport 9002\n9 Guardian Laws"]
+        ORACLE["Oracle-MCP\nport 9003\n162D routing"]
+        GENESIS["Genesis-MCP\nport 9004\nRAG + logs"]
+        HEALER["Healer-MCP\nport 9005\nrepair + replay"]
+    end
+
+    subgraph AGENTS["Agent Layer - 33 Agents (ROPE 3.0)"]
+        AOR["AOR - Orchestrator\nHandoff Protocol v2\nstate machine + retry"]
+        ARB["ARB - Arbiter\nescalation target"]
+        EVA["EVA-33 - Evaluator\nconfidence_level reader"]
+        REST["Remaining 30 agents\nMPG PWB CVA QPA SAP BLV\nEGO CTG ECA CEC ROA LCA\nDBI UXD DCA SNE QTE SEO\nEDU PCH VAP SMM TLO CRM\nPFT CSO KMS HRR PMO TWR"]
+    end
+
+    subgraph PAYLOAD["SYSTEM_PAYLOAD v3.0"]
+        SP["agent_id: AKRONIM\nversion: 3.0\nsession_id: uuid\ntrace_id: uuid4\nconfidence_level: 0.0-1.0\nhandoff_protocol: v2\ncontext: data"]
+    end
+
+    subgraph PERSIST["Persistence Layer"]
+        PG["PostgreSQL\nproduction"]
+        SL["SQLite\ndevelopment"]
+        LOGS["Genesis decision logs\nindexed by trace_id"]
+    end
+
+    EXT -->|"HTTP + X-Trace-ID header"| NGINX
+    NGINX --> FLASK
+    FLASK --> RT
+    RT --> TI
+    TI --> AR
+    AR -->|"route to MCP"| ORACLE
+    ORACLE -->|"162D agent selection"| AOR
+    AOR -->|"validate"| GUARDIAN
+    GUARDIAN -->|"G1-G9 check"| AOR
+    AOR -->|"handoff"| REST
+    AOR -->|"escalate"| ARB
+    AOR -->|"notify confidence < 0.60"| EVA
+    EVA -->|"benchmark report"| GENESIS
+    GENESIS --> LOGS
+    LOGS --> PG
+    LOGS --> SL
+    VORTEX -->|"174Hz health"| AOR
+    HEALER -->|"repair on error"| AOR
+    AOR -.->|"SYSTEM_PAYLOAD v3.0"| SP

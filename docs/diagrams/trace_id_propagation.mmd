@@ -1,0 +1,51 @@
+---
+title: trace_id Propagation Through Agent Chain
+---
+sequenceDiagram
+    autonumber
+    participant CLI as External Client
+    participant NGINX as Nginx
+    participant FLASK as Flask API :8003
+    participant ROUTER as Router-MCP :9000
+    participant AOR as AOR (Orchestrator)
+    participant AGT1 as Agent A (e.g. SAP)
+    participant AGT2 as Agent B (e.g. PMO)
+    participant GENESIS as Genesis-MCP :9004
+    participant EVA as EVA-33 (Evaluator)
+
+    CLI->>NGINX: POST /api/decide\n[no X-Trace-ID header]
+    NGINX->>FLASK: forward request
+
+    FLASK->>ROUTER: route_request(payload)
+    Note over ROUTER: X-Trace-ID absent<br/>generate trace_id = uuid4()
+    ROUTER->>ROUTER: trace_id = "a3f2...c1b7"
+
+    ROUTER->>AOR: SYSTEM_PAYLOAD v3.0\ntrace_id: a3f2...c1b7\nsession_id: sess_42\nhandoff_protocol: v2
+
+    AOR->>AGT1: handoff to SAP\ntrace_id: a3f2...c1b7 (UNCHANGED)\nconfidence_level: (to be set by SAP)
+
+    Note over AGT1: SAP executes task<br/>sets confidence_level: 0.82
+    AGT1->>GENESIS: log entry\n{trace_id: a3f2...c1b7, agent: SAP,\nconfidence: 0.82, event: decision}
+
+    AGT1->>AOR: return SYSTEM_PAYLOAD\ntrace_id: a3f2...c1b7\nconfidence_level: 0.82
+
+    AOR->>EVA: notify(trace_id, confidence=0.82, agent=SAP)
+    Note over EVA: confidence >= 0.60<br/>no alert triggered
+
+    AOR->>AGT2: handoff to PMO\ntrace_id: a3f2...c1b7 (UNCHANGED)\nconfidence_level: (to be set by PMO)
+
+    Note over AGT2: PMO executes task<br/>sets confidence_level: 0.45
+    AGT2->>GENESIS: log entry\n{trace_id: a3f2...c1b7, agent: PMO,\nconfidence: 0.45, event: decision}
+
+    AGT2->>AOR: return SYSTEM_PAYLOAD\ntrace_id: a3f2...c1b7\nconfidence_level: 0.45
+
+    AOR->>EVA: notify(trace_id, confidence=0.45, agent=PMO)
+    Note over EVA: confidence < 0.60<br/>low_confidence_alert triggered
+
+    EVA->>GENESIS: log event\n{trace_id: a3f2...c1b7, type: low_confidence_alert,\nagent: PMO, level: 0.45}
+
+    AOR->>FLASK: chain complete\ntrace_id: a3f2...c1b7
+    FLASK->>NGINX: response + X-Trace-ID: a3f2...c1b7
+    NGINX->>CLI: HTTP 200\nX-Trace-ID: a3f2...c1b7
+
+    Note over GENESIS: GET /genesis/trace/a3f2...c1b7<br/>returns: 4 entries<br/>(SAP decision, PMO decision,<br/>SAP notify, low_confidence_alert)

@@ -1,0 +1,43 @@
+graph TB
+    User["🧠 User / External System"]
+
+    Orchestrator["🎯 AIOS Orchestrator<br/>Request Router"]
+
+    subgraph Guardians ["9-Agent Consensus Layer"]
+        L1["📚 Librarian<br/>Fact-Check"]
+        L2["🏗️ SAP<br/>Architecture"]
+        L3["✋ Auditor<br/>Compliance"]
+        L4["🚨 Sentinel<br/>Risk Detection"]
+        L5["📐 Architect<br/>Design"]
+        L6["❤️ Healer<br/>Fairness"]
+    end
+
+    Kernel["🔒 Deterministic Kernel<br/>(Rust no_std)<br/>162D Decision Space"]
+
+    Genesis["📜 Genesis Record<br/>(Immutable Audit Trail)<br/>Hash Chain"]
+
+    IPC["🔗 Zero-Copy IPC<br/>(Ring Buffer)"]
+
+    Response["✅ Decision Output<br/>+ Reasoning"]
+
+    User -->|"Intention Vector"| Orchestrator
+
+    Orchestrator -->|"Request → 6 Agents"| Guardians
+    Guardians -->|"Votes"| Kernel
+
+    Kernel -->|"Consensus Check"| Guardians
+    Guardians -->|"Hash Proof"| Genesis
+
+    Kernel -->|"Decision"| Response
+    Genesis -->|"Audit Trail"| Response
+
+    IPC -.->|"Zero-copy data flow"| Kernel
+
+    style Orchestrator fill:#4A90E2,stroke:#2c5aa0,stroke-width:2px,color:#fff
+    style Kernel fill:#E24A4A,stroke:#a02c2c,stroke-width:3px,color:#fff
+    style Genesis fill:#4AE290,stroke:#2ca053,stroke-width:2px,color:#fff
+    style Guardians fill:#E4A54A,stroke:#a07a2c,stroke-width:2px
+    style Response fill:#90E24A,stroke:#5aa02c,stroke-width:2px,color:#fff
+
+    classDef user fill:#F0F0F0,stroke:#333,stroke-width:2px
+    class User user

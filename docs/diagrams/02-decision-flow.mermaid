@@ -1,0 +1,36 @@
+graph TD
+    A["🚀 START: AI Action Request"] -->|"Encode as<br/>9D vector"| B["📊 Intention Vector<br/>(3 perspectives × 6 modes × 9 laws)"]
+
+    B --> C{"🔒 Kernel Check:<br/>Is vector in safe<br/>162D subspace?"}
+
+    C -->|"NO"| D["🚫 VETO<br/>Decision blocked"]
+    D --> Z["❌ Denied + Reason"]
+
+    C -->|"YES"| E["🤔 Route to 9 Guardians<br/>(parallel evaluation)"]
+
+    E --> F["⏱️ Consensus Voting<br/>(unanimous required)"]
+
+    F --> G{"All 9 agents<br/>say YES?"}
+
+    G -->|"Any NO"| H["🚫 VETO<br/>Blocked by [Agent]"]
+    H --> Z
+
+    G -->|"YES (9/9)"| I["✅ Decision Approved"]
+
+    I --> J["🔗 Generate Hash<br/>(timestamp + vector + votes<br/>+ decision + agent signatures)"]
+
+    J --> K["📜 Write to Genesis Record<br/>(immutable audit log)<br/>Block #N"]
+
+    K --> L["📤 Return Decision<br/>+ Reasoning + Proof"]
+
+    L --> M["🎯 END: Decision Executed<br/>(with audit trail)"]
+
+    style A fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style B fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style C fill:#fff3e0,stroke:#e65100,stroke-width:3px
+    style E fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    style F fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    style Z fill:#ffebee,stroke:#b71c1c,stroke-width:3px,color:#fff
+    style M fill:#e8f5e9,stroke:#1b5e20,stroke-width:3px
+    style I fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style K fill:#f0e0ff,stroke:#6a1b9a,stroke-width:2px

@@ -1,0 +1,41 @@
+---
+title: Handoff Protocol v2 - State Machine
+---
+stateDiagram-v2
+    [*] --> IDLE
+
+    IDLE --> REQUESTING : agent.execute() called
+
+    REQUESTING --> VALIDATING : Guardian G8 check PASS
+    REQUESTING --> REQUESTING_FAILED : Guardian G8 check FAIL\nor no causal reason (G4)
+
+    VALIDATING --> TRANSFERRING : confidence_level >= 0.60
+    VALIDATING --> LOW_CONFIDENCE : confidence_level < 0.60
+
+    LOW_CONFIDENCE --> TRANSFERRING : EVA-33 notified\noperator override OR\ndefault continue
+    LOW_CONFIDENCE --> ESCALATED : operator HALT decision
+
+    TRANSFERRING --> CONFIRMING : target agent ACK received
+    TRANSFERRING --> TRANSFER_TIMEOUT : no ACK within 30s
+
+    CONFIRMING --> COMPLETE : Genesis-MCP log written
+    CONFIRMING --> TRANSFER_TIMEOUT : log write fails
+
+    REQUESTING_FAILED --> REQUESTING : retry attempt 1 (delay 2s)
+    TRANSFER_TIMEOUT --> TRANSFERRING : retry attempt 1-3\n(delay 2s, 4s, 8s)
+
+    REQUESTING_FAILED --> ESCALATED : retry 3 exhausted
+    TRANSFER_TIMEOUT --> ESCALATED : retry 3 exhausted
+
+    ESCALATED --> [*] : ARB decision\n(retry_different_agent\nOR degrade_gracefully\nOR halt_chain)
+
+    COMPLETE --> [*]
+
+    note right of REQUESTING_FAILED
+        Max retries: 3
+        Backoff: 2s, 4s, 8s (cap 16s)
+    end note
+
+    note right of ESCALATED
+        Genesis-MCP stores:\nevents.type = handoff_escalation\nwith trace_id
+    end note
