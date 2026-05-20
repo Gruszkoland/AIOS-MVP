@@ -73,7 +73,7 @@ def get_pooled_conn() -> DBConnection:
     return get_conn()
 
 
-def return_conn(conn) -> None:
+def return_conn(conn: DBConnection) -> None:
     """Return a pooled connection back to the pool. No-op for SQLite connections."""
     if _pool is not None:
         try:

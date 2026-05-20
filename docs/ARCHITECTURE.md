@@ -1,10 +1,14 @@
-# ADRION 369 -- Architecture & System Design
+# Repository Architecture Overview
 
-**Version:** 4.0 | **Updated:** 2026-04-11
+**Version:** 5.0 | **Updated:** 2026-05-20
 
 ---
 
 ## 1. System Overview
+
+This repository contains **two complementary systems**:
+
+### Subsystem A: ADRION 369 — Orchestration Layer (Python/Go)
 
 ADRION 369 is a multi-agent AI orchestration system built on the **Trinity-EBDI 162D
 decision framework**. Every autonomous decision is evaluated through three orthogonal
@@ -26,9 +30,28 @@ microservices layer:
 | Go Vortex          | Go 1.22     | Echo v4      | 1740 | EBDI state machine, digital root oracle |
 | MCP Layer (6 svcs) | Python 3.11 | Various      | 9000-9005 | Specialized microservices          |
 
+> **For deep dive on ADRION 369 architecture, see sections below (2-14).
+> For AI OS Cognitive Kernel (Rust) architecture, see [AI_OS_KERNEL_ARCHITECTURE.md](./AI_OS_KERNEL_ARCHITECTURE.md).**
+
+### Subsystem B: AI OS Cognitive Kernel (Rust)
+
+A deterministic real-time OS kernel designed to run LLM agents as advisory-only safety layers:
+
+- **Kernel Plane** (no_std, deterministic, hard real-time) — scheduler, IPC router, capability enforcer
+- **IPC Plane** (zero-copy ring buffers, shared memory, < 1μs latency)
+- **Advisory Plane** (LLM agents, user-space, soft real-time) — Guardian evaluations, recommendations
+
+**Crates:**
+- `kernel/` (~500 lines) — core deterministic scheduler
+- `agents/` (~300 lines) — Guardian trait + 9 specialist implementations
+- `ipc/` (~200 lines) — zero-copy ring-buffer IPC
+- `poc/scheduler-mgr` (~100 lines) — proof-of-concept orchestrator
+
+> **See detailed architectural diagram and flow in [AI_OS_KERNEL_ARCHITECTURE.md](./AI_OS_KERNEL_ARCHITECTURE.md).**
+
 ---
 
-## 2. High-Level Architecture
+## 2. High-Level Architecture (ADRION 369)
 
 ```
                          Browser / External Client

@@ -1,0 +1,267 @@
+name: ShieldOS Local Setup Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_go_tests:
+        description: "Skip Go tests (faster run)"
+        required: false
+        default: "false"
+        type: boolean
+      hermetic_threshold:
+        description: "Minimum hermetic score to pass (0-100)"
+        required: false
+        default: "70"
+        type: string
+
+  push:
+    branches:
+      - "setup/**"
+      - "feature/shieldos-*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  GO_VERSION: "1.22"
+  # Non-secret CI placeholders — safe to log
+  UAP_API_KEY: "ci-placeholder-api-key-32chars-00"
+  JWT_SECRET: "ci-placeholder-jwt-secret-32chars"
+  DRM_HMAC_SECRET: "ci-placeholder-drm-secret-32char"
+
+jobs:
+  # ── Job 1: Validate prerequisites and environment ──────────────────────────
+  validate:
+    name: Validate Prerequisites
+    runs-on: ubuntu-latest
+    outputs:
+      python_ok: ${{ steps.prereqs.outputs.python_ok }}
+      docker_ok: ${{ steps.prereqs.outputs.docker_ok }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Validate prerequisites
+        id: prereqs
+        run: |
+          echo "--- Python version ---"
+          python3 --version
+
+          echo "--- Docker version ---"
+          docker --version
+
+          echo "--- Docker Compose version ---"
+          docker compose version
+
+          echo "--- Disk space ---"
+          df -h /
+
+          echo "python_ok=true"  >> "$GITHUB_OUTPUT"
+          echo "docker_ok=true"  >> "$GITHUB_OUTPUT"
+
+      - name: Validate project structure
+        run: |
+          echo "Checking required files..."
+          for f in \
+            scripts/setup_shieldos_local.py \
+            scripts/setup_shieldos_ci.sh \
+            scripts/verify_shieldos_hermetic.py \
+            docker-compose.local.yml \
+            .env.example; do
+            if [ -f "$f" ]; then
+              echo "  [OK] $f"
+            else
+              echo "  [MISSING] $f"
+            fi
+          done
+
+  # ── Job 2: Full setup and test run ─────────────────────────────────────────
+  setup-and-test:
+    name: Setup & Test
+    needs: validate
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: genesis_record_test
+          POSTGRES_USER: adrion
+          POSTGRES_PASSWORD: ci_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 15
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://adrion:ci_test_password@localhost:5432/genesis_record_test
+      DB_ENGINE: postgresql
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: adrion
+      POSTGRES_PASSWORD: ci_test_password
+      POSTGRES_DB: genesis_record_test
+      ENVIRONMENT: test
+      DEBUG_MODE: "false"
+      LOG_LEVEL: WARNING
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Setup Go ${{ env.GO_VERSION }}
+        if: ${{ github.event.inputs.skip_go_tests != 'true' }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+        continue-on-error: true
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          if [ -f requirements-arbitrage.txt ]; then
+            pip install -r requirements-arbitrage.txt
+          fi
+          pip install pytest pytest-cov pytest-timeout
+
+      - name: Create log directory
+        run: mkdir -p logs
+
+      - name: Run ShieldOS CI setup script
+        run: |
+          chmod +x scripts/setup_shieldos_ci.sh
+          bash scripts/setup_shieldos_ci.sh
+
+      - name: Run hermetic verification
+        id: hermetic
+        run: |
+          python3 scripts/verify_shieldos_hermetic.py --json | tee logs/hermetic_report.json
+
+          THRESHOLD="${{ github.event.inputs.hermetic_threshold || '70' }}"
+          python3 - <<'PYEOF'
+          import json, sys, os
+          threshold = int(os.environ.get("THRESHOLD", "70"))
+          try:
+              with open("logs/hermetic_report.json") as f:
+                  report = json.load(f)
+              score = report.get("hermetic_score", 0)
+              print(f"Hermetic score: {score}/100 (threshold: {threshold})")
+              violations = report.get("violations", [])
+              if violations:
+                  print(f"Violations ({len(violations)}):")
+                  for v in violations[:10]:
+                      print(f"  [{v.get('severity','?')}] {v.get('check','?')}: {v.get('detail','')}")
+              if score < threshold:
+                  print(f"FAIL: Score {score} < threshold {threshold}")
+                  sys.exit(1)
+              print(f"PASS: Score {score} >= threshold {threshold}")
+          except FileNotFoundError:
+              print("hermetic_report.json not found — skipping score check")
+          PYEOF
+        env:
+          THRESHOLD: ${{ github.event.inputs.hermetic_threshold || '70' }}
+
+      - name: Run Python local setup script (dry-run mode)
+        run: |
+          python3 scripts/setup_shieldos_local.py \
+            --skip-containers \
+            --json | tee logs/local_setup_result.json
+
+          # Validate JSON output
+          python3 -c "
+          import json, sys
+          with open('logs/local_setup_result.json') as f:
+              r = json.load(f)
+          print(f'Setup success: {r.get(\"success\")}')
+          print(f'Hermetic score: {r.get(\"hermetic_score\")}/100')
+          failed = r.get('steps_failed', [])
+          if failed:
+              print(f'Failed steps: {failed}')
+              sys.exit(1)
+          "
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shieldos-setup-${{ github.run_id }}
+          path: |
+            logs/
+            !logs/*.pid
+          retention-days: 14
+          if-no-files-found: warn
+
+  # ── Job 3: Report summary ───────────────────────────────────────────────────
+  report:
+    name: Setup Report
+    needs: [validate, setup-and-test]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: shieldos-setup-${{ github.run_id }}
+          path: logs/
+        continue-on-error: true
+
+      - name: Print summary
+        run: |
+          echo "## ShieldOS Setup Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Job | Result |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Validate | ${{ needs.validate.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Setup & Test | ${{ needs.setup-and-test.result }} |" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f "logs/hermetic_report.json" ]; then
+            SCORE=$(python3 -c "
+          import json
+          with open('logs/hermetic_report.json') as f:
+              r = json.load(f)
+          print(r.get('hermetic_score', 'N/A'))
+          " 2>/dev/null || echo "N/A")
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Hermetic Score:** ${SCORE}/100" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ -f "logs/ci_setup_report_"*.json ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**CI Report:**" >> "$GITHUB_STEP_SUMMARY"
+            echo "\`\`\`json" >> "$GITHUB_STEP_SUMMARY"
+            cat logs/ci_setup_report_*.json >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+            echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
