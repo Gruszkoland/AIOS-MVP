@@ -152,13 +152,13 @@ GET /ebdi/telemetry
 GET /guardian/laws
 → All 9 Guardian Laws status
   G1: Unity
-  G2: Harmony
+  G2: Truth
   G3: Rhythm
   G4: Causality
   G5: Transparency
-  G6: Authenticity
-  G7: Privacy
-  G8: Nonmaleficence
+  G6: Nonmaleficence
+  G7: Autonomy
+  G8: Justice
   G9: Sustainability
 ```
 

@@ -315,16 +315,16 @@ insight = gardener.speculative_insight()
 | #   | ID  | Name           | Severity | Description                                            |
 | --- | --- | -------------- | -------- | ------------------------------------------------------ |
 | 1   | G1  | Unity          | MEDIUM   | All actions must serve system coherence                |
-| 2   | G2  | Harmony        | MEDIUM   | Balance between competing objectives                   |
+| 2   | G2  | Truth          | HIGH     | Anti-manipulation; analysis must be genuine            |
 | 3   | G3  | Rhythm         | MEDIUM   | Consistent cadence and timing of operations            |
 | 4   | G4  | Causality      | HIGH     | Every action must have a traceable, justified cause    |
 | 5   | G5  | Transparency   | MEDIUM   | All decisions and reasoning visible and auditable      |
-| 6   | G6  | Authenticity   | HIGH     | Outputs genuine and free from deception                |
-| 7   | G7  | Privacy        | CRITICAL | Data and analysis local-only; no external disclosure   |
-| 8   | G8  | Nonmaleficence | CRITICAL | Never cause harm to users, systems, or data            |
+| 6   | G6  | Nonmaleficence | CRITICAL | Do no harm; protect system and users from damage       |
+| 7   | G7  | Autonomy       | HIGH     | Respect free will; no spam or unsolicited contact      |
+| 8   | G8  | Justice        | CRITICAL | Fairness and equitable treatment                       |
 | 9   | G9  | Sustainability | HIGH     | Operate within resource limits, preserve system health |
 
-**Reguła weta:** CRITICAL (G7, G8) → natychmiastowy DENY. ≥2 dowolnych naruszeń → DENY.
+**Reguła weta:** CRITICAL (G6, G8) → natychmiastowy DENY. ≥2 dowolnych naruszeń → DENY.
 
 ## DESIGN PHILOSOPHY (Inspiracje architektoniczne)
 
