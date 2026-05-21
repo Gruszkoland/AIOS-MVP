@@ -8,7 +8,7 @@ import logging
 import os
 import sqlite3
 from datetime import datetime
-from typing import Any, Optional, Protocol
+from typing import Any, Optional, Protocol, cast
 
 from .config import DB_ENGINE, DB_PATH, DB_URL
 
@@ -111,7 +111,7 @@ def get_conn() -> DBConnection:
     conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
-    return conn
+    return cast(DBConnection, conn)
 
 
 def init_db(db_path: Optional[str] = None) -> None:
@@ -157,7 +157,7 @@ def upsert_job(job: dict) -> bool:
         return cursor.rowcount > 0
 
 
-def get_jobs(status: str = None, limit: int = 50) -> list[dict]:
+def get_jobs(status: Optional[str] = None, limit: int = 50) -> list[dict]:
     with get_conn() as conn:
         if status:
             rows = conn.execute(
@@ -416,11 +416,11 @@ def upsert_deal(deal: dict) -> bool:
         return False
 
 
-def get_deals(channel_id: str = None, status: str = None, min_margin: float = None,
+def get_deals(channel_id: Optional[str] = None, status: Optional[str] = None, min_margin: Optional[float] = None,
               limit: int = 50) -> list[dict]:
     """Query deals with optional filters."""
-    clauses = []
-    params = []
+    clauses: list[str] = []
+    params: list[Any] = []
     if channel_id:
         clauses.append("channel_id=?")
         params.append(channel_id)
