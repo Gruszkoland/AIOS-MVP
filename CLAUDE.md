@@ -15,7 +15,7 @@
 - **Name:** ADRION 369 — Multi-Agent AI Orchestration System
 - **Language:** Python 3.11+ (primary), Go 1.22 (Vortex), JavaScript (dashboard)
 - **Framework:** Flask app factory + 5 Blueprints, Echo (Go), Pydantic BaseSettings
-- **Decision model:** Trinity-EBDI 162D space (3 perspectives x 6 agents x 9 laws)
+- **Decision model:** Trinity-EBDI 162D space (3 perspectives x 6 modes x 9 laws)
 - **Canonical source of truth:** `docs/GUARDIAN_LAWS_CANONICAL.json` (9 praw)
 - **User language:** Polish (komunikacja), English (code comments, git commits)
 
@@ -89,17 +89,32 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 
 ### Guardian Laws (canonical: `docs/GUARDIAN_LAWS_CANONICAL.json`)
 
-| #   | Code | Name           | Severity | Veto |
-| --- | ---- | -------------- | -------- | ---- |
-| 1   | G1   | Unity          | MEDIUM   | No   |
-| 2   | G2   | Harmony        | HIGH     | No   |
-| 3   | G3   | Rhythm         | MEDIUM   | No   |
-| 4   | G4   | Causality      | HIGH     | No   |
-| 5   | G5   | Transparency   | MEDIUM   | No   |
-| 6   | G6   | Authenticity   | HIGH     | No   |
-| 7   | G7   | Privacy        | CRITICAL | YES  |
-| 8   | G8   | Nonmaleficence | CRITICAL | YES  |
-| 9   | G9   | Sustainability | HIGH     | No   |
+**9 Immutable Laws** evaluated through **6 Processing Modes**:
+
+| G# | Law | Severity | Purpose | Primary Modes |
+|----|-----|----------|---------|---|
+| G1 | Unity | MEDIUM | Collective good, system coherence | Inventory, Process, Action |
+| G2 | Truth | HIGH | Anti-manipulation, genuine analysis | Debate, Healing, Action |
+| G3 | Rhythm | MEDIUM | Sustainable pace, balance | Inventory, Process |
+| G4 | Causality | HIGH | Full traceability | Debate, Action |
+| G5 | Transparency | MEDIUM | Explainability, auditable | All 6 Modes |
+| G6 | Nonmaleficence | CRITICAL | Prevent harm | Debate, Healing, Action |
+| G7 | Autonomy | HIGH | Respect free will, no spam | Empathy, Healing |
+| G8 | Justice | CRITICAL | Fair treatment | Debate, Action |
+| G9 | Sustainability | HIGH | Long-term viability | Process, Action |
+
+**6 Processing Modes** (Hexagon):
+1. **Inventory** — Observe facts (3-word summaries)
+2. **Empathy** — Assess emotional/relational impact
+3. **Process** — Organize goals, allocate resources
+4. **Debate** — Multi-agent consensus (5/6 quorum)
+5. **Healing** — Detect deception/manipulation
+6. **Action** — Execute + Genesis Record logging
+
+**3 Perspectives** (Trinity):
+- **Material:** Resources (CPU, RAM, energy)
+- **Intellectual:** Truth (beauty, coherence, logic)
+- **Essential:** Purpose (mission, unity, commons)
 
 **Rule:** CRITICAL violation = instant DENY. 2+ any violations = DENY.
 
@@ -164,7 +179,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 ## 7. CHECKLIST: 75/100 → 100/100
 
 > **Stan inwentaryzacji (2026-04-11):** root=179 items, 45 .md, 10 .log, 9 .txt, 8 .ps1, 24 .py scripts, `Users/` + `O/` dirs present.
-> **Matryca 3-6-9:** 3 perspektywy (LOGOS/ETHOS/EROS) × 6 aspektów hierarchii × 9 praw Guardian = 162D przestrzeń decyzyjna.
+> **Matryca 3-6-9:** 3 perspektywy (Material/Intellectual/Essential) × 6 modes (Inventory/Empathy/Process/Debate/Healing/Action) × 9 praw Guardian = 162D przestrzeń decyzyjna.
 
 ### PHASE 1: CRITICAL FIXES (75→85) — P0 — Branch: `fix/p0-critical`
 

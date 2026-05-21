@@ -1,3 +1,5 @@
+<!-- markdownlint-disable -->
+
 # Repository Architecture Overview
 
 **Version:** 5.0 | **Updated:** 2026-05-20
@@ -196,17 +198,53 @@ evaluate_trinity(job, analysis, system_resources) -> TrinityScore
 Harmonic mean makes each perspective fail-fast: a single zero component
 drives the whole score to zero.
 
-### 4.3 Hexagon 6-Stage Pipeline (arbitrage/hexagon.py)
+### 4.3 Hexagon 6-Stage Pipeline (6 Processing Modes)
 
-Six sequential processing stages refine the decision after Guardian and Trinity
-approval:
+Every decision cycles through six sequential processing stages (the "Hexagon"), each ~30ms:
 
-1. **Inventory** -- current state assessment, market data, portfolio analysis
-2. **Empathy** -- stakeholder impact, team availability, market sentiment
-3. **Process** -- workflow validation, resource allocation
-4. **Debate** -- multi-perspective pros/cons, risk assessment
-5. **Healing** -- cost reduction, quality improvement, tech debt
-6. **Action** -- execution planning, timeline, success metrics
+#### M1: Inventory — What do I see?
+**Observe facts about the request.** Database lookup for precedents, fact extraction, state validation.
+- Evaluates against: G1 (Unity), G3 (Rhythm), G5 (Transparency)
+- Perspective: Material (resources available)
+- Output: observed state summary (3-word facts)
+- Latency: ~30ms
+
+#### M2: Empathy — What does the user feel?
+**Emotional and relational assessment.** Stakeholder impact analysis, historical context, relationship preservation.
+- Evaluates against: G7 (Autonomy), G5 (Transparency)
+- Perspective: Essential (purpose, harmony)
+- Output: stakeholder sentiment, impact summary
+- Latency: ~30ms
+
+#### M3: Process — How to organize this?
+**Decompose into subgoals. Allocate resources.** Goal decomposition, resource availability, timeline feasibility.
+- Evaluates against: G1 (Unity), G3 (Rhythm), G9 (Sustainability)
+- Perspective: Material (resources), Intellectual (logic)
+- Output: execution plan, resource requirements
+- Latency: ~30ms
+
+#### M4: Debate — Is this safe?
+**Multi-agent consensus voting.** Byzantine fault-tolerant (5/6 quorum), conflicting perspectives reconciled.
+- Evaluates against: G2 (Truth), G4 (Causality), G6 (Nonmaleficence), G8 (Justice)
+- Perspective: Intellectual (truth, logic)
+- Output: consensus decision, voting breakdown
+- Latency: ~30ms
+
+#### M5: Healing — Are there manipulations?
+**Detect adversarial/deceptive patterns.** Hidden assumption discovery, principle alignment verification.
+- Evaluates against: G2 (Truth), G5 (Transparency), G6 (Nonmaleficence)
+- Perspective: Intellectual (truth), Essential (integrity)
+- Output: risk assessment, deception flags
+- Latency: ~30ms
+
+#### M6: Action — Execute with logging
+**Commit decision to Genesis Record.** Decision hash commitment, Merkle tree chain extension.
+- Evaluates against: G4 (Causality), G5 (Transparency), G8 (Justice)
+- Perspective: All three (comprehensive logging)
+- Output: decision hash, audit trail, timestamp
+- Latency: ~30ms
+
+**Total Hexagon latency: ~180ms (budget: <200ms)**
 
 Each stage produces `{stage_name, analysis, recommendations, confidence_score}`.
 
@@ -687,4 +725,3 @@ and secrets managed via `kubectl create secret` (YAML contains
 3. GitHub Actions: validate → build → push to GHCR → create release
 
 ---
-

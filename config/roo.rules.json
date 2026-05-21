@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "requireConfigParse": true,
+    "forbidPlaintextSecrets": true,
+    "preferEnvVars": true,
+    "maxHookExecutionMs": 2000
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "development": {
+      "security": "standard",
+      "analysis": "balanced",
+      "verbosity": "info"
+    },
+    "production": {
+      "security": "strict",
+      "analysis": "strict",
+      "verbosity": "warning"
+    }
+  },
+  "defaultProfile": "development"
+}

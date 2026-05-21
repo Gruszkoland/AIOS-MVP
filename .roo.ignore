@@ -158,6 +158,10 @@ Genesis Record/Historia Serwera/**/*.log
 Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/**/*.tmp
 reports/temp/
 monitoring/cache/
+cUsersadiha.1_Projekty/
+PROJEKTY/
+90_ARCHIWUM/
+Genesis Record/
 
 # Archives & Compressed
 *.rar

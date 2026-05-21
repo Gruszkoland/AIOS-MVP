@@ -1,76 +1,210 @@
 {
-  "version": "2.0",
-  "schema_note": "Canonical source of truth for all 9 Guardian Laws. Runtime module: arbitrage/guardian.py uses stable code-names (see 'runtime_name') for backward compatibility.",
+  "version": "3.0",
+  "timestamp": "2026-05-20",
+  "description": "Canonical source of truth for ADRION 369's 162-dimensional ethics engine: 3 Perspectives × 6 Modes × 9 Laws",
+  "three_dimensional_architecture": {
+    "perspectives": 3,
+    "modes": 6,
+    "laws": 9,
+    "total_dimensions": 162
+  },
   "weight_map": {
     "CRITICAL": 10,
     "HIGH": 2,
     "MEDIUM": 1
   },
   "deny_weighted_threshold": 4,
+  "perspectives": [
+    {
+      "id": "P1",
+      "name": "Material",
+      "description": "Do we have resources? (CPU, RAM, energy)",
+      "questions": [
+        "What computational resources are available?",
+        "What is the energy budget?",
+        "Can we afford the operational cost?"
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "Intellectual",
+      "description": "Does this make sense? (truth, beauty, goodness)",
+      "questions": [
+        "Is the analysis truthful and genuine?",
+        "Does the decision follow logical coherence?",
+        "Is there elegant simplicity?"
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "Essential",
+      "description": "Does this serve purpose? (unity, harmony, mission)",
+      "questions": [
+        "Does this action serve the common good?",
+        "Is the system's mission advanced?",
+        "Does this preserve long-term sustainability?"
+      ]
+    }
+  ],
+  "modes": [
+    {
+      "id": "M1",
+      "name": "Inventory",
+      "description": "What do I see? Observe facts",
+      "ordinal": 1,
+      "latency_ms": 30,
+      "activities": [
+        "Database lookup for precedents",
+        "Fact extraction from request",
+        "State validation"
+      ]
+    },
+    {
+      "id": "M2",
+      "name": "Empathy",
+      "description": "What does the user feel? Emotional assessment",
+      "ordinal": 2,
+      "latency_ms": 30,
+      "activities": [
+        "Stakeholder impact analysis",
+        "Historical relationship context",
+        "Relationship preservation heuristics"
+      ]
+    },
+    {
+      "id": "M3",
+      "name": "Process",
+      "description": "How to organize this? Structure and resources",
+      "ordinal": 3,
+      "latency_ms": 30,
+      "activities": [
+        "Goal decomposition",
+        "Resource availability check",
+        "Timeline feasibility assessment"
+      ]
+    },
+    {
+      "id": "M4",
+      "name": "Debate",
+      "description": "Is this safe? Multi-agent consensus",
+      "ordinal": 4,
+      "latency_ms": 30,
+      "activities": [
+        "Byzantine fault-tolerant voting (5/6 quorum)",
+        "Conflicting perspectives reconciliation",
+        "Safety threshold enforcement"
+      ]
+    },
+    {
+      "id": "M5",
+      "name": "Healing",
+      "description": "Are there manipulations? Detect deception",
+      "ordinal": 5,
+      "latency_ms": 30,
+      "activities": [
+        "Adversarial pattern detection",
+        "Hidden assumption discovery",
+        "Principle alignment verification"
+      ]
+    },
+    {
+      "id": "M6",
+      "name": "Action",
+      "description": "Execute decision with logging",
+      "ordinal": 6,
+      "latency_ms": 30,
+      "activities": [
+        "Decision hash commitment",
+        "Genesis Record commit",
+        "Merkle tree chain extension"
+      ]
+    }
+  ],
   "laws": [
     {
       "id": "G1",
-      "runtime_name": "Unity",
       "name": "Unity",
       "severity": "MEDIUM",
-      "description": "All actions must serve system coherence"
+      "description": "Collective good—job aligns with system coherence",
+      "principle_alignment": "Essential",
+      "primary_modes": ["Inventory", "Process", "Action"]
     },
     {
       "id": "G2",
-      "runtime_name": "Truth",
-      "name": "Harmony",
+      "name": "Truth",
       "severity": "HIGH",
-      "description": "Balance between competing objectives; analysis must be genuine and reasoned"
+      "description": "Prohibition on manipulation—analysis must be genuine and reasoned",
+      "principle_alignment": "Intellectual",
+      "primary_modes": ["Debate", "Healing", "Action"]
     },
     {
       "id": "G3",
-      "runtime_name": "Rhythm",
       "name": "Rhythm",
       "severity": "MEDIUM",
-      "description": "Maintain consistent cadence and timing of operations"
+      "description": "Balance and equilibrium—maintain consistent operational cadence",
+      "principle_alignment": "Material",
+      "primary_modes": ["Inventory", "Process"]
     },
     {
       "id": "G4",
-      "runtime_name": "Causality",
       "name": "Causality",
       "severity": "HIGH",
-      "description": "Every action must have a traceable, justified cause"
+      "description": "Everything traced—every action has traceable, justified cause",
+      "principle_alignment": "Intellectual",
+      "primary_modes": ["Debate", "Action"]
     },
     {
       "id": "G5",
-      "runtime_name": "Transparency",
       "name": "Transparency",
       "severity": "MEDIUM",
-      "description": "All decisions and reasoning must be visible and auditable"
+      "description": "Explainability—all decisions and reasoning visible and auditable",
+      "principle_alignment": "Intellectual",
+      "primary_modes": ["Inventory", "Debate", "Healing", "Action", "Process", "Empathy"]
     },
     {
       "id": "G6",
-      "runtime_name": "Nonmaleficence",
-      "name": "Authenticity",
-      "severity": "HIGH",
-      "description": "Outputs must be genuine and free from deception",
-      "runtime_note": "Runtime guardian.py implements '_law_nonmaleficence' at pipeline position 6 for architectural G8 (financial harm). G6 Authenticity is enforced implicitly via G2 Truth/Harmony (analysis must be genuine and reasoned). Explicit G6 implementation planned for v1.3."
+      "name": "Nonmaleficence",
+      "severity": "CRITICAL",
+      "description": "Do no harm—protect system and users from financial/operational damage",
+      "principle_alignment": "Essential",
+      "primary_modes": ["Debate", "Healing", "Action"]
     },
     {
       "id": "G7",
-      "runtime_name": "Autonomy",
-      "name": "Privacy",
-      "severity": "CRITICAL",
-      "description": "All data remains local; no repeated unsolicited contact without consent"
+      "name": "Autonomy",
+      "severity": "HIGH",
+      "description": "Respect free will—no spam, no repeated unsolicited contact without consent",
+      "principle_alignment": "Essential",
+      "primary_modes": ["Empathy", "Healing"]
     },
     {
       "id": "G8",
-      "runtime_name": "Justice",
-      "name": "Nonmaleficence",
+      "name": "Justice",
       "severity": "CRITICAL",
-      "description": "Never cause harm: do not bid on jobs outside fair budget range"
+      "description": "Fairness—equitable treatment, no discrimination",
+      "principle_alignment": "Essential",
+      "primary_modes": ["Debate", "Action"]
     },
     {
       "id": "G9",
-      "runtime_name": "Sustainability",
       "name": "Sustainability",
       "severity": "HIGH",
-      "description": "Operate within resource limits and preserve long-term system health"
+      "description": "Long-term viability—operate within resource limits and preserve system health",
+      "principle_alignment": "Material",
+      "primary_modes": ["Process", "Action"]
     }
-  ]
+  ],
+  "decision_flow": {
+    "step_1": "Vectorize user intent → 162D ethics vector (3P × 6M × 9L)",
+    "step_2": "6 Guardians evaluate in parallel (~30ms each)",
+    "step_3": "Hexagon execution sequential (M1→M2→M3→M4→M5→M6, ~180ms total)",
+    "step_4": "Byzantine consensus (5/6 quorum required)",
+    "step_5": "Genesis Record commit (hash-chained audit trail)",
+    "step_6": "Decision: ALLOW / DENY / ESCALATE"
+  },
+  "compliance_notes": {
+    "eu_ai_act": "All 9 Laws align with EU AI Act requirements",
+    "veto_laws": ["G6 (Nonmaleficence)", "G8 (Justice)"],
+    "veto_threshold": "Any CRITICAL violation triggers instant DENY"
+  }
 }

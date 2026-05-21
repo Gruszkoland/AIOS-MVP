@@ -1,7 +1,7 @@
 """
-ADRION 369 — Guardian Laws Engine v5.3
+ADRION 369 — Guardian Laws Engine v6.0
 
-11 Ethical laws validated sequentially for every arbitrage decision (ADRION 369 §VI).
+9 Immutable Guardian Laws validated sequentially for every decision (ADRION 369 §VI).
 
 Decision rules (weighted system):
   WEIGHT_MAP: CRITICAL=10, HIGH=2, MEDIUM=1
@@ -17,27 +17,23 @@ Decision rules (weighted system):
     2x HIGH    = 4  -> DENY (two moderate issues compound)
     1x CRITICAL    = 10 -> always DENY
 
-11 Guardian Laws (§VI ADRION 369 v5.3):
-  G1. Unity          (MEDIUM)   — job aligns with system's core purpose
-  G2. Harmony        (MEDIUM)   — balance between competing objectives (was Truth)
-  G3. Rhythm         (MEDIUM)   — bid pace is sustainable (daily limits)
-  G4. Causality      (HIGH)     — price chain is traceable and non-negative
-  G5. Transparency   (MEDIUM)   — all required analysis fields present
-  G6. Authenticity   (HIGH)     — LLM output genuine, non-deceptive, non-frozen
-  G7. Privacy        (CRITICAL) — no external disclosure without consent (was Autonomy)
-  G8. Nonmaleficence (CRITICAL) — no financial harm to operator
-  G9. Sustainability (HIGH)     — daily total operational cost within limit
-  G10. Evolution     (HIGH)     — errors drive improvement; PME feedback loops active
-  G11. RelationalCare (MEDIUM)  — respect user attention budget; transparency on cost
+9 Guardian Laws (§VI ADRION 369 v6.0):
+  G1. Unity          (MEDIUM)   — collective good; system coherence
+  G2. Truth          (HIGH)     — prohibition on manipulation; genuine analysis
+  G3. Rhythm         (MEDIUM)   — balance; sustainable bid pace
+  G4. Causality      (HIGH)     — everything traced; non-negative price chain
+  G5. Transparency   (MEDIUM)   — explainability; all analysis fields present
+  G6. Nonmaleficence (CRITICAL) — do no harm; protect from financial damage
+  G7. Autonomy       (HIGH)     — respect free will; no spam/unsolicited contact
+  G8. Justice        (CRITICAL) — fairness; equitable treatment
+  G9. Sustainability (HIGH)     — long-term viability; operational cost within limit
 
 DSPy Signature:
   In(job:dict, analysis:dict, context:dict) -> Out(laws:list[LawResult], compliance:int, approved:bool)
 
-Backward compatibility:
-  Code "Harmony"    = Canonical G2 "Harmony"
-  Code "Privacy"    = Canonical G7 "Privacy"        [CRITICAL]
-  Code "Authenticity" = Canonical G6 "Authenticity" [HIGH]
-  Runtime names preserved for API/test compatibility.
+Canonical definitions:
+  All law names and severities per docs/GUARDIAN_LAWS_CANONICAL.json (v3.0).
+  Mapped to 3 Perspectives × 6 Modes × 9 Laws = 162-dimensional ethics space.
 """
 from __future__ import annotations
 

@@ -1,0 +1,55 @@
+name: copilot-config-health
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - ".roo/**"
+      - ".vscode/**"
+      - "scripts/reporting/validate_copilot_workspace.ps1"
+      - "scripts/reporting/generate_copilot_stability_report.py"
+      - ".github/workflows/copilot-config-health.yml"
+  pull_request:
+    paths:
+      - ".roo/**"
+      - ".vscode/**"
+      - "scripts/reporting/validate_copilot_workspace.ps1"
+      - "scripts/reporting/generate_copilot_stability_report.py"
+      - ".github/workflows/copilot-config-health.yml"
+
+jobs:
+  validate-copilot-config:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate config files
+        shell: pwsh
+        run: |
+          ./scripts/reporting/validate_copilot_workspace.ps1
+
+      - name: Generate stability report
+        shell: pwsh
+        run: |
+          python scripts/reporting/generate_copilot_stability_report.py
+
+      - name: Generate tooling recommendations
+        shell: pwsh
+        run: |
+          python scripts/reporting/generate_tooling_recommendations.py
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: copilot-stability-report
+          path: |
+            reports/copilot_stability_report.json
+            reports/tooling_recommendations_report.json

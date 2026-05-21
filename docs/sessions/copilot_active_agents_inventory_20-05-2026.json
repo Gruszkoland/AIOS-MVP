@@ -1,0 +1,75 @@
+﻿{
+    "timestamp":  "2026-05-20T13:19:24",
+    "active_sources":  [
+                           ".github",
+                           ".github/agents",
+                           "config/persona-agents"
+                       ],
+    "count":  16,
+    "agents":  [
+                   {
+                       "name":  "adrion-architect.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\.github\\adrion-architect.agent.md"
+                   },
+                   {
+                       "name":  "high-yield-dev.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\.github\\high-yield-dev.agent.md"
+                   },
+                   {
+                       "name":  "security-guard.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\.github\\security-guard.agent.md"
+                   },
+                   {
+                       "name":  "ai-personas.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\.github\\agents\\ai-personas.agent.md"
+                   },
+                   {
+                       "name":  "awa.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\.github\\agents\\awa.agent.md"
+                   },
+                   {
+                       "name":  "n8n-architect.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\.github\\agents\\n8n-architect.agent.md"
+                   },
+                   {
+                       "name":  "rev.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\.github\\agents\\rev.agent.md"
+                   },
+                   {
+                       "name":  "amplifier.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\config\\persona-agents\\amplifier.agent.md"
+                   },
+                   {
+                       "name":  "architect.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\config\\persona-agents\\architect.agent.md"
+                   },
+                   {
+                       "name":  "auditor.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\config\\persona-agents\\auditor.agent.md"
+                   },
+                   {
+                       "name":  "boosterlever.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\config\\persona-agents\\boosterlever.agent.md"
+                   },
+                   {
+                       "name":  "chronos.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\config\\persona-agents\\chronos.agent.md"
+                   },
+                   {
+                       "name":  "healer.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\config\\persona-agents\\healer.agent.md"
+                   },
+                   {
+                       "name":  "librarian.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\config\\persona-agents\\librarian.agent.md"
+                   },
+                   {
+                       "name":  "sap.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\config\\persona-agents\\sap.agent.md"
+                   },
+                   {
+                       "name":  "sentinel.agent.md",
+                       "path":  "C:\\Users\\adiha\\.1_Projekty\\config\\persona-agents\\sentinel.agent.md"
+                   }
+               ]
+}

@@ -1,0 +1,12 @@
+{
+  "activeSources": [
+    ".github",
+    "config/persona-agents"
+  ],
+  "archivedSources": [
+    "PROJEKTY/**",
+    "Genesis Record/**",
+    "90_ARCHIWUM/**"
+  ],
+  "notes": "Only activeSources are treated as source-of-truth for Copilot agent loading and validation."
+}

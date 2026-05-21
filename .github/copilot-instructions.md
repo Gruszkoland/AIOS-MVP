@@ -7,8 +7,7 @@ changelog:
   - "5.0: Faza 5 — dodano ECOSYSTEM v2.0 (3 filary: antifragility/attention/playground) + aktywacja przez Gardener hooks w Krokach 1.5, 2.5, 3, 5"
   - "4.1: Guardian Laws synced with CANONICAL.json, deduplicated Step 4 & response format, added Implementation Status, simplified Protocol 333, added Testing Directives, Persona-Agent mapping, Roo-Code integration, Design Philosophy section"
   - "4.0: Initial 10-mechanism safety framework, EBDI vectoring, Protocol 333 sensors"
-applyTo:
-  - "**/*"
+applyTo: "**/*"
 ---
 
 # ROLE: MASTER ORCHESTRATOR (ADRION 369 v4.1)
@@ -221,13 +220,15 @@ Wszystkie modyfikacje plików loguj w Markdown jako kod tekstowy:
 ## TESTING DIRECTIVES
 
 - **Framework**: `pytest` (Python), `go test` (Go). Nie używaj `unittest` bezpośrednio.
+- **Run Policy (ALWAYS)**: Po każdej zmianie kodu uruchom odpowiedni zestaw testów (co najmniej testy pliku/modułu, a przy zmianach przekrojowych pełny suite).
+- **Results Persistence (ALWAYS)**: Zapisuj wynik uruchomionych testów w repozytorium wdrażanym, domyślnie do `REPORTS/test-results/<YYYY-MM-DD_HH-mm-ss>_test-report.txt` (utwórz katalog jeśli nie istnieje).
 - **Konwencja**: `tests/test_<module>.py` — każdy nowy moduł wymaga pliku testów.
 - **Mockowanie**: Preferuj `monkeypatch` (pytest) zamiast `unittest.mock.patch`. Wyjątek: `create=True` dla nieistniejących atrybutów.
 - **Coverage gate**: Python ≥65%, Go ≥80% (CI: `python-ci.yml`, `release.yml`).
 - **Izolacja**: Fixture `clean_env` (patches `dotenv.load_dotenv`) — zapobiega override z `.env`.
 - **Windows**: Testy API — `_rate_lim_post()` workaround dla TCP RST + threaded HTTPServer.
 - **Lazy imports**: Moduły z ciężkimi zależnościami (database, Apify) — patch na poziomie importu.
-- **Zasada**: Nie pisz testów dla trywialnych zmian. Pisz dla każdej nowej funkcji, endpointu i logiki decyzyjnej.
+- **Zasada jakości**: Im więcej sensownych testów tym lepiej — rozszerzaj testy dla każdej nowej funkcji, endpointu, logiki decyzyjnej i scenariuszy regresyjnych.
 
 ## FATAL ERROR HANDLING
 

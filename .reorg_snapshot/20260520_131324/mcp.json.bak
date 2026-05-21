@@ -8,105 +8,103 @@
       ],
       "env": {
         "DEFAULT_MINIMUM_TOKENS": ""
-      },
-      "disabled": false
+      }
     },
-    "filesystem": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "${workspaceFolder}"
-      ],
-      "env": {},
-      "disabled": false
-    },
-    "git": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-git",
-        "${workspaceFolder}"
-      ],
-      "env": {},
-      "disabled": false
-    },
-    "python": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp.server.python"
-      ],
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}",
-        "PYTHONDONTWRITEBYTECODE": "1"
-      },
-      "disabled": false
-    },
-    "docker": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-docker"
-      ],
-      "env": {
-        "DOCKER_HOST": "${env:DOCKER_HOST}"
-      },
-      "disabled": false
-    },
-    "postgres": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-postgres"
-      ],
-      "env": {
-        "DATABASE_URL": "${env:DATABASE_URL}"
-      },
-      "disabled": true
-    },
-    "brave-search": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-brave-search"
-      ],
-      "env": {
-        "BRAVE_API_KEY": "${env:BRAVE_API_KEY}"
-      },
-      "disabled": true
-    },
-    "debugging": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp.server.debug"
-      ],
-      "env": {
-        "DEBUG_LEVEL": "info",
-        "PYTHONPATH": "${workspaceFolder}"
-      },
-      "disabled": false
-    },
-    "n8n": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "n8n-mcp"
-      ],
-      "env": {
-        "MCP_MODE": "stdio",
-        "LOG_LEVEL": "error",
-        "DISABLE_CONSOLE_OUTPUT": "true",
-        "N8N_API_URL": "${env:N8N_API_URL}",
-        "N8N_BASE_URL": "${env:N8N_BASE_URL}",
-        "N8N_URL": "${env:N8N_URL}",
-        "N8N_API_KEY": "${env:N8N_API_KEY}"
-      },
-      "disabled": false
-    }
+    "MCP_MODE": "stdio",
+    "LOG_LEVEL": "error",
+    "DISABLE_CONSOLE_OUTPUT": "true",
+    "N8N_API_URL": "https://n8n.aitransformationagency.pl",
+    "N8N_BASE_URL": "https://n8n.aitransformationagency.pl",
+    "N8N_URL": "https://n8n.aitransformationagency.pl",
+    "N8N_API_KEY": "${env:N8N_API_KEY}""args": [
+      "-y",
+      "@modelcontextprotocol/server-filesystem",
+      "${workspaceFolder}"
+    ],
+    "env": {},
+    "disabled": false
   },
-  "rooSettings": {
+  "git": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-git",
+      "${workspaceFolder}"
+    ],
+    "env": {},
+    "disabled": false
+  },
+  "python": {
+    "command": "python",
+    "args": [
+      "-m",
+      "mcp.server.python"
+    ],
+    "env": {
+      "PYTHONPATH": "${workspaceFolder}",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "disabled": false
+  },
+  "docker": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-docker"
+    ],
+    "env": {
+      "DOCKER_HOST": "unix:///var/run/docker.sock"
+    },
+    "disabled": false
+  },
+  "postgres": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-postgres"
+    ],
+    "env": {
+      "DATABASE_URL": "postgresql://adrion:adrion_pass@localhost:5432/genesis_record"
+    },
+    "disabled": true
+  },
+  "brave-search": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-brave-search"
+    ],
+    "env": {
+      "BRAVE_API_KEY": "${env:BRAVE_API_KEY}"
+    },
+    "disabled": true
+  },
+  "debugging": {
+    "command": "python",
+    "args": [
+      "-m",
+      "mcp.server.debug"
+    ],
+    "env": {
+      "DEBUG_LEVEL": "info",
+      "PYTHONPATH": "${workspaceFolder}"
+    },
+    "disabled": false
+  },
+  "n8n": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "n8n-mcp"
+    ],
+    "env": {
+      "N8N_API_URL": "https://aitransformationagency.pl/api/v1",
+      "N8N_API_KEY": "${env:N8N_API_KEY}"
+    },
+    "disabled": false
+  }
+},
+"rooSettings": {
   "project": {
     "name": "ADRION-369",
     "version": "4.0.1",
@@ -163,8 +161,8 @@
       "performance"
     ]
   }
-  },
-  "toolConfig": {
+},
+"toolConfig": {
   "ruff": {
     "configFile": "pyproject.toml",
     "pythonVersion": "3.11",
@@ -183,8 +181,8 @@
     "buildContext": ".",
     "registry": "docker.io"
   }
-  },
-  "pathMappings": {
+},
+"pathMappings": {
   "workspace": "${workspaceFolder}",
   "config": "${workspaceFolder}/config",
   "scripts": "${workspaceFolder}/scripts",
@@ -192,11 +190,11 @@
   "mcp": "${workspaceFolder}/mcp_servers",
   "arbitrage": "${workspaceFolder}/arbitrage",
   "docs": "${workspaceFolder}/docs"
-  },
-  "metadata": {
+},
+"metadata": {
   "configVersion": "1.0",
   "createdAt": "2026-04-08",
   "maintainer": "ADRION-369 Master Orchestrator",
   "purpose": "Roo Code MCP configuration for ADRION 369"
-  }
+}
 }
