@@ -1,1 +1,0 @@
-# Genesis MCP Server package

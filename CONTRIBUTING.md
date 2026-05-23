@@ -374,3 +374,33 @@ All contributions must comply with the 9 Guardian Laws. The canonical definition
 ## License
 
 By contributing to AIOS MVP, you agree that your contributions will be licensed under the MIT License (see [LICENSE](LICENSE)).
+
+---
+
+## Unsafe code review checklist
+
+Any PR that introduces or modifies an `unsafe` block **must** receive two approvals and satisfy all items below before merge.
+
+### Required items (all must be checked)
+
+- [ ] Every `unsafe` block has a `// SAFETY:` comment explaining which invariant is maintained and why it is upheld at this call site.
+- [ ] The invariant cannot be violated by any safe caller — if it can, the API must be `unsafe fn` itself.
+- [ ] A test exists that would panic or produce incorrect output if the invariant were violated (even a debug-mode assertion is sufficient).
+- [ ] `miri` has been run on the affected code: `cargo miri test -p <crate>` passes without errors.
+- [ ] No uninitialized memory is read (use `MaybeUninit` explicitly if needed).
+- [ ] No data races are introduced (document why in the `SAFETY` comment if shared state is involved).
+- [ ] Pointer arithmetic is bounds-checked or proven safe by construction.
+
+### How to run miri locally
+
+```bash
+rustup toolchain install nightly
+rustup component add miri --toolchain nightly
+cargo +nightly miri test -p aios-kernel
+cargo +nightly miri test -p aios-ipc
+```
+
+### PR label
+
+Add the `unsafe-review` label to any PR touching `unsafe` blocks. This auto-requests reviews from the `@Gruszkoland/kernel-reviewers` team.
+

@@ -1,1 +1,0 @@
-# Guardian MCP Server package

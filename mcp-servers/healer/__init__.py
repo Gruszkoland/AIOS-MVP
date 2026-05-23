@@ -1,1 +1,0 @@
-# Healer MCP Server package
