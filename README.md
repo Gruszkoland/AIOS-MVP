@@ -55,9 +55,9 @@ Further reading:
 
 | Crate | Lines (approx.) | Purpose |
 |-------|-----------------|---------|
-| `kernel` | ~500 | Deterministic no_std core — 162D topology, consensus |
-| `agents` | ~300 | Guardian trait + 9 specialist implementations |
-| `ipc` | ~200 | Zero-copy ring-buffer inter-process communication |
+| `kernel` | ~370 | Deterministic no_std core — 162D topology, consensus |
+| `agents` | ~140 | Guardian trait + 9 specialist implementations |
+| `ipc` | ~330 | Zero-copy ring-buffer inter-process communication |
 | `poc/scheduler-mgr` | ~100 | User-space PoC orchestrator |
 
 ---
@@ -83,7 +83,11 @@ A ticket is closed when it:
 
 ---
 
-## Current focus — Sprint 1
+## Status — v0.2.0-alpha
+
+Sprint 1 complete: kernel 162D topology, IPC ring buffer, and Guardian trait are implemented with full test coverage.
+Current focus: Sprint 2 — benchmarking IPC latency, fuzzing the consensus engine, and end-to-end PoC integration.
+
 
 1. Monorepo setup and directory structure
 2. Developer tooling configuration (rustfmt, clippy, pre-commit)

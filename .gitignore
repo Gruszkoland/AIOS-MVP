@@ -1,20 +1,56 @@
+# Rust build artefacts
 /target
-/.idea
-/.vscode
+Cargo.lock
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Databases and secrets
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Local machine config
+.gitconfig
+.wslconfig
+.lmstudio-home-pointer
+.moonshot_ai_rc
+-*.xml
 .DS_Store
 Thumbs.db
-.env
-.env*
+.idea/
+
+# Logs and runtime artefacts
 *.log
 _*.log
+.sync-logs/
+logs/
 coverage/
 cov_*.txt
 temp_*.txt
 test_output.txt
-_*_stderr.log
-_*_stdout.log
-.pytest_cache/
-*.pyc
-__pycache__/
-logs/
-.claude.json
+
+# IDE
+.vscode/settings.json
+.vscode/launch.json
+
+# Node
+node_modules/
+
+# Keep secrets baseline
+!.secrets.baseline

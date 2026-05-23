@@ -1,41 +1,21 @@
-# ADRION 369 Code Ownership
+# AIOS-MVP Code Ownership
+# Default owner
+*                        @Gruszkoland
 
-# Each line: pattern owner(s)
+# Rust kernel crates (unsafe-review required for any unsafe block)
+/kernel/                 @Gruszkoland
+/ipc/                    @Gruszkoland
+/agents/                 @Gruszkoland
+/poc/                    @Gruszkoland
 
-# Owners are auto-requested for review on matching PRs
+# MCP servers
+/mcp_servers/            @Gruszkoland
 
-# Default — project owner
+# Documentation and ADRs
+/docs/                   @Gruszkoland
 
--                           @adiha
+# CI/CD
+/.github/workflows/      @Gruszkoland
 
-# Core arbitrage engine
-
-arbitrage/ @adiha
-arbitrage/guardian.py @adiha
-arbitrage/trinity.py @adiha
-
-# Go Vortex
-
-cmd/ @adiha
-internal/ @adiha
-go.mod @adiha
-
-# UAP Orchestrator
-
-uap/ @adiha
-
-# Infrastructure
-
-docker-compose*.yml @adiha
-kubernetes/ @adiha
-Dockerfile* @adiha
-
-# CI/CD — changes here need explicit review
-
-.github/ @adiha
-
-# Security-sensitive files
-
-arbitrage/config.py @adiha
-arbitrage/database.py @adiha
-arbitrage/llm.py @adiha
+# Security
+/SECURITY.md             @Gruszkoland

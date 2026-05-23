@@ -6,9 +6,9 @@ authors.workspace = true
 license.workspace = true
 
 [dependencies]
-kernel = { path = "../../kernel" }
-agents = { path = "../../agents" }
-ipc = { path = "../../ipc" }
+aios-kernel = { path = "../../kernel" }
+aios-agents = { path = "../../agents" }
+aios-ipc = { path = "../../ipc" }
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
