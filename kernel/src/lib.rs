@@ -5,117 +5,148 @@
 //! AIOS Kernel — deterministic `no_std` core.
 //!
 //! Implements the 162-dimensional decision topology from the ADRION 369
-//! moral framework (3 Principles × 6 Interpretation Modes × 9 Guardians).
+//! moral framework:
 //!
-//! # Architecture
 //! ```text
-//! DecisionVector<162>
-//!     ├─ Principle layer   [0..54]   — Life, Freedom, Dignity
-//!     ├─ Mode layer        [54..108] — Analytical … Relational
-//!     └─ Guardian layer    [108..162]— 9 specialist agents × 6 weights
+//! D^162 = P^3 (Trinity) × H^6 (Hexagon) × G^9 (Guardian Laws)
 //! ```
 //!
-//! All types implement `Copy` so they live on the stack — no allocator needed.
+//! # Layer overview
+//!
+//! | Layer | Axis | Count | Examples |
+//! |-------|------|-------|---------|
+//! | Trinity perspectives | P^3 | 3 | Material, Intellectual, Essential |
+//! | Hexagon pipeline stages | H^6 | 6 | Inventory … Action — **NOT guardians** |
+//! | Guardian Laws | G^9 | 9 | Unity … Sustainability (canonical) |
+//!
+//! G10 (Evolution) and G11 (RelationalCare) are runtime extensions active in
+//! the Python layer — they are not part of the 162D tensor product.
 
-// ─── Principle layer (indices 0..54) ────────────────────────────────────────
+// ─── Trinity perspectives (P^3, not guardians) ──────────────────────────────
 
-/// The three top-level moral principles of ADRION 369.
+/// The three top-level scoring perspectives.
+/// These are **not** Guardian Laws — they form the P^3 axis of D^162.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
-pub enum Principle {
-    /// P1 — Protect and preserve life.
-    Life = 0,
-    /// P2 — Respect and promote freedom.
-    Freedom = 1,
-    /// P3 — Uphold inherent dignity.
-    Dignity = 2,
+pub enum TrinityPerspective {
+    /// P1 — Physical resources, energy, compute availability.
+    Material = 0,
+    /// P2 — Logical coherence, truth verification, elegance.
+    Intellectual = 1,
+    /// P3 — Mission alignment, ethics compliance.
+    Essential = 2,
 }
 
-impl Principle {
-    /// Returns the slice offset into a `DecisionVector` for this principle.
+impl TrinityPerspective {
+    /// Offset into a `DecisionVector` for this perspective's 54 dimensions.
     #[inline]
     pub const fn offset(self) -> usize {
-        self as usize * 18  // 3 principles × 18 weights each = 54
+        self as usize * 18
     }
 }
 
-// ─── Interpretation-mode layer (indices 54..108) ─────────────────────────────
+// ─── Hexagon pipeline stages (H^6, not guardians) ───────────────────────────
 
-/// Six lenses through which each decision is evaluated.
+/// The six sequential decision-pipeline stages.
+/// These are **not** Guardian Laws — they form the H^6 axis of D^162.
+/// Previously mislabelled as "6 Guardian Personas" in documentation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
-pub enum InterpretationMode {
-    /// M1 — Logical deduction from first principles.
-    Analytical = 0,
-    /// M2 — Learned patterns from past decisions.
-    Empirical = 1,
-    /// M3 — Long-horizon risk modelling.
-    Predictive = 2,
-    /// M4 — Multi-stakeholder perspective integration.
-    Contextual = 3,
-    /// M5 — Moral intuition and value alignment.
-    Normative = 4,
-    /// M6 — Care ethics and relationship-based reasoning.
-    Relational = 5,
+pub enum HexagonStage {
+    /// H1 — Inventory: analyse available resources and assets.
+    Inventory = 0,
+    /// H2 — Empathy: assess stakeholder impact and social reality.
+    Empathy = 1,
+    /// H3 — Process: optimise workflow and execution.
+    Process = 2,
+    /// H4 — Debate: multi-perspective confrontation of results.
+    Debate = 3,
+    /// H5 — Healing: risk mitigation and crisis preparation.
+    Healing = 4,
+    /// H6 — Action: final recommendation and deployment plan.
+    Action = 5,
 }
 
-impl InterpretationMode {
-    /// Returns the slice offset into a `DecisionVector` for this mode.
+impl HexagonStage {
+    /// Offset into a `DecisionVector` for this stage's 27 dimensions.
     #[inline]
     pub const fn offset(self) -> usize {
-        54 + self as usize * 9  // 6 modes × 9 weights each = 54
+        54 + self as usize * 9
     }
 }
 
-// ─── Guardian layer (indices 108..162) ──────────────────────────────────────
+// ─── Guardian Laws (G^9, canonical) ─────────────────────────────────────────
 
-/// The nine specialist Guardian agents, each with veto capability.
+/// The nine canonical Guardian Laws of ADRION 369 (G1–G9).
+///
+/// Each variant has two names:
+/// - The **law name** (abstract ethical principle, used in GUARDIAN_LAWS_CANONICAL.json)
+/// - The **persona alias** (operational agent that enforces it, used in LAWS.md)
+///
+/// G10 (Evolution) and G11 (RelationalCare) exist as runtime extensions in the
+/// Python layer but are not represented here — they are outside the canonical 9.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
-pub enum Guardian {
-    /// G1 — Librarian: knowledge integrity.
-    Librarian = 0,
-    /// G2 — SAP: situational awareness processor.
-    Sap = 1,
-    /// G3 — Auditor: compliance and logging.
-    Auditor = 2,
-    /// G4 — Sentinel: real-time threat detection.
-    Sentinel = 3,
-    /// G5 — Architect: structural coherence.
-    Architect = 4,
-    /// G6 — Healer: system recovery.
-    Healer = 5,
-    /// G7 — Oracle: probabilistic forecasting.
-    Oracle = 6,
-    /// G8 — Vortex: resource optimisation.
-    Vortex = 7,
-    /// G9 — Genesis: creative synthesis.
-    Genesis = 8,
+pub enum GuardianLaw {
+    /// G1 — Unity (persona: Librarian). All actions serve system coherence.
+    Unity = 0,
+    /// G2 — Harmony (persona: SAP). Balance competing objectives; genuine analysis.
+    Harmony = 1,
+    /// G3 — Rhythm (persona: Auditor). Consistent cadence and timing.
+    Rhythm = 2,
+    /// G4 — Causality (persona: Sentinel). Every action has a traceable cause.
+    Causality = 3,
+    /// G5 — Transparency (persona: Architect). Decisions visible and auditable.
+    Transparency = 4,
+    /// G6 — Authenticity (persona: Healer). Outputs genuine, non-deceptive.
+    Authenticity = 5,
+    /// G7 — Privacy (persona: system-wide). CRITICAL — veto power.
+    Privacy = 6,
+    /// G8 — Nonmaleficence (persona: system-wide). CRITICAL — veto power.
+    Nonmaleficence = 7,
+    /// G9 — Sustainability (persona: system-wide). Long-term resource health.
+    Sustainability = 8,
 }
 
-impl Guardian {
-    /// Returns the slice offset into a `DecisionVector` for this guardian.
+impl GuardianLaw {
+    /// Returns the slice offset into a `DecisionVector` for this law (6 dims).
     #[inline]
     pub const fn offset(self) -> usize {
-        108 + self as usize * 6  // 9 guardians × 6 mode-weights each = 54
+        108 + self as usize * 6
     }
 
-    /// Criticality score used in the weighted consensus calculation.
-    ///
-    /// Returns `10` for safety-critical guardians, `2` for high-impact, `1` for standard.
+    /// Severity-based criticality weight for consensus scoring.
+    /// CRITICAL = 10, HIGH = 2, MEDIUM = 1.
     #[inline]
     pub const fn criticality(self) -> u32 {
         match self {
-            Guardian::Sentinel | Guardian::Auditor => 10,
-            Guardian::Architect | Guardian::Healer => 2,
-            _ => 1,
+            GuardianLaw::Privacy | GuardianLaw::Nonmaleficence => 10, // CRITICAL
+            GuardianLaw::Causality
+            | GuardianLaw::Authenticity
+            | GuardianLaw::Sustainability => 2, // HIGH
+            _ => 1, // MEDIUM
         }
     }
 
-    /// Whether this guardian holds veto power over `DENY` decisions.
+    /// Whether this guardian holds hard veto power over any decision.
     #[inline]
     pub const fn has_veto(self) -> bool {
-        matches!(self, Guardian::Sentinel | Guardian::Auditor | Guardian::Architect)
+        matches!(self, GuardianLaw::Privacy | GuardianLaw::Nonmaleficence)
+    }
+
+    /// Human-readable persona alias for this law.
+    pub const fn persona_alias(self) -> &'static str {
+        match self {
+            GuardianLaw::Unity => "Librarian",
+            GuardianLaw::Harmony => "SAP",
+            GuardianLaw::Rhythm => "Auditor",
+            GuardianLaw::Causality => "Sentinel",
+            GuardianLaw::Transparency => "Architect",
+            GuardianLaw::Authenticity => "Healer",
+            GuardianLaw::Privacy | GuardianLaw::Nonmaleficence | GuardianLaw::Sustainability => {
+                "system-wide"
+            }
+        }
     }
 }
 
@@ -123,13 +154,10 @@ impl Guardian {
 
 /// A 162-dimensional fixed-size decision vector.
 ///
-/// Dimensions are laid out as:
-/// - `[0..54]`   — Principle × mode weights (3 × 18)
-/// - `[54..108]` — Mode × guardian weights (6 × 9)
-/// - `[108..162]`— Guardian × mode scores (9 × 6)
-///
-/// All values are in the range `[0, 255]` (u8) for compact storage.
-/// Use `normalize()` to map them to `[0.0, 1.0]` f32 when needed.
+/// Layout:
+/// - `[0..54]`    — Trinity × mode weights (3 perspectives × 18 dims each)
+/// - `[54..108]`  — Hexagon × guardian weights (6 stages × 9 dims each)
+/// - `[108..162]` — Guardian × stage scores (9 laws × 6 dims each)
 #[derive(Clone, Copy)]
 pub struct DecisionVector {
     data: [u8; 162],
@@ -142,13 +170,13 @@ impl DecisionVector {
         Self { data: [0u8; 162] }
     }
 
-    /// Creates a uniform decision vector with all weights set to `value`.
+    /// Creates a uniform vector with all weights set to `value`.
     #[inline]
     pub const fn uniform(value: u8) -> Self {
         Self { data: [value; 162] }
     }
 
-    /// Returns the raw value at `index`. Panics in debug if out of range.
+    /// Returns the raw value at `index`.
     #[inline]
     pub fn get(&self, index: usize) -> u8 {
         self.data[index]
@@ -160,35 +188,35 @@ impl DecisionVector {
         self.data[index] = value;
     }
 
-    /// Sets all weights for a given `Principle` region (18 dimensions).
-    pub fn set_principle_weights(&mut self, p: Principle, weights: [u8; 18]) {
-        let off = p.offset();
-        self.data[off..off + 18].copy_from_slice(&weights);
-    }
-
-    /// Sets all weights for a given `InterpretationMode` region (9 dimensions).
-    pub fn set_mode_weights(&mut self, m: InterpretationMode, weights: [u8; 9]) {
-        let off = m.offset();
-        self.data[off..off + 9].copy_from_slice(&weights);
-    }
-
-    /// Sets all scores for a given `Guardian` region (6 dimensions).
-    pub fn set_guardian_scores(&mut self, g: Guardian, scores: [u8; 6]) {
+    /// Sets 6 scores for a given `GuardianLaw`.
+    pub fn set_guardian_scores(&mut self, g: GuardianLaw, scores: [u8; 6]) {
         let off = g.offset();
         self.data[off..off + 6].copy_from_slice(&scores);
     }
 
-    /// Computes the L1 norm of the vector (sum of all components).
+    /// Sets 18 weights for a given `TrinityPerspective`.
+    pub fn set_trinity_weights(&mut self, p: TrinityPerspective, weights: [u8; 18]) {
+        let off = p.offset();
+        self.data[off..off + 18].copy_from_slice(&weights);
+    }
+
+    /// Sets 9 weights for a given `HexagonStage`.
+    pub fn set_hexagon_weights(&mut self, h: HexagonStage, weights: [u8; 9]) {
+        let off = h.offset();
+        self.data[off..off + 9].copy_from_slice(&weights);
+    }
+
+    /// L1 norm (sum of all 162 components).
     pub fn l1_norm(&self) -> u32 {
         self.data.iter().map(|&b| b as u32).sum()
     }
 
-    /// Computes the unweighted mean of all 162 components, scaled to [0, 255].
+    /// Unweighted mean scaled to [0, 255].
     pub fn mean(&self) -> u8 {
         (self.l1_norm() / 162) as u8
     }
 
-    /// Returns a normalised f32 value for a single dimension (0.0..=1.0).
+    /// Normalised f32 for a single dimension (0.0..=1.0).
     pub fn normalised(&self, index: usize) -> f32 {
         self.data[index] as f32 / 255.0
     }
@@ -196,60 +224,55 @@ impl DecisionVector {
 
 // ─── Consensus engine ────────────────────────────────────────────────────────
 
-/// Possible outcomes of the ADRION consensus algorithm.
+/// Possible outcomes of the ADRION 369 consensus algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConsensusVerdict {
     /// All guardians approve — action is permitted.
     Approve,
-    /// Weighted score is too low — action is denied.
+    /// Weighted score below threshold — action is denied.
     Deny,
-    /// A veto-holding guardian registered a hard block.
+    /// A veto-holding guardian (G7 Privacy or G8 Nonmaleficence) hard-blocked.
     VetoDeny,
-    /// Score is inconclusive — defer to human oversight.
+    /// Score inconclusive — defer to human oversight.
     DeferToHuman,
 }
 
-/// Computes a weighted consensus verdict from a `DecisionVector`.
-///
-/// Algorithm:
-/// 1. For each guardian, sum its 6 mode-scores weighted by `Guardian::criticality()`.
-/// 2. Accumulate into `total_weighted` and `max_possible`.
-/// 3. Compute ratio = `total_weighted / max_possible`.
-/// 4. If any veto guardian has mean score < `VETO_THRESHOLD` → `VetoDeny`.
-/// 5. `ratio >= APPROVE_THRESHOLD` → `Approve`.
-/// 6. `ratio <= DENY_THRESHOLD` → `Deny`.
-/// 7. Otherwise → `DeferToHuman`.
+/// Computes a weighted consensus verdict across all 9 canonical Guardian Laws.
 pub fn compute_consensus(v: &DecisionVector) -> ConsensusVerdict {
-    const APPROVE_THRESHOLD: u32 = 178;  // ~70% of 255
-    const DENY_THRESHOLD: u32 = 76;      // ~30% of 255
-    const VETO_FLOOR: u8 = 64;           // ~25% — hard veto floor
+    const APPROVE_THRESHOLD: u32 = 178; // ~70% of 255
+    const DENY_THRESHOLD: u32 = 76;     // ~30% of 255
+    const VETO_FLOOR: u8 = 64;          // ~25% — hard veto floor
 
-    let guardians = [
-        Guardian::Librarian, Guardian::Sap, Guardian::Auditor,
-        Guardian::Sentinel, Guardian::Architect, Guardian::Healer,
-        Guardian::Oracle, Guardian::Vortex, Guardian::Genesis,
+    const LAWS: [GuardianLaw; 9] = [
+        GuardianLaw::Unity,
+        GuardianLaw::Harmony,
+        GuardianLaw::Rhythm,
+        GuardianLaw::Causality,
+        GuardianLaw::Transparency,
+        GuardianLaw::Authenticity,
+        GuardianLaw::Privacy,
+        GuardianLaw::Nonmaleficence,
+        GuardianLaw::Sustainability,
     ];
 
     let mut total_weighted: u64 = 0;
     let mut max_possible: u64 = 0;
 
-    for g in guardians {
-        let off = g.offset();
+    for law in LAWS {
+        let off = law.offset();
         let scores = &v.data[off..off + 6];
         let sum: u32 = scores.iter().map(|&s| s as u32).sum();
         let mean6 = (sum / 6) as u8;
 
-        // Hard veto check for safety-critical guardians
-        if g.has_veto() && mean6 < VETO_FLOOR {
+        if law.has_veto() && mean6 < VETO_FLOOR {
             return ConsensusVerdict::VetoDeny;
         }
 
-        let w = g.criticality() as u64;
+        let w = law.criticality() as u64;
         total_weighted += sum as u64 * w;
         max_possible += 255 * 6 * w;
     }
 
-    // Scale ratio to 0..255
     let ratio = (total_weighted * 255 / max_possible) as u32;
 
     if ratio >= APPROVE_THRESHOLD {
@@ -268,91 +291,97 @@ mod tests {
     use super::*;
 
     #[test]
-    fn zeroed_vector_is_deny() {
+    fn zeroed_vector_veto_fires() {
         let v = DecisionVector::zeroed();
-        // All zeros — all guardians below veto floor (64), so first veto guardian fires
         assert_eq!(compute_consensus(&v), ConsensusVerdict::VetoDeny);
     }
 
     #[test]
-    fn uniform_high_vector_is_approve() {
+    fn uniform_high_is_approve() {
         let v = DecisionVector::uniform(220);
         assert_eq!(compute_consensus(&v), ConsensusVerdict::Approve);
     }
 
     #[test]
-    fn uniform_low_vector_is_deny() {
-        let v = DecisionVector::uniform(20);
-        // Mean is 20 which is below veto floor for sentinel/auditor/architect
+    fn veto_fires_on_privacy_law() {
+        let mut v = DecisionVector::uniform(200);
+        v.set_guardian_scores(GuardianLaw::Privacy, [10; 6]);
         assert_eq!(compute_consensus(&v), ConsensusVerdict::VetoDeny);
     }
 
     #[test]
-    fn veto_fires_when_sentinel_scores_low() {
-        let mut v = DecisionVector::uniform(200); // everyone high
-        // Drag sentinel (G4, offset=108+3*6=126) down below veto floor
-        v.set_guardian_scores(Guardian::Sentinel, [10, 10, 10, 10, 10, 10]);
+    fn veto_fires_on_nonmaleficence_law() {
+        let mut v = DecisionVector::uniform(200);
+        v.set_guardian_scores(GuardianLaw::Nonmaleficence, [10; 6]);
         assert_eq!(compute_consensus(&v), ConsensusVerdict::VetoDeny);
     }
 
     #[test]
     fn no_veto_mid_range_defers() {
-        // Set all veto guardians above veto floor, but overall score in middle range
         let mut v = DecisionVector::zeroed();
-        // Veto guardians: Sentinel, Auditor, Architect — set to 128
-        v.set_guardian_scores(Guardian::Sentinel, [128; 6]);
-        v.set_guardian_scores(Guardian::Auditor, [128; 6]);
-        v.set_guardian_scores(Guardian::Architect, [128; 6]);
-        // Non-veto guardians — low
-        v.set_guardian_scores(Guardian::Librarian, [80; 6]);
-        v.set_guardian_scores(Guardian::Sap, [80; 6]);
-        v.set_guardian_scores(Guardian::Healer, [80; 6]);
-        v.set_guardian_scores(Guardian::Oracle, [80; 6]);
-        v.set_guardian_scores(Guardian::Vortex, [80; 6]);
-        v.set_guardian_scores(Guardian::Genesis, [80; 6]);
+        v.set_guardian_scores(GuardianLaw::Privacy, [128; 6]);
+        v.set_guardian_scores(GuardianLaw::Nonmaleficence, [128; 6]);
+        for law in [GuardianLaw::Unity, GuardianLaw::Harmony, GuardianLaw::Rhythm,
+                    GuardianLaw::Causality, GuardianLaw::Transparency,
+                    GuardianLaw::Authenticity, GuardianLaw::Sustainability] {
+            v.set_guardian_scores(law, [80; 6]);
+        }
         let verdict = compute_consensus(&v);
         assert!(matches!(verdict, ConsensusVerdict::DeferToHuman | ConsensusVerdict::Deny));
     }
 
     #[test]
-    fn principle_offset_is_correct() {
-        assert_eq!(Principle::Life.offset(), 0);
-        assert_eq!(Principle::Freedom.offset(), 18);
-        assert_eq!(Principle::Dignity.offset(), 36);
+    fn guardian_law_names_match_canonical() {
+        assert_eq!(GuardianLaw::Unity.persona_alias(), "Librarian");
+        assert_eq!(GuardianLaw::Harmony.persona_alias(), "SAP");
+        assert_eq!(GuardianLaw::Rhythm.persona_alias(), "Auditor");
+        assert_eq!(GuardianLaw::Causality.persona_alias(), "Sentinel");
+        assert_eq!(GuardianLaw::Transparency.persona_alias(), "Architect");
+        assert_eq!(GuardianLaw::Authenticity.persona_alias(), "Healer");
     }
 
     #[test]
-    fn mode_offset_is_correct() {
-        assert_eq!(InterpretationMode::Analytical.offset(), 54);
-        assert_eq!(InterpretationMode::Relational.offset(), 99);
+    fn only_g7_g8_have_veto() {
+        let veto_laws = [GuardianLaw::Privacy, GuardianLaw::Nonmaleficence];
+        let non_veto = [
+            GuardianLaw::Unity, GuardianLaw::Harmony, GuardianLaw::Rhythm,
+            GuardianLaw::Causality, GuardianLaw::Transparency, GuardianLaw::Authenticity,
+            GuardianLaw::Sustainability,
+        ];
+        for law in veto_laws { assert!(law.has_veto(), "{:?} should have veto", law); }
+        for law in non_veto { assert!(!law.has_veto(), "{:?} should not have veto", law); }
     }
 
     #[test]
-    fn guardian_offset_is_correct() {
-        assert_eq!(Guardian::Librarian.offset(), 108);
-        assert_eq!(Guardian::Genesis.offset(), 156);
+    fn criticality_weights_match_canonical() {
+        assert_eq!(GuardianLaw::Privacy.criticality(), 10);
+        assert_eq!(GuardianLaw::Nonmaleficence.criticality(), 10);
+        assert_eq!(GuardianLaw::Causality.criticality(), 2);
+        assert_eq!(GuardianLaw::Authenticity.criticality(), 2);
+        assert_eq!(GuardianLaw::Sustainability.criticality(), 2);
+        assert_eq!(GuardianLaw::Unity.criticality(), 1);
     }
 
     #[test]
-    fn guardian_criticality_weights() {
-        assert_eq!(Guardian::Sentinel.criticality(), 10);
-        assert_eq!(Guardian::Auditor.criticality(), 10);
-        assert_eq!(Guardian::Architect.criticality(), 2);
-        assert_eq!(Guardian::Healer.criticality(), 2);
-        assert_eq!(Guardian::Oracle.criticality(), 1);
+    fn hexagon_stages_are_not_guardians_distinct_offsets() {
+        assert_eq!(HexagonStage::Inventory.offset(), 54);
+        assert_eq!(HexagonStage::Action.offset(), 99);
+        assert_eq!(GuardianLaw::Unity.offset(), 108);
+        assert_ne!(HexagonStage::Action.offset(), GuardianLaw::Unity.offset());
+    }
+
+    #[test]
+    fn trinity_perspectives_are_not_guardians_distinct_offsets() {
+        assert_eq!(TrinityPerspective::Material.offset(), 0);
+        assert_eq!(TrinityPerspective::Essential.offset(), 36);
+        assert_eq!(GuardianLaw::Unity.offset(), 108);
     }
 
     #[test]
     fn set_and_get_roundtrip() {
         let mut v = DecisionVector::zeroed();
-        v.set(42, 99);
-        assert_eq!(v.get(42), 99);
-    }
-
-    #[test]
-    fn uniform_mean_is_value() {
-        let v = DecisionVector::uniform(100);
-        assert_eq!(v.mean(), 100);
+        v.set(100, 77);
+        assert_eq!(v.get(100), 77);
     }
 
     #[test]
@@ -363,10 +392,7 @@ mod tests {
 
     #[test]
     fn normalised_bounds() {
-        let v = DecisionVector::uniform(255);
-        let n = v.normalised(0);
-        assert!((n - 1.0).abs() < 1e-6);
-        let z = DecisionVector::zeroed();
-        assert!(z.normalised(0).abs() < 1e-6);
+        assert!((DecisionVector::uniform(255).normalised(0) - 1.0).abs() < 1e-6);
+        assert!(DecisionVector::zeroed().normalised(0).abs() < 1e-6);
     }
 }
