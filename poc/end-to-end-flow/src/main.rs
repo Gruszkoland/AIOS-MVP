@@ -8,12 +8,12 @@
 //! 5. Recommendation flows back through IPC
 //! 6. Kernel executes decision based on veto rules
 
-use agents::{AgentCriticality, CognitiveAgent};
-use ipc::RingBuffer;
+use aios_agents::{AgentCriticality, CognitiveAgent};
+use aios_ipc::RingBuffer;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-const RING_BUFFER_SIZE: usize = 4096;
+// IPC ring buffer: 64 slots x 256 bytes each
 
 /// Decision context posted by kernel to advisory agents.
 /// Contains decision type, required capabilities, and hard deadline.
@@ -101,6 +101,8 @@ impl CognitiveAgent for SecurityGuardian {
         "SecurityGuardian"
     }
 
+    fn tier(&self) -> aios_agents::SwarmTier { aios_agents::SwarmTier::Operational }
+
     fn criticality(&self) -> AgentCriticality {
         AgentCriticality::Advisory
     }
@@ -166,6 +168,8 @@ impl CognitiveAgent for EthicsGuardian {
         "EthicsGuardian"
     }
 
+    fn tier(&self) -> aios_agents::SwarmTier { aios_agents::SwarmTier::Operational }
+
     fn criticality(&self) -> AgentCriticality {
         AgentCriticality::Advisory
     }
@@ -211,6 +215,8 @@ impl CognitiveAgent for PerformanceGuardian {
     fn name(&self) -> &'static str {
         "PerformanceGuardian"
     }
+
+    fn tier(&self) -> aios_agents::SwarmTier { aios_agents::SwarmTier::Operational }
 
     fn criticality(&self) -> AgentCriticality {
         AgentCriticality::SoftRealtime
@@ -307,8 +313,8 @@ async fn main() {
     println!("═══════════════════════════════════════════════════════════\n");
 
     // Initialize ring buffer (simulated IPC shared memory)
-    let _ring_buffer: RingBuffer<RING_BUFFER_SIZE> = RingBuffer::new();
-    println!("✓ IPC ring buffer initialized (capacity: {} bytes)", RING_BUFFER_SIZE);
+    let _ring_buffer: RingBuffer<64, 256> = RingBuffer::new();
+    println!("✓ IPC ring buffer initialized (64 slots × 256 bytes = {} bytes total)", 64 * 256);
     println!("  Target latency: <1µs per message\n");
 
     // Scenario 1: Normal decision flow

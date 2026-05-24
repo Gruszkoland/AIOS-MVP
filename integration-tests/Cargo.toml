@@ -1,0 +1,11 @@
+[package]
+name = "aios-integration-tests"
+version = "0.2.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+aios-kernel = { path = "../kernel" }
+aios-ipc    = { path = "../ipc" }
+aios-agents = { path = "../agents" }

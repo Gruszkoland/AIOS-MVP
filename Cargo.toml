@@ -6,6 +6,7 @@ members = [
   "ipc",
   "poc/scheduler-mgr",
   "poc/end-to-end-flow",
+  "integration-tests",
 ]
 
 [workspace.package]
