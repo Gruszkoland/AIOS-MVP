@@ -238,6 +238,7 @@ pub enum ConsensusVerdict {
 }
 
 /// Computes a weighted consensus verdict across all 9 canonical Guardian Laws.
+#[must_use]
 pub fn compute_consensus(v: &DecisionVector) -> ConsensusVerdict {
     const APPROVE_THRESHOLD: u32 = 178; // ~70% of 255
     const DENY_THRESHOLD: u32 = 76;     // ~30% of 255

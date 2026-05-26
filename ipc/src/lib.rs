@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 //! AIOS zero-copy ring-buffer IPC.
 //!
 //! Designed for sub-microsecond message passing between kernel components

@@ -83,6 +83,18 @@ A ticket is closed when it:
 
 ---
 
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [QUICKSTART.md](QUICKSTART.md) | Get from zero to `cargo test` in 15 minutes |
+| [docs/AGENT_SWARM.md](docs/AGENT_SWARM.md) | Swarm topology, tier definitions, conflict protocol |
+| [docs/GUARDIAN_MAP.md](docs/GUARDIAN_MAP.md) | Canonical 9 Guardian Laws, persona mapping, naming history |
+| [docs/GUARDIAN_LAWS_CANONICAL.json](docs/GUARDIAN_LAWS_CANONICAL.json) | Machine-readable canonical laws (v3.1) |
+| [docs/adr/](docs/adr/) | Architecture Decision Records |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guide + unsafe review checklist |
+
 ## Status — v0.2.0-alpha
 
 Sprint 1 complete: kernel 162D topology, IPC ring buffer, and Guardian trait are implemented with full test coverage.

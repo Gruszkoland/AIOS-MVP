@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 //! AIOS agent swarm — cognitive agent traits and implementations.
 //!
 //! # Architecture

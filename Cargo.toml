@@ -13,3 +13,19 @@ members = [
 edition = "2021"
 license = "MPL-2.0"
 authors = ["Adrian Halicki"]
+
+[workspace.dependencies]
+serde     = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio     = { version = "1", features = ["full"] }
+
+[profile.release]
+opt-level    = 3
+lto          = true
+codegen-units = 1
+strip        = "symbols"
+panic        = "abort"
+
+[profile.bench]
+opt-level = 3
+lto       = true
