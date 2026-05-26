@@ -6,14 +6,14 @@ Kompleksowa dokumentacja, plany, specyfikacje i raporty projektu **ADRION 369** 
 
 ## Struktura folderu
 
-| Folder                           | Pliki (unikalne)                                       | Zawartość                                                      | Status             |
+| Folder                           | Pliki (aktualne)                                       | Zawartość                                                      | Status             |
 | -------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------- | ------------------ |
-| **01_CORE_MANIFESTS**            | 6                                                      | Fundamenty, manifesty, wizja                                   | Archiwalne         |
-| **02_STRATEGY_PLANS**            | ~20 bezp. + ~40 w Phase2_Implementation                | Plany strategiczne i biznesowe                                 | Aktualne           |
-| **03_TECHNICAL_SPECS**           | 22                                                     | Specyfikacje techniczne i architektura                         | Aktualne           |
-| **04_AGENTS_SWARM**              | 18                                                     | Dokumentacja agentów AI (6+3)                                  | W toku             |
+| **01_CORE_MANIFESTS**            | 7                                                      | Fundamenty, manifesty, wizja                                   | Archiwalne         |
+| **02_STRATEGY_PLANS**            | 29                                                     | Plany strategiczne i biznesowe                                 | Aktualne           |
+| **03_TECHNICAL_SPECS**           | 82                                                     | Specyfikacje techniczne, architektura (incl. PROGRAMATOR docs) | Aktualne           |
+| **04_AGENTS_SWARM**              | 17                                                     | Dokumentacja agentów AI (6+3)                                  | W toku             |
 | **05_UI_UX_DESIGN**              | 16                                                     | Design interfejsów i mockupy                                   | Wdrażane           |
-| **06_SECURITY_BACKUPS**          | 0 unikalnych                                           | Kopia v1.0 (patrz uwaga o duplikatach)                         | Do weryfikacji     |
+| **06_SECURITY_BACKUPS**          | ⚠️ Wycofane                                            | Kopia v1.0 (do przeglądu/usunięcia)                            | Do weryfikacji     |
 | **07_RESOURCES_MEDIA**           | 5                                                      | Zasoby multimedialne                                           | Wspierające        |
 | **08_HISTORY_ARCHIVE**           | 19                                                     | Historia i poprzednie wersje (Source_Files_3-6-9)              | Archiwalne         |
 | **10_RAPORTY_DZIALANIA_SYSTEMU** | ~162 (31 PLAN + 46 PROGRESS + 80+ REPORTS + 5 luźnych) | Raporty, postęp, plany (PLAN->PROGRESS->REPORTS)               | Bieżące            |
@@ -24,13 +24,7 @@ Kompleksowa dokumentacja, plany, specyfikacje i raporty projektu **ADRION 369** 
 
 **Pliki luźne w katalogu głównym Genesis Record** (poza folderami): 7 (README.md, 2 raporty optymalizacji, DEPLOYMENT_STATUS, SECURITY_AUDIT_REPORT, HEALER_LOGS.txt, event_log.jsonl)
 
-> **UWAGA: Zagnieżdżone duplikaty** — Trzy foldery zawierają pełne kopie katalogu Genesis Record:
->
-> - `02_STRATEGY_PLANS/Phase2_Implementation/Genesis Record/` (kopia)
-> - `03_TECHNICAL_SPECS/v1.0_Deployment/Genesis Record/` (kopia)
-> - `06_SECURITY_BACKUPS/v1.0_Backups/Genesis Record/` (kopia)
->
-> Każda z tych kopii zawiera ~70+ plików duplikujących oryginały. Zalecane usunięcie w ramach kolejnej fazy porządkowania.
+> **UWAGA o czyszczeniu (2026-05-26):** Zagnieżdżone kopie Genesis Record zostały usunięte. Brak duplikatów ścieżkowych. Rzeczywiste liczby plików zostały zweryfikowane i zaktualizowane w tabeli powyżej.
 
 ---
 
@@ -182,7 +176,7 @@ Użyj ścieżek relatywnych:
 
 ## 📅 Ostatnia aktualizacja
 
-- **Data**: 2026-04-05
-- **Wersja**: ADRION 369 v4.0 (Master Orchestrator)
-- **Status**: ✅ Gotowa do wdrażania + Dokumentacja inwestorska
-- **Następna przegląd**: 2026-05-05
+- **Data**: 2026-05-26
+- **Wersja**: ADRION 369 v5.0 (Phase 1 Security Hardening)
+- **Status**: ✅ P1-4 Genesis Record cleanup complete — rzeczywiste liczby plików zweryfikowane
+- **Następna przegląd**: 2026-06-26

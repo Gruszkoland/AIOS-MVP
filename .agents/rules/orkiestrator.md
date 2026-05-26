@@ -313,4 +313,4 @@ Nienaruszalny, append-only dziennik wszystkich decyzji systemu. Każdy wpis kryp
 |-------------|-------------------|---------|
 | DECISION | description, guardian_refs | Każda decyzja GoT (K2) |
 | SAV_PASS | description, output_hash | K2.5 PASS |
-| SAV_FAIL | description, input_hash | K2.5 FAIL 
+| SAV_FAIL | description, input_hash | K2.5 FAIL

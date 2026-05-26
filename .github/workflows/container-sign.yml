@@ -1,0 +1,68 @@
+name: Container Image Signing — Cosign
+
+on:
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  sign-image:
+    name: Sign container image with Cosign
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Cosign
+        uses: sigstore/cosign-installer@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get image digest
+        id: image
+        run: |
+          IMAGE="ghcr.io/${{ github.repository_owner }}/adrion"
+          TAG="${{ github.ref_name }}"
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE:$TAG" 2>/dev/null || echo "")
+          if [ -z "$DIGEST" ]; then
+            docker pull "$IMAGE:$TAG"
+            DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE:$TAG")
+          fi
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+
+      - name: Sign image with Cosign
+        env:
+          COSIGN_EXPERIMENTAL: 1
+        run: |
+          cosign sign --yes ${{ steps.image.outputs.digest }}
+
+      - name: Verify signature
+        env:
+          COSIGN_EXPERIMENTAL: 1
+        run: |
+          cosign verify ${{ steps.image.outputs.digest }}
+
+      - name: Generate SBOM (Software Bill of Materials)
+        run: |
+          cosign download sbom ${{ steps.image.outputs.digest }} > /tmp/sbom.json
+          cosign attach sbom --sbom /tmp/sbom.json ${{ steps.image.outputs.digest }}
+
+      - name: Upload signing report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cosign-report
+          path: |
+            /tmp/sbom.json
+          retention-days: 30

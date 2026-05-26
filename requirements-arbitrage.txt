@@ -25,3 +25,9 @@ PyYAML>=6.0                 # Load openapi.yaml for /api/openapi.json
 
 # Logging
 python-json-logger>=2.0.0  # Structured JSON logging
+
+# Testing (property-based)
+hypothesis>=6.92.0         # Property-based testing framework
+
+# Testing (contract & API schema validation)
+schemathesis>=3.30.0       # Property-based API testing against OpenAPI

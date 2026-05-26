@@ -5,6 +5,33 @@
 
 ---
 
+## [v5.8] — 2026-05-26 — Phase 2 Quality Polish (Hypothesis + Go Deps)
+
+### 📦 Maintenance
+
+- **Go dependencies upgraded** (P2-3):
+  - `golang.org/x/crypto` v0.50.0 → v0.52.0
+  - `golang.org/x/net` v0.53.0 → v0.55.0
+  - `golang.org/x/sys` v0.43.0 → v0.45.0
+  - `golang.org/x/text` v0.36.0 → v0.37.0
+  - All Go tests pass (100%)
+
+### ✅ Testing Infrastructure
+
+- **Hypothesis property-based tests** (P2-2):
+  - `tests/test_guardian_hypothesis.py` — 200 examples testing Guardian Law invariants
+  - `tests/test_trinity_hypothesis.py` — 200 examples testing Trinity Score calculations
+  - Validates: score ranges, weighted thresholds, CRITICAL violation veto, compliance arithmetic
+
+### 🔴 DEPRECATED (legacy)
+
+- **`arbitrage_server.py`** — Marked for removal in v5.0 (Q3 2026)
+  - **Migration:** Use `wsgi.py` → `arbitrage.app.create_app()` instead
+  - Current status: Thin stub that redirects to wsgi.py
+  - See CLAUDE.md PHASE 2, task P2-6 for removal timeline
+
+---
+
 ## [v5.7] — 2026-05-20 — Deprecation Path & Root Cleanup
 
 ### 🔴 DEPRECATED
