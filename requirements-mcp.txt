@@ -46,6 +46,6 @@ browser-use
 # Optional: Vector Search & ML (for GENESIS RAG + Federated Learning)
 numpy==1.24.3
 scipy==1.11.3
-hnswlib==0.7.0
+hnswlib==0.8.0
 sentence-transformers==2.2.2
 # faiss-cpu==1.7.4  # Alternative to hnswlib
