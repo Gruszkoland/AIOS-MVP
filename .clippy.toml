@@ -1,0 +1,8 @@
+# Clippy configuration for AIOS-MVP
+# Applied via: cargo clippy --workspace -- -D warnings
+
+# Allow larger error types (Guardian laws system uses rich enums)
+too-many-arguments-threshold = 8
+
+# Cognitive complexity threshold
+cognitive-complexity-threshold = 30

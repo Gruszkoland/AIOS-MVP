@@ -157,16 +157,38 @@ jobs:
             echo "✓ Guardian Laws canonical reference found"
           fi
 
+
+  # Stage 6: Memory safety (miri)
+  miri:
+    name: Memory Safety (cargo miri)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: miri
+
+      - name: Run miri on kernel
+        run: cargo +nightly miri test -p aios-kernel
+        env:
+          MIRIFLAGS: "-Zmiri-disable-isolation"
+
+      - name: Run miri on ipc
+        run: cargo +nightly miri test -p aios-ipc
+        env:
+          MIRIFLAGS: "-Zmiri-disable-isolation"
+
   # Gate: All checks must pass
   all-checks:
     name: All Checks Complete
     runs-on: ubuntu-latest
-    needs: [ deny, lint, build-test, coverage, benchmarks, guardian-laws ]
+    needs: [ deny, lint, build-test, coverage, miri, benchmarks, guardian-laws ]
     if: always()
     steps:
       - name: Check if all jobs passed
         run: |
           if [ "${{ needs.deny.result }}" != "success" ] || \
+             [ "${{ needs.miri.result }}" != "success" ] || \
              [ "${{ needs.lint.result }}" != "success" ] || \
              [ "${{ needs.build-test.result }}" != "success" ] || \
              [ "${{ needs.coverage.result }}" != "success" ]; then

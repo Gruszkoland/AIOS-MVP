@@ -1,0 +1,19 @@
+[default]
+# Packages to measure (exclude poc and integration-tests from coverage gate)
+packages = ["aios-kernel", "aios-ipc", "aios-agents"]
+timeout  = "300s"
+out      = ["Xml"]
+output-dir = "target/coverage"
+
+# Exclude generated/auto code
+exclude-files = [
+  "*/benches/*",
+  "*/tests/*",
+  "target/*",
+]
+
+# Fail if coverage below this threshold
+fail-under = 80.0
+
+# Run with all features
+all-features = true
