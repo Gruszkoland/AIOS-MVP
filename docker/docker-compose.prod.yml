@@ -9,6 +9,7 @@ services:
     environment:
       - DB_PATH=/app/data/arbitrage.db
       - LLM_BACKEND=${LLM_BACKEND:-auto}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
     expose:
       - "8001"
     volumes:
@@ -264,6 +265,7 @@ services:
     environment:
       - MAPI_HOST=0.0.0.0
       - MAPI_PORT=8002
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
     expose:
       - "8002"
     depends_on:
@@ -330,6 +332,36 @@ services:
         limits:
           memory: 128m
           cpus: "0.1"
+
+  # ── Jaeger Distributed Tracing (OpenTelemetry collector) ─────────────────
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: adrion-jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - COLLECTOR_GRPC_HOST_PORT=0.0.0.0:4317
+      - COLLECTOR_GRPC_MAX_MESSAGE_SIZE=4194304
+    ports:
+      - "4317:4317"
+      - "16686:16686"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:14269/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "{{.Name}}"
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
 
 volumes:
   loki-data:

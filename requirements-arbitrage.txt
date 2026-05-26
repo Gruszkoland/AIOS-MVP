@@ -31,3 +31,10 @@ hypothesis>=6.92.0         # Property-based testing framework
 
 # Testing (contract & API schema validation)
 schemathesis>=3.30.0       # Property-based API testing against OpenAPI
+
+# Observability (distributed tracing)
+opentelemetry-api>=1.22.0          # OpenTelemetry tracing API
+opentelemetry-sdk>=1.22.0          # OpenTelemetry SDK
+opentelemetry-instrumentation>=0.43b0  # Auto instrumentation
+opentelemetry-instrumentation-flask>=0.43b0  # Flask middleware
+opentelemetry-instrumentation-requests>=0.43b0  # Requests HTTP client

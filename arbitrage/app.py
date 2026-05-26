@@ -13,15 +13,42 @@ Usage:
 import logging
 import os
 import time
+from contextvars import ContextVar
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
+# ── OpenTelemetry Tracing (distributed trace context) ─────────────────────
+_TRACE_ID_CTX: ContextVar[str | None] = ContextVar("trace_id", default=None)
+
+try:
+    from opentelemetry import trace, metrics
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+    from opentelemetry.instrumentation.flask import FlaskInstrumentor
+    from opentelemetry.instrumentation.requests import RequestsInstrumentor
+    from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+    from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+
+    _otel_enabled = True
+    _otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
+except ImportError:
+    _otel_enabled = False
+
 # ── Structured JSON logging for Loki/Grafana ────────────────────────────────
 try:
     from pythonjsonlogger import jsonlogger
+
+    class TraceIDJsonFormatter(jsonlogger.JsonFormatter):
+        def add_fields(self, log_record, record, message_dict):
+            super().add_fields(log_record, record, message_dict)
+            trace_id = _TRACE_ID_CTX.get()
+            if trace_id:
+                log_record["trace_id"] = trace_id
+
     _json_handler = logging.StreamHandler()
-    _json_handler.setFormatter(jsonlogger.JsonFormatter(
+    _json_handler.setFormatter(TraceIDJsonFormatter(
         "%(asctime)s %(name)s %(levelname)s %(message)s",
         rename_fields={"asctime": "timestamp", "levelname": "level"},
     ))
@@ -46,6 +73,28 @@ def create_app() -> Flask:
     """Create and configure the Flask application with all blueprints."""
     app = Flask(__name__)
     CORS(app, origins=[_CORS_ORIGIN])
+
+    # ── Initialize OpenTelemetry tracing ─────────────────────────────────────
+    if _otel_enabled:
+        try:
+            resource = Resource.create({SERVICE_NAME: "adrion-api"})
+            tracer_provider = TracerProvider(resource=resource)
+            tracer_provider.add_span_processor(
+                BatchSpanProcessor(OTLPSpanExporter(endpoint=_otlp_endpoint))
+            )
+            trace.set_tracer_provider(tracer_provider)
+
+            FlaskInstrumentor().instrument_app(app, request_hook=lambda span, request: (
+                _TRACE_ID_CTX.set(span.get_span_context().trace_id.to_hex()),
+                span.set_attribute("http.client_ip", request.remote_addr or "unknown"),
+            ))
+            RequestsInstrumentor().instrument()
+
+            logger.info("OpenTelemetry tracing initialized (endpoint=%s)", _otlp_endpoint)
+        except Exception as e:
+            logger.warning("OpenTelemetry initialization failed: %s", e)
+    else:
+        logger.info("OpenTelemetry not available (opentelemetry package not installed)")
 
     # ── CSRF Origin/Referer check (API-appropriate, no tokens needed) ─────
     _ALLOWED_ORIGINS = {_CORS_ORIGIN, "http://localhost:8003"}
