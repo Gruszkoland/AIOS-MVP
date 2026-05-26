@@ -28,7 +28,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Trivy security scan
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: adrion:latest
           format: table

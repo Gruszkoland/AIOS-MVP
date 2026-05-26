@@ -1,3 +1,8 @@
+[![CI](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/rust-ci.yml/badge.svg)](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/rust-ci.yml)
+[![Docs](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/rust-docs.yml/badge.svg)](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/rust-docs.yml)
+[![Security](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/security-ci.yml/badge.svg)](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/security-ci.yml)
+[![License: MPL-2.0](https://img.shields.io/badge/License-MPL--2.0-blue.svg)](LICENSE)
+
 # AI OS — Cognitive Kernel + Zero-Copy Agents
 
 > **For:** Systems engineers building deterministic AI-advised infrastructure
@@ -98,7 +103,9 @@ A ticket is closed when it:
 ## Status — v0.2.0-alpha
 
 Sprint 1 complete: kernel 162D topology, IPC ring buffer, and Guardian trait are implemented with full test coverage.
-Current focus: Sprint 2 — benchmarking IPC latency, fuzzing the consensus engine, and end-to-end PoC integration.
+**Tests:** 48 Rust tests (unit + cross-crate integration), 0 failed.
+**Docs:** [API Reference](https://gruszkoland.github.io/AIOS-MVP/)
+Current focus: Sprint 2 — benchmarking IPC latency, cargo miri validation, end-to-end PoC integration.
 
 
 1. Monorepo setup and directory structure

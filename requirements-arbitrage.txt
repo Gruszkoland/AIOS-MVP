@@ -2,8 +2,8 @@
 # Install with: pip install -r requirements-arbitrage.txt
 
 # Core
-python-dotenv>=1.0.0   # .env file loading
-Flask>=3.1.0           # REST API server
+python-dotenv>=1.2.2   # .env file loading
+Flask>=3.1.3           # REST API server
 flask-cors>=6.0.0      # CORS for dashboard
 Flask-WTF>=1.2.0       # CSRF protection with wtforms
 waitress>=3.0.0        # Production WSGI server
