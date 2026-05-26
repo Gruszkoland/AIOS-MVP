@@ -104,7 +104,7 @@ A ticket is closed when it:
 
 Sprint 1 complete: kernel 162D topology, IPC ring buffer, and Guardian trait are implemented with full test coverage.
 **Tests:** 48 Rust tests (unit + cross-crate integration), 0 failed.
-**Docs:** [API Reference](https://gruszkoland.github.io/AIOS-MVP/)
+**Docs:** [API Reference — Live Docs](https://gruszkoland.github.io/AIOS-MVP/)
 Current focus: Sprint 2 — benchmarking IPC latency, cargo miri validation, end-to-end PoC integration.
 
 
