@@ -1,9 +1,33 @@
 # V1.0 HARDENING PLAN — AIOS-MVP Security & Production Readiness
 
-**Version:** 1.0-beta (IN PROGRESS)
+**Version:** 1.0-beta (IN PROGRESS — PHASE 1 WEEK 1 STARTED)
 **Duration:** 12 weeks (June 8 — August 31, 2026)
 **Team Allocation:** 4 FTE (same team as MVP1)
 **Total Effort:** 48 FTE-weeks
+
+---
+
+## PHASE 1 STATUS — WEEK 1 (June 8–14)
+
+✅ **STARTED** — P1-1 (Code Signing) + P1-2 (Seccomp Policies) Infrastructure Laid
+
+### Completed Artifacts
+
+**P1-1: Ed25519 Signing**
+- [x] `ipc/src/signing.rs` — PublicKey, Signature, SigningConfig, verify_agent_binary()
+- [x] `ipc/Cargo.toml` — ed25519-dalek dependency added
+- [x] `agents/build.rs` — Binary signing script (dev placeholder, prod-ready structure)
+- [x] `agents/src/main.rs` — Entry point with signing verification hooks
+- [x] `tests/test_signing_chain.rs` — 8 integration tests (all 6 agents tested)
+
+**P1-2: Seccomp Policies**
+- [x] `security/seccomp-policies.json` — 6 agent policies, 250+ syscall mappings, rationale documented
+
+### Next Steps (Days 3-5)
+
+- **Day 3 (Jun 10):** Integrate verification into Guardian initialization
+- **Day 4 (Jun 11):** E2E test: deploy signed agent, reject unsigned
+- **Day 5 (Jun 12-14):** Code review + Phase 1 gate demonstration
 
 ---
 

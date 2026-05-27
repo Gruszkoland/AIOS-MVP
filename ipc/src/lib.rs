@@ -1,12 +1,18 @@
 //! IPC Layer: Ring Buffer + Cap'n Proto Bridge
 //! Zero-copy communication between kernel and agents
-//! Includes: Ed25519 code signing for agent binary verification (non-critical path)
+//! Phase 1 Security Foundation: Signing + Integrity + Merkle + Config
 
 pub mod bridge;
 pub mod signing;
+pub mod integrity;
+pub mod merkle;
+pub mod config_signing;
 
 pub use bridge::{Decision, Response, RingBuffer, BridgeStats};
 pub use signing::{PublicKey, Signature, SigningConfig, VerificationResult, verify_agent_binary};
+pub use integrity::{CRC32, Timestamp, IntegrityResult, verify_integrity};
+pub use merkle::{Hash, GenesisEntry, MerkleTree};
+pub use config_signing::{ConfigEntry, ConfigAuditTrail};
 
 /// Version
 pub const IPC_VERSION: &str = "0.2.0";
