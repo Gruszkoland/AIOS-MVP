@@ -18,3 +18,9 @@ _*_stdout.log
 __pycache__/
 logs/
 .claude.json
+
+# Week 5 test consolidation
+tests/test_phase*.py
+tests/test_k8s_*.py
+tests/test_quantum.py
+tests/helpers/
