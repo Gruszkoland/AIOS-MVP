@@ -35,7 +35,7 @@ AIOS MVP takes security seriously. We appreciate responsible vulnerability discl
 | **MEDIUM** | 4.0-6.9 | 7 days | 30 days | 30-60 days embargo |
 | **LOW** | 0.1-3.9 | 14 days | Next minor release | 60+ days embargo |
 
-### CRITICAL issues (G7 Privacy, G8 Nonmaleficence)
+### CRITICAL issues (G6 Nonmaleficence, G8 Justice)
 
 **Do NOT open a public issue.** Instead:
 
@@ -48,8 +48,8 @@ AIOS MVP takes security seriously. We appreciate responsible vulnerability discl
 
 Per the [Guardian Laws](docs/GUARDIAN_LAWS_CANONICAL.json):
 
-- **G7 Privacy violation** — unauthorized data exposure, PII leaks, authentication bypass
-- **G8 Nonmaleficence violation** — remote code execution, SQL injection, data destruction
+- **G6 Nonmaleficence violation** — prevent harm: remote code execution, SQL injection, data destruction
+- **G8 Justice violation** — fairness: unauthorized privilege escalation, discrimination, unfair treatment
 
 ### Scope
 

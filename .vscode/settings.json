@@ -76,7 +76,7 @@
     "editor.insertSpaces": false,
     "editor.tabSize": 4
   },
-  "workbench.colorTheme": "Material Theme High Contrast",
+  "workbench.colorTheme": "Tomorrow Night Blue",
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.fetchOnPull": true,

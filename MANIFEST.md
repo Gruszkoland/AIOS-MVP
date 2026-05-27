@@ -1,6 +1,6 @@
 # 🏗️ ADRION 369 v4.0 — PROJECT MANIFEST & ARCHITECTURAL GUIDELINES
 
-> **Single Source of Truth for AI Orchestrators, Copilots, and Development Teams**  
+> **Single Source of Truth for AI Orchestrators, Copilots, and Development Teams**
 > **Version:** 5.0 | **Updated:** 2026-04-22 | **Status:** Core Standards Locked
 
 ---
@@ -174,32 +174,32 @@ def calculate_trinity_score(
 ) -> float:
     """
     Compute combined Trinity Score from three perspectives.
-    
+
     Aggregation:
     - Material & Intellectual: harmonic mean
     - Essential: geometric mean
     - Final: arithmetic mean of all three
-    
+
     Args:
         material_score: System resource availability (0–1).
         intellectual_score: LLM analysis quality (0–1).
         essential_score: Purpose alignment + profitability (0–1).
-    
+
     Returns:
         Combined score (0–1). Approved when >= TRINITY_MIN_COMBINED.
-    
+
     Raises:
         ValueError: If any score is not in [0, 1].
     """
     if not all(0 <= s <= 1 for s in [material_score, intellectual_score, essential_score]):
         raise ValueError("All scores must be in [0, 1]")
-    
+
     # Material & Intellectual use harmonic mean (fail-fast)
     harmonic = 2 / (1/material_score + 1/intellectual_score) if material_score > 0 and intellectual_score > 0 else 0
-    
+
     # Essential uses geometric mean
     geometric = (essential_score) ** (1/1)  # Simplified for 1 factor
-    
+
     # Final: arithmetic mean
     return (harmonic + geometric) / 2
 ```
@@ -537,13 +537,13 @@ All decisions are validated against these canonical laws (see `docs/GUARDIAN_LAW
 | # | Code | Name | Severity | Veto |
 |---|------|------|----------|------|
 | 1 | G1 | Unity | MEDIUM | — |
-| 2 | G2 | Harmony | HIGH | — |
+| 2 | G2 | Truth | HIGH | — |
 | 3 | G3 | Rhythm | MEDIUM | — |
 | 4 | G4 | Causality | HIGH | — |
 | 5 | G5 | Transparency | MEDIUM | — |
-| 6 | G6 | Authenticity | HIGH | — |
-| 7 | G7 | Privacy | **CRITICAL** | ✓ |
-| 8 | G8 | Nonmaleficence | **CRITICAL** | ✓ |
+| 6 | G6 | Nonmaleficence | **CRITICAL** | ✓ |
+| 7 | G7 | Autonomy | HIGH | — |
+| 8 | G8 | Justice | **CRITICAL** | ✓ |
 | 9 | G9 | Sustainability | HIGH | — |
 
 **Decision Rule:**
@@ -630,6 +630,7 @@ MAX_BID_PER_JOB = 100               # USD
 | **Manifest Version** | 5.0 |
 | **Authority** | Project Lead (Adi Ha) |
 | **Canonical Source** | `docs/GUARDIAN_LAWS_CANONICAL.json` |
+| **Compression Protocol** | `docs/COMPRESSION_GUIDE.md` (Level 0–2 symbolic notation, 50–70% token savings) |
 
 ---
 

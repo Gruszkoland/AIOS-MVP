@@ -104,6 +104,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 | G9 | Sustainability | HIGH | Long-term viability | Process, Action |
 
 **6 Processing Modes** (Hexagon):
+
 1. **Inventory** — Observe facts (3-word summaries)
 2. **Empathy** — Assess emotional/relational impact
 3. **Process** — Organize goals, allocate resources
@@ -112,6 +113,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 6. **Action** — Execute + Genesis Record logging
 
 **3 Perspectives** (Trinity):
+
 - **Material:** Resources (CPU, RAM, energy)
 - **Intellectual:** Truth (beauty, coherence, logic)
 - **Essential:** Purpose (mission, unity, commons)
@@ -135,6 +137,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 | `arbitrage_server.py`   | **DEPRECATED** — do NOT use    | Has deprecation warning, will be removed              |
 | `uap/backend/api.py`    | UAP orchestrator (2111 lines)  | **Needs refactor** — monolith, SQL injection risk     |
 | `docs/openapi.yaml`     | OpenAPI 3.1 spec (1096 lines)  | 27 endpoints documented                               |
+| `docs/COMPRESSION_GUIDE.md` | Token compression style guide | Level 0–2 symbolic notation, 50–70% savings          |
 | `pyproject.toml`        | Project metadata + tool config | pytest, coverage, ruff settings                       |
 
 ---
@@ -366,7 +369,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
      FROM python:3.11-slim AS builder
      COPY requirements*.txt .
      RUN pip install --no-cache-dir --prefix=/install -r requirements-arbitrage.txt
-     
+
      # Stage 2: Runtime
      FROM python:3.11-slim AS runtime
      COPY --from=builder /install /usr/local

@@ -111,7 +111,7 @@ git push origin feature/my-feature
 4. **Reviews required:**
    - Normal PR: 1 maintainer approval
    - PR with `unsafe` label: 2 approvals required (at least one reviewer must have a security focus)
-   - PR affecting G7 (Privacy) or G8 (Nonmaleficence): explicit security review required (see [SECURITY.md](SECURITY.md))
+   - PR affecting G6 (Nonmaleficence) or G8 (Justice): explicit security review required (see [SECURITY.md](SECURITY.md))
 
 ### Before Submitting
 
@@ -345,17 +345,17 @@ All contributions must comply with the 9 Guardian Laws. The canonical definition
 | Law | Severity | Veto | Requirement |
 |-----|----------|------|-------------|
 | **G1: Unity** | MEDIUM | No | Code maintains system coherence |
-| **G2: Harmony** | HIGH | No | Components work together smoothly |
+| **G2: Truth** | HIGH | No | Analysis is genuine and reasoning is sound |
 | **G3: Rhythm** | MEDIUM | No | Timing and cadence are predictable |
-| **G4: Causality** | HIGH | No | Cause-effect relationships are clear |
+| **G4: Causality** | HIGH | No | Cause-effect relationships are traceable |
 | **G5: Transparency** | MEDIUM | No | Decisions and logic are explainable |
-| **G6: Authenticity** | HIGH | No | No deception or misdirection |
-| **G7: Privacy** | CRITICAL | YES | No unauthorized data access or exposure |
-| **G8: Nonmaleficence** | CRITICAL | YES | No harm to users or systems |
+| **G6: Nonmaleficence** | CRITICAL | YES | No harm to users or systems |
+| **G7: Autonomy** | HIGH | No | Respect free will, no spam or coercion |
+| **G8: Justice** | CRITICAL | YES | Fair and equitable treatment |
 | **G9: Sustainability** | HIGH | No | Long-term viability considered |
 
 **Evaluation rules:**
-- A single CRITICAL violation (G7 or G8) results in automatic DENY — no exceptions
+- A single CRITICAL violation (G6 or G8) results in automatic DENY — no exceptions
 - Two or more violations of any severity result in DENY
 - PRs that affect G7 or G8 require explicit security review in addition to normal approvals
 

@@ -46,7 +46,7 @@
 - Root directory cleanup: moved 21 session .md files to `docs/sessions/`
 - Consolidated scripts: moved 14 .ps1 scripts to `scripts/install/`
 - Updated `.gitignore` to ignore generated artifacts (logs, coverage files)
-- Guardian Laws canonical names synced: `Truth` → `Harmony`, `Autonomy` → `Privacy`, `Justice` → `Nonmaleficence`
+- Guardian Laws canonical names synced: `Harmony` → `Truth`, `Privacy` → `Autonomy`, `Authenticity` → removed, corrected G6/G8 separation
 - Database type hints: Added `DBConnection` protocol and typed `return_conn()` argument
 
 ---
@@ -116,12 +116,12 @@
 - **Problem:** Self-reinforcing audit loop — prompt cytujący G5 automatycznie spełnia G5 i wymusza ujawnienie architektury
 - **Rozwiązanie:** `G5TransparencyGuard` — rate limit audytów (5 min), max głębokość (2), detekcja ≥3 wzorców exploitu → SENTINEL_ESCALATION
 
-#### G7 — Privacy (CRITICAL, Essence Triad)
+#### G7 — Autonomy (HIGH, Essence Triad)
 
 - **Problem:** Jakościowe testy bez mierzalnych progów → szara strefa weryfikacji consent
-- **Rozwiązanie:** `G7PrivacyEvaluator` — numeryczne progi: `consent_score ≥ 0.95`, `informed_score ≥ 0.90`, `coercion_score ≤ 0.05`, `opt_out_available = True`
+- **Rozwiązanie:** `G7AutonomyEvaluator` — numeryczne progi: `consent_score ≥ 0.95`, `informed_score ≥ 0.90`, `coercion_score ≤ 0.05`, `opt_out_available = True`
 
-#### G8 — Nonmaleficence (CRITICAL, Essence Triad)
+#### G8 — Justice (CRITICAL, Essence Triad)
 
 - **Problem:** Brak mierzalnych progów fairness → możliwy subtelny resource grab bez wykrycia
 - **Rozwiązanie:** `G8NonmaleficenceEvaluator` — Gini-inspired: `fair_share_score ≥ 0.90`, `variance ≤ 0.15`, starvation detection `< 10%`

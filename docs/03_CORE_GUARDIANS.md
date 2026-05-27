@@ -18,13 +18,13 @@
 | **#** | **Code** | **Name (EN)** | **Nazwa (PL)** | **Severity** | **Veto** | **Triada** |
 |-------|----------|---------------|-----------------|--------------|----------|------------|
 | 1 | **G1** | **Unity** | Jedność | `MEDIUM` | No | 📦 Matter |
-| 2 | **G2** | **Harmony** | Harmonia | `HIGH` | No | 📦 Matter |
+| 2 | **G2** | **Truth** | Prawda | `HIGH` | No | 💡 Light |
 | 3 | **G3** | **Rhythm** | Rytm | `MEDIUM` | No | 📦 Matter |
 | 4 | **G4** | **Causality** | Przyczynowość | `HIGH` | No | 💡 Light |
 | 5 | **G5** | **Transparency** | Przejrzystość | `MEDIUM` | No | 💡 Light |
-| 6 | **G6** | **Authenticity** | Autentyczność | `HIGH` | No | 💡 Light |
-| 7 | **G7** | **Privacy** | Prywatność | `CRITICAL` | **YES** | 💎 Essence |
-| 8 | **G8** | **Nonmaleficence** | Nieszkodzenie | `CRITICAL` | **YES** | 💎 Essence |
+| 6 | **G6** | **Nonmaleficence** | Nieszkodzenie | `CRITICAL` | **YES** | 💎 Essence |
+| 7 | **G7** | **Autonomy** | Autonomia | `HIGH` | No | 💎 Essence |
+| 8 | **G8** | **Justice** | Sprawiedliwość | `CRITICAL` | **YES** | 💎 Essence |
 | 9 | **G9** | **Sustainability** | Zrównoważenie | `HIGH` | No | 💎 Essence |
 
 ---
@@ -38,7 +38,7 @@ violations = count(laws NOT compliant)
 cumulative_score = genesis_record.get_cumulative_violations(session_id)
 
 # --- POZIOM 1: Natychmiastowe VETO (CRITICAL laws) ---
-if ANY CRITICAL law violated (G7, G8):
+if ANY CRITICAL law violated (G6, G8):
     decision = DENY_IMMEDIATELY          # Natychmiastowe veto — bez eskalacji
     genesis_record.log(violation, severity="CRITICAL")
 
@@ -101,23 +101,23 @@ cumulative_violation_counter:
 | Prawo | Pytanie kluczowe |
 |-------|------------------|
 | **G1 Unity** | Czy akcja służy **wspólnemu dobru**, nie jednostce? |
-| **G2 Harmony** | Czy dane są **prawdziwe** i nienaruszone? |
+| **G2 Truth** | Czy dane są **prawdziwe** i nienaruszone? |
 | **G3 Rhythm** | Czy system zachowuje **homeostazę** (cykle aktywność/odpoczynek)? |
 
-### 💡 Light Triad (G4–G6) — "Czy proces jest czysty?"
+### 💡 Light Triad (G4–G5) — "Czy proces jest czysty?"
 
 | Prawo | Pytanie kluczowe |
 |-------|------------------|
 | **G4 Causality** | Czy akcja jest **zalogowana** w Genesis Record z pełnym łańcuchem hashów? |
 | **G5 Transparency** | Czy decyzja jest **wyjaśnialna** (reasoning >= 20 znaków)? |
-| **G6 Authenticity** | Czy system **nie szkodzi** użytkownikom ani sobie? |
 
-### 💎 Essence Triad (G7–G9) — "Czy cel jest właściwy?"
+### 💎 Essence Triad (G6–G9) — "Czy cel jest właściwy?"
 
 | Prawo | Pytanie kluczowe |
 |-------|------------------|
-| **G7 Privacy** | Czy **zgoda użytkownika** została uzyskana? (CRITICAL — VETO) |
-| **G8 Nonmaleficence** | Czy alokacja zasobów jest **sprawiedliwa**? (CRITICAL — VETO) |
+| **G6 Nonmaleficence** | Czy system **nie szkodzi** użytkownikom ani sobie? (CRITICAL — VETO) |
+| **G7 Autonomy** | Czy **autonomia użytkownika** jest **respektowana**? (bez spamu) |
+| **G8 Justice** | Czy alokacja zasobów jest **sprawiedliwa**? (CRITICAL — VETO) |
 | **G9 Sustainability** | Czy akcja jest **zrównoważona** długoterminowo? |
 
 ---
@@ -168,7 +168,7 @@ cumulative_violation_counter:
 
 ---
 
-### **G2: Harmony (Harmonia)**
+### **G2: Truth (Prawda)**
 
 > *Zakaz manipulacji danymi i oszukiwania użytkownika*
 
@@ -184,7 +184,7 @@ cumulative_violation_counter:
 - System celowo wprowadza w błąd
 
 > **Przykład:** Agent mówi "95% accuracy" (faktycznie 67%)
-> `Harmony Check: VIOLATION` — Misrepresentation of performance metrics
+> `Truth Check: VIOLATION` — Misrepresentation of performance metrics
 
 ---
 
@@ -247,7 +247,7 @@ cumulative_violation_counter:
 
 ---
 
-### **G6: Authenticity (Autentyczność)**
+### **G6: Nonmaleficence (Nieszkodzenie)** 🔴 CRITICAL — VETO POWER
 
 > *Nie szkodzić użytkownikom ani systemowi*
 
@@ -263,9 +263,11 @@ cumulative_violation_counter:
 - System crash risk
 - User safety compromised
 
+**Naruszenie = NATYCHMIASTOWY DENY** — bez wyjątków, bez eskalacji
+
 ---
 
-### **G7: Privacy (Prywatność)** 🔴 CRITICAL — VETO POWER
+### **G7: Autonomy (Autonomia)**
 
 > *Szacunek dla wolnej woli i zgody użytkownika*
 
@@ -275,13 +277,17 @@ cumulative_violation_counter:
 3. **User can opt-out?**
 4. No coercion detected?
 
-**Naruszenie = NATYCHMIASTOWY DENY** — bez wyjątków, bez eskalacji
+**Naruszenie gdy:**
+- Brak jawnej zgody
+- Spam lub powtarzany kontakt bez zgody
+- Manipulacja użytkownika
+- Uwięzienie (brak wyjścia)
 
 ---
 
-### **G8: Nonmaleficence (Nieszkodzenie)** 🔴 CRITICAL — VETO POWER
+### **G8: Justice (Sprawiedliwość)** 🔴 CRITICAL — VETO POWER
 
-> *Uczciwa alokacja zasobów między agentami*
+> *Uczciwa alokacja zasobów między agentami i równe traktowanie*
 
 **Weryfikacja:**
 1. **Resource distribution fairness**

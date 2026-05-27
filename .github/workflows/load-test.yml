@@ -1,0 +1,190 @@
+name: Load Testing — k6 Performance Gates
+
+on:
+  push:
+    branches: [main, master, develop]
+    paths:
+      - 'arbitrage/**'
+      - 'uap/**'
+      - 'k6/**'
+      - '.github/workflows/load-test.yml'
+  pull_request:
+    branches: [main, master, develop]
+  schedule:
+    # Run nightly smoke test at 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      vus:
+        description: Virtual Users
+        default: '50'
+        required: true
+      duration:
+        description: Test Duration (e.g., 5m, 10m)
+        default: '5m'
+        required: true
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    name: k6 Load Test
+
+    services:
+      postgres:
+        image: postgres:15.4-alpine
+        env:
+          POSTGRES_DB: adrion_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-arbitrage.txt
+
+      - name: Start Flask application (background)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/adrion_test
+          FLASK_ENV: test
+          FLASK_APP: arbitrage.app:create_app
+          PYTHONUNBUFFERED: 1
+        run: |
+          python -m waitress --port=8003 wsgi:app &
+          echo $! > /tmp/app.pid
+          sleep 5
+          if ! curl -f http://localhost:8003/health; then
+            echo "App failed to start"
+            cat /tmp/app.log
+            exit 1
+          fi
+
+      - name: Set up k6
+        run: |
+          sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+
+      - name: Run k6 load test
+        env:
+          BASE_URL: 'http://localhost:8003'
+          VUS: ${{ github.event.inputs.vus || '50' }}
+          DURATION: ${{ github.event.inputs.duration || '5m' }}
+          STRICT: 'true'
+        run: |
+          k6 run k6/loadtest.js \
+            --vus=$VUS \
+            --duration=$DURATION \
+            --out=json=k6-results.json \
+            --summary-export=k6-summary.json
+
+      - name: Parse k6 results
+        if: always()
+        run: |
+          python << 'EOF'
+          import json
+          import sys
+
+          with open('k6-summary.json', 'r') as f:
+            summary = json.load(f)
+
+          metrics = summary.get('metrics', {})
+
+          # Extract key metrics
+          http_reqs = metrics.get('http_reqs', {}).get('values', {}).get('count', 0)
+          error_rate = metrics.get('http_req_failed', {}).get('values', {}).get('rate', 0) * 100
+          p95_latency = metrics.get('http_req_duration', {}).get('values', {}).get('p(95)', 0)
+          p99_latency = metrics.get('http_req_duration', {}).get('values', {}).get('p(99)', 0)
+
+          print(f"HTTP Requests: {http_reqs}")
+          print(f"Error Rate: {error_rate:.2f}%")
+          print(f"p95 Latency: {p95_latency:.0f}ms")
+          print(f"p99 Latency: {p99_latency:.0f}ms")
+
+          # Performance gates
+          gates = {
+              'Error Rate < 1%': error_rate < 1.0,
+              'p95 Latency < 500ms': p95_latency < 500,
+              'p99 Latency < 1000ms': p99_latency < 1000,
+              'Requests > 0': http_reqs > 0,
+          }
+
+          print("\n=== Performance Gates ===")
+          all_passed = True
+          for gate, passed in gates.items():
+              status = "✓ PASS" if passed else "✗ FAIL"
+              print(f"{status}: {gate}")
+              if not passed:
+                  all_passed = False
+
+          if not all_passed:
+              sys.exit(1)
+          EOF
+
+      - name: Upload k6 results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-results
+          path: |
+            k6-results.json
+            k6-summary.json
+          retention-days: 30
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = JSON.parse(fs.readFileSync('k6-summary.json', 'utf8'));
+            const metrics = summary.metrics || {};
+
+            const httpReqs = metrics['http_reqs']?.values?.count || 0;
+            const errorRate = ((metrics['http_req_failed']?.values?.rate || 0) * 100).toFixed(2);
+            const p95Latency = (metrics['http_req_duration']?.values?.['p(95)'] || 0).toFixed(0);
+            const p99Latency = (metrics['http_req_duration']?.values?.['p(99)'] || 0).toFixed(0);
+
+            const body = `
+            ## k6 Load Test Results
+
+            | Metric | Value | Status |
+            |--------|-------|--------|
+            | HTTP Requests | ${httpReqs} | ✓ |
+            | Error Rate | ${errorRate}% | ${errorRate < 1 ? '✓' : '✗'} |
+            | p95 Latency | ${p95Latency}ms | ${p95Latency < 500 ? '✓' : '✗'} |
+            | p99 Latency | ${p99Latency}ms | ${p99Latency < 1000 ? '✓' : '✗'} |
+
+            [View detailed results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Stop Flask app
+        if: always()
+        run: |
+          if [ -f /tmp/app.pid ]; then
+            kill $(cat /tmp/app.pid) || true
+          fi
