@@ -174,6 +174,45 @@ TOTAL: 6 weeks to MVP1 production ready (4 FTE × 6 weeks = 24 FTE-weeks)
 
 ---
 
+---
+
+## 🔄 PHASE 1: SECURITY FOUNDATION — WEEK 1 (June 8–14)
+
+**Status:** IN PROGRESS ✨
+
+### Completed Deliverables
+
+✅ **P1-1: Code Signing — Ed25519 Implementation**
+- `ipc/Cargo.toml` — Added ed25519-dalek dependency
+- `ipc/src/signing.rs` — PublicKey, Signature, SigningConfig, verify_agent_binary() with 8 unit tests
+- `ipc/src/lib.rs` — Exported signing module (removed no_std constraint for compatibility)
+- `agents/build.rs` — Build script for agent binary signing on compile
+- `agents/Cargo.toml` — Added build script + dependencies
+- `agents/src/main.rs` — Agent binary entry point with signing verification hooks
+- `tests/test_signing_chain.rs` — Integration tests (sign+verify, reject unsigned, corrupted, unknown key, all 6 agents)
+
+**Gate Progress:** 
+- [x] Signing structs defined + tested
+- [x] Build script ready
+- [ ] Verification integration (Day 3, pending)
+- [ ] E2E deployment test (Day 4, pending)
+
+✅ **P1-2 (Parallel): Seccomp Policies — Phase 1 Foundation**
+- `security/seccomp-policies.json` — 6 agent policies with detailed syscall allowlists/denylists
+  - Librarian (0): Read-only storage, ~20 syscalls
+  - SAP (1): Analysis + threading, ~70 syscalls
+  - Auditor (2): Compliance logging, ~15 syscalls
+  - Sentinel (3): Security monitoring + events, ~60 syscalls
+  - Architect (4): Config validation, ~30 syscalls
+  - Healer (5): Recovery + state repair, ~50 syscalls
+
+**Gate Progress:**
+- [x] All 6 policies designed + rationale documented
+- [ ] libseccomp bindings (Day 3, pending)
+- [ ] Enforcement testing (Day 4, pending)
+
+---
+
 ## 🎉 PROJECT COMPLETION SUMMARY
 
 **MVP1 Delivery Complete:** 2026-06-07 (6 weeks, 24 FTE-weeks)

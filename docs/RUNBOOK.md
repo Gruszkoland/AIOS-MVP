@@ -1,7 +1,7 @@
 # AIOS-MVP v0.1.0-alpha RUNBOOK
 
-**Version:** 0.1.0-alpha  
-**Release Date:** 2026-06-07  
+**Version:** 0.1.0-alpha
+**Release Date:** 2026-06-07
 **Status:** Production Ready (Alpha)
 
 ---
@@ -331,6 +331,6 @@ gh issue create \
 
 ---
 
-**Release:** v0.1.0-alpha  
-**Generated:** 2026-06-07  
+**Release:** v0.1.0-alpha
+**Generated:** 2026-06-07
 **Status:** ✅ PRODUCTION READY (ALPHA QUALITY)

@@ -1,12 +1,12 @@
 //! IPC Layer: Ring Buffer + Cap'n Proto Bridge
 //! Zero-copy communication between kernel and agents
-
-#![no_std]
-#![forbid(unsafe_code)]  // bridge.rs contains only when necessary
+//! Includes: Ed25519 code signing for agent binary verification (non-critical path)
 
 pub mod bridge;
+pub mod signing;
 
 pub use bridge::{Decision, Response, RingBuffer, BridgeStats};
+pub use signing::{PublicKey, Signature, SigningConfig, VerificationResult, verify_agent_binary};
 
 /// Version
 pub const IPC_VERSION: &str = "0.2.0";

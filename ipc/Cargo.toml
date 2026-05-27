@@ -1,17 +1,16 @@
 [package]
-name = "aios-agents"
-version = "0.1.0"
+name = "aios-ipc"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
 authors = ["ADRION 369 Development"]
-build = "build.rs"
-
-[[bin]]
-name = "aios-agents"
-path = "src/main.rs"
 
 [dependencies]
-aios-ipc = { path = "../ipc" }
 ed25519-dalek = { version = "2.1", features = ["rand"] }
+hex = "0.4"
 
 [dev-dependencies]
+rand = "0.8"
+
+[lib]
+path = "src/lib.rs"

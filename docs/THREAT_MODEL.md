@@ -1,7 +1,7 @@
 # AIOS-MVP v0.1.0-alpha — Security Threat Model
 
-**Version:** 0.1.0-alpha  
-**Release Date:** 2026-06-07  
+**Version:** 0.1.0-alpha
+**Release Date:** 2026-06-07
 **Status:** Alpha (Known Limitations)
 
 ---
@@ -407,23 +407,23 @@ If you discover a security vulnerability in AIOS-MVP v0.1.0-alpha:
 # (v0.1.0 has basic logging, v1.0 will add active monitors)
 
 # Check Genesis Record for anomalies
-SELECT timestamp, agent_type, decision FROM genesis_record 
-WHERE confidence < 0.5 
+SELECT timestamp, agent_type, decision FROM genesis_record
+WHERE confidence < 0.5
   OR latency_ns > 5000000  -- > 5ms
   ORDER BY timestamp DESC;
 
 # Monitor agent heartbeat
-SELECT agent_type, last_heartbeat 
+SELECT agent_type, last_heartbeat
 FROM agent_status;
 
 # Check for consensus failures
-SELECT COUNT(*) FROM genesis_record 
+SELECT COUNT(*) FROM genesis_record
 WHERE decision = 'rejected_timeout';
 ```
 
 ---
 
-**Version:** 0.1.0-alpha  
-**Status:** ⚠️ ALPHA — Known Gaps (see "Not Hardened" section)  
-**Security Review:** Conducted 2026-06-07  
+**Version:** 0.1.0-alpha
+**Status:** ⚠️ ALPHA — Known Gaps (see "Not Hardened" section)
+**Security Review:** Conducted 2026-06-07
 **Next Review:** v1.0 pre-release (target: 2026-09-01)

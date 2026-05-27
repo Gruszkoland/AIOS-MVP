@@ -1,7 +1,7 @@
 # AIOS-MVP v0.1.0-alpha — Performance Report
 
-**Version:** 0.1.0-alpha  
-**Release Date:** 2026-06-07  
+**Version:** 0.1.0-alpha
+**Release Date:** 2026-06-07
 **Test Environment:** Ubuntu 22.04 LTS, Intel i7-12700K, 32GB RAM
 
 ---
@@ -399,7 +399,7 @@ Memory usage                    | > 50% available | Swap risk
 
 ---
 
-**Version:** 0.1.0-alpha  
-**Test Date:** 2026-06-07  
-**Benchmark Duration:** 48 hours continuous load testing  
+**Version:** 0.1.0-alpha
+**Test Date:** 2026-06-07
+**Benchmark Duration:** 48 hours continuous load testing
 **Status:** ✅ MEETS PERFORMANCE TARGETS

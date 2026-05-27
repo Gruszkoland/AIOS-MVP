@@ -1,8 +1,8 @@
 # V1.0 HARDENING PLAN — AIOS-MVP Security & Production Readiness
 
-**Version:** 1.0-beta (planned Q3 2026)  
-**Duration:** 12 weeks (Q3 2026: July 1 — September 30)  
-**Team Allocation:** 4 FTE (same team as MVP1)  
+**Version:** 1.0-beta (IN PROGRESS)
+**Duration:** 12 weeks (June 8 — August 31, 2026)
+**Team Allocation:** 4 FTE (same team as MVP1)
 **Total Effort:** 48 FTE-weeks
 
 ---
@@ -21,7 +21,7 @@ After successful MVP1 delivery (v0.1.0-alpha, 6 weeks), v1.0 phase focuses on:
 
 ## 🎯 PHASE BREAKDOWN (12 weeks = 4 phases × 3 weeks)
 
-### Phase 1: Security Foundation (Weeks 1-3, July 1-21)
+### Phase 1: Security Foundation (Weeks 1-3, June 8-28)
 
 **Focus:** Core security mechanisms
 
@@ -47,7 +47,7 @@ After successful MVP1 delivery (v0.1.0-alpha, 6 weeks), v1.0 phase focuses on:
 
 ---
 
-### Phase 2: Consensus Hardening (Weeks 4-6, July 22-August 11)
+### Phase 2: Consensus Hardening (Weeks 4-6, June 29-July 19)
 
 **Focus:** Byzantine fault tolerance + reliability
 
@@ -72,7 +72,7 @@ After successful MVP1 delivery (v0.1.0-alpha, 6 weeks), v1.0 phase focuses on:
 
 ---
 
-### Phase 3: Operations & Observability (Weeks 7-9, August 12-September 1)
+### Phase 3: Operations & Observability (Weeks 7-9, July 20-August 9)
 
 **Focus:** Production operations + monitoring
 
@@ -246,6 +246,6 @@ Week 12:   v1.0 release (P4-4), gate + tag
 
 ---
 
-**Plan Status:** Ready for execution (post v0.1.0-alpha release)  
-**Next Step:** Kickoff meeting Week 1 of Q3 2026 (July 1)  
+**Plan Status:** Ready for execution (post v0.1.0-alpha release)
+**Next Step:** Kickoff meeting Week 1 of Q3 2026 (July 1)
 **Success Definition:** v1.0 production-ready, security audit passed, multi-region active
