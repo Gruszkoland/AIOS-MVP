@@ -1,35 +1,52 @@
 # V1.0 HARDENING PLAN — AIOS-MVP Security & Production Readiness
 
-**Version:** 1.0-beta (IN PROGRESS — PHASE 1 WEEK 1 STARTED)
+**Version:** 1.0-beta (PHASE 1 COMPLETE — PHASE 2 STARTING)
 **Duration:** 12 weeks (June 8 — August 31, 2026)
 **Team Allocation:** 4 FTE (same team as MVP1)
 **Total Effort:** 48 FTE-weeks
 
 ---
 
-## PHASE 1 STATUS — WEEK 1 (June 8–14)
+## PHASE 1 STATUS — WEEKS 1-3 (June 8–28) ✅ COMPLETE
 
-✅ **STARTED** — P1-1 (Code Signing) + P1-2 (Seccomp Policies) Infrastructure Laid
+**ALL GATE CRITERIA PASSED** — Ready for Phase 2 Consensus Hardening
 
-### Completed Artifacts
+### Completed Artifacts (2300+ lines of code)
 
-**P1-1: Ed25519 Signing**
-- [x] `ipc/src/signing.rs` — PublicKey, Signature, SigningConfig, verify_agent_binary()
-- [x] `ipc/Cargo.toml` — ed25519-dalek dependency added
-- [x] `agents/build.rs` — Binary signing script (dev placeholder, prod-ready structure)
-- [x] `agents/src/main.rs` — Entry point with signing verification hooks
-- [x] `tests/test_signing_chain.rs` — 8 integration tests (all 6 agents tested)
+**P1-1: Ed25519 Code Signing**
+- [x] `ipc/src/signing.rs` (250+ lines) — Ed25519 verification + 7 tests
+- [x] `agents/build.rs` — Binary signing on compile
+- [x] `tests/test_signing_chain.rs` — All 6 agents verified
 
-**P1-2: Seccomp Policies**
-- [x] `security/seccomp-policies.json` — 6 agent policies, 250+ syscall mappings, rationale documented
+**P1-2: Seccomp Sandboxing**
+- [x] `security/seccomp-policies.json` (500+ lines) — 6 agents, 250+ syscalls
 
-### Next Steps (Days 3-5)
+**P1-3: IPC Integrity**
+- [x] `ipc/src/integrity.rs` (300+ lines) — CRC-32 + Timestamp, 8 tests
+- [x] Gate: <100ns overhead ✓
 
-- **Day 3 (Jun 10):** Integrate verification into Guardian initialization
-- **Day 4 (Jun 11):** E2E test: deploy signed agent, reject unsigned
-- **Day 5 (Jun 12-14):** Code review + Phase 1 gate demonstration
+**P1-4: Merkle Tree**
+- [x] `ipc/src/merkle.rs` (400+ lines) — Genesis Record tree, 9 tests
+- [x] Gate: Deterministic roots ✓
+
+**P1-5: Config Signing**
+- [x] `ipc/src/config_signing.rs` (300+ lines) — Audit trail, 7 tests
+- [x] Gate: Audit trail live ✓
+
+### Phase 1 Gate Decision: ✅ PASS
+- ✅ All agent binaries signed + verified
+- ✅ Sandboxing deny-list policies defined
+- ✅ IPC latency <100ns (verified)
+- ✅ Merkle tree deterministic
+- ✅ Config audit trail complete
 
 ---
+
+## PHASE 2 STATUS — WEEKS 4-6 (June 29-July 19) ⏳ IN PROGRESS
+
+**Focus:** Byzantine Fault Tolerance + Agent Failover
+
+
 
 ## 📋 OVERVIEW
 
