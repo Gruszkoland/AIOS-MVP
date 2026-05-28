@@ -1,0 +1,160 @@
+groups:
+  - name: aios_critical_alerts
+    interval: 30s
+    rules:
+      # === LATENCY ALERTS ===
+      - alert: HighDecisionLatencyP99
+        expr: decision_latency_p99_ns > 1000000  # > 1ms
+        for: 2m
+        labels:
+          severity: warning
+          component: latency
+        annotations:
+          summary: "High P99 decision latency detected"
+          description: "P99 latency is {{ $value }}ns, exceeds 1ms threshold"
+
+      - alert: CriticalDecisionLatencyP999
+        expr: decision_latency_p999_ns > 5000000  # > 5ms
+        for: 1m
+        labels:
+          severity: critical
+          component: latency
+        annotations:
+          summary: "CRITICAL: Decision latency P999 exceeds 5ms"
+          description: "P999 latency is {{ $value }}ns"
+
+      # === THROUGHPUT ALERTS ===
+      - alert: LowThroughput
+        expr: decisions_per_second < 100
+        for: 3m
+        labels:
+          severity: warning
+          component: throughput
+        annotations:
+          summary: "Throughput below acceptable level"
+          description: "Decisions per second: {{ $value }}, minimum 100"
+
+      - alert: DecisionFailureRate
+        expr: (1 - decision_success_rate) > 0.01  # > 1% failures
+        for: 2m
+        labels:
+          severity: critical
+          component: reliability
+        annotations:
+          summary: "Decision failure rate exceeds 1%"
+          description: "Success rate: {{ $value | humanizePercentage }}"
+
+      # === BYZANTINE ALERTS ===
+      - alert: ByzantineAgentDetected
+        expr: byzantine_suspected_count > 0
+        for: 1m
+        labels:
+          severity: warning
+          component: byzantine
+        annotations:
+          summary: "Suspected Byzantine agent detected"
+          description: "{{ $value }} Byzantine agents suspected"
+
+      - alert: ConfirmedByzantineAgent
+        expr: byzantine_confirmed_count > 0
+        for: 30s
+        labels:
+          severity: critical
+          component: byzantine
+        annotations:
+          summary: "CRITICAL: Confirmed Byzantine agent in consensus"
+          description: "{{ $value }} Byzantine agents confirmed"
+
+      - alert: ExcessiveViewChanges
+        expr: rate(view_changes_total[5m]) > 0.5  # > 1 per 10s
+        for: 2m
+        labels:
+          severity: warning
+          component: consensus
+        annotations:
+          summary: "Excessive PBFT view changes detected"
+          description: "View change rate: {{ $value }} per 5m"
+
+      # === QUORUM ALERTS ===
+      - alert: QuorumDrop
+        expr: increase(quorum_drops_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: quorum
+        annotations:
+          summary: "CRITICAL: Quorum safety violation detected"
+          description: "{{ $value }} quorum drops in last 5 minutes"
+
+      - alert: QuorumBelowMinimum
+        expr: (12 - byzantine_confirmed_count) < 9  # 8/12 minimum
+        for: 1m
+        labels:
+          severity: critical
+          component: quorum
+        annotations:
+          summary: "CRITICAL: Quorum size below n > 3f minimum"
+          description: "Active agents: {{ $value }}"
+
+      # === RATE LIMITER ALERTS ===
+      - alert: HighRateLimitRejectionRate
+        expr: rate_limit_rejection_rate > 0.05  # > 5% rejected
+        for: 2m
+        labels:
+          severity: warning
+          component: rate_limiting
+        annotations:
+          summary: "High rate limit rejection rate"
+          description: "Rejection rate: {{ $value | humanizePercentage }}"
+
+      - alert: PossibleDoSAttack
+        expr: rate_limit_rejection_rate > 0.2  # > 20% rejected
+        for: 30s
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "CRITICAL: Possible DoS attack detected"
+          description: "Rejection rate: {{ $value | humanizePercentage }}"
+
+      # === AGENT UPTIME ALERTS ===
+      - alert: AgentDowntime
+        expr: agent_uptime_percent < 99  # < 99% uptime
+        for: 5m
+        labels:
+          severity: warning
+          component: agents
+        annotations:
+          summary: "Agent uptime degraded"
+          description: "Agent {{ $labels.agent_id }} uptime: {{ $value | humanizePercentage }}"
+
+      - alert: AgentCriticalDowntime
+        expr: agent_uptime_percent < 95  # < 95% uptime
+        for: 2m
+        labels:
+          severity: critical
+          component: agents
+        annotations:
+          summary: "CRITICAL: Agent critical downtime"
+          description: "Agent {{ $labels.agent_id }} uptime: {{ $value | humanizePercentage }}"
+
+      # === CONSENSUS HEALTH ALERTS ===
+      - alert: ConsensusStalled
+        expr: rate(consensus_rounds_total[5m]) == 0  # No rounds in 5m
+        for: 1m
+        labels:
+          severity: critical
+          component: consensus
+        annotations:
+          summary: "CRITICAL: Consensus rounds stalled"
+          description: "No consensus rounds detected in last 5 minutes"
+
+      - alert: AbnormalConsensusRoundDuration
+        expr: histogram_quantile(0.95, consensus_round_duration_seconds) > 10  # P95 > 10s
+        for: 2m
+        labels:
+          severity: warning
+          component: consensus
+        annotations:
+          summary: "Consensus round duration abnormally high"
+          description: "P95 round duration: {{ $value }}s"

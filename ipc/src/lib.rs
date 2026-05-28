@@ -12,6 +12,7 @@ pub mod quorum;
 pub mod adaptive_timeout;
 pub mod otel;
 pub mod rate_limiter;
+pub mod metrics;
 
 pub use bridge::{Decision, Response, RingBuffer, BridgeStats};
 pub use signing::{PublicKey, Signature, SigningConfig, VerificationResult, verify_agent_binary};
@@ -23,6 +24,7 @@ pub use quorum::{QuorumConfig, QuorumError, QuorumManager};
 pub use adaptive_timeout::TimeoutAdaptor;
 pub use otel::{TraceContext, SpanEvent, DistributedSpan, TraceCollector};
 pub use rate_limiter::{TokenBucket, RateLimiter, RateLimiterConfig};
+pub use metrics::{LatencyBucket, DecisionLatency, ConsensusRound, ThroughputCounter, AgentUptime, ByzantineFaultMetrics, RateLimiterMetrics, PrometheusExporter};
 
 /// Version
 pub const IPC_VERSION: &str = "0.2.0";
