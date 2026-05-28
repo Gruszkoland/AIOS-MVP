@@ -1,3 +1,5 @@
+pub mod failover;
+
 /// Criticality level — agents must NEVER block the kernel critical path.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentCriticality {
