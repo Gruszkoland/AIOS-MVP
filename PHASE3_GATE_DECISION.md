@@ -1,8 +1,8 @@
 # PHASE 3 GATE DECISION — PROMETHEUS + GRAFANA + ALERTS
 
-**Date:** 2026-06-29  
-**Phase:** 3 (Foundation Layer Expansion)  
-**Tasks:** P3-3 (Prometheus metrics) + P3-4 (Grafana dashboards + alerts)  
+**Date:** 2026-06-29
+**Phase:** 3 (Foundation Layer Expansion)
+**Tasks:** P3-3 (Prometheus metrics) + P3-4 (Grafana dashboards + alerts)
 **Status:** ✅ ALL GATES PASSED
 
 ---
@@ -88,8 +88,8 @@
 6. Confirmed Byzantine Agents — Gauge with thresholds (0→1→12 agents)
 7. Agent Uptime by Agent ID — Multi-agent timeseries (99%/95% thresholds)
 
-**Refresh Rate:** 10s  
-**Time Range:** Last 6 hours  
+**Refresh Rate:** 10s
+**Time Range:** Last 6 hours
 **Tags:** AIOS, MVP1, Phase3, Consensus
 
 #### Dashboard 2: Consensus & Byzantine Faults Dashboard
@@ -103,8 +103,8 @@
 4. Suspected Byzantine Agents — Gauge (0→5→10)
 5. Rate Limiter Rejection Rate — Timeseries with DoS thresholds (0→5%→10%)
 
-**Refresh Rate:** 10s  
-**Time Range:** Last 6 hours  
+**Refresh Rate:** 10s
+**Time Range:** Last 6 hours
 **Tags:** AIOS, MVP1, Phase3, Byzantine, Consensus
 
 ---
@@ -224,5 +224,5 @@
 
 ---
 
-**Timestamp:** 2026-06-29 UTC  
+**Timestamp:** 2026-06-29 UTC
 **Commit:** (pending — see git commands below)

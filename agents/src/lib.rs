@@ -1,4 +1,5 @@
 pub mod failover;
+pub mod k8s_failover;
 
 /// Criticality level — agents must NEVER block the kernel critical path.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
