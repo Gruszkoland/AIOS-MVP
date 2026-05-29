@@ -176,38 +176,31 @@ jobs:
       # Post to Slack (review queue or auto-publish notification)
       - name: Notify Slack
         if: always()
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          webhook-url: ${{ secrets.SLACK_WEBHOOK || '' }}
-          payload: |
-            {
-              "text": "📱 AMPLIFIER Achievement Analysis",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*AMPLIFIER Achievement Analysis*\n${{ steps.metadata.outputs.type }}: ${{ steps.metadata.outputs.title }}\n\n*Trinity Score:* ${{ steps.trinity.outputs.trinity_score }}\n*Authenticity:* ${{ steps.amplifier.outputs.authenticity }}\n*Decision:* ${{ steps.amplifier.outputs.decision }}"
-                  }
-                },
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "text": {"type": "plain_text", "text": "View PR"},
-                      "url": "${{ steps.metadata.outputs.url }}"
-                    },
-                    {
-                      "type": "button",
-                      "text": {"type": "plain_text", "text": "Review"},
-                      "value": "review",
-                      "style": "primary"
-                    }
-                  ]
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK" ]; then
+            echo "ℹ️  SLACK_WEBHOOK not configured - skipping Slack notification"
+            exit 0
+          fi
+
+          payload=$(cat <<'JSON'
+          {
+            "text": "📱 AMPLIFIER Achievement Analysis",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*AMPLIFIER Achievement Analysis*\n${{ steps.metadata.outputs.type }}: ${{ steps.metadata.outputs.title }}\n\n*Trinity Score:* ${{ steps.trinity.outputs.trinity_score }}\n*Authenticity:* ${{ steps.amplifier.outputs.authenticity }}\n*Decision:* ${{ steps.amplifier.outputs.decision }}"
                 }
-              ]
-            }
+              }
+            ]
+          }
+          JSON
+          )
+
+          curl -sS -X POST -H 'Content-type: application/json' --data "$payload" "$SLACK_WEBHOOK"
 
       # If decision is AUTO-PUBLISH: Post to LinkedIn (mock implementation)
       - name: Publish to LinkedIn
@@ -265,7 +258,6 @@ jobs:
           echo "   Achievement: ${{ inputs.achievement_title }}"
           echo "   Trinity Score: ${{ inputs.trinity_score }}"
 
----
 # Configuration for GitHub Actions Integration
 # Add to secrets in GitHub repository:
 # - LINKEDIN_TOKEN: OAuth token from LinkedIn (required for publishing)
