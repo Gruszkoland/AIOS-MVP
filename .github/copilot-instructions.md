@@ -230,6 +230,52 @@ Wszystkie modyfikacje plików loguj w Markdown jako kod tekstowy:
 - **Lazy imports**: Moduły z ciężkimi zależnościami (database, Apify) — patch na poziomie importu.
 - **Zasada jakości**: Im więcej sensownych testów tym lepiej — rozszerzaj testy dla każdej nowej funkcji, endpointu, logiki decyzyjnej i scenariuszy regresyjnych.
 
+## REPOSITORY CONTEXT CONTRACT (MANDATORY)
+<!-- BEGIN:REPO_CONTEXT_CONTRACT -->
+Przy **tworzeniu repozytorium** oraz przy **każdej naprawie/refaktorze** agent MUSI najpierw odczytać i zaktualizować plik:
+
+- `REPO_CONTEXT_STATUS.txt` (root repo)
+
+Jeśli plik nie istnieje, agent tworzy go przed pierwszą zmianą kodu.
+
+Minimalna struktura pliku `REPO_CONTEXT_STATUS.txt`:
+
+1. `REPO_GOAL` — cel i zakres repo (1-3 akapity)
+2. `DEPLOYMENT_PLAN` — lista elementów do wdrożenia i kolejność
+3. `CHANGELOG_LIVE` — lista dotychczasowych poprawek i zmian (append-only)
+4. `CURRENT_RISKS` — top ryzyk technicznych i operacyjnych
+5. `NEXT_ACTIONS` — następne kroki na najbliższą iterację
+6. `LAST_VERIFIED` — data, autor, wynik walidacji
+
+Zasady egzekucji:
+
+- Przed edycją kodu: sprawdź obecność i aktualność `REPO_CONTEXT_STATUS.txt`.
+- Po zakończeniu zadania: dopisz wpis do `CHANGELOG_LIVE` i zaktualizuj `LAST_VERIFIED`.
+- Przy pracy wieloagentowej: traktuj ten plik jako SSOT dla szybkiej diagnozy stanu.
+- Nie usuwaj historii wpisów; tylko dopisuj nowe rekordy.
+<!-- END:REPO_CONTEXT_CONTRACT -->
+
+## POLITYKA USUWANIA PLIKÓW (NADRZĘDNA)
+
+### ZALECANE KASOWANIE
+
+Przed kazda operacja usuniecia (`Remove-Item`, `rm`, `del`, `git clean`, `git rm`) agent MUSI:
+
+1. Przedstawic liste plikow proponowanych do usuniecia (pelne sciezki lub sciezki repo).
+2. Oznaczyc sekcje naglowkiem `ZALECANE KASOWANIE`.
+3. Dla kazdej pozycji podac uzasadnienie: dlaczego plik jest kandydatem do usuniecia.
+4. Dla kazdej pozycji podac wplyw i metode odtworzenia/backup.
+5. Uzyskac jawna akceptacje uzytkownika w tej samej sesji.
+6. Dopiero po akceptacji wykonac operacje usuniecia.
+
+Reguly bezwzgledne:
+
+- Brak akceptacji uzytkownika = zakaz kasowania.
+- Zabronione automatyczne kasowanie podczas refaktoru/reorganizacji bez pytania.
+- Najpierw plan i lista, potem decyzja uzytkownika, na koncu wykonanie.
+- Gdy kasowanie dotyczy danych lub raportow, najpierw zaproponuj backup i potwierdz sciezke backupu.
+- Lista kandydatow bez uzasadnienia per plik jest niekompletna i nie moze byc wykonana.
+
 ## FATAL ERROR HANDLING
 
 Jeśli napotkasz błąd krytyczny środowiska: nie zatrzymuj się i nie zgłaszaj bezradności. Uruchom pętlę naprawczą (Healer + Sentinel), wygeneruj nowy wariant grafu decyzyjnego i podejmij kolejną próbę wdrożenia. Działaj z niezachwianą pewnością w sukces misji.
@@ -315,16 +361,16 @@ insight = gardener.speculative_insight()
 | #   | ID  | Name           | Severity | Description                                            |
 | --- | --- | -------------- | -------- | ------------------------------------------------------ |
 | 1   | G1  | Unity          | MEDIUM   | All actions must serve system coherence                |
-| 2   | G2  | Truth          | HIGH     | Anti-manipulation; analysis must be genuine            |
+| 2   | G2  | Harmony        | HIGH     | Balance between competing objectives; analysis must be genuine |
 | 3   | G3  | Rhythm         | MEDIUM   | Consistent cadence and timing of operations            |
 | 4   | G4  | Causality      | HIGH     | Every action must have a traceable, justified cause    |
 | 5   | G5  | Transparency   | MEDIUM   | All decisions and reasoning visible and auditable      |
-| 6   | G6  | Nonmaleficence | CRITICAL | Do no harm; protect system and users from damage       |
-| 7   | G7  | Autonomy       | HIGH     | Respect free will; no spam or unsolicited contact      |
-| 8   | G8  | Justice        | CRITICAL | Fairness and equitable treatment                       |
+| 6   | G6  | Authenticity   | HIGH     | Outputs must be genuine and free from deception        |
+| 7   | G7  | Privacy        | CRITICAL | Data and analysis must remain local-only unless explicitly authorized |
+| 8   | G8  | Nonmaleficence | CRITICAL | Never cause harm to users, systems, or data            |
 | 9   | G9  | Sustainability | HIGH     | Operate within resource limits, preserve system health |
 
-**Reguła weta:** CRITICAL (G6, G8) → natychmiastowy DENY. ≥2 dowolnych naruszeń → DENY.
+**Reguła weta:** CRITICAL (G7, G8) → natychmiastowy DENY. ≥2 dowolnych naruszeń → DENY.
 
 ## DESIGN PHILOSOPHY (Inspiracje architektoniczne)
 

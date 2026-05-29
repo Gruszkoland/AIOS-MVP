@@ -1,41 +1,42 @@
 # ADRION 369 Code Ownership
 
-# Each line: pattern owner(s)
+# Default owner
+* @adiha
 
-# Owners are auto-requested for review on matching PRs
+# Governance and AI instructions
+MANIFEST.md @adiha
+CLAUDE.md @adiha
+.github/copilot-instructions.md @adiha
+REPO_CONTEXT_STATUS.txt @adiha
 
-# Default — project owner
-
--                           @adiha
+# CI/CD and automation
+.github/workflows/ @adiha
+scripts/reporting/ @adiha
+scripts/deploy/ @adiha
 
 # Core arbitrage engine
-
 arbitrage/ @adiha
 arbitrage/guardian.py @adiha
 arbitrage/trinity.py @adiha
 
-# Go Vortex
-
+# Go and Rust runtime components
 cmd/ @adiha
-internal/ @adiha
+kernel/ @adiha
+agents/ @adiha
+ipc/ @adiha
 go.mod @adiha
 
-# UAP Orchestrator
-
+# UAP orchestrator and MCP
 uap/ @adiha
+mcp-servers/ @adiha
 
 # Infrastructure
-
 docker-compose*.yml @adiha
+docker/ @adiha
 kubernetes/ @adiha
 Dockerfile* @adiha
 
-# CI/CD — changes here need explicit review
-
-.github/ @adiha
-
 # Security-sensitive files
-
 arbitrage/config.py @adiha
 arbitrage/database.py @adiha
 arbitrage/llm.py @adiha

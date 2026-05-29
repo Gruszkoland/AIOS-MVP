@@ -145,18 +145,35 @@ jobs:
             echo "✓ Guardian Laws canonical reference found"
           fi
 
+  # Stage 6: Undefined behavior checks (Miri)
+  miri:
+    name: Miri UB checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: miri
+
+      - name: Setup miri
+        run: cargo miri setup
+
+      - name: Run miri tests (ipc)
+        run: cargo miri test -p ipc --tests
+
   # Gate: All checks must pass
   all-checks:
     name: All Checks Complete
     runs-on: ubuntu-latest
-    needs: [ lint, build-test, coverage, benchmarks, guardian-laws ]
+    needs: [ lint, build-test, coverage, benchmarks, guardian-laws, miri ]
     if: always()
     steps:
       - name: Check if all jobs passed
         run: |
           if [ "${{ needs.lint.result }}" != "success" ] || \
              [ "${{ needs.build-test.result }}" != "success" ] || \
-             [ "${{ needs.coverage.result }}" != "success" ]; then
+             [ "${{ needs.coverage.result }}" != "success" ] || \
+             [ "${{ needs.miri.result }}" != "success" ]; then
             echo "❌ CI pipeline failed"
             exit 1
           fi

@@ -10,6 +10,8 @@
 - TUI kiosk mode, MVP-first
 - Safety verified by design (capability model, fuzzing in DoD)
 
+**Repository note:** This repository currently hosts both Rust kernel work and Python/Flask ADRION orchestration services. Operational governance sources are `MANIFEST.md`, `CLAUDE.md`, and `.github/copilot-instructions.md`.
+
 ---
 
 ## Repository layout
@@ -48,13 +50,13 @@ Sequential evaluation stages, each ~30ms:
 
 ### 9 Guardian Laws (Ethical Constraints)
 - **G1: Unity** (MEDIUM) — Collective good, system coherence
-- **G2: Truth** (HIGH) — Anti-manipulation, genuine analysis
+- **G2: Harmony** (HIGH) — Balance between competing objectives, genuine analysis
 - **G3: Rhythm** (MEDIUM) — Balance, sustainable pace
 - **G4: Causality** (HIGH) — Everything traced, full traceability
 - **G5: Transparency** (MEDIUM) — Explainability, auditable decisions
-- **G6: Nonmaleficence** (CRITICAL) — Do no harm, prevent damage
-- **G7: Autonomy** (HIGH) — Respect free will, no spam
-- **G8: Justice** (CRITICAL) — Fairness, equitable treatment
+- **G6: Authenticity** (HIGH) — Outputs must be genuine and free from deception
+- **G7: Privacy** (CRITICAL) — Local-first data protection
+- **G8: Nonmaleficence** (CRITICAL) — Do no harm, prevent damage
 - **G9: Sustainability** (HIGH) — Long-term viability, resource limits
 
 ### Total: 3 × 6 × 9 = **162 Dimensions**

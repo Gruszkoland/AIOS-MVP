@@ -31,13 +31,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-arbitrage.txt
           pip install -r requirements-mcp.txt
-          pip install pytest pytest-cov ruff mypy
+          pip install pytest pytest-cov ruff mypy bandit safety
 
       - name: Lint (ruff)
         run: ruff check arbitrage/ tests/ --select=E,F,W --ignore=E501
 
       - name: Type check (mypy)
-        run: mypy arbitrage/ --ignore-missing-imports --no-strict-optional
+        run: mypy arbitrage/ --strict --ignore-missing-imports
+
+      - name: Sync version and state
+        run: python scripts/reporting/sync_version_state.py
+
+      - name: Validate repo context contract status
+        run: python scripts/reporting/validate_repo_context_status.py
+
+      - name: Validate MCP structure policy
+        run: python scripts/reporting/validate_mcp_structure.py
+
+      - name: Security scan (bandit)
+        run: bandit -r arbitrage/ -ll
+
+      - name: Dependency scan (safety)
+        run: safety check -r requirements-arbitrage.txt
 
       - name: Run tests with coverage
         run: |

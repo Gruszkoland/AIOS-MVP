@@ -1,0 +1,65 @@
+REPO_CONTEXT_STATUS
+Version: 1.0
+
+REPO_GOAL
+- Primary goal: Stabilna i audytowalna integracja wybranych funkcji KIMI/KIKI z AIOS-MVP bez regresji istniejacego runtime.
+- Scope in: Migracja logiki trinity/kurs, genesis ledger, antifragile memory; feature flags; testy i health probes; deployment przez adapter.
+- Scope out: Pelny direct-copy calego pakietu KIKI, usuwanie istniejacych serwisow produkcyjnych, zmiany destrukcyjne w historii repo.
+
+DEPLOYMENT_PLAN
+- [x] Stage 1: Baseline + checkpoint + definicja gate A/B/C.
+- [x] Stage 2: Naprawa syntax i wydzielenie modulow migracyjnych.
+- [x] Stage 3: Integracja przez feature flags + testy regresji + walidacja deployment.
+- Target environment: Dev -> Staging (etapowo), bez wymuszania produkcji.
+- Rollback strategy: Branch checkpoint/kimi-20260529-013334 + cofniecie zmian do punktu checkpoint.
+
+DEPLOYMENT_GATES
+- Gate A (syntax/import): `python -m py_compile` dla migrowanych modulow.
+- Gate B (tests): zielone testy jednostkowe i regresyjne dla dotknietych obszarow.
+- Gate C (deploy): A11 predeploy + final deployment gate + health check po wdrozeniu.
+
+CHANGELOG_LIVE
+- 2026-05-29 01:33 | copilot | Baseline snapshot + checkpoint branch | low | done
+- 2026-05-29 01:33 | copilot | Health baseline zapisany do REPORTS/baseline | medium | done
+- 2026-05-29 01:34 | copilot | Gate B baseline fail (ModuleNotFoundError: arbitrage) | medium | open
+- 2026-05-29 01:37 | copilot | Naprawa KIKI syntax w kimi_migration/source_fixed (30/30 py_compile) | high | done
+- 2026-05-29 01:37 | copilot | Dodane moduly: trinity_kurs, genesis_ledger, antifragile_memory + feature flag | high | done
+- 2026-05-29 01:37 | copilot | Testy KIMI: 8 passed, raport zapisany do REPORTS/test-results | high | done
+- 2026-05-29 01:38 | copilot | A11 predeploy PASS + final deployment gate PASS (podprojekt ADRION) | high | done
+- 2026-05-29 01:38 | copilot | Health check naprawiony przez instalacje pystray, status HEALTHY | high | done
+- 2026-05-29 01:52 | copilot | Utworzono plan naprawczy 54->85+ i roadmape faz A-F | high | done
+- 2026-05-29 02:17 | copilot | Faza A: dodano VERSION + PROJECT_STATE + sync_version_state + governance workflow | high | done
+- 2026-05-29 02:17 | copilot | Faza B: hardening .gitignore + security lane (bandit/safety) w python-ci | high | done
+- 2026-05-29 02:17 | copilot | Faza C: canonical MCP policy + validator mcp-servers vs mcp_servers | medium | done
+- 2026-05-29 02:17 | copilot | Faza D: dynamic confidence score + testy jednostkowe | high | done
+- 2026-05-29 02:17 | copilot | Faza E: rust-ci miri job + all-checks gate | high | done
+- 2026-05-29 02:17 | copilot | Faza F: CODEOWNERS + branch protection runbook + quickstart smoke | medium | done
+- 2026-05-29 03:05 | copilot | Reorganizacja root markdown do docs/release,gates,status,summaries bez kasowania | high | done
+- 2026-05-29 03:05 | copilot | Opcja A przyjeta: canonical MCP = mcp_servers + aktualizacja policy i validatora | high | done
+- 2026-05-29 03:16 | copilot | Polityka ZALECANE KASOWANIE rozszerzona o uzasadnienie per plik i wplyw | high | done
+
+CURRENT_RISKS
+- Python path/import mismatch for tests | medium | uruchamianie testow z `PYTHONPATH=.` i testy scoped do nowych modulow
+- Drift instrukcji miedzy CLAUDE i copilot | low | sync script + pre-commit hook aktywny
+- Różnica topologii repo root vs podprojekt ADRION dla skryptow A11 | medium | uruchamiaj gate/deploy z projektu zawierajacego modul `arbitrage`
+
+NEXT_ACTIONS
+- [x] Action 1: Zamknac F0 i zatwierdzic gate A/B/C
+- [x] Action 2: Naprawic syntax blockers KIKI i skompilowac moduly migracyjne
+- [x] Action 3: Wydzielic i dodac testy dla trinity/kurs, genesis i antifragile
+- [x] Action 4: Dodać CI gate sprawdzajacy synchronizacje kontraktu instrukcji
+- [x] Action 5: Uruchomic Faze A planu AIOS_MVP_REMEDIATION_EXECUTION_PLAN (VERSION + SSOT validators)
+- [x] Action 6: Wykonac hardening .gitignore i security hygiene (Faza B)
+- [x] Action 7: Zaplanowac deduplikacje MCP i canonical compose (Faza C)
+- [x] Action 8: Dodac dynamic confidence scoring i testy (Faza D)
+- [x] Action 9: Rozszerzyc CI o miri oraz governance checks (Faza E)
+- [x] Action 10: Zamknac governance final (CODEOWNERS + runbook + quickstart smoke)
+- [x] Action 11: Wykonac czyszczenie root przez przeniesienia dokumentacji bez usuwania
+- [x] Action 12: Ujednolicic MCP naming do Opcji A (mcp_servers)
+- [x] Action 13: Oczekiwac akceptacji uzytkownika dla sekcji ZALECANE KASOWANIE
+- [x] Action 14: Wymusic uzasadnienie per plik dla list kasowania
+
+LAST_VERIFIED
+- Date: 2026-05-29 03:16
+- Verified by: GitHub Copilot (GPT-5.3-Codex)
+- Validation result: Reorganizacja root wykonana bez kasowania; Opcja A aktywna; lista kasowania wymaga uzasadnien per pozycja

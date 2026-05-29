@@ -1,7 +1,8 @@
 # 🏗️ ADRION 369 v4.0 — PROJECT MANIFEST & ARCHITECTURAL GUIDELINES
 
 > **Single Source of Truth for AI Orchestrators, Copilots, and Development Teams**
-> **Version:** 5.0 | **Updated:** 2026-04-22 | **Status:** Core Standards Locked
+> **Version:** 5.1.0| **Updated:** 2026-05-29 | **Status:** Core Standards Locked
+> **Version Source:** `VERSION` (synced by `scripts/reporting/sync_version_state.py`)
 
 ---
 

@@ -1,4 +1,29 @@
 repos:
+  # ── Local: Sync instruction contracts ───────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: sync-repo-context-contract
+        name: sync-repo-context-contract
+        entry: python scripts/reporting/sync_repo_context_contract.py
+        language: system
+        pass_filenames: false
+        - id: sync-version-state
+          name: sync version state
+          entry: python scripts/reporting/sync_version_state.py
+          language: system
+          pass_filenames: false
+        - id: validate-repo-context-status
+          name: validate repo context status
+          entry: python scripts/reporting/validate_repo_context_status.py
+          language: system
+          pass_filenames: false
+        - id: validate-mcp-structure
+          name: validate mcp structure
+          entry: python scripts/reporting/validate_mcp_structure.py
+          language: system
+          pass_filenames: false
+        files: ^(\.github/copilot-instructions\.md|CLAUDE\.md)$
+
   # ── Python: Ruff (linting + formatting) ──────────────────────────────────────
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.3.0

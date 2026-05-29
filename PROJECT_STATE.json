@@ -1,0 +1,17 @@
+{
+  "project": "AIOS-MVP",
+  "version": "5.1.0",
+  "last_updated": "2026-05-29T00:17:14Z",
+  "confidence_model": {
+    "mode": "dynamic",
+    "inputs": [
+      "success_rate",
+      "activity_freshness_hours",
+      "completed_tasks"
+    ],
+    "formula": "round(min(100, max(0, success_rate*70 + freshness_score*20 + task_score*10)), 2)"
+  },
+  "agents": [],
+  "metrics": {},
+  "confidence_score": 82.17
+}

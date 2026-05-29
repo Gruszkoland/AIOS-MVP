@@ -1,6 +1,6 @@
 # AIOS v1.0 — Operational Runbooks
 
-**Last Updated:** 2026-06-29  
+**Last Updated:** 2026-06-29
 **Audience:** On-call engineers, SREs, incident commanders
 
 ---
@@ -222,7 +222,7 @@ fi
    # Are nodes down?
    kubectl get nodes
    # Should show all nodes Ready
-   
+
    # If nodes NotReady: drain & evacuate
    kubectl drain <node-name> --ignore-daemonsets --force
    ```
@@ -232,10 +232,10 @@ fi
    # Find pending/failed pods
    kubectl get pods -n aios -l app=aios-agents \
      --field-selector=status.phase=Failed,status.phase=Pending
-   
+
    # Force restart
    kubectl delete pod <pod-name> -n aios
-   
+
    # Scale up if replicas insufficient
    kubectl scale deployment aios-agents --replicas=12 -n aios
    ```
@@ -406,9 +406,9 @@ kubectl exec postgresql-restore-pitr -n aios -- \
 ```markdown
 # Incident Report
 
-**Date:** 2026-06-29  
-**Severity:** [CRITICAL | HIGH | MEDIUM | LOW]  
-**Status:** [INVESTIGATING | MITIGATED | RESOLVED]  
+**Date:** 2026-06-29
+**Severity:** [CRITICAL | HIGH | MEDIUM | LOW]
+**Status:** [INVESTIGATING | MITIGATED | RESOLVED]
 
 ## Timeline
 
@@ -449,5 +449,5 @@ kubectl exec postgresql-restore-pitr -n aios -- \
 
 ---
 
-**Last Update:** 2026-06-29 UTC  
+**Last Update:** 2026-06-29 UTC
 **Next Review:** 2026-07-29

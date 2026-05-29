@@ -1,10 +1,9 @@
 # CLAUDE.md — ADRION 369 Project Control File
 
 > **Version:** 5.1-plan | **Updated:** 2026-04-22 | **Score:** 77/100 (target: 100/100)
-> **Plan:** 23 tasks in 5 waves × 4 phases | 18 agents parallel | 5 verification gates
+> **Plan:** 23 tasks in 5 waves x 4 phases | 18 agents parallel | 5 verification gates
 > This file is the single source of truth for Claude Code. It is loaded at conversation start.
-
-> 📋 **Standards & Architecture:** See [`MANIFEST.md`](MANIFEST.md) — Full coding standards,
+> **Standards & Architecture:** See [`MANIFEST.md`](MANIFEST.md) — Full coding standards,
 > naming conventions, test markers, Git conventions, Guardian Laws, Trinity-EBDI framework.
 > **All AI agents must read MANIFEST.md before making code changes.**
 
@@ -18,6 +17,45 @@
 - **Decision model:** Trinity-EBDI 162D space (3 perspectives x 6 modes x 9 laws)
 - **Canonical source of truth:** `docs/GUARDIAN_LAWS_CANONICAL.json` (9 praw)
 - **User language:** Polish (komunikacja), English (code comments, git commits)
+
+## 1.1. INSTRUCTION BOUNDARY
+
+- `CLAUDE.md`: project execution plan, quality gates, and repo-level constraints.
+- `.github/copilot-instructions.md`: runtime behavior for the coding agent in VS Code.
+- `docs/GUARDIAN_LAWS_CANONICAL.json`: canonical names/severities for Guardian Laws.
+- `MANIFEST.md`: coding standards and architecture conventions.
+- Precedence on conflicts: `docs/GUARDIAN_LAWS_CANONICAL.json` > `MANIFEST.md` > `CLAUDE.md` > `.github/copilot-instructions.md`.
+
+## 1.2. REPOSITORY CONTEXT CONTRACT (SYNCED)
+
+<!-- BEGIN:REPO_CONTEXT_CONTRACT -->
+Przy **tworzeniu repozytorium** oraz przy **każdej naprawie/refaktorze** agent MUSI najpierw odczytać i zaktualizować plik:
+
+- `REPO_CONTEXT_STATUS.txt` (root repo)
+
+Jeśli plik nie istnieje, agent tworzy go przed pierwszą zmianą kodu.
+
+Minimalna struktura pliku `REPO_CONTEXT_STATUS.txt`:
+
+1. `REPO_GOAL` — cel i zakres repo (1-3 akapity)
+2. `DEPLOYMENT_PLAN` — lista elementów do wdrożenia i kolejność
+3. `CHANGELOG_LIVE` — lista dotychczasowych poprawek i zmian (append-only)
+4. `CURRENT_RISKS` — top ryzyk technicznych i operacyjnych
+5. `NEXT_ACTIONS` — następne kroki na najbliższą iterację
+6. `LAST_VERIFIED` — data, autor, wynik walidacji
+
+Zasady egzekucji:
+
+- Przed edycją kodu: sprawdź obecność i aktualność `REPO_CONTEXT_STATUS.txt`.
+- Po zakończeniu zadania: dopisz wpis do `CHANGELOG_LIVE` i zaktualizuj `LAST_VERIFIED`.
+- Przy pracy wieloagentowej: traktuj ten plik jako SSOT dla szybkiej diagnozy stanu.
+- Nie usuwaj historii wpisów; tylko dopisuj nowe rekordy.
+<!-- END:REPO_CONTEXT_CONTRACT -->
+
+Synchronizacja z `.github/copilot-instructions.md` jest automatyczna przez:
+
+- `scripts/reporting/sync_repo_context_contract.py`
+- hook pre-commit `sync-repo-context-contract`
 
 ---
 
@@ -45,6 +83,12 @@ open http://localhost:8003/api/docs     # Swagger UI
 
 ## 3. TESTING
 
+Test policy (always):
+
+- Always run relevant tests after each code change (module-level minimum, full suite for cross-cutting changes).
+- Always persist test results in the deployed repository under `REPORTS/test-results/<YYYY-MM-DD_HH-mm-ss>_test-report.txt`.
+- Prefer adding meaningful regression tests for each new function, endpoint, and decision branch.
+
 ```bash
 # Python (must pass with 80%+ coverage)
 python -m pytest tests/ -q --cov=arbitrage --cov-fail-under=80
@@ -65,7 +109,7 @@ safety check -r requirements-arbitrage.txt
 
 ## 4. ARCHITECTURE (v4.0)
 
-```
+```text
 Browser --> Nginx (TLS) --> Flask App Factory (arbitrage/app.py)
                               |-- arbitrage_bp (9 routes: jobs, bids, scout, cycle)
                               |-- quantum_bp  (3 routes: decide, status, scan)
@@ -92,15 +136,15 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 **9 Immutable Laws** evaluated through **6 Processing Modes**:
 
 | G# | Law | Severity | Purpose | Primary Modes |
-|----|-----|----------|---------|---|
+| --- | --- | --- | --- | --- |
 | G1 | Unity | MEDIUM | Collective good, system coherence | Inventory, Process, Action |
-| G2 | Truth | HIGH | Anti-manipulation, genuine analysis | Debate, Healing, Action |
+| G2 | Harmony | HIGH | Balance between competing objectives, genuine analysis | Debate, Healing, Action |
 | G3 | Rhythm | MEDIUM | Sustainable pace, balance | Inventory, Process |
 | G4 | Causality | HIGH | Full traceability | Debate, Action |
 | G5 | Transparency | MEDIUM | Explainability, auditable | All 6 Modes |
-| G6 | Nonmaleficence | CRITICAL | Prevent harm | Debate, Healing, Action |
-| G7 | Autonomy | HIGH | Respect free will, no spam | Empathy, Healing |
-| G8 | Justice | CRITICAL | Fair treatment | Debate, Action |
+| G6 | Authenticity | HIGH | Outputs must be genuine and free from deception | Debate, Healing, Action |
+| G7 | Privacy | CRITICAL | Data and analysis local-only, no unauthorized disclosure | Empathy, Healing |
+| G8 | Nonmaleficence | CRITICAL | Prevent harm to users, systems, and data | Debate, Action |
 | G9 | Sustainability | HIGH | Long-term viability | Process, Action |
 
 **6 Processing Modes** (Hexagon):
@@ -118,27 +162,27 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 - **Intellectual:** Truth (beauty, coherence, logic)
 - **Essential:** Purpose (mission, unity, commons)
 
-**Rule:** CRITICAL violation = instant DENY. 2+ any violations = DENY.
+**Rule:** CRITICAL violation (G7/G8) = instant DENY. 2+ any violations = DENY.
 
 ---
 
 ## 5. KEY FILES (do NOT guess — read before editing)
 
-| File                    | Role                           | Notes                                                 |
-| ----------------------- | ------------------------------ | ----------------------------------------------------- |
-| `wsgi.py`               | Production entry point         | Imports `create_app()` from `arbitrage.app`           |
-| `arbitrage/app.py`      | Flask app factory              | CSRF, CORS, health checks, graceful shutdown, OpenAPI |
-| `arbitrage/blueprints/` | 5 route modules                | `safe_float`/`safe_int` in `__init__.py`              |
-| `arbitrage/config.py`   | Pydantic BaseSettings          | All env vars typed + validated                        |
-| `arbitrage/guardian.py` | 9 Guardian Laws engine         | `evaluate_guardians(job, analysis, context)`          |
-| `arbitrage/trinity.py`  | Trinity Score engine           | `evaluate_trinity(job, analysis, resources)`          |
-| `arbitrage/database.py` | DB layer (SQLite + PG pool)    | Parameterized SQL only, `graceful_drain()`            |
-| `arbitrage/llm.py`      | LLM abstraction                | Ollama-first, canary deploy, injection filter         |
-| `arbitrage_server.py`   | **DEPRECATED** — do NOT use    | Has deprecation warning, will be removed              |
-| `uap/backend/api.py`    | UAP orchestrator (2111 lines)  | **Needs refactor** — monolith, SQL injection risk     |
-| `docs/openapi.yaml`     | OpenAPI 3.1 spec (1096 lines)  | 27 endpoints documented                               |
-| `docs/COMPRESSION_GUIDE.md` | Token compression style guide | Level 0–2 symbolic notation, 50–70% savings          |
-| `pyproject.toml`        | Project metadata + tool config | pytest, coverage, ruff settings                       |
+| File                        | Role                           | Notes                                                 |
+| --------------------------- | ------------------------------ | ----------------------------------------------------- |
+| `wsgi.py`                   | Production entry point         | Imports `create_app()` from `arbitrage.app`           |
+| `arbitrage/app.py`          | Flask app factory              | CSRF, CORS, health checks, graceful shutdown, OpenAPI |
+| `arbitrage/blueprints/`     | 5 route modules                | `safe_float`/`safe_int` in `__init__.py`              |
+| `arbitrage/config.py`       | Pydantic BaseSettings          | All env vars typed + validated                        |
+| `arbitrage/guardian.py`     | 9 Guardian Laws engine         | `evaluate_guardians(job, analysis, context)`          |
+| `arbitrage/trinity.py`      | Trinity Score engine           | `evaluate_trinity(job, analysis, resources)`          |
+| `arbitrage/database.py`     | DB layer (SQLite + PG pool)    | Parameterized SQL only, `graceful_drain()`            |
+| `arbitrage/llm.py`          | LLM abstraction                | Ollama-first, canary deploy, injection filter         |
+| `arbitrage_server.py`       | Deprecated server              | Use `wsgi.py`; removal planned                        |
+| `uap/backend/api.py`        | UAP orchestrator (2111 lines)  | Needs refactor; monolith and SQL injection risk       |
+| `docs/openapi.yaml`         | OpenAPI 3.1 spec (1096 lines)  | 27 endpoints documented                               |
+| `docs/COMPRESSION_GUIDE.md` | Token compression style guide  | Level 0-2 symbolic notation, 50-70% savings           |
+| `pyproject.toml`            | Project metadata + tool config | pytest, coverage, ruff settings                       |
 
 ---
 
@@ -182,7 +226,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 ## 7. CHECKLIST: 75/100 → 100/100
 
 > **Stan inwentaryzacji (2026-04-11):** root=179 items, 45 .md, 10 .log, 9 .txt, 8 .ps1, 24 .py scripts, `Users/` + `O/` dirs present.
-> **Matryca 3-6-9:** 3 perspektywy (Material/Intellectual/Essential) × 6 modes (Inventory/Empathy/Process/Debate/Healing/Action) × 9 praw Guardian = 162D przestrzeń decyzyjna.
+> **Matryca 3-6-9:** 3 perspektywy (Material/Intellectual/Essential) x 6 modes (Inventory/Empathy/Process/Debate/Healing/Action) x 9 praw Guardian = 162D przestrzen decyzyjna.
 
 ### PHASE 1: CRITICAL FIXES (75→85) — P0 — Branch: `fix/p0-critical`
 
@@ -227,10 +271,10 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 #### P0-3: UAP monolith refactor `[ARCHITECTURE]`
 
 - **Status:** `[ ]` NOT STARTED
-- **File:** `uap/backend/api.py` (2110 lines → target: 5 files × ~400 lines)
+- **File:** `uap/backend/api.py` (2110 lines → target: 5 files x ~400 lines)
 - **Target structure:**
 
-  ```
+  ```text
   uap/backend/
     api.py              (~200 lines — app factory, shared middleware, health)
     blueprints/
@@ -279,7 +323,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
      - Go Vortex (EBDI + digital root)
      - MCP Layer (6 microservices on ports 9000-9005)
      - Circuit Breaker + Rate Limiter + LLM Canary
-  3. Include Matryca 3-6-9 diagram (3 perspectives × 6 aspects × 9 laws = 162D)
+  3. Include Matryca 3-6-9 diagram (3 perspectives x 6 aspects x 9 laws = 162D)
   4. Add data flow diagram: Browser → Nginx → Flask → Guardian → Trinity → LLM
 - **Agent:** `backend-developer` | **Branch:** `docs/p0-5-architecture`
 
@@ -543,7 +587,7 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 ### POST-100: SCALING (backlog)
 
 | # | Task | Details | Priority |
-|---|------|---------|----------|
+| --- | --- | --- | --- |
 | S1 | Infrastructure as Code | Terraform/Pulumi for cloud provisioning (AWS/GCP) | MEDIUM |
 | S2 | Multi-region DR | Cross-region PostgreSQL replication, failover automation | HIGH |
 | S3 | Load testing in CI | k6 benchmarks on every release, performance regression gate | MEDIUM |
@@ -555,20 +599,20 @@ MCP Layer                    --> Router:9000, Vortex:9001, Guardian:9002, Oracle
 
 ### Zasada Matrycy 3-6-9
 
-Każde zadanie oceniane przez 3 perspektywy:
+Kazde zadanie oceniane przez 3 perspektywy:
 
-- **LOGOS (Prawda):** Czy naprawia faktyczny błąd? Czy kod jest poprawny?
-- **ETHOS (Dobro):** Czy chroni system i użytkowników? Czy jest etyczne?
+- **LOGOS (Prawda):** Czy naprawia faktyczny blad? Czy kod jest poprawny?
+- **ETHOS (Dobro):** Czy chroni system i uzytkownikow? Czy jest etyczne?
 - **EROS (Tworzenie):** Czy posuwa projekt do przodu? Czy jest eleganckie?
 
-### Kolejność wykonania (dependency graph)
+### Kolejnosc wykonania (dependency graph)
 
-```
+```text
 WAVE 1 (parallel — no deps):
   P0-1 (SQL injection)  ──┐
   P0-2 (Root cleanup)     │── Can run simultaneously
   P0-4 (Docker socket)    │
-  P0-5 (ARCHITECTURE.md) ─┘
+  P0-5 (ARCHITECTURE.md) ->
 
 WAVE 2 (after P0-1):
   P0-3 (UAP refactor) ── needs P0-1 fix in place first
@@ -595,7 +639,7 @@ WAVE 6 (after all above):
 **WAVE 1 — P0 Quick Wins (4 agents parallel):**
 
 | Agent | Task | Type | Effort | Branch |
-|-------|------|------|--------|--------|
+| --- | --- | --- | --- | --- |
 | A1 | P0-1: SQL injection fix | backend-developer | S | `fix/p0-1-sql-injection` |
 | A2 | P0-2: Root cleanup v2 | general-purpose | L | `chore/p0-2-root-cleanup` |
 | A3 | P0-4: Docker socket removal | backend-developer | XS | `fix/p0-4-docker-socket` |
@@ -604,13 +648,13 @@ WAVE 6 (after all above):
 **WAVE 2 — P0 Major Refactor (1 agent, focused):**
 
 | Agent | Task | Type | Effort | Branch |
-|-------|------|------|--------|--------|
+| --- | --- | --- | --- | --- |
 | A1 | P0-3: UAP refactor (2110→5 files) | backend-developer | XL | `refactor/p0-3-uap-blueprints` |
 
 **WAVE 3 — P1 Security (5 agents parallel):**
 
 | Agent | Task | Type | Effort | Branch |
-|-------|------|------|--------|--------|
+| --- | --- | --- | --- | --- |
 | A1 | P1-1: CSRF + P1-2: K8s TLS | backend-developer | M+M | `feature/p1-1-csrf`, `feature/p1-2-k8s-tls` |
 | A2 | P1-3: DB types + P1-5: Laws sync | python-pro | S+S | `fix/p1-3-db-types`, `fix/p1-5-laws-sync` |
 | A3 | P1-4: Genesis Record cleanup | general-purpose | M | `chore/p1-4-genesis-cleanup` |
@@ -620,7 +664,7 @@ WAVE 6 (after all above):
 **WAVE 4 — P2 Quality (3 agents parallel):**
 
 | Agent | Task | Type | Effort | Branch |
-|-------|------|------|--------|--------|
+| --- | --- | --- | --- | --- |
 | A1 | P2-2: Hypothesis tests | python-pro | M | `feature/p2-2-hypothesis-tests` |
 | A2 | P2-3: Go deps | backend-developer | S | `chore/p2-3-go-deps` |
 | A3 | P2-5 + P2-6: Deprecation + Stub | backend-developer | S+S | `chore/p2-5-deprecation`, `chore/p2-6-stub-server` |
@@ -628,7 +672,7 @@ WAVE 6 (after all above):
 **WAVE 5 — P3 Excellence (5 agents parallel):**
 
 | Agent | Task | Type | Effort | Branch |
-|-------|------|------|--------|--------|
+| --- | --- | --- | --- | --- |
 | A1 | P3-1: Contract testing | python-pro | M | `feature/p3-1-contract-tests` |
 | A2 | P3-2: DAST scanning | backend-developer | M | `feature/p3-2-dast-zap` |
 | A3 | P3-3: Image signing | backend-developer | S | `feature/p3-3-cosign` |
@@ -728,3 +772,4 @@ schemathesis run docs/openapi.yaml --dry-run     # contract test schema valid
 | `docker-compose.lmstudio.yml`        | LM Studio    | backend + LM Studio endpoint                 | lmstudio     |
 | `docker-compose.k8s-integration.yml` | K8s bridge   | local services + k8s network                 | auto         |
 | `docker-compose-orchestration.yml`   | Full stack   | All services orchestrated                    | auto         |
+<!-- EOF -->

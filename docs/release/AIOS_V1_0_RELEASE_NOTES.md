@@ -1,8 +1,8 @@
 # AIOS MVP v1.0 — Release Notes
 
-**Version:** 1.0.0  
-**Release Date:** 2026-06-29  
-**Status:** ✅ PRODUCTION READY  
+**Version:** 1.0.0
+**Release Date:** 2026-06-29
+**Status:** ✅ PRODUCTION READY
 **Phases:** 4 complete (Security, Consensus, Observability, Production Hardening)
 
 ---
@@ -87,35 +87,35 @@ AIOS v1.0 is a Byzantine-fault-tolerant multi-agent orchestration system enginee
 
 ### Phase 1 — Hardened Foundation
 
-✅ TLS encryption (cert-manager + Let's Encrypt)  
-✅ SQL injection prevention (parameterized queries, allowlist validation)  
-✅ CSRF protection (Flask-WTF token-based)  
-✅ Rate limiting (token bucket, 3-tier: endpoint/IP/global)  
-✅ Secrets management (no hardcoded creds, environment variables + K8s Secrets)  
+✅ TLS encryption (cert-manager + Let's Encrypt)
+✅ SQL injection prevention (parameterized queries, allowlist validation)
+✅ CSRF protection (Flask-WTF token-based)
+✅ Rate limiting (token bucket, 3-tier: endpoint/IP/global)
+✅ Secrets management (no hardcoded creds, environment variables + K8s Secrets)
 ✅ Code signing (cosign image attestation + verification)
 
 ### Phase 2 — Consensus Hardening
 
-✅ Byzantine fault tolerance (PBFT, n > 3f quorum)  
-✅ State machine replication (deterministic log ordering)  
-✅ Adaptive timeouts (10ms–5s range based on latency)  
-✅ View changes (automatic leader re-election on timeout)  
+✅ Byzantine fault tolerance (PBFT, n > 3f quorum)
+✅ State machine replication (deterministic log ordering)
+✅ Adaptive timeouts (10ms–5s range based on latency)
+✅ View changes (automatic leader re-election on timeout)
 ✅ Failure injection tests (8 unit tests covering all Byzantine scenarios)
 
 ### Phase 3 — Observability
 
-✅ OpenTelemetry tracing (W3C TraceContext format)  
-✅ Prometheus metrics (20+ metrics: latency P50/P99/P999, throughput, Byzantine counts)  
-✅ Grafana dashboards (2 dashboards, 12 panels, 10s refresh)  
-✅ Critical alerts (15 rules: 8 CRITICAL, 7 WARNING)  
+✅ OpenTelemetry tracing (W3C TraceContext format)
+✅ Prometheus metrics (20+ metrics: latency P50/P99/P999, throughput, Byzantine counts)
+✅ Grafana dashboards (2 dashboards, 12 panels, 10s refresh)
+✅ Critical alerts (15 rules: 8 CRITICAL, 7 WARNING)
 ✅ Distributed tracing (trace ID correlation across regions)
 
 ### Phase 4 — Production Hardening
 
-✅ PostgreSQL HA (3-region replication: primary + 2 standbys)  
-✅ Kubernetes failover automation (liveness/readiness probes, PDB enforced quorum)  
-✅ Disaster recovery (PITR + WAL archival, 7-day retention)  
-✅ Pod disruption budgets (8/12 minimum enforced)  
+✅ PostgreSQL HA (3-region replication: primary + 2 standbys)
+✅ Kubernetes failover automation (liveness/readiness probes, PDB enforced quorum)
+✅ Disaster recovery (PITR + WAL archival, 7-day retention)
+✅ Pod disruption budgets (8/12 minimum enforced)
 ✅ Multi-region failover (30s detection, 5s switchover for hot standby)
 
 ---
@@ -133,15 +133,15 @@ AIOS v1.0 is a Byzantine-fault-tolerant multi-agent orchestration system enginee
 
 ### Throughput
 
-- Decisions per second (DPS): 1000+ baseline, 3000+ under load  
-- Consensus rounds: 100+ per second  
+- Decisions per second (DPS): 1000+ baseline, 3000+ under load
+- Consensus rounds: 100+ per second
 - Requests per second: 5000+ (Flask + Nginx)
 
 ### Availability
 
-- Target uptime: 99.95% (monthly: ~22 min downtime)  
-- Hot standby failover: <5s RTO, 0 RPO  
-- Async replica failover: <30s RTO, ~1s RPO  
+- Target uptime: 99.95% (monthly: ~22 min downtime)
+- Hot standby failover: <5s RTO, 0 RPO
+- Async replica failover: <30s RTO, ~1s RPO
 - Byzantine fault tolerance: up to 3 simultaneous agent failures tolerated (n=12, f=3)
 
 ---
@@ -452,6 +452,6 @@ kubectl get pods -n aios --field-selector=status.phase=Running | wc -l
 
 ---
 
-**Release Date:** 2026-06-29  
-**Verification Status:** ✅ ALL GATES PASSED  
+**Release Date:** 2026-06-29
+**Verification Status:** ✅ ALL GATES PASSED
 **Production Ready:** ✅ YES

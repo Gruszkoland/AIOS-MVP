@@ -1,0 +1,29 @@
+name: Repository Governance
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  governance-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Validate REPO_CONTEXT_STATUS contract
+        run: python scripts/reporting/validate_repo_context_status.py
+
+      - name: Sync contract section
+        run: python scripts/reporting/sync_repo_context_contract.py
+
+      - name: Sync VERSION and PROJECT_STATE
+        run: python scripts/reporting/sync_version_state.py
+
+      - name: Validate MCP directory naming
+        run: python scripts/reporting/validate_mcp_structure.py
