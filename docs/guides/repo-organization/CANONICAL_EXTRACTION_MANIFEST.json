@@ -1,0 +1,38 @@
+{
+  "generated_at_utc": "2026-05-29 15:06:31Z",
+  "output_root": "migration_batches/batch3/to-formula/canonical-core",
+  "extracted": [
+    {
+      "source": "docs/GUARDIAN_LAWS_CANONICAL.json",
+      "target": "migration_batches/batch3/to-formula/canonical-core/docs/GUARDIAN_LAWS_CANONICAL.json",
+      "sha256": "9bf5f2d26b391ff28fa30f8f151d516e78a0ff1c96609cad8fc88da7a1652ae4",
+      "size": 2437
+    },
+    {
+      "source": "REPO_CONTEXT_STATUS.txt",
+      "target": "migration_batches/batch3/to-formula/canonical-core/REPO_CONTEXT_STATUS.txt",
+      "sha256": "338a04813a67bc2523f9bdf364f74cda830f5939ad31f57f49b8d1f821221027",
+      "size": 1270
+    },
+    {
+      "source": "docs/guides/repo-organization/FINAL_GOVERNANCE_CLOSURE.md",
+      "target": "migration_batches/batch3/to-formula/canonical-core/docs/guides/repo-organization/FINAL_GOVERNANCE_CLOSURE.md",
+      "sha256": "fa579ba9635b302c724e68ae0e015b33ffa2e485ec6b5914250d949100557ba5",
+      "size": 1562
+    }
+  ],
+  "duplicate_candidates": [
+    {
+      "canonical": "docs/GUARDIAN_LAWS_CANONICAL.json",
+      "duplicate": "migration_batches/batch2/to-archive/PROJEKTY/162 demencje w schemacie 369/adrion-369-working/docs/GUARDIAN_LAWS_CANONICAL.json",
+      "sha256": "9bf5f2d26b391ff28fa30f8f151d516e78a0ff1c96609cad8fc88da7a1652ae4",
+      "suggested_action": "replace_with_reference"
+    },
+    {
+      "canonical": "docs/GUARDIAN_LAWS_CANONICAL.json",
+      "duplicate": "migration_batches/batch2/to-archive/PROJEKTY/162 demencje w schemacie 369/docs/GUARDIAN_LAWS_CANONICAL.json",
+      "sha256": "9bf5f2d26b391ff28fa30f8f151d516e78a0ff1c96609cad8fc88da7a1652ae4",
+      "suggested_action": "replace_with_reference"
+    }
+  ]
+}

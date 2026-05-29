@@ -64,11 +64,17 @@ Ten plik pokazuje wszystkie etapy wdrozenia organizacji repozytoriow oraz aktual
 
 ## Faza 4 - Canonical extraction (Week 2)
 
-- [ ] Przeniesc canonical docs do Formula
+- [x] Przeniesc canonical docs do Formula (staging: `migration_batches/batch3/to-formula/canonical-core`)
 - [ ] Przeniesc contracts i schemas do Formula
-- [ ] Zastapic duplikaty canonical references w Architecture
-- [ ] Zastapic duplikaty canonical references w System
+- [~] Zastapic duplikaty canonical references w Architecture (manifest i kandydaci wygenerowani)
+- [~] Zastapic duplikaty canonical references w System (manifest i kandydaci wygenerowani)
 - [ ] Uruchomic i domknac canonical sync gate
+
+Dowody wykonania (2026-05-29):
+
+- `scripts/reporting/extract_canonical_docs.py`
+- `docs/guides/repo-organization/CANONICAL_EXTRACTION_MANIFEST.md`
+- `docs/guides/repo-organization/CANONICAL_EXTRACTION_MANIFEST.json`
 
 ## Faza 5 - Architecture consolidation (Week 3)
 

@@ -55,17 +55,3 @@ All of the following must be true:
 2. Mandatory checks are green on merge commit.
 3. Branch protection rules enabled on default branch.
 4. Migration tracker moved to `closed` state.
-
-## Execution Snapshot (2026-05-29)
-
-- PR migration branch: merged (`#7`, merge commit `9a24542`).
-- Local quality/governance lane: PASS.
-	- Evidence report: `REPORTS/test-results/2026-05-29_quality-governance-pass.txt`
-- Post-migration reference mapping refreshed (`POST_MIGRATION_REFERENCE_MAP.md`, 117 files with references).
-- Canonical extraction bootstrap completed (`CANONICAL_EXTRACTION_MANIFEST.md/.json`).
-
-Open items before formal closure:
-
-1. Enable and verify required branch-protection checks in GitHub UI.
-2. Complete canonical contracts/schemas extraction and reference replacement wave.
-3. Move migration tracker state to `closed` after remote gate confirmation.

@@ -1,0 +1,60 @@
+[submodule "docs/starlight-template"]
+	path = docs/starlight-template
+	url = https://github.com/withastro/starlight.git
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/.33-personas-audit"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/.33-personas-audit
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/.33-personas-audit
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/162 demencje w schemacie 369"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/162 demencje w schemacie 369
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/162 demencje w schemacie 369
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/Consultacja-Wielomodelowa-AI"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/Consultacja-Wielomodelowa-AI
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/Consultacja-Wielomodelowa-AI
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/Punkt odniesienia"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/Punkt odniesienia
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/Punkt odniesienia
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/adrion-369"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/adrion-369
+	url = https://github.com/Gruszkoland/adrion-369.git
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/adrion-369-architecture"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/adrion-369-architecture
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/adrion-369-architecture
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/adrion-deploy"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/adrion-deploy
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/adrion-deploy
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/adrion-mcp-servers"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/adrion-mcp-servers
+	url = https://github.com/Gruszkoland/adrion-mcp-servers.git
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/adrion-template-demo"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/adrion-template-demo
+	url = https://github.com/Gruszkoland/adrion-template-demo.git
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/embedding-ab-test-framework"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/embedding-ab-test-framework
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/embedding-ab-test-framework
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/kyc-provider-integration-guide"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/kyc-provider-integration-guide
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/kyc-provider-integration-guide
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/leadgen-comet-pipeline"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/leadgen-comet-pipeline
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/leadgen-comet-pipeline
+	ignore = dirty
+[submodule "migration_batches/batch2/to-archive/PROJEKTY/n8n-produkcja"]
+	path = migration_batches/batch2/to-archive/PROJEKTY/n8n-produkcja
+	url = ./migration_batches/batch2/to-archive/PROJEKTY/n8n-produkcja
+	ignore = dirty
+[submodule "scalanie"]
+	path = scalanie
+	url = https://github.com/Gruszkoland/scalanie.git
+	ignore = dirty

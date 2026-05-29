@@ -111,3 +111,8 @@
   - 2026-05-29 | Cross-repo | Complete post-migration reference mapping report | Owner: Platform Lead | Status: Done | Risk: Low | Next: Keep report updated after each move batch
   - 2026-05-29 | System | Remap active runtime references (`Cargo.toml`, CI, compose, README, CODEOWNERS) | Owner: DevOps Lead | Status: Done | Risk: Med | Next: Observe CI rerun outcomes
   - 2026-05-29 | Cross-repo | Enable Phase E quality lane workflow + governance closure plan | Owner: QA + Governance | Status: Done | Risk: Med | Next: Add checks as required in branch protection
+
+## Execution Log - 2026-05-29 (Week 2 bootstrap)
+
+- 2026-05-29 | Formula | Extract canonical docs to Formula staging (`migration_batches/batch3/to-formula/canonical-core`) | Owner: Domain Architect | Status: Done | Risk: Low | Next: Extract contracts/schemas
+- 2026-05-29 | Architecture/System | Generate duplicate-candidate manifest for canonical payloads (`CANONICAL_EXTRACTION_MANIFEST.*`) | Owner: Docs Lead | Status: In Progress | Risk: Med | Next: Replace duplicate payloads with references where policy allows

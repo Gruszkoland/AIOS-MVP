@@ -166,6 +166,10 @@ Typ dokumentu: Reference
   - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
 - `docs/guides/STARTING_HERE.md`
   - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `docs/guides/repo-organization/CANONICAL_EXTRACTION_MANIFEST.json`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `docs/guides/repo-organization/CANONICAL_EXTRACTION_MANIFEST.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
 - `docs/guides/repo-organization/POST_MIGRATION_REFERENCE_MAP.md`
   - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
   - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
@@ -257,22 +261,6 @@ Typ dokumentu: Reference
   - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
 - `docs/tools/generate_readmes.py`
   - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
-- `kimi_migration/source_fixed/push_F0-Z2.py`
-  - agents/ -> migration_batches/batch2/to-architecture/agents/
-- `kimi_migration/source_fixed/push_F0-Z3.py`
-  - agents/ -> migration_batches/batch2/to-architecture/agents/
-- `kimi_migration/source_fixed/push_F0-Z4.py`
-  - agents/ -> migration_batches/batch2/to-architecture/agents/
-- `kimi_migration/source_fixed/push_F1.py`
-  - agents/ -> migration_batches/batch2/to-architecture/agents/
-- `kimi_migration/source_fixed/push_F2.py`
-  - agents/ -> migration_batches/batch2/to-architecture/agents/
-- `kimi_migration/source_fixed/push_F3.py`
-  - agents/ -> migration_batches/batch2/to-architecture/agents/
-- `kimi_migration/source_fixed/push_F4.py`
-  - agents/ -> migration_batches/batch2/to-architecture/agents/
-- `kimi_migration/source_fixed/push_F5.py`
-  - agents/ -> migration_batches/batch2/to-architecture/agents/
 - `kubernetes/deploy.sh`
   - tools/ -> migration_batches/batch2/to-system/tools/
 - `mcp_servers/recursive-mas/server.py`
@@ -303,4 +291,4 @@ Typ dokumentu: Reference
 
 ## Summary
 
-- Files with references: 123
+- Files with references: 117
