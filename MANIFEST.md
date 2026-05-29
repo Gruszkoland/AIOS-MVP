@@ -1,7 +1,8 @@
 # 🏗️ ADRION 369 v4.0 — PROJECT MANIFEST & ARCHITECTURAL GUIDELINES
 
-> **Single Source of Truth for AI Orchestrators, Copilots, and Development Teams**  
+> **Single Source of Truth for AI Orchestrators, Copilots, and Development Teams**
 > **Version:** 5.0 | **Updated:** 2026-04-22 | **Status:** Core Standards Locked
+> **Project Version:** 0.2.0
 
 ---
 
@@ -135,17 +136,17 @@ nginx (TLS) → Flask:8003 (arbitrage, quantum, oracle, wholesale, payments)
 
 ### Naming Conventions
 
-| Context | Convention | Example |
-|---------|-----------|---------|
-| **Python Functions** | `snake_case` | `analyze_job()`, `calculate_trinity_score()` |
-| **Python Classes** | `PascalCase` | `GuardianLawsEngine`, `TrinityScore` |
-| **Python Constants** | `UPPER_SNAKE_CASE` | `MAX_RETRY_ATTEMPTS`, `TRINITY_MIN_COMBINED` |
-| **Database Columns** | `lower_snake_case` | `created_at`, `job_id`, `guardian_score` |
-| **Flask Routes** | `kebab-case` (URL)| `/api/arbitrage/jobs`, `/api/oracle/predict` |
-| **Environment Variables** | `UPPER_SNAKE_CASE` | `DATABASE_URL`, `OLLAMA_API_BASE` |
-| **Go Functions** | `PascalCase` (exported) | `GetVortexState()`, `CalculateDigitalRoot()` |
-| **Go Constants** | `PascalCase` | `VortexPulseHz` |
-| **File Names** | `snake_case.py` | `guardian.py`, `circuit_breaker.py` |
+| Context                   | Convention              | Example                                      |
+| ------------------------- | ----------------------- | -------------------------------------------- |
+| **Python Functions**      | `snake_case`            | `analyze_job()`, `calculate_trinity_score()` |
+| **Python Classes**        | `PascalCase`            | `GuardianLawsEngine`, `TrinityScore`         |
+| **Python Constants**      | `UPPER_SNAKE_CASE`      | `MAX_RETRY_ATTEMPTS`, `TRINITY_MIN_COMBINED` |
+| **Database Columns**      | `lower_snake_case`      | `created_at`, `job_id`, `guardian_score`     |
+| **Flask Routes**          | `kebab-case` (URL)      | `/api/arbitrage/jobs`, `/api/oracle/predict` |
+| **Environment Variables** | `UPPER_SNAKE_CASE`      | `DATABASE_URL`, `OLLAMA_API_BASE`            |
+| **Go Functions**          | `PascalCase` (exported) | `GetVortexState()`, `CalculateDigitalRoot()` |
+| **Go Constants**          | `PascalCase`            | `VortexPulseHz`                              |
+| **File Names**            | `snake_case.py`         | `guardian.py`, `circuit_breaker.py`          |
 
 ### Clean Code Standards
 
@@ -174,32 +175,32 @@ def calculate_trinity_score(
 ) -> float:
     """
     Compute combined Trinity Score from three perspectives.
-    
+
     Aggregation:
     - Material & Intellectual: harmonic mean
     - Essential: geometric mean
     - Final: arithmetic mean of all three
-    
+
     Args:
         material_score: System resource availability (0–1).
         intellectual_score: LLM analysis quality (0–1).
         essential_score: Purpose alignment + profitability (0–1).
-    
+
     Returns:
         Combined score (0–1). Approved when >= TRINITY_MIN_COMBINED.
-    
+
     Raises:
         ValueError: If any score is not in [0, 1].
     """
     if not all(0 <= s <= 1 for s in [material_score, intellectual_score, essential_score]):
         raise ValueError("All scores must be in [0, 1]")
-    
+
     # Material & Intellectual use harmonic mean (fail-fast)
     harmonic = 2 / (1/material_score + 1/intellectual_score) if material_score > 0 and intellectual_score > 0 else 0
-    
+
     # Essential uses geometric mean
     geometric = (essential_score) ** (1/1)  # Simplified for 1 factor
-    
+
     # Final: arithmetic mean
     return (harmonic + geometric) / 2
 ```
@@ -302,16 +303,16 @@ from arbitrage.database import get_db_session
 
 ### Test Markers (pytest)
 
-| Marker | Scope | Speed | External | Usage |
-|--------|-------|-------|----------|-------|
-| `@pytest.mark.unit` | Single function | <100ms | None | Happy path, errors |
-| `@pytest.mark.smoke` | Critical paths | <1s | None | Sanity checks |
-| `@pytest.mark.integration` | Multiple modules | 1–5s | DB, LLM | Mocked external calls |
-| `@pytest.mark.e2e` | Full pipeline | 5–30s | Live DB | Real orchestration |
-| `@pytest.mark.guardian` | Guardian Laws | 1–5s | None | Law compliance |
-| `@pytest.mark.ragas` | RAG evaluation | 30–60s | LLM | RAG quality metrics |
-| `@pytest.mark.tier0` | Critical (NEVER skip) | <5s | None | Core system integrity |
-| `@pytest.mark.crisis` | Crisis mode tests | Variable | None | Failover, resilience |
+| Marker                     | Scope                 | Speed    | External | Usage                 |
+| -------------------------- | --------------------- | -------- | -------- | --------------------- |
+| `@pytest.mark.unit`        | Single function       | <100ms   | None     | Happy path, errors    |
+| `@pytest.mark.smoke`       | Critical paths        | <1s      | None     | Sanity checks         |
+| `@pytest.mark.integration` | Multiple modules      | 1–5s     | DB, LLM  | Mocked external calls |
+| `@pytest.mark.e2e`         | Full pipeline         | 5–30s    | Live DB  | Real orchestration    |
+| `@pytest.mark.guardian`    | Guardian Laws         | 1–5s     | None     | Law compliance        |
+| `@pytest.mark.ragas`       | RAG evaluation        | 30–60s   | LLM      | RAG quality metrics   |
+| `@pytest.mark.tier0`       | Critical (NEVER skip) | <5s      | None     | Core system integrity |
+| `@pytest.mark.crisis`      | Crisis mode tests     | Variable | None     | Failover, resilience  |
 
 ### Running Tests
 
@@ -405,16 +406,16 @@ pytest tests/ -q --cov=arbitrage --cov-fail-under=80
 
 **Types:**
 
-| Type | Usage |
-|------|-------|
-| `feat` | New feature (API route, service, config) |
-| `fix` | Bug fix (corrects logic, error handling) |
+| Type       | Usage                                      |
+| ---------- | ------------------------------------------ |
+| `feat`     | New feature (API route, service, config)   |
+| `fix`      | Bug fix (corrects logic, error handling)   |
 | `refactor` | Code restructuring (no feature/bug change) |
-| `test` | Add/update tests |
-| `docs` | Documentation only |
-| `chore` | Deps, tooling, config (no code logic) |
-| `perf` | Performance optimization |
-| `security` | Security fix or hardening |
+| `test`     | Add/update tests                           |
+| `docs`     | Documentation only                         |
+| `chore`    | Deps, tooling, config (no code logic)      |
+| `perf`     | Performance optimization                   |
+| `security` | Security fix or hardening                  |
 
 **Examples:**
 
@@ -523,28 +524,28 @@ def list_jobs():
 
 Every decision is evaluated in a **162-dimensional space** (3 perspectives × 6 agents × 9 laws):
 
-| Perspective | Source | Aggregation | Pass Condition |
-|-------------|--------|-------------|---|
-| **Material** | CPU/RAM (psutil) | Harmonic mean | ≥ 0.3 |
-| **Intellectual** | LLM quality score | Harmonic mean | ≥ 0.5 |
-| **Essential** | Purpose + profit | Geometric mean | ≥ 0.2 |
-| **Combined** | Average of 3 | Arithmetic mean | ≥ `TRINITY_MIN_COMBINED` |
+| Perspective      | Source            | Aggregation     | Pass Condition           |
+| ---------------- | ----------------- | --------------- | ------------------------ |
+| **Material**     | CPU/RAM (psutil)  | Harmonic mean   | ≥ 0.3                    |
+| **Intellectual** | LLM quality score | Harmonic mean   | ≥ 0.5                    |
+| **Essential**    | Purpose + profit  | Geometric mean  | ≥ 0.2                    |
+| **Combined**     | Average of 3      | Arithmetic mean | ≥ `TRINITY_MIN_COMBINED` |
 
 ### Guardian Laws Engine (9 Rules)
 
 All decisions are validated against these canonical laws (see `docs/GUARDIAN_LAWS_CANONICAL.json`):
 
-| # | Code | Name | Severity | Veto |
-|---|------|------|----------|------|
-| 1 | G1 | Unity | MEDIUM | — |
-| 2 | G2 | Harmony | HIGH | — |
-| 3 | G3 | Rhythm | MEDIUM | — |
-| 4 | G4 | Causality | HIGH | — |
-| 5 | G5 | Transparency | MEDIUM | — |
-| 6 | G6 | Authenticity | HIGH | — |
-| 7 | G7 | Privacy | **CRITICAL** | ✓ |
-| 8 | G8 | Nonmaleficence | **CRITICAL** | ✓ |
-| 9 | G9 | Sustainability | HIGH | — |
+| #   | Code | Name           | Severity     | Veto |
+| --- | ---- | -------------- | ------------ | ---- |
+| 1   | G1   | Unity          | MEDIUM       | —    |
+| 2   | G2   | Harmony        | HIGH         | —    |
+| 3   | G3   | Rhythm         | MEDIUM       | —    |
+| 4   | G4   | Causality      | HIGH         | —    |
+| 5   | G5   | Transparency   | MEDIUM       | —    |
+| 6   | G6   | Authenticity   | HIGH         | —    |
+| 7   | G7   | Privacy        | **CRITICAL** | ✓    |
+| 8   | G8   | Nonmaleficence | **CRITICAL** | ✓    |
+| 9   | G9   | Sustainability | HIGH         | —    |
 
 **Decision Rule:**
 
@@ -619,17 +620,17 @@ MAX_BID_PER_JOB = 100               # USD
 
 ## 🔟 METADATA
 
-| Attribute | Value |
-|-----------|-------|
-| **Project Name** | ADRION 369 v4.0 |
-| **Team Language** | Polish (communication), English (code) |
-| **Python Version** | 3.11+ |
-| **Go Version** | 1.22+ |
-| **Test Coverage** | ≥80% (enforced) |
-| **Last Updated** | 2026-04-22 |
-| **Manifest Version** | 5.0 |
-| **Authority** | Project Lead (Adi Ha) |
-| **Canonical Source** | `docs/GUARDIAN_LAWS_CANONICAL.json` |
+| Attribute            | Value                                  |
+| -------------------- | -------------------------------------- |
+| **Project Name**     | ADRION 369 v4.0                        |
+| **Team Language**    | Polish (communication), English (code) |
+| **Python Version**   | 3.11+                                  |
+| **Go Version**       | 1.22+                                  |
+| **Test Coverage**    | ≥80% (enforced)                        |
+| **Last Updated**     | 2026-04-22                             |
+| **Manifest Version** | 5.0                                    |
+| **Authority**        | Project Lead (Adi Ha)                  |
+| **Canonical Source** | `docs/GUARDIAN_LAWS_CANONICAL.json`    |
 
 ---
 

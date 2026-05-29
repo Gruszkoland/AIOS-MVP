@@ -1,6 +1,7 @@
 {
-  "timestamp": "2026-05-20T00:00:00+00:00",
+  "timestamp": "2026-05-29T13:52:36.267611+00:00",
   "version": "3.0",
+  "project_version": "0.2.0",
   "agents": {
     "MPG-01": {
       "id": "MPG-01",
@@ -8,7 +9,7 @@
       "domain": "prompt_generation",
       "status": "idle",
       "last_task": null,
-      "confidence": 100,
+      "confidence": 29,
       "updated_at": "2026-05-20T00:00:00+00:00"
     },
     "PAA-02": {
@@ -17,7 +18,7 @@
       "domain": "process_architecture",
       "status": "idle",
       "last_task": null,
-      "confidence": 100,
+      "confidence": 29,
       "updated_at": "2026-05-20T00:00:00+00:00"
     },
     "TDO-03": {
@@ -26,7 +27,7 @@
       "domain": "tooling_discovery",
       "status": "idle",
       "last_task": null,
-      "confidence": 100,
+      "confidence": 29,
       "updated_at": "2026-05-20T00:00:00+00:00"
     },
     "AUA-04": {
@@ -35,7 +36,7 @@
       "domain": "automation_upgrade",
       "status": "idle",
       "last_task": null,
-      "confidence": 100,
+      "confidence": 29,
       "updated_at": "2026-05-20T00:00:00+00:00"
     },
     "VTA-05": {
@@ -44,7 +45,7 @@
       "domain": "verification_testing",
       "status": "idle",
       "last_task": null,
-      "confidence": 100,
+      "confidence": 29,
       "updated_at": "2026-05-20T00:00:00+00:00"
     },
     "GRA-06": {
@@ -53,7 +54,7 @@
       "domain": "governance_risk",
       "status": "idle",
       "last_task": null,
-      "confidence": 100,
+      "confidence": 29,
       "updated_at": "2026-05-20T00:00:00+00:00"
     },
     "OCA-07": {
@@ -62,7 +63,7 @@
       "domain": "orchestration",
       "status": "idle",
       "last_task": null,
-      "confidence": 100,
+      "confidence": 29,
       "updated_at": "2026-05-20T00:00:00+00:00"
     },
     "KSA-08": {
@@ -71,7 +72,7 @@
       "domain": "knowledge",
       "status": "idle",
       "last_task": null,
-      "confidence": 100,
+      "confidence": 29,
       "updated_at": "2026-05-20T00:00:00+00:00"
     },
     "RIA-09": {
@@ -80,7 +81,7 @@
       "domain": "rollout_iteration",
       "status": "idle",
       "last_task": null,
-      "confidence": 100,
+      "confidence": 29,
       "updated_at": "2026-05-20T00:00:00+00:00"
     }
   },
@@ -89,7 +90,7 @@
     "active_agents": 0,
     "error_agents": 0,
     "idle_agents": 9,
-    "last_updated": "2026-05-20T00:00:00+00:00"
+    "last_updated": "2026-05-29T13:52:36.267611+00:00"
   },
   "last_heartbeat": {
     "timestamp": "2026-05-20T00:00:00+00:00",

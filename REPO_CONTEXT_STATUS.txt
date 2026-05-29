@@ -1,0 +1,74 @@
+# REPO_CONTEXT_STATUS
+
+status: ACTIVE
+last_updated: 2026-05-29
+owner: Platform Lead
+
+## REQUIRED_SECTIONS
+
+- repository_identity
+- architecture_model
+- version_alignment
+- governance_status
+- security_hygiene
+- migration_status
+- ci_gates
+- known_risks
+- next_actions
+
+## repository_identity
+
+repo_name: AIOS-MVP
+repo_role: system-layer
+layout_model: monorepo-multi-stack
+canonical_dependency: Formula -> Architecture -> System
+
+## architecture_model
+
+python_runtime: 3.11+
+go_runtime: 1.22
+rust_workspace: enabled
+entrypoint_primary: wsgi.py
+
+## version_alignment
+
+version_file: 0.2.0
+manifest_project_version: 0.2.0
+project_state_project_version: 0.2.0
+status: ALIGNED
+
+## governance_status
+
+boundary_freeze_week1: PASS
+mission_statements: DONE
+repo_organization_docs: DONE
+
+## security_hygiene
+
+pre_commit_detect_secrets: enabled
+secrets_baseline_present: true
+gitignore_hardening: done
+
+## migration_status
+
+current_phase: phase-3-pr-and-stabilization
+batch1: done
+batch2: done
+pending_path_fixes: true
+
+## ci_gates
+
+repo_context_gate: pending
+python_ci: configured
+security_ci: configured
+
+## known_risks
+
+- path-regression-after-folder-moves
+- canonical-drift-during-extraction
+
+## next_actions
+
+1. close-batch2-pr
+2. fix-import-and-ci-paths
+3. run-extended-smoke

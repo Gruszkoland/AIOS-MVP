@@ -4,6 +4,7 @@
 
 # Python
 __pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 *.pyd
@@ -18,6 +19,7 @@ build/
 
 # Databases and secrets
 *.db
+_*.db
 *.sqlite
 *.sqlite3
 .env
@@ -28,8 +30,11 @@ build/
 # Local machine config
 .gitconfig
 .wslconfig
+.wslconfig*
 .lmstudio-home-pointer
+.lmstudio_*
 .moonshot_ai_rc
+.moonshot*
 -*.xml
 .DS_Store
 Thumbs.db
@@ -44,6 +49,7 @@ coverage/
 cov_*.txt
 temp_*.txt
 test_output.txt
+kimi_migration/
 
 # IDE
 .vscode/settings.json

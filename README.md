@@ -1,9 +1,11 @@
+# AI OS — Cognitive Kernel + Zero-Copy Agents
+
 [![CI](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/rust-ci.yml/badge.svg)](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/rust-ci.yml)
+[![Python CI](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/python-ci.yml/badge.svg)](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/python-ci.yml)
+[![Quality Lane](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/quality-lane.yml/badge.svg)](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/quality-lane.yml)
 [![Docs](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/rust-docs.yml/badge.svg)](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/rust-docs.yml)
 [![Security](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/security-ci.yml/badge.svg)](https://github.com/Gruszkoland/AIOS-MVP/actions/workflows/security-ci.yml)
 [![License: MPL-2.0](https://img.shields.io/badge/License-MPL--2.0-blue.svg)](LICENSE)
-
-# AI OS — Cognitive Kernel + Zero-Copy Agents
 
 ## Mission Statement (System Repository)
 
@@ -30,12 +32,12 @@ and reference architecture contracts are consumed from the Architecture layer.
 
 ## Repository layout
 
-```
+```text
 AIOS-MVP/
 ├── kernel/           — deterministic no_std core (162D decision topology)
-├── agents/           — LLM agent traits and Guardian implementations
+├── migration_batches/batch2/to-architecture/agents/ — LLM agent traits and Guardian implementations
 ├── ipc/              — zero-copy ring-buffer IPC primitives
-├── poc/              — proof-of-concept examples (user-space scheduler)
+├── migration_batches/batch1/review-bucket/poc/ — proof-of-concept examples (user-space scheduler)
 ├── docs/             — RFC documents, architecture decisions, technical specs
 ├── scripts/          — build helpers and dev tooling
 ├── .github/          — CI/CD workflows
@@ -57,7 +59,7 @@ cargo build --all
 cargo test --all
 
 # Run the PoC scheduler orchestrator
-cd poc/scheduler-mgr && cargo run --release
+cd migration_batches/batch1/review-bucket/poc/scheduler-mgr && cargo run --release
 # Listening on http://localhost:8000
 ```
 

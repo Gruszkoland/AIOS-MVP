@@ -2,10 +2,10 @@
 resolver = "2"
 members = [
   "kernel",
-  "agents",
+  "migration_batches/batch2/to-architecture/agents",
   "ipc",
-  "poc/scheduler-mgr",
-  "poc/end-to-end-flow",
+  "migration_batches/batch1/review-bucket/poc/scheduler-mgr",
+  "migration_batches/batch1/review-bucket/poc/end-to-end-flow",
   "integration-tests",
 ]
 

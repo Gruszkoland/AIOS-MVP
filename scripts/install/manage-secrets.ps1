@@ -11,18 +11,18 @@
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet("generate","rotate","validate","show-keys")]
-    [string]$Action  = "validate",
-    [string]$Root    = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
-    [string]$Key     = "",
-    [int]$Length     = 32
+    [ValidateSet("generate", "rotate", "validate", "show-keys")]
+    [string]$Action = "validate",
+    [string]$Root = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
+    [string]$Key = "",
+    [int]$Length = 32
 )
 
 $EnvFile = Join-Path $Root ".env"
 
-function Write-OK   { param($m) Write-Host "  [OK] $m" -ForegroundColor Green  }
+function Write-OK { param($m) Write-Host "  [OK] $m" -ForegroundColor Green }
 function Write-WARN { param($m) Write-Host "  [!!] $m" -ForegroundColor Yellow }
-function Write-INFO { param($m) Write-Host "       $m" -ForegroundColor Gray   }
+function Write-INFO { param($m) Write-Host "       $m" -ForegroundColor Gray }
 
 # ── Secret generation ─────────────────────────────────────────────────────────
 function New-RandomSecret {
@@ -61,14 +61,14 @@ Write-Host "  Env: $EnvFile" -ForegroundColor DarkGray
 
 # ── Secret definitions ────────────────────────────────────────────────────────
 $secretKeys = @(
-    @{ Key = "POSTGRES_PASSWORD";      Mask = $true;  Required = $false; Default = "" }
-    @{ Key = "N8N_BASIC_AUTH_PASSWORD"; Mask = $true;  Required = $false; Default = "" }
-    @{ Key = "STRIPE_SECRET_KEY";      Mask = $true;  Required = $false; Default = "" }
-    @{ Key = "STRIPE_WEBHOOK_SECRET";  Mask = $true;  Required = $false; Default = "" }
-    @{ Key = "APIFY_TOKEN";            Mask = $true;  Required = $false; Default = "" }
-    @{ Key = "OPENAI_API_KEY";         Mask = $true;  Required = $false; Default = "" }
-    @{ Key = "ANTHROPIC_API_KEY";      Mask = $true;  Required = $false; Default = "" }
-    @{ Key = "GOOGLE_API_KEY";         Mask = $true;  Required = $false; Default = "" }
+    @{ Key = "POSTGRES_PASSWORD"; Mask = $true; Required = $false; Default = "" }
+    @{ Key = "N8N_BASIC_AUTH_PASSWORD"; Mask = $true; Required = $false; Default = "" }
+    @{ Key = "STRIPE_SECRET_KEY"; Mask = $true; Required = $false; Default = "" }
+    @{ Key = "STRIPE_WEBHOOK_SECRET"; Mask = $true; Required = $false; Default = "" }
+    @{ Key = "APIFY_TOKEN"; Mask = $true; Required = $false; Default = "" }
+    @{ Key = "OPENAI_API_KEY"; Mask = $true; Required = $false; Default = "" }
+    @{ Key = "ANTHROPIC_API_KEY"; Mask = $true; Required = $false; Default = "" }
+    @{ Key = "GOOGLE_API_KEY"; Mask = $true; Required = $false; Default = "" }
 )
 
 switch ($Action) {
@@ -83,14 +83,15 @@ switch ($Action) {
                 Set-EnvKey -Key $s -Value $newVal
                 $generated += $s
                 Write-OK "$s — wygenerowano ($Length znaków)"
-            } else {
+            }
+            else {
                 Write-INFO "$s — już ustawiony (pominięto)"
             }
         }
 
         # Synchronize docker-compose env (N8N and postgres passwords)
         if ($generated.Count -gt 0) {
-            Write-WARN "Pamiętaj: zaktualizuj adrion-swarm/docker-compose.yml lub użyj `${ENV_VAR} składni"
+            Write-WARN "Pamiętaj: zaktualizuj migration_batches/batch2/to-system/adrion-swarm/docker-compose.yml lub użyj `${ENV_VAR} skladni"
         }
         Write-OK "Gotowe — $($generated.Count) sekretów wygenerowanych"
     }
@@ -115,7 +116,7 @@ switch ($Action) {
 
     "validate" {
         $envDict = Get-EnvDict
-        $issues  = @()
+        $issues = @()
 
         # Check for default/weak passwords
         $weakPatterns = @("password", "adrion_pass", "changeme", "12345", "admin", "secret")
@@ -125,7 +126,8 @@ switch ($Action) {
                 if ($s.Required) {
                     Write-WARN "$($s.Key): BRAK (wymagany)"
                     $issues += $s.Key
-                } else {
+                }
+                else {
                     Write-INFO "$($s.Key): nieskonfigurowany (opcjonalny)"
                 }
                 continue
@@ -140,8 +142,9 @@ switch ($Action) {
             if ($val.Length -lt 12 -and $s.Key -like "*PASSWORD*") {
                 Write-WARN "$($s.Key): za krótkie hasło ($($val.Length) znaków, min 12)"
                 $issues += "$($s.Key) short"
-            } else {
-                $masked = $val.Substring(0,[math]::Min(4,$val.Length)) + "***"
+            }
+            else {
+                $masked = $val.Substring(0, [math]::Min(4, $val.Length)) + "***"
                 Write-OK "$($s.Key): $masked"
             }
         }
@@ -149,7 +152,8 @@ switch ($Action) {
         Write-Host ""
         if ($issues.Count -eq 0) {
             Write-OK "Wszystkie sekrety OK"
-        } else {
+        }
+        else {
             Write-WARN "$($issues.Count) problemów z sekretami"
             Write-INFO "Uruchom: .\manage-secrets.ps1 -Action generate"
         }

@@ -36,7 +36,7 @@ def validate_task(task: dict, index: int) -> list[str]:
 
 
 def validate_tasks_file(path: Path) -> list[str]:
-    data = json.loads(path.read_text(encoding="utf-8"))
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
     tasks = data.get("tasks", [])
 
     errors: list[str] = []

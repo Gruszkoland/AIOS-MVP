@@ -18,18 +18,22 @@ Plan wykonania zadan z audytu 54/100 tak, aby uporzadkowac architekture, bezpiec
 ## Faza A - Governance i SSOT (Dzien 1)
 
 1. Ujednolicenie kontekstu repo
+
 - Utrzymaj i waliduj REPO_CONTEXT_STATUS.txt jako SSOT.
 - Dodaj CI gate: fail PR gdy brakuje sekcji wymaganych.
 
-2. Ujednolicenie wersjonowania
+1. Ujednolicenie wersjonowania
+
 - Dodaj plik VERSION.
 - Synchronizuj VERSION -> MANIFEST.md -> PROJECT_STATE.json.
 
-3. Ujednolicenie dokumentacji tozsamosci
+1. Ujednolicenie dokumentacji tozsamosci
+
 - W README doprecyzuj model: mono-repo multi-stack albo split target.
 - Dodaj ADR decyzji architektonicznej (mono-repo vs split).
 
 Definition of Done
+
 - VERSION istnieje i jest referencjonowany.
 - README + MANIFEST + PROJECT_STATE bez sprzecznosci wersji.
 - CI waliduje REPO_CONTEXT_STATUS.
@@ -37,82 +41,126 @@ Definition of Done
 ## Faza B - Bezpieczenstwo repo i hygiene (Dzien 1-2)
 
 1. .gitignore hardening
-- Dodaj: __pycache__/, *.db, .lmstudio*, .moonshot*, .wslconfig.
 
-2. Sekrety i artefakty
+- Dodaj: **pycache**/, _.db, .lmstudio_, .moonshot\*, .wslconfig.
+
+1. Sekrety i artefakty
+
 - Potwierdz aktywna baze .secrets.baseline.
 - Upewnij sie, ze detect-secrets jest wymagany w pre-commit i CI.
 
-3. Historia git (krok destrukcyjny - tylko po akceptacji)
+1. Historia git (krok destrukcyjny - tylko po akceptacji)
+
 - Plan dla usuniecia arbitrage.db i artefaktow z historii (git-filter-repo/BFG).
 - Przed wykonaniem: lista obiektow + potwierdzenie usera + backup.
 
 Definition of Done
+
 - Brak nowych artefaktow lokalnych w git status.
 - Security scan i pre-commit przechodza.
 
 ## Faza C - Architektura i struktura (Dzien 2-4)
 
 1. MCP deduplikacja
+
 - Wybierz standard jednej nazwy katalogu: mcp-servers albo mcp_servers.
 - Zrob mapowanie plikow i migracje importow.
 
-2. Build topology
+1. Build topology
+
 - Zweryfikuj cmd/vortex-server po stronie Go i decyzje: osobny module lub jawne odseparowanie od Rust workspace.
 
-3. Compose i Docker spojnosc
+1. Compose i Docker spojnosc
+
 - Zdefiniuj canonical entrypoint compose dla glownego scenariusza.
 - Ogranicz proliferacje Dockerfile przez profile i multi-stage pattern.
 
 Definition of Done
+
 - Jedna konwencja MCP.
 - Dokument architektury i build flow bez sprzecznosci.
 - Canonical compose uruchamia scenariusz referencyjny.
 
+Status wykonania (2026-05-29)
+
+- [x] MCP deduplikacja: wybrana konwencja `mcp_servers` i poprawione aktywne wolumeny compose.
+- [x] Build topology: `go list ./cmd/vortex-server/...` potwierdza separacje przez modul `adrion-vortex`.
+- [x] Canonical compose (scenariusz referencyjny dev): `docker-compose.local.yml`.
+- [ ] Ograniczenie proliferacji Dockerfile przez profile i full multi-stage standard (pozostaje).
+
 ## Faza D - Runtime metrics i wiarygodnosc danych (Dzien 3-5)
 
 1. PROJECT_STATE confidence
+
 - Zastap confidence=100 dynamiczna metryka (success_rate, freshness, task_count).
 - Dodaj reguly inicjalizacji i fallback dla stale danych.
 
-2. Testowalnosc metryki
+1. Testowalnosc metryki
+
 - Testy jednostkowe dla kalkulacji confidence.
 - Test regresji: idle agent nie moze miec confidence=100.
 
 Definition of Done
+
 - confidence jest wyliczane dynamicznie.
 - Testy metryk przechodza.
+
+Status wykonania (2026-05-29)
+
+- [x] Wdrozone dynamiczne confidence (`arbitrage/project_state_confidence.py`).
+- [x] Dodano updater (`scripts/reporting/update_project_state_confidence.py`).
+- [x] Dodano testy regresji (`tests/test_project_state_confidence.py`) - PASS.
 
 ## Faza E - CI/CD i quality gates (Dzien 4-6)
 
 1. Python quality lane
+
 - Wymus: ruff, black, mypy --strict, bandit, safety.
 
-2. Rust unsafe verification
+1. Rust unsafe verification
+
 - Dodaj cargo miri do pipeline dla obszarow z unsafe.
 
-3. Dokumentacja i szybki start
+1. Dokumentacja i szybki start
+
 - Dodaj QUICKSTART.md z komendami smoke dla Rust i Python.
 - Dodaj badge coverage Python.
 
 Definition of Done
+
 - CI przechodzi dla obu stackow.
 - QUICKSTART dziala w clean env.
+
+Status wykonania (2026-05-29)
+
+- [x] Dodano quality lane workflow: `black`, `ruff`, `mypy --strict`, `bandit`, `safety`, `miri`.
+- [x] Dodano coverage/quality badge do README.
+- [~] Pelne domkniecie CI po rerun na branchu PR.
 
 ## Faza F - Governance final (Dzien 6-7)
 
 1. CODEOWNERS
+
 - Mapowanie wlascicieli dla crates/modulow Python.
 
-2. Branch protection (procedural)
+1. Branch protection (procedural)
+
 - Wymagany min. 1 review + zielone CI przed merge.
 
-3. Raport zamkniecia
+1. Raport zamkniecia
+
 - Final score re-evaluation i delta vs 54/100.
 
 Definition of Done
+
 - CODEOWNERS aktywny.
 - Polityki merge opisane i wdrozone.
+
+Status wykonania (2026-05-29)
+
+- [x] CODEOWNERS zaktualizowany do bieżących ścieżek po migracji.
+- [x] Dodano dokument final governance closure i zestaw wymaganych checków.
+- [~] Wdrozenie branch protection pozostaje do wykonania po stronie ustawien GitHub.
 
 ## Kolejnosc wdrozenia (critical path)
 
@@ -136,11 +184,20 @@ Definition of Done
 
 ## Checklist startowa (następne 24h)
 
-- [ ] Dodac VERSION + synchronizator VERSION.
-- [ ] Dodac CI validator REPO_CONTEXT_STATUS.
-- [ ] Harden .gitignore.
-- [ ] Przygotowac plan bezpiecznego usuniecia artefaktow z historii.
-- [ ] Wybrac kanoniczna nazwe katalogu MCP i zaplanowac migracje.
+- [x] Dodac VERSION + synchronizator VERSION.
+- [x] Dodac CI validator REPO_CONTEXT_STATUS.
+- [x] Harden .gitignore.
+- [x] Przygotowac plan bezpiecznego usuniecia artefaktow z historii.
+- [x] Wybrac kanoniczna nazwe katalogu MCP i zaplanowac migracje.
+
+### Delta wdrozenia (2026-05-29)
+
+- Dodano `REPO_CONTEXT_STATUS.txt` jako aktywny SSOT z wymaganymi sekcjami.
+- Dodano walidator: `scripts/reporting/validate_repo_context_status.py`.
+- Dodano CI gate: `.github/workflows/repo-context-gate.yml`.
+- Ujednolicono wersjonowanie: `VERSION -> MANIFEST (Project Version) -> PROJECT_STATE.project_version`.
+- Ujednolicono MCP na konwencji `mcp_servers` i poprawiono mapowania volume w `docker-compose.mcp-tier.yml`.
+- Dodano runbook non-destructive dla purge historii: `docs/guides/repo-organization/GIT_HISTORY_ARTIFACT_PURGE_PLAN.md`.
 
 ## Plan wykonawczy T-48h do deadline PARP (startup funding readiness)
 

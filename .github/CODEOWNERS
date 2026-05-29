@@ -5,8 +5,8 @@
 # Rust kernel crates (unsafe-review required for any unsafe block)
 /kernel/                 @Gruszkoland
 /ipc/                    @Gruszkoland
-/agents/                 @Gruszkoland
-/poc/                    @Gruszkoland
+/migration_batches/batch2/to-architecture/agents/ @Gruszkoland
+/migration_batches/batch1/review-bucket/poc/      @Gruszkoland
 
 # MCP servers
 /mcp_servers/            @Gruszkoland
