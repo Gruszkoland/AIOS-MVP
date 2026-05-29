@@ -141,3 +141,98 @@ Definition of Done
 - [ ] Harden .gitignore.
 - [ ] Przygotowac plan bezpiecznego usuniecia artefaktow z historii.
 - [ ] Wybrac kanoniczna nazwe katalogu MCP i zaplanowac migracje.
+
+## Plan wykonawczy T-48h do deadline PARP (startup funding readiness)
+
+### Założenie operacyjne
+
+- MVP traktujemy jako prototyp TRL 3-4 do oceny inwestycyjnej, nie jako produkcję.
+- Celem jest pakiet 100/100 w rubryce: technika + biznes + compliance + outreach.
+
+### Rubryka 100/100 (10 x 10 punktów)
+
+1. Product narrative i problem-solution fit
+2. Wiarygodność techniczna demonstratora
+3. Deployment + rollback repeatability
+4. CI quality gates
+5. Security + AI Act readiness
+6. Repo governance i SSOT
+7. IP ownership i ochrona know-how
+8. Ekonomia i wycena aportu
+9. Outreach Z01-Z05 execution
+10. Data room kompletność
+
+### Harmonogram godzinowy (T-48h)
+
+#### Blok 1 (T-48h do T-36h): domknięcie techniczne
+
+- [ ] T-48h: Freeze scope MVP (bez nowych feature)
+- [ ] T-47h: Zielona ścieżka smoke test dla demonstratora
+- [ ] T-46h: Ustabilizować jeden canonical workflow CI do pokazu
+- [ ] T-45h: Zapis dowodów PASS (log, commit, timestamp)
+- [ ] T-44h: Weryfikacja rollback strategy w praktyce
+- [ ] T-43h: Zamknięcie listy known risks z mitigacją
+- [ ] T-42h: Review security findings (critical/high)
+- [ ] T-41h: Review dependency risk (Python/Go/Rust)
+- [ ] T-40h: Potwierdzenie minimalnej ścieżki uruchomienia MVP
+- [ ] T-39h: Snapshot statusu repo pod audyt
+- [ ] T-38h: Final smoke rerun po poprawkach
+- [ ] T-37h: Lock dokumentacji technicznej do wersji demo
+- [ ] T-36h: Gate G1: Technical Credibility PASS/FAIL
+
+#### Blok 2 (T-36h do T-24h): pakiet inwestorski
+
+- [ ] T-35h: One-pager Investment Memo v1
+- [ ] T-34h: Value proposition i moat (ADRION 162D + AI Act)
+- [ ] T-33h: Segmentacja klientów i use-case pitch
+- [ ] T-32h: COCOMO II assumptions i wycena $894k update
+- [ ] T-31h: IP ownership statement (100% founders)
+- [ ] T-30h: Ryzyka prawne i compliance notes
+- [ ] T-29h: Series A readiness T+100 roadmap
+- [ ] T-28h: Data room index (co, gdzie, po co)
+- [ ] T-27h: Evidence pack: logi, metryki, wyniki testów
+- [ ] T-26h: FAQ inwestorskie (10 najtrudniejszych pytań)
+- [ ] T-25h: Pitch narrative 3 min i 10 min
+- [ ] T-24h: Gate G2: Investor Package PASS/FAIL
+
+#### Blok 3 (T-24h do T-12h): outreach Z01-Z05
+
+- [ ] T-23h: Lista targetów Z01 (VC) - min 20
+- [ ] T-22h: Lista targetów Z02 (inkubacja/akceleracja) - min 20
+- [ ] T-21h: Lista targetów Z03 (grant/public) - min 20
+- [ ] T-20h: Lista targetów Z04 (partnerzy strategiczni) - min 20
+- [ ] T-19h: Lista targetów Z05 (aniołowie/syndykaty) - min 20
+- [ ] T-18h: Szablon wiadomości A/B (mail/LinkedIn)
+- [ ] T-17h: Batch #1 wysyłek (top 40 kontaktów)
+- [ ] T-16h: Follow-up template + CRM tracker
+- [ ] T-15h: Batch #2 wysyłek (kolejne 60 kontaktów)
+- [ ] T-14h: Triaging odpowiedzi i kwalifikacja leadów
+- [ ] T-13h: Ustalanie terminów spotkań intro
+- [ ] T-12h: Gate G3: Outreach KPI PASS/FAIL
+
+#### Blok 4 (T-12h do T-0h): finalizacja
+
+- [ ] T-11h: Ostateczny consistency check SSOT
+- [ ] T-10h: Aktualizacja statusu wersji i changelogów
+- [ ] T-9h: Final evidence pack zip + checksum
+- [ ] T-8h: Rehearsal demo + pitch
+- [ ] T-7h: Security/compliance sign-off
+- [ ] T-6h: Backup i rollback checkpoint
+- [ ] T-5h: Final outreach push + follow-up
+- [ ] T-4h: Gate review board (Go/No-Go)
+- [ ] T-3h: Poprawki krytyczne tylko typu blocker
+- [ ] T-2h: Freeze final artifacts
+- [ ] T-1h: Wysyłka finalnych pakietów
+- [ ] T-0h: Zamknięcie sesji i raport końcowy
+
+### KPI wykonawcze (minimum)
+
+- Technical: 1 canonical green lane + 1 powtarzalny smoke pass
+- Governance: 0 sprzeczności między VERSION/README/MANIFEST/PROJECT_STATE
+- Investor: 1 komplet memo + valuation + IP statement + roadmap
+- Outreach: 100 kontaktów (5x20), min 10 odpowiedzi, min 3 spotkania
+
+### Kryterium Go/No-Go
+
+- GO: wszystkie bramki G1, G2, G3 = PASS
+- NO-GO: dowolna bramka FAIL -> wysyłka ograniczona do soft outreach i szybka pętla naprawcza
