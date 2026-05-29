@@ -1,0 +1,8 @@
+﻿Backup-Date: 2026-05-29 04:23:02
+Archive-Path: C:\Users\adiha\.1_Projekty\archiwum\2026-05-29_kasowanie-kandydatów
+arbitrage.db|file|253952|archiwum\2026-05-29_kasowanie-kandydatów\arbitrage.db
+__pycache__|dir|806|archiwum\2026-05-29_kasowanie-kandydatów\__pycache__
+.mypy_cache|dir|36950913|archiwum\2026-05-29_kasowanie-kandydatów\.mypy_cache
+.pytest_cache|dir|92051|archiwum\2026-05-29_kasowanie-kandydatów\.pytest_cache
+.ruff_cache|dir|326|archiwum\2026-05-29_kasowanie-kandydatów\.ruff_cache
+REPORTS|dir|4481|archiwum\2026-05-29_kasowanie-kandydatów\REPORTS

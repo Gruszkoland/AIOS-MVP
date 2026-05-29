@@ -1,0 +1,32 @@
+﻿TIMESTAMP=20260529-013334
+BRANCH=checkpoint/kimi-20260529-013334
+--- GIT STATUS ---
+ M .github/copilot-instructions.md
+ M .pre-commit-config.yaml
+ M AIOS_V1_0_OPERATIONAL_RUNBOOKS.md
+ M AIOS_V1_0_PRODUCTION_READINESS_CHECKLIST.md
+ M AIOS_V1_0_RELEASE_NOTES.md
+ M CLAUDE.md
+ M PHASE5_GATE_DECISION.md
+ m "PROJEKTY/162 demencje w schemacie 369"
+ m PROJEKTY/Consultacja-Wielomodelowa-AI
+ ? "PROJEKTY/Punkt odniesienia"
+ m PROJEKTY/adrion-369
+ m PROJEKTY/adrion-369-architecture
+ ? PROJEKTY/adrion-deploy
+ m PROJEKTY/adrion-mcp-servers
+ m PROJEKTY/adrion-template-demo
+ m PROJEKTY/embedding-ab-test-framework
+ m PROJEKTY/kyc-provider-integration-guide
+ m PROJEKTY/leadgen-comet-pipeline
+ m PROJEKTY/n8n-produkcja
+?? REPORTS/
+?? REPO_CONTEXT_STATUS.txt
+?? docs/guides/DEPLOYMENT_ALTERNATIVE_TOOL_ADAPTER.md
+?? docs/guides/KIMI_REPAIR_DEPLOYMENT_PLAN.md
+?? scripts/deploy/deploy_via_alternative_tool.ps1
+?? scripts/reporting/sync_repo_context_contract.py
+--- PYTHON ---
+Python 3.11.9
+--- GO ---
+go version go1.26.1 windows/amd64

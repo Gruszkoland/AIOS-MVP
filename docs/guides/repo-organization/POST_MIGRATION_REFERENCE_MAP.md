@@ -1,0 +1,306 @@
+# Post-Migration Reference Mapping Report
+
+Typ dokumentu: Reference
+
+## Mapping Rules
+
+- `agents/` -> `migration_batches/batch2/to-architecture/agents/`
+- `poc/` -> `migration_batches/batch1/review-bucket/poc/`
+- `adrion-swarm/` -> `migration_batches/batch2/to-system/adrion-swarm/`
+- `n8n-workflows/` -> `migration_batches/batch2/to-system/n8n-workflows/`
+- `tools/` -> `migration_batches/batch2/to-system/tools/`
+- `PROJEKTY/` -> `migration_batches/batch2/to-archive/PROJEKTY/`
+
+## Findings
+
+- `.agents/skills/n8n-architect/SKILL.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `.claude/README.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `.github/agents/ai-personas.agent.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `.github/agents/n8n-architect.agent.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `.github/workflows/phase5b-deployment.yml`
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+- `.github/workflows/rust-ci.yml`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `.github/workflows/rust-docs.yml`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `.roo.json`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `.roo/README.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `.vscode/settings.json`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `CHANGELOG.md`
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `Cargo.toml`
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `Genesis Record/03_TECHNICAL_SPECS/Implementation_Roadmap_v4.0_04-04-2026.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `Genesis Record/04_AGENTS_SWARM/.adrion-code-rules.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/04_AGENTS_SWARM/.clinerules.txt`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/04_AGENTS_SWARM/SEJF_DEFINICJI.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/COMPREHENSIVE_ADRION_369_INVENTORY.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/DOCKER_IMAGES_ASSESSMENT_2026-04-05.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/DOCKER_QUICK_REFERENCE_2026-04-05.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/IMPLEMENTATION_DOCKER_SECURITY_UPGRADES_2026-04-05.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/MONITORING/Tools-Integration-Status.json`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/PHASE3_AUTONOMOUS_SUBAGENTS_COMPLETION_Apr11_2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/PHASE3_COMPLETE_FINAL_REPORT_Apr11_2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/PLAN/DEPLOYMENT_CHECKLIST.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/PLAN/analiza-i-aktualizacja-dashboardu.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/PLAN/dashboard-persona-alignment.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/PLAN/plan-dokonczenia-projektu-ocena.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/PROGRESS/kwantowy-modul-decyzyjny-369-loop.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/RAPORT_POSTEP_U1-U8_ORAZ_ANALIZA_GROSK_2026-04-13.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/ADVANCED_AGENT_FEATURES_PHASE_C_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/ATAM_ADR_Analiza_Architektury_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/BACKEND_INTEGRATION_PLAN_PHASE_B_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/COMPREHENSIVE_ROADMAP_PHASES_A_D_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/IMPLEMENTATION_PHASE_ABC_COMPLETE_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/IMPLEMENTATION_SUMMARY.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/OPTION_A_COMPLETION_REPORT_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/PHASE_A_B_EXECUTION_GUIDE_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/PHASE_C_ADVANCED_FEATURES_IMPLEMENTATION_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/PHASE_D_UX_REFINEMENTS_PRODUCTION_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/SESSION_SUMMARY_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/SESSION_SUMMARY_PHASE_BC_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/UX_REFINEMENTS_PLAN_PHASE_D_05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/analiza-dashboardu-podsumowanie.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `Genesis Record/10_RAPORTY_DZIALANIA_SYSTEMU/REPORTS/etap-9-finalizacja-adrion-369-v2-0.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `MANIFEST.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `PROGRESS/Organizacja_Przestrzeni_15-05-2026.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `QUICKSTART.md`
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `README.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `REPORTS/ORGANIZATION_FINAL_15-05-2026.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `REPORTS/baseline/baseline-20260529-013334.txt`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `ROADMAP.md`
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `config/persona-agents/README.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `dashboard/app.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docker-compose.yml`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `docs/ADRION_369_ARCHITECTURE_FRAMEWORK.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/API_EVENT_SOURCING_GENESIS_MCP.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/ARCHITECTURE.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `docs/CAPABILITY_MODEL.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/DEPLOYMENT_RUNBOOK.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `docs/DISASTER_RECOVERY.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `docs/IMPLEMENTATION-ROADMAP-Structure-Creation.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/ROPE_3.0_MIGRATION.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/STATUS.md`
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `docs/TOOLING-MATRIX-Maps.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/go-no-go.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `docs/guides/DEPLOYMENT_FLOW_DIAGRAM.txt`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/guides/DEPLOYMENT_INSTRUCTIONS_SECURITY_UPGRADES.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `docs/guides/GETTING_STARTED.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `docs/guides/QUICK-START-INTEGRATOR.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/guides/REPO_ASSIGNMENT_GRUSZKOLAND_2026-05-29.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `docs/guides/STARTING_HERE.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `docs/guides/repo-organization/POST_MIGRATION_REFERENCE_MAP.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `docs/guides/repo-organization/PR_READY_CHECKLIST_EXECUTION.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `docs/guides/repo-organization/REVIEW_BUCKET_MAPPING.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `docs/index-recursive-mas-note.md`
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `docs/progress/ATAM-ADR-Implementation-05-04-2026.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/reference/operacyjna/rozwoj.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/reference/referencje/1_DANE_DO_WDROZENIA.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `docs/reference/referencje/3D-VISUALIZATION-INDEX.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `docs/reference/referencje/EXPORT_STRATEGY.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/reference/referencje/KNOWLEDGE BANK.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `docs/reference/referencje/Konfiguracja_ApliArte_AI.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/reference/referencje/ORGANIZATION_README.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/reference/referencje/PLUGINS_README.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `docs/reference/referencje/PROJECT_INDEX.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `docs/reference/referencje/adrion-369-STRUKTURA.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `docs/reference/referencje/konfiguracja_gemini_api.md`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `docs/reports/deployment/ANALIZA-FOLDERU-ADRION-369-14-05-2026.md`
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+- `docs/rfc/0001-cognitive-agent.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/rfcs/0001-cognitive-agent-trait.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/sessions/AGENTS.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/sessions/ANALIZA_ZBEDNYCH_ELEMENTOW.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/sessions/GITHUB_PUSH_STRATEGY.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `docs/sessions/IMPLEMENTATION_ROADMAP_AIOS_MVP.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `docs/sessions/MASTER_DELIVERY_SUMMARY.md`
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `docs/sessions/PHASE5_CONTINUATION_PLAN.md`
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+- `docs/sessions/PROJECT_COMPLETION_SUMMARY.md`
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+- `docs/sessions/README_GITHUB.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `docs/sessions/SKILLS_INSTALLATION_REPORT_Apr10_2026.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/sessions/TEST_REPORT.md`
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+- `docs/sessions/WAVE_1_COMPLETION_SUMMARY.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+- `docs/sessions/WORKSPACE_STRUCTURE_SCAN_2026-04-08.md`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `docs/tools/generate_grafana_dashboard.py`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `docs/tools/generate_readmes.py`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+- `kimi_migration/source_fixed/push_F0-Z2.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `kimi_migration/source_fixed/push_F0-Z3.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `kimi_migration/source_fixed/push_F0-Z4.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `kimi_migration/source_fixed/push_F1.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `kimi_migration/source_fixed/push_F2.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `kimi_migration/source_fixed/push_F3.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `kimi_migration/source_fixed/push_F4.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `kimi_migration/source_fixed/push_F5.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `kubernetes/deploy.sh`
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `mcp_servers/recursive-mas/server.py`
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `scripts/import_n8n.sh`
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+- `scripts/install/manage-secrets.ps1`
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+- `scripts/reporting/map_post_migration_references.py`
+  - PROJEKTY/ -> migration_batches/batch2/to-archive/PROJEKTY/
+  - adrion-swarm/ -> migration_batches/batch2/to-system/adrion-swarm/
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+  - n8n-workflows/ -> migration_batches/batch2/to-system/n8n-workflows/
+  - poc/ -> migration_batches/batch1/review-bucket/poc/
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `tests/test_base_agent.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `uap/backend/api_phase_b.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `uap/backend/blueprints/agents_phase_b.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `uap/desktop/electron/package-lock.json`
+  - tools/ -> migration_batches/batch2/to-system/tools/
+- `uap/desktop/systray/README_SYSTRAY.md`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+- `uap/tests/test_api.py`
+  - agents/ -> migration_batches/batch2/to-architecture/agents/
+
+## Summary
+
+- Files with references: 123

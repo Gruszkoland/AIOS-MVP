@@ -1,0 +1,65 @@
+name: quality-lane
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  python-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-arbitrage.txt
+          pip install -r requirements-mcp.txt
+          pip install black ruff mypy bandit safety
+
+      - name: Black check
+        run: black --check arbitrage scripts tests
+
+      - name: Ruff check
+        run: ruff check arbitrage scripts tests --select=E,F,W --ignore=E501
+
+      - name: MyPy strict check
+        run: mypy arbitrage --strict --ignore-missing-imports
+
+      - name: Bandit security scan
+        run: bandit -r arbitrage scripts -ll
+
+      - name: Safety dependency check
+        run: |
+          safety check -r requirements-arbitrage.txt
+          safety check -r requirements-mcp.txt
+
+  rust-memory-safety:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup nightly toolchain with miri
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: miri
+
+      - name: Run miri tests on kernel
+        run: cargo +nightly miri test -p aios-kernel
+        env:
+          MIRIFLAGS: "-Zmiri-disable-isolation"
+
+      - name: Run miri tests on ipc
+        run: cargo +nightly miri test -p aios-ipc
+        env:
+          MIRIFLAGS: "-Zmiri-disable-isolation"

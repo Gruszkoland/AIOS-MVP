@@ -140,10 +140,10 @@ jobs:
       - name: Verify no unsafe code violations
         run: |
           # Check that all unsafe blocks have SAFETY comments
-          unsafe_count=$(grep -r "unsafe" --include="*.rs" kernel/ agents/ ipc/ poc/ | grep -v "SAFETY:" | wc -l || true)
+          unsafe_count=$(grep -r "unsafe" --include="*.rs" kernel/ migration_batches/batch2/to-architecture/agents/ ipc/ migration_batches/batch1/review-bucket/poc/ | grep -v "SAFETY:" | wc -l || true)
           if [ $unsafe_count -gt 0 ]; then
             echo "ERROR: Found unsafe blocks without SAFETY comments:"
-            grep -rn "unsafe" --include="*.rs" kernel/ agents/ ipc/ poc/ | grep -v "SAFETY:"
+            grep -rn "unsafe" --include="*.rs" kernel/ migration_batches/batch2/to-architecture/agents/ ipc/ migration_batches/batch1/review-bucket/poc/ | grep -v "SAFETY:"
             exit 1
           fi
           echo "✓ All unsafe blocks have SAFETY comments"

@@ -5,6 +5,18 @@ param(
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-Set-Location $projectRoot
+$pythonExe = Join-Path $projectRoot ".venv\Scripts\python.exe"
+$scriptPath = Join-Path $projectRoot "scripts\testing\start_arbitrage_api_test_port.py"
 
-& ".\.venv\Scripts\python.exe" "scripts\testing\start_arbitrage_api_test_port.py" $Port
+Push-Location $projectRoot
+try {
+    if (Test-Path $pythonExe) {
+        & $pythonExe $scriptPath $Port
+    }
+    else {
+        & python $scriptPath $Port
+    }
+}
+finally {
+    Pop-Location
+}

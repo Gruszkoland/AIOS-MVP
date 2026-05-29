@@ -32,7 +32,6 @@ x-restart-policy: &restart_policy
 # ── Infrastructure services ───────────────────────────────────────────────────
 
 services:
-
   # ── PostgreSQL 15 ──────────────────────────────────────────────────────────
   postgres:
     image: postgres:15-alpine
@@ -75,7 +74,14 @@ services:
     networks:
       - adrion-hermetic
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_local_CHANGE_ME}", "ping"]
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "-a",
+          "${REDIS_PASSWORD:-redis_local_CHANGE_ME}",
+          "ping",
+        ]
       <<: *healthcheck_default
     <<: *restart_policy
     labels:
@@ -137,7 +143,7 @@ services:
       # Telemetry disabled in local dev
       TELEMETRY_ENABLED: "false"
     volumes:
-      - ./mcp-servers:/app/mcp-servers:ro
+      - ./mcp_servers:/app/mcp_servers:ro
     networks:
       - adrion-hermetic
     depends_on:
@@ -179,7 +185,7 @@ services:
       VORTEX_API_KEY: ${VORTEX_API_KEY:-CHANGE_ME_IN_PRODUCTION}
       TELEMETRY_ENABLED: "false"
     volumes:
-      - ./mcp-servers:/app/mcp-servers:ro
+      - ./mcp_servers:/app/mcp_servers:ro
       - vortex_logs:/app/logs
     networks:
       - adrion-hermetic
@@ -209,7 +215,7 @@ services:
       GUARDIAN_API_KEY: ${GUARDIAN_API_KEY:-CHANGE_ME_IN_PRODUCTION}
       TELEMETRY_ENABLED: "false"
     volumes:
-      - ./mcp-servers:/app/mcp-servers:ro
+      - ./mcp_servers:/app/mcp_servers:ro
       - guardian_audit:/app/genesis-data
     networks:
       - adrion-hermetic
@@ -239,7 +245,7 @@ services:
       ORACLE_API_KEY: ${ORACLE_API_KEY:-CHANGE_ME_IN_PRODUCTION}
       TELEMETRY_ENABLED: "false"
     volumes:
-      - ./mcp-servers:/app/mcp-servers:ro
+      - ./mcp_servers:/app/mcp_servers:ro
     networks:
       - adrion-hermetic
     healthcheck:
@@ -299,7 +305,7 @@ services:
       HEALER_API_KEY: ${HEALER_API_KEY:-CHANGE_ME_IN_PRODUCTION}
       TELEMETRY_ENABLED: "false"
     volumes:
-      - ./mcp-servers:/app/mcp-servers:ro
+      - ./mcp_servers:/app/mcp_servers:ro
       - healer_monitoring:/app/monitoring
     networks:
       - adrion-hermetic
