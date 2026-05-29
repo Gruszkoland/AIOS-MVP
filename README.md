@@ -5,10 +5,21 @@
 
 # AI OS — Cognitive Kernel + Zero-Copy Agents
 
+## Mission Statement (System Repository)
+
+This repository is the operational system layer where ADRION runs as a real product platform.
+
+It owns runtime applications, orchestration, infrastructure, deployment automation,
+monitoring, and operational runbooks.
+
+It does not own canonical model definitions; those are consumed from the Formula layer,
+and reference architecture contracts are consumed from the Architecture layer.
+
 > **For:** Systems engineers building deterministic AI-advised infrastructure
 > **Why:** Hard real-time kernel + LLM agents as safety layer, not decision layer
 
 **Key characteristics:**
+
 - Rust `no_std` kernel (deterministic, provable)
 - Ring-buffer IPC (sub-μs latency)
 - LLM agents as advisory plane only
@@ -51,6 +62,7 @@ cd poc/scheduler-mgr && cargo run --release
 ```
 
 Further reading:
+
 - [Architecture overview](docs/ARCHITECTURE.md) — system design, 162D decision space, data flows
 - [Contributing guide](CONTRIBUTING.md) — Rust style guide, PR process, unsafe review rules
 
@@ -58,12 +70,12 @@ Further reading:
 
 ## Workspace crates
 
-| Crate | Lines (approx.) | Purpose |
-|-------|-----------------|---------|
-| `kernel` | ~370 | Deterministic no_std core — 162D topology, consensus |
-| `agents` | ~140 | Guardian trait + 9 specialist implementations |
-| `ipc` | ~330 | Zero-copy ring-buffer inter-process communication |
-| `poc/scheduler-mgr` | ~100 | User-space PoC orchestrator |
+| Crate               | Lines (approx.) | Purpose                                              |
+| ------------------- | --------------- | ---------------------------------------------------- |
+| `kernel`            | ~370            | Deterministic no_std core — 162D topology, consensus |
+| `agents`            | ~140            | Guardian trait + 9 specialist implementations        |
+| `ipc`               | ~330            | Zero-copy ring-buffer inter-process communication    |
+| `poc/scheduler-mgr` | ~100            | User-space PoC orchestrator                          |
 
 ---
 
@@ -88,17 +100,16 @@ A ticket is closed when it:
 
 ---
 
-
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [QUICKSTART.md](QUICKSTART.md) | Get from zero to `cargo test` in 15 minutes |
-| [docs/AGENT_SWARM.md](docs/AGENT_SWARM.md) | Swarm topology, tier definitions, conflict protocol |
-| [docs/GUARDIAN_MAP.md](docs/GUARDIAN_MAP.md) | Canonical 9 Guardian Laws, persona mapping, naming history |
-| [docs/GUARDIAN_LAWS_CANONICAL.json](docs/GUARDIAN_LAWS_CANONICAL.json) | Machine-readable canonical laws (v3.1) |
-| [docs/adr/](docs/adr/) | Architecture Decision Records |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guide + unsafe review checklist |
+| Document                                                               | Description                                                |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------- |
+| [QUICKSTART.md](QUICKSTART.md)                                         | Get from zero to `cargo test` in 15 minutes                |
+| [docs/AGENT_SWARM.md](docs/AGENT_SWARM.md)                             | Swarm topology, tier definitions, conflict protocol        |
+| [docs/GUARDIAN_MAP.md](docs/GUARDIAN_MAP.md)                           | Canonical 9 Guardian Laws, persona mapping, naming history |
+| [docs/GUARDIAN_LAWS_CANONICAL.json](docs/GUARDIAN_LAWS_CANONICAL.json) | Machine-readable canonical laws (v3.1)                     |
+| [docs/adr/](docs/adr/)                                                 | Architecture Decision Records                              |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                                     | Contribution guide + unsafe review checklist               |
 
 ## Status — v0.2.0-alpha
 
@@ -106,7 +117,6 @@ Sprint 1 complete: kernel 162D topology, IPC ring buffer, and Guardian trait are
 **Tests:** 48 Rust tests (unit + cross-crate integration), 0 failed.
 **Docs:** [API Reference — Live Docs](https://gruszkoland.github.io/AIOS-MVP/)
 Current focus: Sprint 2 — benchmarking IPC latency, cargo miri validation, end-to-end PoC integration.
-
 
 1. Monorepo setup and directory structure
 2. Developer tooling configuration (rustfmt, clippy, pre-commit)
