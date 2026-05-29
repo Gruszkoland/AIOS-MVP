@@ -7,6 +7,7 @@ Thumbs.db
 .env*
 *.log
 _*.log
+*.db
 coverage/
 cov_*.txt
 temp_*.txt
@@ -18,6 +19,23 @@ _*_stdout.log
 __pycache__/
 logs/
 .claude.json
+.lmstudio-home-pointer
+.moonshot_ai_rc
+.moonshot*
+.wslconfig
+
+# local cache artifacts
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# cleanup candidates (post-backup)
+arbitrage.db
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+REPORTS/
 
 # Week 5 test consolidation
 tests/test_phase*.py
